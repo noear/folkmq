@@ -5,9 +5,17 @@
 ## 开发过程视频
 
 * [[Socket.D 实战] 之录播手写 FolkMQ (1)](https://www.bilibili.com/video/BV1dj411j7PQ/)
+  * 完成客户端功能实现
 * [[Socket.D 实战] 之录播手写 FolkMQ (2)](https://www.bilibili.com/video/BV1EC4y177sb/)
+  * 完成服务端功能实现
+  * 完成通讯测试
 * [[Socket.D 实战] 之录播手写 FolkMQ (3)](https://www.bilibili.com/video/BV11v411c7kJ/)
+  * 添加专用连接地址
+  * 添加异步订阅与发布
+  * 添加AK/SK鉴权
 * [Socket.D 实战] 之录播手写 FolkMQ (4)，待录...
+  * 添加订阅选择（ip订阅，集群订阅）
+  * 添加消费的ACK机制
 
 ## 成果示例
 

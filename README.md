@@ -1,6 +1,6 @@
 ## FolkMQ
 
-* 基于 Socket.D 开发的，时实消息队列。支持订阅和发布功能，俗称：民谣消息队列（FolkMQ）
+* 基于 [Socket.D 通讯应用协议](https://gitee.com/noear/socketd) 开发的消息队列。支持订阅和发布功能，俗称：民谣消息队列（FolkMQ）
 
 ## 开发过程视频
 
@@ -13,10 +13,12 @@
   * 添加专用连接地址
   * 添加异步订阅与发布
   * 添加AK/SK鉴权
-* [Socket.D 实战] 之录播手写 FolkMQ (4)，预告...
+* [[Socket.D 实战] 之录播手写 FolkMQ (4)](https://www.bilibili.com/video/BV1oc41167DY/)
   * 添加订阅选择（ip订阅，集群订阅）
 * [Socket.D 实战] 之录播手写 FolkMQ (5)，预告...
+  * 添加用户身份队列化
   * 添加消费的ACK机制
+  * 添加消息时序化和重试机制
 
 ## 成果示例
 

@@ -2,6 +2,7 @@ package org.noear.folkmq.client;
 
 import org.noear.folkmq.MqConstants;
 import org.noear.socketd.SocketD;
+import org.noear.socketd.transport.core.Entity;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
 import org.noear.socketd.transport.core.entity.StringEntity;
@@ -39,12 +40,16 @@ public class MqClientImpl extends BuilderListener implements MqClient {
      * 订阅
      */
     @Override
-    public CompletableFuture<?> subscribe(String topic, MqConsumerHandler handler) throws IOException {
+    public CompletableFuture<?> subscribe(String topic, Subscription subscription) throws IOException {
         //支持Qos1
-        subscribeMap.put(topic, handler);
+        subscribeMap.put(topic, subscription.getHandler());
+
+        Entity entity = new StringEntity("")
+                .meta(MqConstants.MQ_TOPIC, topic)
+                .meta(MqConstants.MQ_IDENTITY,subscription.getIdentity());
 
         CompletableFuture<?> future = new CompletableFuture<>();
-        session.sendAndSubscribe(MqConstants.MQ_CMD_SUBSCRIBE, new StringEntity("").meta(MqConstants.MQ_TOPIC, topic), (r)->{
+        session.sendAndSubscribe(MqConstants.MQ_CMD_SUBSCRIBE, entity, (r)->{
             future.complete(null);
         });
 

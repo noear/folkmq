@@ -13,8 +13,8 @@ public interface MqConsumer {
     /**
      * 订阅
      *
-     * @param topic   主题
-     * @param handler 消费处理
+     * @param topic        主题
+     * @param subscription 订阅
      */
-    CompletableFuture<?> subscribe(String topic, MqConsumerHandler handler) throws IOException;
+    CompletableFuture<?> subscribe(String topic, Subscription subscription) throws IOException;
 }

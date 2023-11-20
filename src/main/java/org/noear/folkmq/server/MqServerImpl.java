@@ -9,10 +9,8 @@ import org.noear.socketd.transport.core.listener.BuilderListener;
 import org.noear.socketd.transport.server.Server;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author noear
@@ -20,8 +18,9 @@ import java.util.Set;
  */
 public class MqServerImpl extends BuilderListener implements MqServer {
     private Server server;
-    private Map<String, Set<Session>> subscribeMap = new HashMap<>();
-    private Map<String,String> accessMap = new HashMap<>();
+    private Set<Session> sessionSet = new HashSet<>();
+    private Map<String, Set<String>> subscribeMap = new HashMap<>();
+    private Map<String, String> accessMap = new HashMap<>();
 
 
     @Override
@@ -51,7 +50,9 @@ public class MqServerImpl extends BuilderListener implements MqServer {
             }
 
             String topic = m.meta(MqConstants.MQ_TOPIC);
-            onSubscribe(topic, s);
+            String identity = m.meta(MqConstants.MQ_IDENTITY);
+
+            onSubscribe(topic, identity, s);
         });
 
         //接收发布指令
@@ -73,8 +74,8 @@ public class MqServerImpl extends BuilderListener implements MqServer {
         super.onOpen(session);
 
         if (accessMap.size() > 0) {
-            String accessKey = session.param(MqConstants.STR_ACCESS_KEY);
-            String accessSecretKey = session.param(MqConstants.STR_ACCESS_SECRET_KEY);
+            String accessKey = session.param(MqConstants.PARAM_ACCESS_KEY);
+            String accessSecretKey = session.param(MqConstants.PARAM_ACCESS_SECRET_KEY);
 
             if (accessKey == null || accessSecretKey == null) {
                 session.close();
@@ -86,31 +87,56 @@ public class MqServerImpl extends BuilderListener implements MqServer {
                 return;
             }
         }
+
+        sessionSet.add(session);
+    }
+
+    @Override
+    public void onClose(Session session) {
+        sessionSet.remove(session);
     }
 
     /**
      * 当订阅时
      */
-    private synchronized void onSubscribe(String topic, Session session) {
-        Set<Session> sessions = subscribeMap.get(topic);
-        if (sessions == null) {
-            sessions = new LinkedHashSet<>();
-            subscribeMap.put(topic, sessions);
+    private synchronized void onSubscribe(String topic, String identity, Session session) {
+        //给会话添加身份（可以有多个不同的身份）
+        session.attr(identity, "1");
+
+        //以身份进行订阅
+        Set<String> identitys = subscribeMap.get(topic);
+        if (identitys == null) {
+            identitys = new HashSet<>();
+            subscribeMap.put(topic, identitys);
         }
 
-        sessions.add(session);
+        identitys.add(identity);
     }
 
     /**
      * 当发布时
      */
     private void onPublish(String topic, Message message) throws IOException {
-        //取出所有订阅的会话
-        Set<Session> sessions = subscribeMap.get(topic);
-        if (sessions != null) {
-            for (Session s : sessions) {
-                s.send(MqConstants.MQ_CMD_DISTRIBUTE, message);
-                message.data().reset();
+        //取出所有订阅的身份
+        Set<String> identitys = subscribeMap.get(topic);
+        if (identitys != null) {
+            for (String identity : identitys) {
+                //找到此身份的其中一个会话（如果是 ip 就一个；如果是集群名则任选一个）
+                List<Session> sessions = sessionSet.parallelStream()
+                        .filter(s -> s.attrMap().containsKey(identity))
+                        .collect(Collectors.toList());
+                if (sessions.size() > 0) {
+                    //随机取一个会话
+                    int idx = 0;
+                    if (sessions.size() > 1) {
+                        idx = new Random().nextInt(sessions.size());
+                    }
+                    Session s1 = sessions.get(idx);
+
+                    //给会话发送消息
+                    s1.send(MqConstants.MQ_CMD_DISTRIBUTE, message);
+                    message.data().reset();
+                }
             }
         }
     }

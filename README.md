@@ -6,3 +6,4 @@
 
 * [[Socket.D 实战] 之录播手写 FolkMQ (1)](https://www.bilibili.com/video/BV1dj411j7PQ/)
 * [[Socket.D 实战] 之录播手写 FolkMQ (2)](https://www.bilibili.com/video/BV1EC4y177sb/)
+* [Socket.D 实战] 之录播手写 FolkMQ (3)，待录

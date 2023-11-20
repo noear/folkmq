@@ -9,7 +9,8 @@ import org.noear.folkmq.server.MqServerImpl;
  */
 public class ServerDemo {
     public static void main(String[] args) throws Exception {
-        MqServer server = new MqServerImpl();
-        server.start(9393);
+        MqServer server = new MqServerImpl()
+                .addAccess("folkmq", "YapLHTx19RlsEE16")
+                .start(9393);
     }
 }

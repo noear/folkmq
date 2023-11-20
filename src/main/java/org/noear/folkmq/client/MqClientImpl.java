@@ -11,6 +11,7 @@ import org.noear.socketd.transport.core.listener.SimpleListener;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * @author noear
@@ -22,9 +23,9 @@ public class MqClientImpl extends BuilderListener implements MqClient {
     private Map<String, MqConsumerHandler> subscribeMap = new HashMap<>();
 
     public MqClientImpl(String serverUrl) throws Exception {
-        this.serverUrl = serverUrl;
+        this.serverUrl = serverUrl.replace("folkmq://", "sd:tcp://");
 
-        this.session = SocketD.createClient(serverUrl)
+        this.session = SocketD.createClient(this.serverUrl)
                 .listen(this)
                 .open();
 
@@ -38,19 +39,30 @@ public class MqClientImpl extends BuilderListener implements MqClient {
      * 订阅
      */
     @Override
-    public void subscribe(String topic, MqConsumerHandler handler) throws IOException {
+    public CompletableFuture<?> subscribe(String topic, MqConsumerHandler handler) throws IOException {
         //支持Qos1
         subscribeMap.put(topic, handler);
-        session.sendAndRequest(MqConstants.MQ_CMD_SUBSCRIBE, new StringEntity("").meta(MqConstants.MQ_TOPIC, topic));
+
+        CompletableFuture<?> future = new CompletableFuture<>();
+        session.sendAndSubscribe(MqConstants.MQ_CMD_SUBSCRIBE, new StringEntity("").meta(MqConstants.MQ_TOPIC, topic), (r)->{
+            future.complete(null);
+        });
+
+        return future;
     }
 
     /**
      * 发布
      */
     @Override
-    public void publish(String topic, String message) throws IOException {
+    public CompletableFuture<?> publish(String topic, String message) throws IOException {
         //支持Qos1
-        session.sendAndRequest(MqConstants.MQ_CMD_PUBLISH, new StringEntity(message).meta(MqConstants.MQ_TOPIC, topic));
+        CompletableFuture<?> future = new CompletableFuture<>();
+        session.sendAndSubscribe(MqConstants.MQ_CMD_PUBLISH, new StringEntity(message).meta(MqConstants.MQ_TOPIC, topic), r -> {
+            future.complete(null);
+        });
+
+        return future;
     }
 
     /**

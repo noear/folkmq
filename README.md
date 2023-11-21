@@ -15,9 +15,11 @@
   * 添加AK/SK鉴权
 * [[Socket.D 实战] 之录播手写 FolkMQ (4)](https://www.bilibili.com/video/BV1oc41167DY/)
   * 添加订阅身份支持（支持：以实例订阅，以集群订阅）
-* [Socket.D 实战] 之录播手写 FolkMQ (5)，预告...
+* [[Socket.D 实战] 之录播手写 FolkMQ (5)](https://www.bilibili.com/video/BV1zc41167Uj/)
+  * 添加客户端消费的ACK机制支持
+* [Socket.D 实战] 之录播手写 FolkMQ (6)，预告...
+  * 添加服务端的ACK机制支持
   * 添加用户身份队列化
-  * 添加消费的ACK机制
   * 添加消息时序化和重试机制
 
 ## 成果示例

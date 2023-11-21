@@ -84,6 +84,14 @@ public class MqClientImpl extends BuilderListener implements MqClientInternal {
         return future;
     }
 
+
+
+    @Override
+    public MqClient autoAck(boolean auto) {
+        this.autoAck = auto;
+        return this;
+    }
+
     /**
      * 消费确认
      */
@@ -115,11 +123,5 @@ public class MqClientImpl extends BuilderListener implements MqClientInternal {
         if (log.isWarnEnabled()) {
             log.warn("{}", error);
         }
-    }
-
-    @Override
-    public MqClient autoAck(boolean auto) {
-        this.autoAck = auto;
-        return this;
     }
 }

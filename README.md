@@ -20,9 +20,14 @@
 * [[Socket.D 实战] 之录播手写 FolkMQ (6)](https://www.bilibili.com/video/BV1pe411f7BX/)
   * 添加用户身份队列化
   * 添加消息派发时序化
-* [Socket.D 实战] 之录播手写 FolkMQ (7)，预告...
+* [[Socket.D 实战] 之录播手写 FolkMQ (7)](https://www.bilibili.com/video/BV1iM411Z7cu/)
   * 添加服务端的ACK机制支持
   * 添加消息重试机制
+* [Socket.D 实战] 之录播手写 FolkMQ (8), 预告
+  * 优化代码
+  * 解决客户端可能因为网络原因没法ack的问题
+  * 添加持久化和高可用支持
+  * 添加集群支持
 
 ## 成果示例
 

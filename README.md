@@ -17,10 +17,12 @@
   * 添加订阅身份支持（支持：以实例订阅，以集群订阅）
 * [[Socket.D 实战] 之录播手写 FolkMQ (5)](https://www.bilibili.com/video/BV1zc41167Uj/)
   * 添加客户端消费的ACK机制支持
-* [Socket.D 实战] 之录播手写 FolkMQ (6)，预告...
-  * 添加服务端的ACK机制支持
+* [[Socket.D 实战] 之录播手写 FolkMQ (6)](https://www.bilibili.com/video/BV1pe411f7BX/)
   * 添加用户身份队列化
-  * 添加消息时序化和重试机制
+  * 添加消息派发时序化
+* [Socket.D 实战] 之录播手写 FolkMQ (7)，预告...
+  * 添加服务端的ACK机制支持
+  * 添加消息重试机制
 
 ## 成果示例
 

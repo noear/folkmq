@@ -13,7 +13,8 @@ public class ClientDemo2 {
 
         //客户端
         MqClient client = new MqClientImpl(
-                "folkmq://127.0.0.1:9393?accessKey=folkmq&accessSecretKey=YapLHTx19RlsEE16");
+                "folkmq://127.0.0.1:9393?accessKey=folkmq&accessSecretKey=YapLHTx19RlsEE16")
+                .autoAck(true);
 
         //订阅
         //订阅

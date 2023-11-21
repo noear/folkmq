@@ -7,7 +7,8 @@ import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
 import org.noear.socketd.transport.core.entity.StringEntity;
 import org.noear.socketd.transport.core.listener.BuilderListener;
-import org.noear.socketd.transport.core.listener.SimpleListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -18,10 +19,13 @@ import java.util.concurrent.CompletableFuture;
  * @author noear
  * @since 1.0
  */
-public class MqClientImpl extends BuilderListener implements MqClient {
+public class MqClientImpl extends BuilderListener implements MqClientInternal {
+    private static final Logger log = LoggerFactory.getLogger(MqClientImpl.class);
+
     private String serverUrl;
     private Session session;
     private Map<String, MqConsumerHandler> subscribeMap = new HashMap<>();
+    private boolean autoAck = true;
 
     public MqClientImpl(String serverUrl) throws Exception {
         this.serverUrl = serverUrl.replace("folkmq://", "sd:tcp://");
@@ -30,14 +34,24 @@ public class MqClientImpl extends BuilderListener implements MqClient {
                 .listen(this)
                 .open();
 
+        //接收派发指令
         on(MqConstants.MQ_CMD_DISTRIBUTE, (s, m) -> {
             String topic = m.meta(MqConstants.MQ_TOPIC);
-            onDistribute(topic, m.dataAsString());
+            try {
+                onDistribute(topic, m);
+
+                //是否自动ACK
+                if(autoAck){
+                    acknowledge(m, true);
+                }
+            } catch (Exception e) {
+                acknowledge(m, false);
+            }
         });
     }
 
     /**
-     * 订阅
+     * 订阅主题
      */
     @Override
     public CompletableFuture<?> subscribe(String topic, Subscription subscription) throws IOException {
@@ -46,10 +60,10 @@ public class MqClientImpl extends BuilderListener implements MqClient {
 
         Entity entity = new StringEntity("")
                 .meta(MqConstants.MQ_TOPIC, topic)
-                .meta(MqConstants.MQ_IDENTITY,subscription.getIdentity());
+                .meta(MqConstants.MQ_IDENTITY, subscription.getIdentity());
 
         CompletableFuture<?> future = new CompletableFuture<>();
-        session.sendAndSubscribe(MqConstants.MQ_CMD_SUBSCRIBE, entity, (r)->{
+        session.sendAndSubscribe(MqConstants.MQ_CMD_SUBSCRIBE, entity, (r) -> {
             future.complete(null);
         });
 
@@ -57,7 +71,7 @@ public class MqClientImpl extends BuilderListener implements MqClient {
     }
 
     /**
-     * 发布
+     * 发布消息
      */
     @Override
     public CompletableFuture<?> publish(String topic, String message) throws IOException {
@@ -71,13 +85,41 @@ public class MqClientImpl extends BuilderListener implements MqClient {
     }
 
     /**
+     * 消费确认
+     */
+    @Override
+    public void acknowledge(Message message, boolean isOk) throws IOException {
+        session.replyEnd(message, new StringEntity("")
+                .meta(MqConstants.MQ_ACK, isOk ? "0" : "1"));
+    }
+
+
+    /**
      * 当派发时
      */
-    private void onDistribute(String topic, String message) throws IOException {
+    private void onDistribute(String topic, Message message) throws IOException {
         MqConsumerHandler handler = subscribeMap.get(topic);
 
         if (handler != null) {
-            handler.handle(topic, message);
+            handler.handle(topic, new MqMessageImpl(this, message));
         }
+    }
+
+    /**
+     * 当失败时
+     */
+    @Override
+    public void onError(Session session, Throwable error) {
+        super.onError(session, error);
+
+        if (log.isWarnEnabled()) {
+            log.warn("{}", error);
+        }
+    }
+
+    @Override
+    public MqClient autoAck(boolean auto) {
+        this.autoAck = auto;
+        return this;
     }
 }

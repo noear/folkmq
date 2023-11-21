@@ -7,4 +7,5 @@ package org.noear.folkmq.client;
  * @since 1.0
  */
 public interface MqClient extends MqConsumer, MqProducer {
+    MqClient autoAck(boolean auto);
 }

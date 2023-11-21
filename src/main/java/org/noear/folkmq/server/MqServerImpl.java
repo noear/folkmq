@@ -126,11 +126,10 @@ public class MqServerImpl extends BuilderListener implements MqServer {
         //取出所有订阅的身份
         Set<String> identitySet = subscribeMap.get(topic);
         if (identitySet != null) {
-            MqMessageHolder messageHolder = new MqMessageHolder(message);
-
             for (String identity : identitySet) {
                 MqMessageQueue queue = identityMap.get(identity);
                 if (queue != null) {
+                    MqMessageHolder messageHolder = new MqMessageHolder(message);
                     queue.add(messageHolder);
                 }
             }

@@ -14,12 +14,18 @@ public class ClientDemo2 {
         //客户端
         MqClient client = new MqClientImpl(
                 "folkmq://127.0.0.1:9393?accessKey=folkmq&accessSecretKey=YapLHTx19RlsEE16")
-                .autoAck(true);
+                .autoAck(false);
 
         //订阅
         //订阅
         client.subscribe("demo", new Subscription("b",  ((topic, message) -> {
-            System.out.println("ClientDemo1::" + topic + " - " + message);
+            if(message.getTimes() < 2){
+                System.out.println("ClientDemo2-no::" + topic + " - " + message);
+                message.acknowledge(false);
+            }else{
+                System.out.println("ClientDemo2-ok::" + topic + " - " + message);
+                message.acknowledge(true);
+            }
         })));
     }
 }

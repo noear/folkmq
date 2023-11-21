@@ -98,7 +98,7 @@ public class MqClientImpl extends BuilderListener implements MqClientInternal {
     @Override
     public void acknowledge(Message message, boolean isOk) throws IOException {
         session.replyEnd(message, new StringEntity("")
-                .meta(MqConstants.MQ_ACK, isOk ? "0" : "1"));
+                .meta(MqConstants.MQ_ACK, isOk ? "1" : "0"));
     }
 
 

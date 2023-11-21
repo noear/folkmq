@@ -14,25 +14,21 @@ import java.io.IOException;
  */
 public class MqMessageImpl implements MqMessage {
     private final MqClientInternal clientInternal;
-    private final Message message;
-    private final String content;
+    private final Message from;
+    private final String topic;
     private final int times;
+    private final String content;
 
-    public MqMessageImpl(MqClientInternal clientInternal, Message message) {
+    public MqMessageImpl(MqClientInternal clientInternal, Message from) {
         this.clientInternal = clientInternal;
-        this.message = message;
-        this.content = message.dataAsString();
-        this.times = Integer.parseInt(message.metaOrDefault(MqConstants.MQ_TIMES, "0"));
+        this.from = from;
+        this.topic = from.metaOrDefault(MqConstants.MQ_TOPIC, "");
+        this.times = Integer.parseInt(from.metaOrDefault(MqConstants.MQ_TIMES, "0"));
+        this.content = from.dataAsString();
     }
 
-    @Override
-    public String getKey() {
-        return message.sid();
-    }
-
-    @Override
-    public String getContent() {
-        return content;
+    public String getTopic() {
+        return topic;
     }
 
     @Override
@@ -41,12 +37,22 @@ public class MqMessageImpl implements MqMessage {
     }
 
     @Override
+    public String getContent() {
+        return content;
+    }
+
+
+    @Override
     public void acknowledge(boolean isOk) throws IOException {
-        clientInternal.acknowledge(message, isOk);
+        clientInternal.acknowledge(from, isOk);
     }
 
     @Override
     public String toString() {
-        return getContent();
+        return "MqMessage{" +
+                "topic='" + topic + '\'' +
+                ", times=" + times +
+                ", content='" + content + '\'' +
+                '}';
     }
 }

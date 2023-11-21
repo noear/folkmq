@@ -18,7 +18,6 @@ public class ClientDemo3 {
         //订阅
         client.subscribe("demo2", new Subscription("c",  ((topic, message) -> {
             System.out.println("ClientDemo3::" + topic + " - " + message);
-            message.acknowledge(true);
         })));
     }
 }

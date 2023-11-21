@@ -28,6 +28,12 @@
             <artifactId>socketd-transport-java-tcp</artifactId>
             <version>${socketd.version}</version>
         </dependency>
+
+<!--        <dependency>-->
+<!--            <groupId>org.noear</groupId>-->
+<!--            <artifactId>solon.logging.simple</artifactId>-->
+<!--            <version>2.6.0</version>-->
+<!--        </dependency>-->
     </dependencies>
 
 </project>

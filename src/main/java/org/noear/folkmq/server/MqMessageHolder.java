@@ -1,6 +1,12 @@
 package org.noear.folkmq.server;
 
+import org.noear.socketd.transport.core.Entity;
 import org.noear.socketd.transport.core.Message;
+import org.noear.socketd.transport.core.entity.EntityDefault;
+import org.noear.socketd.transport.core.entity.StringEntity;
+
+import java.io.IOException;
+import java.util.concurrent.ScheduledFuture;
 
 /**
  * 消息持有人
@@ -9,19 +15,24 @@ import org.noear.socketd.transport.core.Message;
  * @since 1.0
  */
 public class MqMessageHolder {
-    private Message message;
+    private Message from;
+    private EntityDefault content;
     private long nextTime;
     private int times;
 
-    public MqMessageHolder(Message message) {
-        this.message = message;
+    protected ScheduledFuture<?> deferredFuture;
+
+    public MqMessageHolder(Message from) {
+        this.from = from;
+        this.content = new StringEntity(from.dataAsString()).metaMap(from.metaMap());
     }
 
     /**
-     * 获取消息
-     */
-    public Message getMessage() {
-        return message;
+     * 获取消息内容
+     * */
+    public EntityDefault getContent() throws IOException {
+        content.data().reset();
+        return content;
     }
 
     /**

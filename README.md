@@ -2,7 +2,7 @@
   FolkMQ
 </h1>
 <p align="center">
-	<strong>一个新起的内存型消息队列（大约 20000 TPS）</strong>
+	<strong>一个新起的内存型消息队列（大约 25000 TPS）</strong>
 </p>
 
 <p align="center">

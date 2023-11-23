@@ -35,16 +35,38 @@ public class MqMessageQueueImpl implements MqMessageQueue {
         distribute();
     }
 
+    /**
+     * 添加延时处理
+     */
     public void addDelayed(MqMessageHolder messageHolder) {
+        addDelayed(messageHolder, messageHolder.getNextTime() - System.currentTimeMillis());
+    }
+
+    /**
+     * 添加延时处理
+     *
+     * @param millisDelay 延时（单位：毫秒）
+     */
+    public void addDelayed(MqMessageHolder messageHolder, long millisDelay) {
         if (messageHolder.deferredFuture != null) {
             messageHolder.deferredFuture.cancel(true);
-
         }
 
         messageHolder.deferredFuture = RunUtils.delay(() -> {
             add(messageHolder);
-        }, messageHolder.getNextTime() - System.currentTimeMillis());
+        }, millisDelay);
     }
+
+    /**
+     * 清处延时
+     */
+    public void clearDelayed(MqMessageHolder messageHolder) {
+        if (messageHolder.deferredFuture != null) {
+            messageHolder.deferredFuture.cancel(true);
+            messageHolder.deferredFuture = null;
+        }
+    }
+
 
     /**
      * 派发
@@ -91,15 +113,21 @@ public class MqMessageQueueImpl implements MqMessageQueue {
         }
         Session s1 = sessions.get(idx);
 
-        //todo:这里可能会有线程同步问题
         messageHolder.getContent().meta(MqConstants.MQ_TIMES, String.valueOf(messageHolder.getTimes()));
+
+
+        //添加延时任务：30秒后，如果没有没有答复就重发
+        addDelayed(messageHolder, 30 * 10);
 
         //给会话发送消息
         s1.sendAndSubscribe(MqConstants.MQ_CMD_DISTRIBUTE, messageHolder.getContent(), m -> {
             int ack = Integer.parseInt(m.metaOrDefault(MqConstants.MQ_ACK, "0"));
             if (ack == 0) {
-                //进入延后队列，之后再试 //todo:如果因为网络原因，没有回调怎么办？
+                //no, 进入延后队列，之后再试
                 addDelayed(messageHolder.deferred());
+            } else {
+                //ok
+                clearDelayed(messageHolder);
             }
         });
     }

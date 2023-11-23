@@ -6,6 +6,8 @@ import org.noear.folkmq.client.Subscription;
 import org.noear.folkmq.server.MqServer;
 import org.noear.folkmq.server.MqServerImpl;
 
+import java.util.concurrent.CountDownLatch;
+
 /**
  * @author noear 2023/11/21 created
  */
@@ -17,6 +19,8 @@ public class BenchmarkTest {
                 .start(9393);
 
         Thread.sleep(1000);
+        int count = 10_0000 + 10000;
+        CountDownLatch countDownLatch = new CountDownLatch(count);
 
         //客户端
         MqClient client = new MqClientImpl(
@@ -25,6 +29,7 @@ public class BenchmarkTest {
         //订阅
         client.subscribe("demo", new Subscription("a", ((topic, message) -> {
             //System.out.println("ClientDemo1::" + topic + " - " + message);
+            countDownLatch.countDown();
         })));
 
         //预热
@@ -32,13 +37,18 @@ public class BenchmarkTest {
             client.publish("demo", "hi-" + i);
         }
 
+        //发布测试
         long start_time = System.currentTimeMillis();
-        //发布
-        for (int i = 0; i < 100_0000; i++) {
+        for (int i = 0; i < count; i++) {
             client.publish("demo", "hi-" + i);
         }
-        long time_span = System.currentTimeMillis() - start_time;
+        long sendTime = System.currentTimeMillis() - start_time;
 
-        System.out.println(time_span);
+        System.out.println("sendTime: " + sendTime);
+        countDownLatch.await();
+
+        long distributeTime = System.currentTimeMillis() - start_time;
+
+        System.out.println("distributeTime: " + distributeTime);
     }
 }

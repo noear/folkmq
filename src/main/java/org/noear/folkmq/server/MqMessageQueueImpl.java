@@ -3,6 +3,8 @@ package org.noear.folkmq.server;
 import org.noear.folkmq.MqConstants;
 import org.noear.socketd.transport.core.Session;
 import org.noear.socketd.utils.RunUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.*;
@@ -13,11 +15,14 @@ import java.util.concurrent.CompletableFuture;
  * @since 1.0
  */
 public class MqMessageQueueImpl implements MqMessageQueue {
+    private static final Logger log = LoggerFactory.getLogger(MqMessageQueueImpl.class);
+
     private Queue<MqMessageHolder> queue = new LinkedList<>();
 
     private final String identity;
     private final List<Session> subscriberSet;
     private CompletableFuture<?> distributeFuture;
+    private Object distributeFutureLock = "";
 
     public MqMessageQueueImpl(String identity) {
         this.identity = identity;
@@ -40,14 +45,27 @@ public class MqMessageQueueImpl implements MqMessageQueue {
     }
 
     @Override
-    public void push(MqMessageHolder messageHolder) {
+    public synchronized void push(MqMessageHolder messageHolder) {
         queue.add(messageHolder);
 
-        if (distributeFuture == null) {
-            RunUtils.async(() -> {
-                distribute();
-                distributeFuture = null;
-            });
+        distributeFutureInit();
+    }
+
+    private void distributeFutureInit() {
+        synchronized (distributeFutureLock) {
+            if (distributeFuture == null) {
+                distributeFuture = RunUtils.async(() -> {
+                    distribute();
+                    distributeFutureAsNull();
+                });
+            }
+        }
+    }
+
+    private void distributeFutureAsNull() {
+        synchronized (distributeFutureLock) {
+            distributeFuture = null;
+            //System.out.println("distributeFuture = null!");
         }
     }
 
@@ -64,22 +82,26 @@ public class MqMessageQueueImpl implements MqMessageQueue {
      * @param millisDelay 延时（单位：毫秒）
      */
     private void addDelayed(MqMessageHolder messageHolder, long millisDelay) {
-        if (messageHolder.deferredFuture != null) {
-            messageHolder.deferredFuture.cancel(true);
-        }
+        synchronized (messageHolder) {
+            if (messageHolder.deferredFuture != null) {
+                messageHolder.deferredFuture.cancel(true);
+            }
 
-        messageHolder.deferredFuture = RunUtils.delay(() -> {
-            push(messageHolder);
-        }, millisDelay);
+            messageHolder.deferredFuture = RunUtils.delay(() -> {
+                push(messageHolder);
+            }, millisDelay);
+        }
     }
 
     /**
      * 清处延时
      */
     public void clearDelayed(MqMessageHolder messageHolder) {
-        if (messageHolder.deferredFuture != null) {
-            messageHolder.deferredFuture.cancel(true);
-            messageHolder.deferredFuture = null;
+        synchronized (messageHolder) {
+            if (messageHolder.deferredFuture != null) {
+                messageHolder.deferredFuture.cancel(true);
+                messageHolder.deferredFuture = null;
+            }
         }
     }
 
@@ -90,7 +112,6 @@ public class MqMessageQueueImpl implements MqMessageQueue {
     private void distribute() {
         //找到此身份的其中一个会话（如果是 ip 就一个；如果是集群名则任选一个）
         if (subscriberSet.size() > 0) {
-
             MqMessageHolder messageHolder;
             while (true) {
                 messageHolder = queue.poll();
@@ -111,6 +132,8 @@ public class MqMessageQueueImpl implements MqMessageQueue {
                     addDelayed(messageHolder.deferred());
                 }
             }
+        }else{
+            log.warn("No sessions!");
         }
     }
 
@@ -125,7 +148,8 @@ public class MqMessageQueueImpl implements MqMessageQueue {
         }
         Session s1 = sessions.get(idx);
 
-        messageHolder.getContent().meta(MqConstants.MQ_TIMES, String.valueOf(messageHolder.getTimes()));
+        messageHolder.getContent()
+                .meta(MqConstants.MQ_TIMES, String.valueOf(messageHolder.getTimes()));
 
 
         //添加延时任务：30秒后，如果没有没有答复就重发

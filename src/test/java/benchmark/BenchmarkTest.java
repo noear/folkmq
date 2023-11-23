@@ -20,7 +20,7 @@ public class BenchmarkTest {
                 .start(9393);
 
         Thread.sleep(1000);
-        int count = 10_0000 + 10000;
+        int count = 10_000;
         CountDownLatch countDownLatch = new CountDownLatch(count);
 
         //客户端
@@ -28,25 +28,29 @@ public class BenchmarkTest {
                 "folkmq://127.0.0.1:9393?accessKey=folkmq&accessSecretKey=YapLHTx19RlsEE16");
 
         //订阅
-        client.subscribe("demo", new Subscription("a", ((topic, message) -> {
-            //System.out.println("ClientDemo1::" + topic + " - " + message);
+        client.subscribe("hot", new Subscription("a", ((topic, message) -> {
+            System.out.println("::" + topic + " - " + message);
+        })));
+
+        client.subscribe("test", new Subscription("a", ((topic, message) -> {
+            System.out.println("::" + topic + " - " + message);
             countDownLatch.countDown();
         })));
 
-        //预热
-        for (int i = 0; i < 10000; i++) {
-            client.publish("demo", "hi-" + i);
+        //发布预热
+        for (int i = 0; i < 100; i++) {
+            client.publish("hot", "hot-" + i);
         }
 
         //发布测试
         long start_time = System.currentTimeMillis();
         for (int i = 0; i < count; i++) {
-            client.publish("demo", "hi-" + i);
+            client.publish("test", "test-" + i);
         }
         long sendTime = System.currentTimeMillis() - start_time;
 
         System.out.println("sendTime: " + sendTime);
-        countDownLatch.await(6, TimeUnit.SECONDS);
+        countDownLatch.await();
 
         long distributeTime = System.currentTimeMillis() - start_time;
 

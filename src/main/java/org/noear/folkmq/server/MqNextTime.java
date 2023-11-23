@@ -5,6 +5,9 @@ package org.noear.folkmq.server;
  * @since 1.0
  */
 public class MqNextTime {
+    /**
+     * 是否允许派发
+     * */
     public static boolean allowDistribute(MqMessageHolder messageHolder) {
         if (messageHolder.getNextTime() <= System.currentTimeMillis()) {
             return true;
@@ -13,6 +16,9 @@ public class MqNextTime {
         }
     }
 
+    /**
+     * 获取下次派发时间
+     * */
     public static long getNextTime(MqMessageHolder messageHolder) {
         switch (messageHolder.getTimes()) {
             case 0:

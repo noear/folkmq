@@ -54,7 +54,7 @@ public class MqClientImpl extends BuilderListener implements MqClientInternal {
      * 订阅主题
      */
     @Override
-    public CompletableFuture<?> subscribe(String topic, Subscription subscription) throws IOException {
+    public void subscribe(String topic, Subscription subscription) throws IOException {
         //支持Qos1
         subscribeMap.put(topic, subscription.getHandler());
 
@@ -62,12 +62,7 @@ public class MqClientImpl extends BuilderListener implements MqClientInternal {
                 .meta(MqConstants.MQ_TOPIC, topic)
                 .meta(MqConstants.MQ_IDENTITY, subscription.getIdentity());
 
-        CompletableFuture<?> future = new CompletableFuture<>();
-        session.sendAndSubscribe(MqConstants.MQ_CMD_SUBSCRIBE, entity, (r) -> {
-            future.complete(null);
-        });
-
-        return future;
+        session.sendAndRequest(MqConstants.MQ_CMD_SUBSCRIBE, entity);
     }
 
     /**
@@ -76,8 +71,9 @@ public class MqClientImpl extends BuilderListener implements MqClientInternal {
     @Override
     public CompletableFuture<?> publish(String topic, String message) throws IOException {
         //支持Qos1
+        Entity entity = new StringEntity(message).meta(MqConstants.MQ_TOPIC, topic);
         CompletableFuture<?> future = new CompletableFuture<>();
-        session.sendAndSubscribe(MqConstants.MQ_CMD_PUBLISH, new StringEntity(message).meta(MqConstants.MQ_TOPIC, topic), r -> {
+        session.sendAndSubscribe(MqConstants.MQ_CMD_PUBLISH, entity, r -> {
             future.complete(null);
         });
 

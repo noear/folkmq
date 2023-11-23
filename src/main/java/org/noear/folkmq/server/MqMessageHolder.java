@@ -28,6 +28,13 @@ public class MqMessageHolder {
     }
 
     /**
+     * 获取流Id
+     * */
+    public String getSid(){
+        return from.sid();
+    }
+
+    /**
      * 获取消息内容
      * */
     public EntityDefault getContent() throws IOException {

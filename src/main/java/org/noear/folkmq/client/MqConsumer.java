@@ -16,5 +16,5 @@ public interface MqConsumer {
      * @param topic        主题
      * @param subscription 订阅
      */
-    CompletableFuture<?> subscribe(String topic, Subscription subscription) throws IOException;
+    void subscribe(String topic, Subscription subscription) throws IOException;
 }

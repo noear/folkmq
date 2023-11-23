@@ -7,6 +7,7 @@ import org.noear.socketd.transport.core.Session;
 import org.noear.socketd.transport.core.entity.StringEntity;
 import org.noear.socketd.transport.core.listener.BuilderListener;
 import org.noear.socketd.transport.server.Server;
+import org.noear.socketd.utils.RunUtils;
 
 import java.io.IOException;
 import java.util.*;
@@ -59,7 +60,9 @@ public class MqServerImpl extends BuilderListener implements MqServer {
         on(MqConstants.MQ_CMD_PUBLISH, (s, m) -> {
             if (m.isRequest() || m.isSubscribe()) {
                 //表示我收到了
-                s.replyEnd(m, new StringEntity(""));
+                RunUtils.asyncAndTry(()->{
+                    s.replyEnd(m, new StringEntity(""));
+                });
             }
 
             String topic = m.meta(MqConstants.MQ_TOPIC);
@@ -74,6 +77,7 @@ public class MqServerImpl extends BuilderListener implements MqServer {
         super.onOpen(session);
 
         if (accessMap.size() > 0) {
+            //如果有 ak/sk 配置，则进行鉴权
             String accessKey = session.param(MqConstants.PARAM_ACCESS_KEY);
             String accessSecretKey = session.param(MqConstants.PARAM_ACCESS_SECRET_KEY);
 
@@ -91,6 +95,8 @@ public class MqServerImpl extends BuilderListener implements MqServer {
 
     @Override
     public void onClose(Session session) {
+        super.onClose(session);
+
         //遍历这个会话身上的身份记录（有些可能不是）
         for (String identity : session.attrMap().keySet()) {
             MqMessageQueue messageQueue = identityMap.get(identity);

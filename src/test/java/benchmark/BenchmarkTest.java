@@ -54,6 +54,7 @@ public class BenchmarkTest {
 
         long distributeTime = System.currentTimeMillis() - start_time;
 
+        System.out.println("sendTime: " + sendTime);
         System.out.println("distributeTime: " + distributeTime + ", count: " + (count - countDownLatch.getCount()));
     }
 }

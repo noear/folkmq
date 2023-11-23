@@ -23,7 +23,7 @@
 * [[Socket.D 实战] 之录播手写 FolkMQ (7)](https://www.bilibili.com/video/BV1iM411Z7cu/)
   * 添加服务端的ACK机制支持
   * 添加消息重试机制
-* [Socket.D 实战] 之录播手写 FolkMQ (8)
+* [[Socket.D 实战] 之录播手写 FolkMQ (8)](https://www.bilibili.com/video/BV1j34y1w7x2/)
   * 完善ACK要制，确保客户端没有答复还能再发
   * 取消会话查找
 * [Socket.D 实战] 之录播手写 FolkMQ (9), 预告

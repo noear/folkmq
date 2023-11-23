@@ -43,9 +43,9 @@
 <hr />
 
 
-* 基于 [Socket.D 通讯应用协议](https://gitee.com/noear/socketd) 开发的消息队列。支持订阅和发布功能，俗称：民谣消息队列（FolkMQ）。
+* 基于 [Socket.D 通讯应用协议](https://gitee.com/noear/socketd) 开发的内存型消息队列。俗称：民谣消息队列（FolkMQ）
+* 支持 发布、订阅、定时、ACK，重试、延时
 * 大约 20000 TPS（使用 MacBook pro 2020 款本机测试）
-* 支持 发布、订阅、ACK，重试、延时
 
 ## 开发过程视频
 

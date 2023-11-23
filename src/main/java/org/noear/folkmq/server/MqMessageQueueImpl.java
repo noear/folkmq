@@ -6,7 +6,7 @@ import org.noear.socketd.utils.RunUtils;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * @author noear
@@ -16,11 +16,22 @@ public class MqMessageQueueImpl implements MqMessageQueue {
     private Queue<MqMessageHolder> queue = new LinkedList<>();
 
     private final String identity;
-    private final Set<Session> sessionSet;
+    private final List<Session> subscriberSet;
+    private CompletableFuture<?> distributeFuture;
 
-    public MqMessageQueueImpl(String identity, Set<Session> sessionSet) {
+    public MqMessageQueueImpl(String identity) {
         this.identity = identity;
-        this.sessionSet = sessionSet;
+        this.subscriberSet  = new ArrayList<>();
+    }
+
+    @Override
+    public void addSubscriber(Session session){
+        subscriberSet.add(session);
+    }
+
+    @Override
+    public void removeSubscriber(Session session) {
+        subscriberSet.remove(session);
     }
 
     @Override
@@ -29,16 +40,21 @@ public class MqMessageQueueImpl implements MqMessageQueue {
     }
 
     @Override
-    public void add(MqMessageHolder messageHolder) {
+    public void push(MqMessageHolder messageHolder) {
         queue.add(messageHolder);
 
-        distribute();
+        if (distributeFuture == null) {
+            RunUtils.async(() -> {
+                distribute();
+                distributeFuture = null;
+            });
+        }
     }
 
     /**
      * 添加延时处理
      */
-    public void addDelayed(MqMessageHolder messageHolder) {
+    private void addDelayed(MqMessageHolder messageHolder) {
         addDelayed(messageHolder, messageHolder.getNextTime() - System.currentTimeMillis());
     }
 
@@ -47,13 +63,13 @@ public class MqMessageQueueImpl implements MqMessageQueue {
      *
      * @param millisDelay 延时（单位：毫秒）
      */
-    public void addDelayed(MqMessageHolder messageHolder, long millisDelay) {
+    private void addDelayed(MqMessageHolder messageHolder, long millisDelay) {
         if (messageHolder.deferredFuture != null) {
             messageHolder.deferredFuture.cancel(true);
         }
 
         messageHolder.deferredFuture = RunUtils.delay(() -> {
-            add(messageHolder);
+            push(messageHolder);
         }, millisDelay);
     }
 
@@ -73,11 +89,7 @@ public class MqMessageQueueImpl implements MqMessageQueue {
      */
     private void distribute() {
         //找到此身份的其中一个会话（如果是 ip 就一个；如果是集群名则任选一个）
-        List<Session> sessions = sessionSet.parallelStream()
-                .filter(s -> s.attrMap().containsKey(identity))
-                .collect(Collectors.toList());
-
-        if (sessions.size() > 0) {
+        if (subscriberSet.size() > 0) {
 
             MqMessageHolder messageHolder;
             while (true) {
@@ -93,8 +105,8 @@ public class MqMessageQueueImpl implements MqMessageQueue {
                 }
 
                 try {
-                    distributeDo(messageHolder, sessions);
-                } catch (Exception e) {
+                    distributeDo(messageHolder, subscriberSet);
+                } catch (Throwable e) {
                     //进入延后队列
                     addDelayed(messageHolder.deferred());
                 }

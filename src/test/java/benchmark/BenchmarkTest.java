@@ -7,6 +7,7 @@ import org.noear.folkmq.server.MqServer;
 import org.noear.folkmq.server.MqServerImpl;
 
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author noear 2023/11/21 created
@@ -45,10 +46,10 @@ public class BenchmarkTest {
         long sendTime = System.currentTimeMillis() - start_time;
 
         System.out.println("sendTime: " + sendTime);
-        countDownLatch.await();
+        countDownLatch.await(6, TimeUnit.SECONDS);
 
         long distributeTime = System.currentTimeMillis() - start_time;
 
-        System.out.println("distributeTime: " + distributeTime);
+        System.out.println("distributeTime: " + distributeTime + ", count: " + (count - countDownLatch.getCount()));
     }
 }

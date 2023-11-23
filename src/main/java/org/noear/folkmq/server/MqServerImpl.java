@@ -17,7 +17,6 @@ import java.util.*;
  */
 public class MqServerImpl extends BuilderListener implements MqServer {
     private Server server;
-    private Set<Session> sessionSet = new HashSet<>();
     private Map<String, Set<String>> subscribeMap = new HashMap<>();
     private Map<String, MqMessageQueue> identityMap = new HashMap<>();
 
@@ -88,13 +87,19 @@ public class MqServerImpl extends BuilderListener implements MqServer {
                 return;
             }
         }
-
-        sessionSet.add(session);
     }
 
     @Override
     public void onClose(Session session) {
-        sessionSet.remove(session);
+        //遍历这个会话身上的身份记录（有些可能不是）
+        for (String identity : session.attrMap().keySet()) {
+            MqMessageQueue messageQueue = identityMap.get(identity);
+
+            //如果找到对应的队列
+            if (messageQueue != null) {
+                messageQueue.removeSubscriber(session);
+            }
+        }
     }
 
     /**
@@ -115,7 +120,9 @@ public class MqServerImpl extends BuilderListener implements MqServer {
 
         //为身份建立队列(identity -> queue)
         if (identityMap.containsKey(identity) == false) {
-            identityMap.put(identity, new MqMessageQueueImpl(identity, sessionSet));
+            MqMessageQueue messageQueue = new MqMessageQueueImpl(identity);
+            messageQueue.addSubscriber(session);
+            identityMap.put(identity, messageQueue);
         }
     }
 
@@ -130,7 +137,7 @@ public class MqServerImpl extends BuilderListener implements MqServer {
                 MqMessageQueue queue = identityMap.get(identity);
                 if (queue != null) {
                     MqMessageHolder messageHolder = new MqMessageHolder(message);
-                    queue.add(messageHolder);
+                    queue.push(messageHolder);
                 }
             }
         }

@@ -1,6 +1,7 @@
 ## FolkMQ
 
-* 基于 [Socket.D 通讯应用协议](https://gitee.com/noear/socketd) 开发的消息队列。支持订阅和发布功能，俗称：民谣消息队列（FolkMQ）
+* 基于 [Socket.D 通讯应用协议](https://gitee.com/noear/socketd) 开发的消息队列。支持订阅和发布功能，俗称：民谣消息队列（FolkMQ）。
+* 使用 MacBook pro 2020 款测试，约 20000 TPS
 
 ## 开发过程视频
 

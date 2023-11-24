@@ -20,7 +20,7 @@ public interface MqMessage {
     String getTopic();
 
     /**
-     * 消息内容
+     * 内容
      */
     String getContent();
 
@@ -30,7 +30,7 @@ public interface MqMessage {
     int getTimes();
 
     /**
-     * 确认
+     * 回执
      */
     void acknowledge(boolean isOk) throws IOException;
 }

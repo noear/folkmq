@@ -41,7 +41,7 @@ public class MqClientImpl extends BuilderListener implements MqClientInternal {
     //自动回执
     private boolean autoAcknowledge = true;
 
-    public MqClientImpl(String serverUrl) throws Exception {
+    public MqClientImpl(String serverUrl) {
         this.serverUrl = serverUrl.replace("folkmq://", "sd:tcp://");
 
         //接收派发指令
@@ -71,7 +71,7 @@ public class MqClientImpl extends BuilderListener implements MqClientInternal {
     }
 
     @Override
-    public MqClient connect() throws Exception {
+    public MqClient connect() throws IOException {
         Client client = SocketD.createClient(this.serverUrl);
 
         if (clientConfigHandler != null) {

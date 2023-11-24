@@ -21,7 +21,7 @@ public interface MqClient {
     /**
      * 连接
      */
-    MqClient connect() throws Exception;
+    MqClient connect() throws IOException;
 
     /**
      * 断开连接

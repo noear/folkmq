@@ -24,7 +24,7 @@ public abstract class MqConsumerQueueBase implements MqConsumerQueue {
     protected void addDelayed(MqMessageHolder messageHolder, long millisDelay) {
         synchronized (messageHolder) {
             if (messageHolder.delayedFuture != null) {
-                messageHolder.delayedFuture.cancel(true);
+                messageHolder.delayedFuture.cancel(false);
             }
 
             messageHolder.delayedFuture = RunUtils.delay(() -> {
@@ -39,7 +39,7 @@ public abstract class MqConsumerQueueBase implements MqConsumerQueue {
     protected void clearDelayed(MqMessageHolder messageHolder) {
         synchronized (messageHolder) {
             if (messageHolder.delayedFuture != null) {
-                messageHolder.delayedFuture.cancel(true);
+                messageHolder.delayedFuture.cancel(false);
                 messageHolder.delayedFuture = null;
             }
         }

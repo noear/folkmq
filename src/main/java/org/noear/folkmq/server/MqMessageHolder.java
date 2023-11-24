@@ -4,7 +4,9 @@ import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.entity.EntityDefault;
 
 import java.io.IOException;
+import java.util.concurrent.Delayed;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 消息持有人（为消息添加状态信息）
@@ -12,7 +14,7 @@ import java.util.concurrent.ScheduledFuture;
  * @author noear
  * @since 1.0
  */
-public class MqMessageHolder {
+public class MqMessageHolder implements Delayed {
     //来源
     private transient Message from;
     //消息内容
@@ -21,6 +23,8 @@ public class MqMessageHolder {
     private long distributeTime;
     //派发次数
     private int distributeCount;
+    //是否完成
+    private boolean isDone;
 
     //延时任务
     protected ScheduledFuture<?> delayedFuture;
@@ -46,6 +50,10 @@ public class MqMessageHolder {
         return content;
     }
 
+    public void setDistributeTime(long distributeTime) {
+        this.distributeTime = distributeTime;
+    }
+
     /**
      * 获取派发时间（单位：毫秒）
      */
@@ -60,6 +68,14 @@ public class MqMessageHolder {
         return distributeCount;
     }
 
+    public synchronized boolean isDone() {
+        return isDone;
+    }
+
+    public synchronized void setDone(boolean done) {
+        isDone = done;
+    }
+
     /**
      * 延后（生成下次派发时间）
      */
@@ -67,5 +83,16 @@ public class MqMessageHolder {
         distributeCount++;
         distributeTime = MqNextTime.getNextTime(this);
         return this;
+    }
+
+    @Override
+    public long getDelay(TimeUnit unit) {
+        return unit.convert(distributeTime - System.currentTimeMillis(), TimeUnit.MILLISECONDS);
+    }
+
+    @Override
+    public int compareTo(Delayed o) {
+        long f = this.getDelay(TimeUnit.MILLISECONDS) - o.getDelay(TimeUnit.MILLISECONDS);
+        return (int)f;
     }
 }

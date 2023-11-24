@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.DelayQueue;
 
 /**
  * 消费者队列（一个消费者一个队列，一个消费者可多个会话）
@@ -14,7 +15,7 @@ import java.util.*;
  * @author noear
  * @since 1.0
  */
-public class MqConsumerQueueImpl extends MqConsumerQueueBase implements MqConsumerQueue {
+public class MqConsumerQueueImpl implements MqConsumerQueue {
     private static final Logger log = LoggerFactory.getLogger(MqConsumerQueueImpl.class);
 
     //用户
@@ -22,9 +23,29 @@ public class MqConsumerQueueImpl extends MqConsumerQueueBase implements MqConsum
     //用户会话
     private final List<Session> userSessionSet;
 
+
+    protected final DelayQueue<MqMessageHolder> queue = new DelayQueue<>();
+    private final Thread thread;
+
     public MqConsumerQueueImpl(String consumer) {
         this.consumer = consumer;
         this.userSessionSet = new ArrayList<>();
+
+        thread = new Thread(this::queueTake);
+        thread.start();
+    }
+
+    private void queueTake() {
+        while (!thread.isInterrupted()) {
+            try {
+                MqMessageHolder messageHolder = queue.take();
+                distribute(messageHolder);
+            } catch (InterruptedException e) {
+                if (log.isWarnEnabled()) {
+                    log.warn("{}", e);
+                }
+            }
+        }
     }
 
     /**
@@ -54,14 +75,20 @@ public class MqConsumerQueueImpl extends MqConsumerQueueBase implements MqConsum
      * 推入消息
      */
     @Override
-    public synchronized void push(MqMessageHolder messageHolder) {
-        distribute(messageHolder);
+    public void push(MqMessageHolder messageHolder) {
+        if(messageHolder.isDone()){
+            return;
+        }
+
+        queue.add(messageHolder);
+
+        //distribute(messageHolder);
     }
 
     /**
      * 执行派发
      */
-    private void distribute(MqMessageHolder messageHolder) {
+    protected void distribute(MqMessageHolder messageHolder) {
         //找到此身份的其中一个会话（如果是 ip 就一个；如果是集群名则任选一个）
         if (userSessionSet.size() > 0) {
             if (MqNextTime.chkNextTime(messageHolder) == false) {
@@ -109,8 +136,25 @@ public class MqConsumerQueueImpl extends MqConsumerQueueBase implements MqConsum
                 addDelayed(messageHolder.delayed());
             } else {
                 //ok
-                clearDelayed(messageHolder);
+                messageHolder.setDone(true);
             }
         });
+    }
+
+    /**
+     * 添加延时处理
+     */
+    protected void addDelayed(MqMessageHolder messageHolder) {
+        queue.add(messageHolder);
+    }
+
+    /**
+     * 添加延时处理
+     *
+     * @param millisDelay 延时（单位：毫秒）
+     */
+    protected void addDelayed(MqMessageHolder messageHolder, long millisDelay) {
+        messageHolder.setDistributeTime(System.currentTimeMillis() + millisDelay);
+        queue.add(messageHolder);
     }
 }

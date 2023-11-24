@@ -8,7 +8,6 @@ import org.noear.socketd.transport.core.entity.StringEntity;
 import org.noear.socketd.transport.core.listener.BuilderListener;
 import org.noear.socketd.transport.server.Server;
 import org.noear.socketd.transport.server.ServerConfigHandler;
-import org.noear.socketd.utils.RunUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,12 +55,10 @@ public class MqServerImpl extends BuilderListener implements MqServer {
             }
 
             //执行派发
-            RunUtils.async(()->{
-                String topic = m.meta(MqConstants.MQ_TOPIC);
-                long scheduled = Long.parseLong(m.metaOrDefault(MqConstants.MQ_SCHEDULED, "0"));
+            String topic = m.meta(MqConstants.MQ_TOPIC);
+            long scheduled = Long.parseLong(m.metaOrDefault(MqConstants.MQ_SCHEDULED, "0"));
 
-                distributeDo(topic, scheduled, m);
-            });
+            distributeDo(topic, scheduled, m);
         });
     }
 

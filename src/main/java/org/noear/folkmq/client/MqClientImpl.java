@@ -11,11 +11,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 /**
+ * 客户端
+ *
  * @author noear
  * @since 1.0
  */
@@ -54,13 +57,13 @@ public class MqClientImpl extends BuilderListener implements MqClientInternal {
      * 订阅主题
      */
     @Override
-    public void subscribe(String topic, Subscription subscription) throws IOException {
+    public void subscribe(String topic, MqSubscription subscription) throws IOException {
         //支持Qos1
         subscribeMap.put(topic, subscription.getHandler());
 
         Entity entity = new StringEntity("")
                 .meta(MqConstants.MQ_TOPIC, topic)
-                .meta(MqConstants.MQ_IDENTITY, subscription.getIdentity());
+                .meta(MqConstants.MQ_USER, subscription.getUser());
 
         session.sendAndRequest(MqConstants.MQ_CMD_SUBSCRIBE, entity);
     }
@@ -70,8 +73,20 @@ public class MqClientImpl extends BuilderListener implements MqClientInternal {
      */
     @Override
     public CompletableFuture<?> publish(String topic, String message) throws IOException {
+        return publish(topic, message, null);
+    }
+
+    @Override
+    public CompletableFuture<?> publish(String topic, String message, Date scheduled) throws IOException {
         //支持Qos1
-        Entity entity = new StringEntity(message).meta(MqConstants.MQ_TOPIC, topic);
+        StringEntity entity = new StringEntity(message);
+        entity.meta(MqConstants.MQ_TOPIC, topic);
+        if (scheduled == null) {
+            entity.meta(MqConstants.MQ_SCHEDULED, "0");
+        } else {
+            entity.meta(MqConstants.MQ_SCHEDULED, String.valueOf(scheduled.getTime()));
+        }
+
         CompletableFuture<?> future = new CompletableFuture<>();
         session.sendAndSubscribe(MqConstants.MQ_CMD_PUBLISH, entity, r -> {
             future.complete(null);
@@ -79,7 +94,6 @@ public class MqClientImpl extends BuilderListener implements MqClientInternal {
 
         return future;
     }
-
 
 
     @Override

@@ -12,7 +12,10 @@ import java.io.IOException;
  */
 public interface MqClientInternal extends MqClient {
     /**
-     * 确认
+     * 消费回执
+     *
+     * @param message 消息
+     * @param isOk    回执
      */
     void acknowledge(Message message, boolean isOk) throws IOException;
 }

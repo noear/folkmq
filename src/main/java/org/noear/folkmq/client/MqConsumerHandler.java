@@ -11,6 +11,8 @@ import java.io.IOException;
 public interface MqConsumerHandler {
     /**
      * 处理
+     *
+     * @param message 消息
      */
-    void handle(String topic, MqMessage message) throws IOException;
+    void handle(MqMessage message) throws IOException;
 }

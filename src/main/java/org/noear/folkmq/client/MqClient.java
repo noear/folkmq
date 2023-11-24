@@ -12,12 +12,12 @@ import java.util.concurrent.CompletableFuture;
  */
 public interface MqClient {
     /**
-     * 是否自动 ack
+     * 自动回执
      */
-    MqClient autoAck(boolean auto);
+    MqClient autoAcknowledge(boolean auto);
 
     /**
-     * 订阅
+     * 订阅主题
      *
      * @param topic           主题
      * @param consumer        消费者（实例 ip 或 集群 name）
@@ -26,19 +26,19 @@ public interface MqClient {
     void subscribe(String topic, String consumer, MqConsumerHandler consumerHandler) throws IOException;
 
     /**
-     * 发送
+     * 发布消息
      *
      * @param topic   主题
-     * @param message 消息
+     * @param content 消息内容
      */
-    CompletableFuture<?> publish(String topic, String message) throws IOException;
+    CompletableFuture<?> publish(String topic, String content) throws IOException;
 
     /**
-     * 发送
+     * 发布消息
      *
      * @param topic     主题
-     * @param message   消息
-     * @param scheduled 设置预定执行时间
+     * @param content   消息内容
+     * @param scheduled 预定派发时间
      */
-    CompletableFuture<?> publish(String topic, String message, Date scheduled) throws IOException;
+    CompletableFuture<?> publish(String topic, String content, Date scheduled) throws IOException;
 }

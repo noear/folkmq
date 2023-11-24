@@ -26,28 +26,37 @@ import java.util.concurrent.CompletableFuture;
 public class MqClientImpl extends BuilderListener implements MqClientInternal {
     private static final Logger log = LoggerFactory.getLogger(MqClientImpl.class);
 
+    //服务端地址
     private String serverUrl;
-    private Session session;
+    //客户端会话
+    private Session clientSession;
+    //订阅字典
     private Map<String, MqSubscription> subscriptionMap = new HashMap<>();
 
-    private boolean autoAck = true;
+    //自动回执
+    private boolean autoAcknowledge = true;
 
     public MqClientImpl(String serverUrl) throws Exception {
         this.serverUrl = serverUrl.replace("folkmq://", "sd:tcp://");
 
-        this.session = SocketD.createClient(this.serverUrl)
-                .config(c->c.heartbeatInterval(5_000))
+        this.clientSession = SocketD.createClient(this.serverUrl)
+                .config(c -> c.heartbeatInterval(5_000))
                 .listen(this)
                 .open();
 
         //接收派发指令
         on(MqConstants.MQ_CMD_DISTRIBUTE, (s, m) -> {
             String topic = m.meta(MqConstants.MQ_TOPIC);
-            try {
-                onDistribute(topic, m);
 
-                //是否自动ACK
-                if (autoAck) {
+            try {
+                MqSubscription subscription = subscriptionMap.get(topic);
+
+                if (subscription != null) {
+                    subscription.handle(new MqMessageImpl(this, m));
+                }
+
+                //是否自动回执
+                if (autoAcknowledge) {
                     acknowledge(m, true);
                 }
             } catch (Exception e) {
@@ -57,7 +66,16 @@ public class MqClientImpl extends BuilderListener implements MqClientInternal {
     }
 
     /**
-     * 订阅
+     * 自动回执
+     */
+    @Override
+    public MqClient autoAcknowledge(boolean auto) {
+        this.autoAcknowledge = auto;
+        return this;
+    }
+
+    /**
+     * 订阅主题
      *
      * @param topic           主题
      * @param consumer        消费者（实例 ip 或 集群 name）
@@ -70,27 +88,37 @@ public class MqClientImpl extends BuilderListener implements MqClientInternal {
         //支持Qos1
         subscriptionMap.put(topic, subscription);
 
-        if (session.isValid()) {
+        if (clientSession.isValid()) {
             Entity entity = new StringEntity("")
                     .meta(MqConstants.MQ_TOPIC, subscription.getTopic())
                     .meta(MqConstants.MQ_CONSUMER, subscription.getConsumer());
 
-            session.sendAndRequest(MqConstants.MQ_CMD_SUBSCRIBE, entity);
+            clientSession.sendAndRequest(MqConstants.MQ_CMD_SUBSCRIBE, entity);
         }
     }
 
     /**
      * 发布消息
+     *
+     * @param topic   主题
+     * @param content 消息内容
      */
     @Override
-    public CompletableFuture<?> publish(String topic, String message) throws IOException {
-        return publish(topic, message, null);
+    public CompletableFuture<?> publish(String topic, String content) throws IOException {
+        return publish(topic, content, null);
     }
 
+    /**
+     * 发布消息
+     *
+     * @param topic     主题
+     * @param content   消息内容
+     * @param scheduled 预定派发时间
+     */
     @Override
-    public CompletableFuture<?> publish(String topic, String message, Date scheduled) throws IOException {
+    public CompletableFuture<?> publish(String topic, String content, Date scheduled) throws IOException {
         //支持Qos1
-        StringEntity entity = new StringEntity(message);
+        StringEntity entity = new StringEntity(content);
         entity.meta(MqConstants.MQ_TID, Utils.guid());
         entity.meta(MqConstants.MQ_TOPIC, topic);
         if (scheduled == null) {
@@ -100,7 +128,7 @@ public class MqClientImpl extends BuilderListener implements MqClientInternal {
         }
 
         CompletableFuture<?> future = new CompletableFuture<>();
-        session.sendAndSubscribe(MqConstants.MQ_CMD_PUBLISH, entity, r -> {
+        clientSession.sendAndSubscribe(MqConstants.MQ_CMD_PUBLISH, entity, r -> {
             future.complete(null);
         });
 
@@ -108,33 +136,18 @@ public class MqClientImpl extends BuilderListener implements MqClientInternal {
     }
 
 
-    @Override
-    public MqClient autoAck(boolean auto) {
-        this.autoAck = auto;
-        return this;
-    }
-
     /**
-     * 消费确认
+     * 消费回执
      */
     @Override
     public void acknowledge(Message message, boolean isOk) throws IOException {
-        session.replyEnd(message, new StringEntity("")
+        clientSession.replyEnd(message, new StringEntity("")
                 .meta(MqConstants.MQ_ACK, isOk ? "1" : "0"));
     }
 
-
     /**
-     * 当派发时
+     * 当打开时
      */
-    private void onDistribute(String topic, Message message) throws IOException {
-        MqSubscription subscription = subscriptionMap.get(topic);
-
-        if (subscription != null) {
-            subscription.handle(topic, new MqMessageImpl(this, message));
-        }
-    }
-
     @Override
     public void onOpen(Session session) throws IOException {
         super.onOpen(session);
@@ -151,6 +164,9 @@ public class MqClientImpl extends BuilderListener implements MqClientInternal {
         }
     }
 
+    /**
+     * 当关闭时
+     */
     @Override
     public void onClose(Session session) {
         super.onClose(session);
@@ -159,7 +175,7 @@ public class MqClientImpl extends BuilderListener implements MqClientInternal {
     }
 
     /**
-     * 当失败时
+     * 当出错时
      */
     @Override
     public void onError(Session session, Throwable error) {

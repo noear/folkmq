@@ -28,7 +28,6 @@ public class MqSubscription implements MqConsumerHandler {
         return consumer;
     }
 
-
     /**
      * 消息处理器
      */
@@ -39,7 +38,7 @@ public class MqSubscription implements MqConsumerHandler {
     /**
      * @param topic           主题
      * @param consumer        消费者（实例 ip 或 集群 name）
-     * @param consumerHandler 消费处理
+     * @param consumerHandler 消费处理器
      */
     public MqSubscription(String topic, String consumer, MqConsumerHandler consumerHandler) {
         this.topic = topic;
@@ -48,7 +47,7 @@ public class MqSubscription implements MqConsumerHandler {
     }
 
     @Override
-    public void handle(String topic, MqMessage message) throws IOException {
-        consumerHandler.handle(topic, message);
+    public void handle(MqMessage message) throws IOException {
+        consumerHandler.handle(message);
     }
 }

@@ -13,8 +13,10 @@ import java.io.IOException;
  * @since 1.0
  */
 public class MqMessageImpl implements MqMessage {
-    private final MqClientInternal clientInternal;
-    private final Message from;
+    private final transient MqClientInternal clientInternal;
+    private final transient Message from;
+
+    private final String id;
     private final String topic;
     private final int times;
     private final String content;
@@ -22,11 +24,19 @@ public class MqMessageImpl implements MqMessage {
     public MqMessageImpl(MqClientInternal clientInternal, Message from) {
         this.clientInternal = clientInternal;
         this.from = from;
+
+        this.id = from.metaOrDefault(MqConstants.MQ_ID, "");
         this.topic = from.metaOrDefault(MqConstants.MQ_TOPIC, "");
         this.times = Integer.parseInt(from.metaOrDefault(MqConstants.MQ_TIMES, "0"));
         this.content = from.dataAsString();
     }
 
+    @Override
+    public String getId() {
+        return id;
+    }
+
+    @Override
     public String getTopic() {
         return topic;
     }
@@ -50,7 +60,8 @@ public class MqMessageImpl implements MqMessage {
     @Override
     public String toString() {
         return "MqMessage{" +
-                "topic='" + topic + '\'' +
+                "id='" + id + '\'' +
+                ", topic='" + topic + '\'' +
                 ", times=" + times +
                 ", content='" + content + '\'' +
                 '}';

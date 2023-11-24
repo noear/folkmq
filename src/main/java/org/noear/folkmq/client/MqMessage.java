@@ -10,6 +10,16 @@ import java.io.IOException;
  */
 public interface MqMessage {
     /**
+     * 消息ID
+     */
+    String getId();
+
+    /**
+     * 主题
+     */
+    String getTopic();
+
+    /**
      * 消息内容
      */
     String getContent();

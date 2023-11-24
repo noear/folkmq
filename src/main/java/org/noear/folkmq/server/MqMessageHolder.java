@@ -26,9 +26,6 @@ public class MqMessageHolder implements Delayed {
     //是否完成
     private boolean isDone;
 
-    //延时任务
-    protected ScheduledFuture<?> delayedFuture;
-
     public MqMessageHolder(Message from, long distributeTime) {
         this.from = from;
         this.content = new EntityDefault().data(from.dataAsBytes()).metaMap(from.metaMap());
@@ -92,7 +89,7 @@ public class MqMessageHolder implements Delayed {
 
     @Override
     public int compareTo(Delayed o) {
-        long f = this.getDelay(TimeUnit.MILLISECONDS) - o.getDelay(TimeUnit.MILLISECONDS);
-        return (int)f;
+        long f = this.distributeTime - ((MqMessageHolder) o).distributeTime;
+        return (int) f;
     }
 }

@@ -72,10 +72,10 @@ public class MqConsumerQueueImpl implements MqConsumerQueue {
     }
 
     /**
-     * 推入消息
+     * 添加消息
      */
     @Override
-    public void push(MqMessageHolder messageHolder) {
+    public void add(MqMessageHolder messageHolder) {
         if(messageHolder.isDone()){
             return;
         }
@@ -91,16 +91,11 @@ public class MqConsumerQueueImpl implements MqConsumerQueue {
     protected void distribute(MqMessageHolder messageHolder) {
         //找到此身份的其中一个会话（如果是 ip 就一个；如果是集群名则任选一个）
         if (userSessionSet.size() > 0) {
-            if (MqNextTime.chkNextTime(messageHolder) == false) {
+            try {
+                distributeDo(messageHolder, userSessionSet);
+            } catch (Throwable e) {
                 //进入延后队列
-                addDelayed(messageHolder);
-            } else {
-                try {
-                    distributeDo(messageHolder, userSessionSet);
-                } catch (Throwable e) {
-                    //进入延后队列
-                    addDelayed(messageHolder.delayed());
-                }
+                addDelayed(messageHolder.delayed());
             }
         } else {
             //进入延后队列
@@ -126,17 +121,20 @@ public class MqConsumerQueueImpl implements MqConsumerQueue {
 
 
         //添加延时任务：30秒后，如果没有没有回执就重发
-        addDelayed(messageHolder, 30 * 10);
+        addDelayed(messageHolder, 1000 * 30);
 
         //给会话发送消息
         s1.sendAndSubscribe(MqConstants.MQ_CMD_DISTRIBUTE, messageHolder.getContent(), m -> {
             int ack = Integer.parseInt(m.metaOrDefault(MqConstants.MQ_ACK, "0"));
             if (ack == 0) {
                 //no, 进入延后队列，之后再试
+                queue.remove(messageHolder);
                 addDelayed(messageHolder.delayed());
+                //messageHolder.delayed();//刚加过，不用再加了
             } else {
                 //ok
                 messageHolder.setDone(true);
+                queue.remove(messageHolder);
             }
         });
     }

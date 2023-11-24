@@ -212,7 +212,7 @@ public class MqServerImpl extends BuilderListener implements MqServer {
                 MqConsumerQueue queue = consumerMap.get(consumer);
                 if (queue != null) {
                     MqMessageHolder messageHolder = new MqMessageHolder(message, scheduled);
-                    queue.push(messageHolder);
+                    queue.add(messageHolder);
                 }
             }
         }

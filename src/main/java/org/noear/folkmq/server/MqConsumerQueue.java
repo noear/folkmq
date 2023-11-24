@@ -25,7 +25,7 @@ public interface MqConsumerQueue {
     void removeSession(Session session);
 
     /**
-     * 推入消息
+     * 添加消息
      */
-    void push(MqMessageHolder messageHolder);
+    void add(MqMessageHolder messageHolder);
 }

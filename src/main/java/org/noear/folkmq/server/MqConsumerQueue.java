@@ -3,27 +3,22 @@ package org.noear.folkmq.server;
 import org.noear.socketd.transport.core.Session;
 
 /**
- * 用户队列（一个用户一个队列，一个用户可多个会话）
+ * 消费者队列（一个消费者一个队列，一个消费者可多个会话）
  *
  * @author noear
  * @since 1.0
  */
-public interface MqUserQueue {
+public interface MqConsumerQueue {
 
     /**
-     * 添加用户会话
+     * 添加消费者会话
      * */
     void addSession(Session session);
 
     /**
-     * 移除用户会话
+     * 移除消费者会话
      * */
     void removeSession(Session session);
-
-    /**
-     * 获取用户
-     */
-    String getUser();
 
     /**
      * 推入消息

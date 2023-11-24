@@ -10,21 +10,21 @@ import java.io.IOException;
 import java.util.*;
 
 /**
- * 用户队列（一个用户一个队列，一个用户可多个会话）
+ * 消费者队列（一个消费者一个队列，一个消费者可多个会话）
  *
  * @author noear
  * @since 1.0
  */
-public class MqUserQueueImpl implements MqUserQueue {
-    private static final Logger log = LoggerFactory.getLogger(MqUserQueueImpl.class);
+public class MqConsumerQueueImpl implements MqConsumerQueue {
+    private static final Logger log = LoggerFactory.getLogger(MqConsumerQueueImpl.class);
 
     //用户
-    private final String user;
+    private final String consumer;
     //用户会话
     private final List<Session> userSessionSet;
 
-    public MqUserQueueImpl(String user) {
-        this.user = user;
+    public MqConsumerQueueImpl(String consumer) {
+        this.consumer = consumer;
         this.userSessionSet = new ArrayList<>();
     }
 
@@ -36,11 +36,6 @@ public class MqUserQueueImpl implements MqUserQueue {
     @Override
     public void removeSession(Session session) {
         userSessionSet.remove(session);
-    }
-
-    @Override
-    public String getUser() {
-        return user;
     }
 
     @Override
@@ -63,7 +58,7 @@ public class MqUserQueueImpl implements MqUserQueue {
     private void addDelayed(MqMessageHolder messageHolder, long millisDelay) {
         synchronized (messageHolder) {
             if (messageHolder.deferredFuture != null) {
-                messageHolder.deferredFuture.cancel(false);
+                messageHolder.deferredFuture.cancel(true);
             }
 
             messageHolder.deferredFuture = RunUtils.delay(() -> {
@@ -78,7 +73,7 @@ public class MqUserQueueImpl implements MqUserQueue {
     public void clearDelayed(MqMessageHolder messageHolder) {
         synchronized (messageHolder) {
             if (messageHolder.deferredFuture != null) {
-                messageHolder.deferredFuture.cancel(false);
+                messageHolder.deferredFuture.cancel(true);
                 //messageHolder.deferredFuture = null;
             }
         }
@@ -91,7 +86,6 @@ public class MqUserQueueImpl implements MqUserQueue {
     private void distribute(MqMessageHolder messageHolder) {
         //找到此身份的其中一个会话（如果是 ip 就一个；如果是集群名则任选一个）
         if (userSessionSet.size() > 0) {
-
             if (MqNextTime.allowDistribute(messageHolder) == false) {
                 //进入延后队列
                 addDelayed(messageHolder);
@@ -104,6 +98,8 @@ public class MqUserQueueImpl implements MqUserQueue {
                 }
             }
         } else {
+            //进入延后队列
+            addDelayed(messageHolder.deferred());
             log.warn("No sessions!");
         }
     }

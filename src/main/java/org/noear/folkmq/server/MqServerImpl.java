@@ -8,6 +8,8 @@ import org.noear.socketd.transport.core.entity.StringEntity;
 import org.noear.socketd.transport.core.listener.BuilderListener;
 import org.noear.socketd.transport.server.Server;
 import org.noear.socketd.utils.NamedThreadFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.*;
@@ -18,11 +20,13 @@ import java.util.concurrent.*;
  * @since 1.0
  */
 public class MqServerImpl extends BuilderListener implements MqServer {
+    private static final Logger log = LoggerFactory.getLogger(MqServerImpl.class);
+
     private Server server;
     private ExecutorService distributeExecutor;
 
     private Map<String, Set<String>> subscribeMap = new HashMap<>();
-    private Map<String, MqUserQueue> userMap = new HashMap<>();
+    private Map<String, MqConsumerQueue> consumerMap = new HashMap<>();
     private Map<String, String> accessMap = new HashMap<>();
 
 
@@ -76,9 +80,9 @@ public class MqServerImpl extends BuilderListener implements MqServer {
             }
 
             String topic = m.meta(MqConstants.MQ_TOPIC);
-            String user = m.meta(MqConstants.MQ_USER);
+            String consumer = m.meta(MqConstants.MQ_CONSUMER);
 
-            onSubscribe(topic, user, s);
+            onSubscribe(topic, consumer, s);
         });
 
         //接收发布指令
@@ -118,15 +122,19 @@ public class MqServerImpl extends BuilderListener implements MqServer {
                 return;
             }
         }
+
+        log.info("Channel session opened, session={}", session.sessionId());
     }
 
     @Override
     public void onClose(Session session) {
         super.onClose(session);
 
+        log.info("Channel session closed, session={}", session.sessionId());
+
         //遍历这个会话身上的身份记录（有些可能不是）
-        for (String user : session.attrMap().keySet()) {
-            MqUserQueue messageQueue = userMap.get(user);
+        for (String consumer : session.attrMap().keySet()) {
+            MqConsumerQueue messageQueue = consumerMap.get(consumer);
 
             //如果找到对应的队列
             if (messageQueue != null) {
@@ -135,28 +143,39 @@ public class MqServerImpl extends BuilderListener implements MqServer {
         }
     }
 
+    @Override
+    public void onError(Session session, Throwable error) {
+        super.onError(session, error);
+
+        log.error("Channel error, session={}", session.sessionId(), error);
+    }
+
     /**
      * 当订阅时
      */
-    private synchronized void onSubscribe(String topic, String user, Session session) {
+    private synchronized void onSubscribe(String topic, String consumer, Session session) {
+        log.info("Channel subscribe topic={}, consumer={}, session={}", topic, consumer, session.sessionId());
+
         //给会话添加身份（可以有多个不同的身份）
-        session.attr(user, "1");
+        session.attr(consumer, "1");
 
-        //以身份进行订阅(topic -> user)
-        Set<String> userSet = subscribeMap.get(topic);
-        if (userSet == null) {
-            userSet = new HashSet<>();
-            subscribeMap.put(topic, userSet);
+        //以身份进行订阅(topic -> consumer)
+        Set<String> consumerSet = subscribeMap.get(topic);
+        if (consumerSet == null) {
+            consumerSet = new HashSet<>();
+            subscribeMap.put(topic, consumerSet);
         }
 
-        userSet.add(user);
+        consumerSet.add(consumer);
 
-        //为身份建立队列(user -> queue)
-        if (userMap.containsKey(user) == false) {
-            MqUserQueue messageQueue = new MqUserQueueImpl(user);
-            messageQueue.addSession(session);
-            userMap.put(user, messageQueue);
+        //为身份建立队列(consumer -> queue)
+        MqConsumerQueue consumerQueue = consumerMap.get(consumer);
+        if (consumerQueue == null) {
+            consumerQueue = new MqConsumerQueueImpl(consumer);
+            consumerMap.put(consumer, consumerQueue);
         }
+
+        consumerQueue.addSession(session);
     }
 
     /**
@@ -164,10 +183,10 @@ public class MqServerImpl extends BuilderListener implements MqServer {
      */
     private void distribute(String topic, long scheduled, Message message) {
         //取出所有订阅的身份
-        Set<String> userSet = subscribeMap.get(topic);
-        if (userSet != null) {
-            for (String user : userSet) {
-                MqUserQueue queue = userMap.get(user);
+        Set<String> consumerSet = subscribeMap.get(topic);
+        if (consumerSet != null) {
+            for (String consumer : consumerSet) {
+                MqConsumerQueue queue = consumerMap.get(consumer);
                 if (queue != null) {
                     MqMessageHolder messageHolder = new MqMessageHolder(message, scheduled);
                     queue.push(messageHolder);

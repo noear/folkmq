@@ -2,7 +2,7 @@
   FolkMQ
 </h1>
 <p align="center">
-	<strong>一个新起的内存型消息队列（大约 50000 TPS）</strong>
+	<strong>一个新起的内存型消息队列（大约 100_000 TPS）</strong>
 </p>
 
 <p align="center">
@@ -47,7 +47,7 @@
 * 基于 [Socket.D 通讯应用协议](https://gitee.com/noear/socketd) 开发的内存型消息队列。俗称：民谣消息队列（FolkMQ）
 * 支持 发布、订阅、定时、ACK，重试、延时
 * 没有 集群和持久化
-* 大约 50000 TPS（使用 MacBook pro 2020 款本机测试）
+* 大约 100_000 TPS（使用 MacBook pro 2020 款本机测试，单客户端发与收）
 
 ## 开发过程视频
 

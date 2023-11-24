@@ -44,7 +44,8 @@ public class MqServerImpl extends BuilderListener implements MqServer {
             String topic = m.meta(MqConstants.MQ_TOPIC);
             String consumer = m.meta(MqConstants.MQ_CONSUMER);
 
-            onSubscribe(topic, consumer, s);
+            //执行订阅
+            subscribeDo(topic, consumer, s);
         });
 
         //接收发布指令
@@ -58,7 +59,8 @@ public class MqServerImpl extends BuilderListener implements MqServer {
             String topic = m.meta(MqConstants.MQ_TOPIC);
             long scheduled = Long.parseLong(m.metaOrDefault(MqConstants.MQ_SCHEDULED, "0"));
 
-            distributeDo(topic, scheduled, m);
+            //执行交换
+            exchangeDo(topic, scheduled, m);
         });
     }
 
@@ -170,9 +172,9 @@ public class MqServerImpl extends BuilderListener implements MqServer {
     }
 
     /**
-     * 当订阅时
+     * 执行订阅
      */
-    private synchronized void onSubscribe(String topic, String consumer, Session session) {
+    private synchronized void subscribeDo(String topic, String consumer, Session session) {
         log.info("Channel subscribe topic={}, consumer={}, session={}", topic, consumer, session.sessionId());
 
         //给会话添加身份（可以有多个不同的身份）
@@ -198,13 +200,13 @@ public class MqServerImpl extends BuilderListener implements MqServer {
     }
 
     /**
-     * 派发执行
+     * 执行交换
      *
      * @param topic     主题
      * @param scheduled 预定派发时间
      * @param message   消息源
      */
-    private void distributeDo(String topic, long scheduled, Message message) {
+    private void exchangeDo(String topic, long scheduled, Message message) {
         //取出所有订阅的身份
         Set<String> consumerSet = subscribeMap.get(topic);
         if (consumerSet != null) {

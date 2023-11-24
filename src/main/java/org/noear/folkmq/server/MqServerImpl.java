@@ -7,13 +7,13 @@ import org.noear.socketd.transport.core.Session;
 import org.noear.socketd.transport.core.entity.StringEntity;
 import org.noear.socketd.transport.core.listener.BuilderListener;
 import org.noear.socketd.transport.server.Server;
-import org.noear.socketd.utils.NamedThreadFactory;
+import org.noear.socketd.transport.server.ServerConfigHandler;
+import org.noear.socketd.utils.RunUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.*;
 
 /**
  * 消息服务端
@@ -25,7 +25,7 @@ public class MqServerImpl extends BuilderListener implements MqServer {
     private static final Logger log = LoggerFactory.getLogger(MqServerImpl.class);
 
     private Server server;
-    private ExecutorService distributeExecutor;
+    private ServerConfigHandler serverConfigHandler;
 
     private Map<String, Set<String>> subscribeMap = new HashMap<>();
     private Map<String, MqConsumerQueue> consumerMap = new HashMap<>();
@@ -55,13 +55,23 @@ public class MqServerImpl extends BuilderListener implements MqServer {
                 s.replyEnd(m, new StringEntity(""));
             }
 
-            distributeExecutor.submit(() -> {
+            //执行派发
+            RunUtils.async(()->{
                 String topic = m.meta(MqConstants.MQ_TOPIC);
                 long scheduled = Long.parseLong(m.metaOrDefault(MqConstants.MQ_SCHEDULED, "0"));
 
                 distributeDo(topic, scheduled, m);
             });
         });
+    }
+
+    /**
+     * 服务端配置
+     */
+    @Override
+    public MqServer config(ServerConfigHandler configHandler) {
+        serverConfigHandler = configHandler;
+        return this;
     }
 
     /**
@@ -77,45 +87,22 @@ public class MqServerImpl extends BuilderListener implements MqServer {
     }
 
     /**
-     * 配置派发执行器
-     *
-     * @param distributeExecutor 线程池
-     */
-    @Override
-    public MqServer distributeExecutor(ExecutorService distributeExecutor) {
-        if (distributeExecutor != null) {
-            this.distributeExecutor = distributeExecutor;
-        }
-
-        return this;
-    }
-
-    /**
-     * 初始化派发执行器
-     */
-    private void initDistributeExecutor() {
-        if (distributeExecutor == null) {
-            int distributePoolSize = Runtime.getRuntime().availableProcessors() * 2;
-            distributeExecutor = new ThreadPoolExecutor(distributePoolSize, distributePoolSize,
-                    0L, TimeUnit.MILLISECONDS,
-                    new LinkedBlockingQueue(),
-                    new NamedThreadFactory("FolkMQ-distributeExecutor-"));
-        }
-    }
-
-    /**
      * 启动
      */
     @Override
     public MqServer start(int port) throws Exception {
-        //初始化派发执行器
-        initDistributeExecutor();
 
         //启动 SocketD 服务（使用 tpc 通讯）
-        server = SocketD.createServer("sd:tcp")
-                .config(c -> c.port(port))
+        server = SocketD.createServer("sd:tcp");
+
+        if (serverConfigHandler != null) {
+            server.config(serverConfigHandler);
+        }
+
+        server.config(c -> c.port(port))
                 .listen(this)
                 .start();
+
         return this;
     }
 

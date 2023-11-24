@@ -2,6 +2,9 @@ package org.noear.folkmq.client;
 
 import org.noear.folkmq.MqConstants;
 import org.noear.socketd.SocketD;
+import org.noear.socketd.exception.SocketdConnectionException;
+import org.noear.socketd.transport.client.Client;
+import org.noear.socketd.transport.client.ClientConfigHandler;
 import org.noear.socketd.transport.core.Entity;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
@@ -30,6 +33,8 @@ public class MqClientImpl extends BuilderListener implements MqClientInternal {
     private String serverUrl;
     //客户端会话
     private Session clientSession;
+    //客户端配置
+    private ClientConfigHandler clientConfigHandler;
     //订阅字典
     private Map<String, MqSubscription> subscriptionMap = new HashMap<>();
 
@@ -39,16 +44,10 @@ public class MqClientImpl extends BuilderListener implements MqClientInternal {
     public MqClientImpl(String serverUrl) throws Exception {
         this.serverUrl = serverUrl.replace("folkmq://", "sd:tcp://");
 
-        this.clientSession = SocketD.createClient(this.serverUrl)
-                .config(c -> c.heartbeatInterval(5_000))
-                .listen(this)
-                .open();
-
         //接收派发指令
         on(MqConstants.MQ_CMD_DISTRIBUTE, (s, m) -> {
-            String topic = m.meta(MqConstants.MQ_TOPIC);
-
             try {
+                String topic = m.meta(MqConstants.MQ_TOPIC);
                 MqSubscription subscription = subscriptionMap.get(topic);
 
                 if (subscription != null) {
@@ -59,10 +58,38 @@ public class MqClientImpl extends BuilderListener implements MqClientInternal {
                 if (autoAcknowledge) {
                     acknowledge(m, true);
                 }
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 acknowledge(m, false);
             }
         });
+    }
+
+    @Override
+    public MqClient config(ClientConfigHandler configHandler) {
+        clientConfigHandler = configHandler;
+        return this;
+    }
+
+    @Override
+    public MqClient connect() throws Exception {
+        Client client = SocketD.createClient(this.serverUrl);
+
+        if (clientConfigHandler != null) {
+            client.config(clientConfigHandler);
+        }
+
+        clientSession = client.config(c -> c.heartbeatInterval(5_000))
+                .listen(this)
+                .open();
+
+        return this;
+    }
+
+    @Override
+    public void disconnect() throws IOException {
+        if (clientSession != null) {
+            clientSession.close();
+        }
     }
 
     /**
@@ -88,7 +115,7 @@ public class MqClientImpl extends BuilderListener implements MqClientInternal {
         //支持Qos1
         subscriptionMap.put(topic, subscription);
 
-        if (clientSession.isValid()) {
+        if (clientSession != null && clientSession.isValid()) {
             Entity entity = new StringEntity("")
                     .meta(MqConstants.MQ_TOPIC, subscription.getTopic())
                     .meta(MqConstants.MQ_CONSUMER, subscription.getConsumer());
@@ -117,6 +144,10 @@ public class MqClientImpl extends BuilderListener implements MqClientInternal {
      */
     @Override
     public CompletableFuture<?> publish(String topic, String content, Date scheduled) throws IOException {
+        if(clientSession == null){
+            throw new SocketdConnectionException("Not connected!");
+        }
+
         //支持Qos1
         StringEntity entity = new StringEntity(content);
         entity.meta(MqConstants.MQ_TID, Utils.guid());

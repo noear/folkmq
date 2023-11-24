@@ -22,8 +22,8 @@ public class BenchmarkScheduledTest {
         CountDownLatch countDownLatch = new CountDownLatch(count);
 
         //客户端
-        MqClient client = new MqClientImpl(
-                "folkmq://127.0.0.1:9393?accessKey=folkmq&accessSecretKey=YapLHTx19RlsEE16");
+        MqClient client = new MqClientImpl("folkmq://127.0.0.1:9393?ak=folkmq&sk=YapLHTx19RlsEE16")
+                .connect();
 
         //订阅
         client.subscribe("hot", "a", message -> {

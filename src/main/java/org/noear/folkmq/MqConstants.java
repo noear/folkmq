@@ -49,9 +49,9 @@ public interface MqConstants {
     /**
      * 连接参数：ak
      */
-    String PARAM_ACCESS_KEY = "accessKey";
+    String PARAM_ACCESS_KEY = "ak";
     /**
      * 连接参数: sk
      */
-    String PARAM_ACCESS_SECRET_KEY = "accessSecretKey";
+    String PARAM_ACCESS_SECRET_KEY = "sk";
 }

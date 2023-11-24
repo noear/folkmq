@@ -1,6 +1,6 @@
 package org.noear.folkmq.server;
 
-import java.util.concurrent.ExecutorService;
+import org.noear.socketd.transport.server.ServerConfigHandler;
 
 /**
  * 消息服务端
@@ -10,19 +10,17 @@ import java.util.concurrent.ExecutorService;
  */
 public interface MqServer {
     /**
-     * 配置访问账号
-     *
-     * @param accessKey       访问者身份
-     * @param accessSecretKey 访问者密钥
+     * 服务端配置
      */
-    MqServer addAccess(String accessKey, String accessSecretKey);
+    MqServer config(ServerConfigHandler configHandler);
 
     /**
-     * 配置派发执行器
+     * 配置访问账号
      *
-     * @param distributeExecutor 线程池
+     * @param ak 访问者身份
+     * @param sk 访问者密钥
      */
-    MqServer distributeExecutor(ExecutorService distributeExecutor);
+    MqServer addAccess(String ak, String sk);
 
     /**
      * 启动

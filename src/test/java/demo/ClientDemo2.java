@@ -11,9 +11,9 @@ public class ClientDemo2 {
     public static void main(String[] args) throws Exception {
 
         //客户端
-        MqClient client = new MqClientImpl(
-                "folkmq://127.0.0.1:9393?accessKey=folkmq&accessSecretKey=YapLHTx19RlsEE16")
-                .autoAcknowledge(false);
+        MqClient client = new MqClientImpl("folkmq://127.0.0.1:9393?ak=folkmq&sk=YapLHTx19RlsEE16")
+                .autoAcknowledge(false)
+                .connect();
 
         //订阅
         //订阅

@@ -5,7 +5,7 @@ import java.util.Date;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * 客户端
+ * 消息客户端
  *
  * @author noear
  * @since 1.0

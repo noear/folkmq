@@ -16,6 +16,8 @@ import java.util.*;
 import java.util.concurrent.*;
 
 /**
+ * 消息服务端
+ *
  * @author noear
  * @since 1.0
  */
@@ -30,47 +32,8 @@ public class MqServerImpl extends BuilderListener implements MqServer {
     private Map<String, String> accessMap = new HashMap<>();
 
 
-    @Override
-    public MqServer addAccess(String accessKey, String accessSecretKey) {
-        accessMap.put(accessKey, accessSecretKey);
-        return this;
-    }
-
-    @Override
-    public MqServer distributeExecutor(ExecutorService distributeExecutor) {
-        if (distributeExecutor != null) {
-            this.distributeExecutor = distributeExecutor;
-        }
-
-        return this;
-    }
-
-    private void initDistributeExecutor() {
-        if (distributeExecutor == null) {
-            int distributePoolSize = Runtime.getRuntime().availableProcessors() * 2;
-            distributeExecutor = new ThreadPoolExecutor(distributePoolSize, distributePoolSize,
-                    0L, TimeUnit.MILLISECONDS,
-                    new LinkedBlockingQueue(),
-                    new NamedThreadFactory("FolkMQ-distributeExecutor-"));
-        }
-    }
-
-    @Override
-    public MqServer stop() {
-        server.stop();
-        return this;
-    }
-
-    @Override
-    public MqServer start(int port) throws Exception {
-        //初始化派发执行器
-        initDistributeExecutor();
-
-        //启动服务
-        server = SocketD.createServer("sd:tcp")
-                .config(c -> c.port(port))
-                .listen(this)
-                .start();
+    public MqServerImpl() {
+        //::初始化 BuilderListener(self) 的路由监听
 
         //接收订阅指令
         on(MqConstants.MQ_CMD_SUBSCRIBE, (s, m) -> {
@@ -96,13 +59,77 @@ public class MqServerImpl extends BuilderListener implements MqServer {
                 String topic = m.meta(MqConstants.MQ_TOPIC);
                 long scheduled = Long.parseLong(m.metaOrDefault(MqConstants.MQ_SCHEDULED, "0"));
 
-                distribute(topic, scheduled, m);
+                distributeDo(topic, scheduled, m);
             });
         });
+    }
+
+    /**
+     * 配置访问账号
+     *
+     * @param accessKey       访问者身份
+     * @param accessSecretKey 访问者密钥
+     */
+    @Override
+    public MqServer addAccess(String accessKey, String accessSecretKey) {
+        accessMap.put(accessKey, accessSecretKey);
+        return this;
+    }
+
+    /**
+     * 配置派发执行器
+     *
+     * @param distributeExecutor 线程池
+     */
+    @Override
+    public MqServer distributeExecutor(ExecutorService distributeExecutor) {
+        if (distributeExecutor != null) {
+            this.distributeExecutor = distributeExecutor;
+        }
 
         return this;
     }
 
+    /**
+     * 初始化派发执行器
+     */
+    private void initDistributeExecutor() {
+        if (distributeExecutor == null) {
+            int distributePoolSize = Runtime.getRuntime().availableProcessors() * 2;
+            distributeExecutor = new ThreadPoolExecutor(distributePoolSize, distributePoolSize,
+                    0L, TimeUnit.MILLISECONDS,
+                    new LinkedBlockingQueue(),
+                    new NamedThreadFactory("FolkMQ-distributeExecutor-"));
+        }
+    }
+
+    /**
+     * 启动
+     */
+    @Override
+    public MqServer start(int port) throws Exception {
+        //初始化派发执行器
+        initDistributeExecutor();
+
+        //启动 SocketD 服务（使用 tpc 通讯）
+        server = SocketD.createServer("sd:tcp")
+                .config(c -> c.port(port))
+                .listen(this)
+                .start();
+        return this;
+    }
+
+    /**
+     * 停止
+     */
+    @Override
+    public void stop() {
+        server.stop();
+    }
+
+    /**
+     * 会话打开时
+     */
     @Override
     public void onOpen(Session session) throws IOException {
         super.onOpen(session);
@@ -126,6 +153,9 @@ public class MqServerImpl extends BuilderListener implements MqServer {
         log.info("Channel session opened, session={}", session.sessionId());
     }
 
+    /**
+     * 会话关闭时
+     */
     @Override
     public void onClose(Session session) {
         super.onClose(session);
@@ -143,6 +173,9 @@ public class MqServerImpl extends BuilderListener implements MqServer {
         }
     }
 
+    /**
+     * 会话出错时
+     */
     @Override
     public void onError(Session session, Throwable error) {
         super.onError(session, error);
@@ -179,9 +212,13 @@ public class MqServerImpl extends BuilderListener implements MqServer {
     }
 
     /**
-     * 当发布时
+     * 派发执行
+     *
+     * @param topic     主题
+     * @param scheduled 预定派发时间
+     * @param message   消息源
      */
-    private void distribute(String topic, long scheduled, Message message) {
+    private void distributeDo(String topic, long scheduled, Message message) {
         //取出所有订阅的身份
         Set<String> consumerSet = subscribeMap.get(topic);
         if (consumerSet != null) {

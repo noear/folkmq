@@ -2,7 +2,6 @@ package org.noear.folkmq.server;
 
 import org.noear.folkmq.MqConstants;
 import org.noear.socketd.transport.core.Session;
-import org.noear.socketd.utils.RunUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,7 +14,7 @@ import java.util.*;
  * @author noear
  * @since 1.0
  */
-public class MqConsumerQueueImpl implements MqConsumerQueue {
+public class MqConsumerQueueImpl extends MqConsumerQueueBase implements MqConsumerQueue {
     private static final Logger log = LoggerFactory.getLogger(MqConsumerQueueImpl.class);
 
     //用户
@@ -28,57 +27,36 @@ public class MqConsumerQueueImpl implements MqConsumerQueue {
         this.userSessionSet = new ArrayList<>();
     }
 
+    /**
+     * 获取消费者
+     */
+    public String getConsumer() {
+        return consumer;
+    }
+
+    /**
+     * 添加消费者会话
+     */
     @Override
     public void addSession(Session session) {
         userSessionSet.add(session);
     }
 
+    /**
+     * 移除消费者会话
+     */
     @Override
     public void removeSession(Session session) {
         userSessionSet.remove(session);
     }
 
+    /**
+     * 推入消息
+     */
     @Override
     public synchronized void push(MqMessageHolder messageHolder) {
         distribute(messageHolder);
     }
-
-    /**
-     * 添加延时处理
-     */
-    private void addDelayed(MqMessageHolder messageHolder) {
-        addDelayed(messageHolder, messageHolder.getNextTime() - System.currentTimeMillis());
-    }
-
-    /**
-     * 添加延时处理
-     *
-     * @param millisDelay 延时（单位：毫秒）
-     */
-    private void addDelayed(MqMessageHolder messageHolder, long millisDelay) {
-        synchronized (messageHolder) {
-            if (messageHolder.deferredFuture != null) {
-                messageHolder.deferredFuture.cancel(true);
-            }
-
-            messageHolder.deferredFuture = RunUtils.delay(() -> {
-                push(messageHolder);
-            }, millisDelay);
-        }
-    }
-
-    /**
-     * 清理延时处理
-     */
-    public void clearDelayed(MqMessageHolder messageHolder) {
-        synchronized (messageHolder) {
-            if (messageHolder.deferredFuture != null) {
-                messageHolder.deferredFuture.cancel(true);
-                //messageHolder.deferredFuture = null;
-            }
-        }
-    }
-
 
     /**
      * 执行派发
@@ -86,7 +64,7 @@ public class MqConsumerQueueImpl implements MqConsumerQueue {
     private void distribute(MqMessageHolder messageHolder) {
         //找到此身份的其中一个会话（如果是 ip 就一个；如果是集群名则任选一个）
         if (userSessionSet.size() > 0) {
-            if (MqNextTime.allowDistribute(messageHolder) == false) {
+            if (MqNextTime.chkNextTime(messageHolder) == false) {
                 //进入延后队列
                 addDelayed(messageHolder);
             } else {
@@ -94,12 +72,12 @@ public class MqConsumerQueueImpl implements MqConsumerQueue {
                     distributeDo(messageHolder, userSessionSet);
                 } catch (Throwable e) {
                     //进入延后队列
-                    addDelayed(messageHolder.deferred());
+                    addDelayed(messageHolder.delayed());
                 }
             }
         } else {
             //进入延后队列
-            addDelayed(messageHolder.deferred());
+            addDelayed(messageHolder.delayed());
             log.warn("No sessions!");
         }
     }
@@ -108,18 +86,19 @@ public class MqConsumerQueueImpl implements MqConsumerQueue {
      * 派发执行
      */
     private void distributeDo(MqMessageHolder messageHolder, List<Session> sessions) throws IOException {
-        //随机取一个会话
+        //随机取一个会话（集群会有多个会话，实例有时也会有多个会话）
         int idx = 0;
         if (sessions.size() > 1) {
             idx = new Random().nextInt(sessions.size());
         }
         Session s1 = sessions.get(idx);
 
+        //设置新的派发次数
         messageHolder.getContent()
-                .meta(MqConstants.MQ_TIMES, String.valueOf(messageHolder.getTimes()));
+                .meta(MqConstants.MQ_TIMES, String.valueOf(messageHolder.getDistributeCount()));
 
 
-        //添加延时任务：30秒后，如果没有没有答复就重发
+        //添加延时任务：30秒后，如果没有没有回执就重发
         addDelayed(messageHolder, 30 * 10);
 
         //给会话发送消息
@@ -127,7 +106,7 @@ public class MqConsumerQueueImpl implements MqConsumerQueue {
             int ack = Integer.parseInt(m.metaOrDefault(MqConstants.MQ_ACK, "0"));
             if (ack == 0) {
                 //no, 进入延后队列，之后再试
-                addDelayed(messageHolder.deferred());
+                addDelayed(messageHolder.delayed());
             } else {
                 //ok
                 clearDelayed(messageHolder);

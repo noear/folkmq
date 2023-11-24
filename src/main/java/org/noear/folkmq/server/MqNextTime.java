@@ -1,15 +1,19 @@
 package org.noear.folkmq.server;
 
 /**
+ * 派发时间生成器
+ *
  * @author noear
  * @since 1.0
  */
 public class MqNextTime {
     /**
-     * 是否允许派发
+     * 检查下次派发时间
+     *
+     * @param messageHolder 消息
      * */
-    public static boolean allowDistribute(MqMessageHolder messageHolder) {
-        if (messageHolder.getNextTime() <= System.currentTimeMillis()) {
+    public static boolean chkNextTime(MqMessageHolder messageHolder) {
+        if (messageHolder.getDistributeTime() <= System.currentTimeMillis()) {
             return true;
         } else {
             return false;
@@ -18,9 +22,11 @@ public class MqNextTime {
 
     /**
      * 获取下次派发时间
+     *
+     * @param messageHolder 消息
      * */
     public static long getNextTime(MqMessageHolder messageHolder) {
-        switch (messageHolder.getTimes()) {
+        switch (messageHolder.getDistributeCount()) {
             case 0:
                 return 0;
             case 1:

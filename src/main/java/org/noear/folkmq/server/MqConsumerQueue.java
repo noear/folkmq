@@ -9,15 +9,19 @@ import org.noear.socketd.transport.core.Session;
  * @since 1.0
  */
 public interface MqConsumerQueue {
+    /**
+     * 获取消费者
+     */
+    String getConsumer();
 
     /**
      * 添加消费者会话
-     * */
+     */
     void addSession(Session session);
 
     /**
      * 移除消费者会话
-     * */
+     */
     void removeSession(Session session);
 
     /**

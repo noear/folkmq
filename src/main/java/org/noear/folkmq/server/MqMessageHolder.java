@@ -7,60 +7,65 @@ import java.io.IOException;
 import java.util.concurrent.ScheduledFuture;
 
 /**
- * 消息持有人
+ * 消息持有人（为消息添加状态信息）
  *
  * @author noear
  * @since 1.0
  */
 public class MqMessageHolder {
-    private Message from;
+    //来源
+    private transient Message from;
+    //消息内容
     private EntityDefault content;
-    private long nextTime;
-    private int times;
+    //派发时间
+    private long distributeTime;
+    //派发次数
+    private int distributeCount;
 
-    protected ScheduledFuture<?> deferredFuture;
+    //延时任务
+    protected ScheduledFuture<?> delayedFuture;
 
-    public MqMessageHolder(Message from, long nextTime) {
+    public MqMessageHolder(Message from, long distributeTime) {
         this.from = from;
         this.content = new EntityDefault().data(from.dataAsBytes()).metaMap(from.metaMap());
-        this.nextTime = nextTime;
+        this.distributeTime = distributeTime;
     }
 
     /**
      * 获取流Id
-     * */
-    public String getSid(){
+     */
+    public String getSid() {
         return from.sid();
     }
 
     /**
      * 获取消息内容
-     * */
+     */
     public EntityDefault getContent() throws IOException {
         content.data().reset();
         return content;
     }
 
     /**
-     * 获取下次派发时间（单位：毫秒）
+     * 获取派发时间（单位：毫秒）
      */
-    public long getNextTime() {
-        return nextTime;
+    public long getDistributeTime() {
+        return distributeTime;
     }
 
     /**
      * 获取派发次数
      */
-    public int getTimes() {
-        return times;
+    public int getDistributeCount() {
+        return distributeCount;
     }
 
     /**
      * 延后（生成下次派发时间）
      */
-    public MqMessageHolder deferred() {
-        times++;
-        nextTime = MqNextTime.getNextTime(this);
+    public MqMessageHolder delayed() {
+        distributeCount++;
+        distributeTime = MqNextTime.getNextTime(this);
         return this;
     }
 }

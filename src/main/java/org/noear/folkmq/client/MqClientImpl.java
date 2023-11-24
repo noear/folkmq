@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * 客户端
+ * 消息客户端
  *
  * @author noear
  * @since 1.0
@@ -146,7 +146,7 @@ public class MqClientImpl extends BuilderListener implements MqClientInternal {
     }
 
     /**
-     * 当打开时
+     * 会话打开时
      */
     @Override
     public void onOpen(Session session) throws IOException {
@@ -165,7 +165,7 @@ public class MqClientImpl extends BuilderListener implements MqClientInternal {
     }
 
     /**
-     * 当关闭时
+     * 会话关闭时
      */
     @Override
     public void onClose(Session session) {
@@ -175,7 +175,7 @@ public class MqClientImpl extends BuilderListener implements MqClientInternal {
     }
 
     /**
-     * 当出错时
+     * 会话出错时
      */
     @Override
     public void onError(Session session, Throwable error) {

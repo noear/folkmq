@@ -7,6 +7,7 @@ import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
 import org.noear.socketd.transport.core.entity.StringEntity;
 import org.noear.socketd.transport.core.listener.BuilderListener;
+import org.noear.socketd.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,13 +28,15 @@ public class MqClientImpl extends BuilderListener implements MqClientInternal {
 
     private String serverUrl;
     private Session session;
-    private Map<String, MqConsumerHandler> subscribeMap = new HashMap<>();
+    private Map<String, MqSubscription> subscriptionMap = new HashMap<>();
+
     private boolean autoAck = true;
 
     public MqClientImpl(String serverUrl) throws Exception {
         this.serverUrl = serverUrl.replace("folkmq://", "sd:tcp://");
 
         this.session = SocketD.createClient(this.serverUrl)
+                .config(c->c.heartbeatInterval(5_000))
                 .listen(this)
                 .open();
 
@@ -44,7 +47,7 @@ public class MqClientImpl extends BuilderListener implements MqClientInternal {
                 onDistribute(topic, m);
 
                 //是否自动ACK
-                if(autoAck){
+                if (autoAck) {
                     acknowledge(m, true);
                 }
             } catch (Exception e) {
@@ -54,18 +57,26 @@ public class MqClientImpl extends BuilderListener implements MqClientInternal {
     }
 
     /**
-     * 订阅主题
+     * 订阅
+     *
+     * @param topic           主题
+     * @param consumer        消费者（实例 ip 或 集群 name）
+     * @param consumerHandler 消费处理
      */
     @Override
-    public void subscribe(String topic, MqSubscription subscription) throws IOException {
+    public void subscribe(String topic, String consumer, MqConsumerHandler consumerHandler) throws IOException {
+        MqSubscription subscription = new MqSubscription(topic, consumer, consumerHandler);
+
         //支持Qos1
-        subscribeMap.put(topic, subscription.getHandler());
+        subscriptionMap.put(topic, subscription);
 
-        Entity entity = new StringEntity("")
-                .meta(MqConstants.MQ_TOPIC, topic)
-                .meta(MqConstants.MQ_USER, subscription.getUser());
+        if (session.isValid()) {
+            Entity entity = new StringEntity("")
+                    .meta(MqConstants.MQ_TOPIC, subscription.getTopic())
+                    .meta(MqConstants.MQ_CONSUMER, subscription.getConsumer());
 
-        session.sendAndRequest(MqConstants.MQ_CMD_SUBSCRIBE, entity);
+            session.sendAndRequest(MqConstants.MQ_CMD_SUBSCRIBE, entity);
+        }
     }
 
     /**
@@ -80,6 +91,7 @@ public class MqClientImpl extends BuilderListener implements MqClientInternal {
     public CompletableFuture<?> publish(String topic, String message, Date scheduled) throws IOException {
         //支持Qos1
         StringEntity entity = new StringEntity(message);
+        entity.meta(MqConstants.MQ_TID, Utils.guid());
         entity.meta(MqConstants.MQ_TOPIC, topic);
         if (scheduled == null) {
             entity.meta(MqConstants.MQ_SCHEDULED, "0");
@@ -116,11 +128,34 @@ public class MqClientImpl extends BuilderListener implements MqClientInternal {
      * 当派发时
      */
     private void onDistribute(String topic, Message message) throws IOException {
-        MqConsumerHandler handler = subscribeMap.get(topic);
+        MqSubscription subscription = subscriptionMap.get(topic);
 
-        if (handler != null) {
-            handler.handle(topic, new MqMessageImpl(this, message));
+        if (subscription != null) {
+            subscription.handle(topic, new MqMessageImpl(this, message));
         }
+    }
+
+    @Override
+    public void onOpen(Session session) throws IOException {
+        super.onOpen(session);
+
+        log.info("Client session opened, session={}", session.sessionId());
+
+        //用于重连时重新订阅
+        for (MqSubscription subscription : subscriptionMap.values()) {
+            Entity entity = new StringEntity("")
+                    .meta(MqConstants.MQ_TOPIC, subscription.getTopic())
+                    .meta(MqConstants.MQ_CONSUMER, subscription.getConsumer());
+
+            session.send(MqConstants.MQ_CMD_SUBSCRIBE, entity);
+        }
+    }
+
+    @Override
+    public void onClose(Session session) {
+        super.onClose(session);
+
+        log.info("Client session closed, session={}", session.sessionId());
     }
 
     /**

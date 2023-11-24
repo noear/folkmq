@@ -19,10 +19,11 @@ public interface MqClient {
     /**
      * 订阅
      *
-     * @param topic        主题
-     * @param subscription 订阅
+     * @param topic           主题
+     * @param consumer        消费者（实例 ip 或 集群 name）
+     * @param consumerHandler 消费处理
      */
-    void subscribe(String topic, MqSubscription subscription) throws IOException;
+    void subscribe(String topic, String consumer, MqConsumerHandler consumerHandler) throws IOException;
 
     /**
      * 发送

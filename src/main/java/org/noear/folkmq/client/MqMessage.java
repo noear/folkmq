@@ -10,9 +10,9 @@ import java.io.IOException;
  */
 public interface MqMessage {
     /**
-     * 消息ID
+     * 事务ID
      */
-    String getId();
+    String getTid();
 
     /**
      * 主题

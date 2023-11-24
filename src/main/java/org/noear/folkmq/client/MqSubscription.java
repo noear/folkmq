@@ -1,35 +1,54 @@
 package org.noear.folkmq.client;
 
+import java.io.IOException;
+
 /**
- * 订阅者
+ * 订阅记录
  *
  * @author noear
  * @since 1.0
  */
-public class MqSubscription {
-    private String user;
-    private MqConsumerHandler handler;
+public class MqSubscription implements MqConsumerHandler {
+    private final String topic;
+    private final String consumer;
+    private final MqConsumerHandler consumerHandler;
+
 
     /**
-     * 用户（可以是实例 IP，或集群 Name）
+     * 主题
      */
-    public String getUser() {
-        return user;
+    public String getTopic() {
+        return topic;
     }
+
+    /**
+     * 消费者（实例 IP，或集群 Name）
+     */
+    public String getConsumer() {
+        return consumer;
+    }
+
 
     /**
      * 消息处理器
      */
-    public MqConsumerHandler getHandler() {
-        return handler;
+    public MqConsumerHandler getConsumerHandler() {
+        return consumerHandler;
     }
 
     /**
-     * @param user    用户（可以是实例 IP，或集群 Name）
-     * @param handler 消息处理器
+     * @param topic           主题
+     * @param consumer        消费者（实例 ip 或 集群 name）
+     * @param consumerHandler 消费处理
      */
-    public MqSubscription(String user, MqConsumerHandler handler) {
-        this.user = user;
-        this.handler = handler;
+    public MqSubscription(String topic, String consumer, MqConsumerHandler consumerHandler) {
+        this.topic = topic;
+        this.consumer = consumer;
+        this.consumerHandler = consumerHandler;
+    }
+
+    @Override
+    public void handle(String topic, MqMessage message) throws IOException {
+        consumerHandler.handle(topic, message);
     }
 }

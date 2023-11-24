@@ -7,11 +7,11 @@ package org.noear.folkmq;
  * @since 1.0
  */
 public interface MqConstants {
-    String MQ_ID = "mq.id";
+    String MQ_TID = "mq.tid";
     String MQ_TOPIC = "mq.topic";
     String MQ_SCHEDULED = "mq.scheduled";
 
-    String MQ_USER = "mq.user";
+    String MQ_CONSUMER = "mq.consumer";
     String MQ_TIMES = "mq.times";
     String MQ_ACK = "mq.ack";
 

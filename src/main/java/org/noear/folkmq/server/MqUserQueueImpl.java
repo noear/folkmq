@@ -8,65 +8,42 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 
 /**
  * @author noear
  * @since 1.0
  */
-public class MqMessageQueueImpl implements MqMessageQueue {
-    private static final Logger log = LoggerFactory.getLogger(MqMessageQueueImpl.class);
+public class MqUserQueueImpl implements MqUserQueue {
+    private static final Logger log = LoggerFactory.getLogger(MqUserQueueImpl.class);
 
-    private Queue<MqMessageHolder> queue = new LinkedList<>();
+    //用户
+    private final String user;
+    //用户会话
+    private final List<Session> userSessionSet;
 
-    private final String identity;
-    private final List<Session> subscriberSet;
-    private CompletableFuture<?> distributeFuture;
-    private Object distributeFutureLock = "";
-
-    public MqMessageQueueImpl(String identity) {
-        this.identity = identity;
-        this.subscriberSet  = new ArrayList<>();
+    public MqUserQueueImpl(String user) {
+        this.user = user;
+        this.userSessionSet = new ArrayList<>();
     }
 
     @Override
-    public void addSubscriber(Session session){
-        subscriberSet.add(session);
+    public void addSession(Session session) {
+        userSessionSet.add(session);
     }
 
     @Override
-    public void removeSubscriber(Session session) {
-        subscriberSet.remove(session);
+    public void removeSession(Session session) {
+        userSessionSet.remove(session);
     }
 
     @Override
-    public String getIdentity() {
-        return identity;
+    public String getUser() {
+        return user;
     }
 
     @Override
     public synchronized void push(MqMessageHolder messageHolder) {
-        queue.add(messageHolder);
-
-        distributeFutureInit();
-    }
-
-    private void distributeFutureInit() {
-        synchronized (distributeFutureLock) {
-            if (distributeFuture == null) {
-                distributeFuture = RunUtils.async(() -> {
-                    distribute();
-                    distributeFutureAsNull();
-                });
-            }
-        }
-    }
-
-    private void distributeFutureAsNull() {
-        synchronized (distributeFutureLock) {
-            distributeFuture = null;
-            //System.out.println("distributeFuture = null!");
-        }
+        distribute(messageHolder);
     }
 
     /**
@@ -84,7 +61,7 @@ public class MqMessageQueueImpl implements MqMessageQueue {
     private void addDelayed(MqMessageHolder messageHolder, long millisDelay) {
         synchronized (messageHolder) {
             if (messageHolder.deferredFuture != null) {
-                messageHolder.deferredFuture.cancel(true);
+                messageHolder.deferredFuture.cancel(false);
             }
 
             messageHolder.deferredFuture = RunUtils.delay(() -> {
@@ -94,45 +71,37 @@ public class MqMessageQueueImpl implements MqMessageQueue {
     }
 
     /**
-     * 清处延时
+     * 清理延时处理
      */
     public void clearDelayed(MqMessageHolder messageHolder) {
         synchronized (messageHolder) {
             if (messageHolder.deferredFuture != null) {
-                messageHolder.deferredFuture.cancel(true);
-                messageHolder.deferredFuture = null;
+                messageHolder.deferredFuture.cancel(false);
+                //messageHolder.deferredFuture = null;
             }
         }
     }
 
 
     /**
-     * 派发
+     * 执行派发
      */
-    private void distribute() {
+    private void distribute(MqMessageHolder messageHolder) {
         //找到此身份的其中一个会话（如果是 ip 就一个；如果是集群名则任选一个）
-        if (subscriberSet.size() > 0) {
-            MqMessageHolder messageHolder;
-            while (true) {
-                messageHolder = queue.poll();
-                if (messageHolder == null) {
-                    break;
-                }
+        if (userSessionSet.size() > 0) {
 
-                if (MqNextTime.allowDistribute(messageHolder) == false) {
-                    //进入延后队列
-                    addDelayed(messageHolder);
-                    continue;
-                }
-
+            if (MqNextTime.allowDistribute(messageHolder) == false) {
+                //进入延后队列
+                addDelayed(messageHolder);
+            } else {
                 try {
-                    distributeDo(messageHolder, subscriberSet);
+                    distributeDo(messageHolder, userSessionSet);
                 } catch (Throwable e) {
                     //进入延后队列
                     addDelayed(messageHolder.deferred());
                 }
             }
-        }else{
+        } else {
             log.warn("No sessions!");
         }
     }

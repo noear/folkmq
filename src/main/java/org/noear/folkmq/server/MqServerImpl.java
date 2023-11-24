@@ -19,7 +19,7 @@ import java.util.*;
 public class MqServerImpl extends BuilderListener implements MqServer {
     private Server server;
     private Map<String, Set<String>> subscribeMap = new HashMap<>();
-    private Map<String, MqMessageQueue> identityMap = new HashMap<>();
+    private Map<String, MqUserQueue> userMap = new HashMap<>();
 
     private Map<String, String> accessMap = new HashMap<>();
 
@@ -51,22 +51,24 @@ public class MqServerImpl extends BuilderListener implements MqServer {
             }
 
             String topic = m.meta(MqConstants.MQ_TOPIC);
-            String identity = m.meta(MqConstants.MQ_IDENTITY);
+            String user = m.meta(MqConstants.MQ_USER);
 
-            onSubscribe(topic, identity, s);
+            onSubscribe(topic, user, s);
         });
 
         //接收发布指令
         on(MqConstants.MQ_CMD_PUBLISH, (s, m) -> {
             if (m.isRequest() || m.isSubscribe()) {
                 //表示我收到了
-                RunUtils.asyncAndTry(()->{
-                    s.replyEnd(m, new StringEntity(""));
-                });
+                s.replyEnd(m, new StringEntity(""));
             }
 
-            String topic = m.meta(MqConstants.MQ_TOPIC);
-            onPublish(topic, m);
+            RunUtils.async(() -> {
+                String topic = m.meta(MqConstants.MQ_TOPIC);
+                long scheduled = Long.parseLong(m.metaOrDefault(MqConstants.MQ_SCHEDULED, "0"));
+
+                onPublish(topic, scheduled, m);
+            });
         });
 
         return this;
@@ -98,12 +100,12 @@ public class MqServerImpl extends BuilderListener implements MqServer {
         super.onClose(session);
 
         //遍历这个会话身上的身份记录（有些可能不是）
-        for (String identity : session.attrMap().keySet()) {
-            MqMessageQueue messageQueue = identityMap.get(identity);
+        for (String user : session.attrMap().keySet()) {
+            MqUserQueue messageQueue = userMap.get(user);
 
             //如果找到对应的队列
             if (messageQueue != null) {
-                messageQueue.removeSubscriber(session);
+                messageQueue.removeSession(session);
             }
         }
     }
@@ -111,38 +113,38 @@ public class MqServerImpl extends BuilderListener implements MqServer {
     /**
      * 当订阅时
      */
-    private synchronized void onSubscribe(String topic, String identity, Session session) {
+    private synchronized void onSubscribe(String topic, String user, Session session) {
         //给会话添加身份（可以有多个不同的身份）
-        session.attr(identity, "1");
+        session.attr(user, "1");
 
-        //以身份进行订阅(topic -> identity)
-        Set<String> identitySet = subscribeMap.get(topic);
-        if (identitySet == null) {
-            identitySet = new HashSet<>();
-            subscribeMap.put(topic, identitySet);
+        //以身份进行订阅(topic -> user)
+        Set<String> userSet = subscribeMap.get(topic);
+        if (userSet == null) {
+            userSet = new HashSet<>();
+            subscribeMap.put(topic, userSet);
         }
 
-        identitySet.add(identity);
+        userSet.add(user);
 
-        //为身份建立队列(identity -> queue)
-        if (identityMap.containsKey(identity) == false) {
-            MqMessageQueue messageQueue = new MqMessageQueueImpl(identity);
-            messageQueue.addSubscriber(session);
-            identityMap.put(identity, messageQueue);
+        //为身份建立队列(user -> queue)
+        if (userMap.containsKey(user) == false) {
+            MqUserQueue messageQueue = new MqUserQueueImpl(user);
+            messageQueue.addSession(session);
+            userMap.put(user, messageQueue);
         }
     }
 
     /**
      * 当发布时
      */
-    private void onPublish(String topic, Message message) throws IOException {
+    private void onPublish(String topic, long scheduled, Message message) {
         //取出所有订阅的身份
-        Set<String> identitySet = subscribeMap.get(topic);
-        if (identitySet != null) {
-            for (String identity : identitySet) {
-                MqMessageQueue queue = identityMap.get(identity);
+        Set<String> userSet = subscribeMap.get(topic);
+        if (userSet != null) {
+            for (String user : userSet) {
+                MqUserQueue queue = userMap.get(user);
                 if (queue != null) {
-                    MqMessageHolder messageHolder = new MqMessageHolder(message);
+                    MqMessageHolder messageHolder = new MqMessageHolder(message, scheduled);
                     queue.push(messageHolder);
                 }
             }

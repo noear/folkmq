@@ -6,7 +6,7 @@
 
     <groupId>org.noear</groupId>
     <artifactId>folkmq</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0</version>
 
     <name>${project.artifactId}</name>
     <description>Java project for folkmq</description>
@@ -17,7 +17,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
 
-        <socketd.version>2.0.18</socketd.version>
+        <socketd.version>2.0.19</socketd.version>
 
         <maven-compiler.version>3.11.0</maven-compiler.version>
         <maven-assembly.version>3.6.0</maven-assembly.version>
@@ -33,7 +33,7 @@
 
         <dependency>
             <groupId>org.noear</groupId>
-            <artifactId>socketd-transport-netty</artifactId>
+            <artifactId>socketd-transport-smartsocket</artifactId>
             <version>${socketd.version}</version>
         </dependency>
 

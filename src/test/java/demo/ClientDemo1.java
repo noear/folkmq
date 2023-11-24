@@ -17,9 +17,9 @@ public class ClientDemo1 {
                 "folkmq://127.0.0.1:9393?accessKey=folkmq&accessSecretKey=YapLHTx19RlsEE16");
 
         //订阅
-        client.subscribe("demo", new MqSubscription("a", ((topic, message) -> {
-            System.out.println("ClientDemo1::" + topic + " - " + message);
-        })));
+        client.subscribe("demo", "a", ((message) -> {
+            System.out.println("ClientDemo1::" + message);
+        }));
 
         //发布
         for (int i = 0; i < 10; i++) {

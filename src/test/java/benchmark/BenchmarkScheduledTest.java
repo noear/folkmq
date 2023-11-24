@@ -5,9 +5,11 @@ import org.noear.folkmq.client.MqClientImpl;
 import org.noear.folkmq.server.MqServer;
 import org.noear.folkmq.server.MqServerImpl;
 
+import java.util.Date;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
-public class BenchmarkTest {
+public class BenchmarkScheduledTest {
     public static void main(String[] args) throws Exception {
         //服务端
         MqServer server = new MqServerImpl()
@@ -15,7 +17,8 @@ public class BenchmarkTest {
                 .start(9393);
 
         Thread.sleep(1000);
-        int count = 100_000;
+        int count = 1000_000;
+        int timeout = 1000 * 100;
         CountDownLatch countDownLatch = new CountDownLatch(count);
 
         //客户端
@@ -40,12 +43,12 @@ public class BenchmarkTest {
         //发布测试
         long start_time = System.currentTimeMillis();
         for (int i = 0; i < count; i++) {
-            client.publish("test", "test-" + i);
+            client.publish("test", "test-" + i, new Date(System.currentTimeMillis() + 5000));
         }
         long sendTime = System.currentTimeMillis() - start_time;
 
         System.out.println("sendTime: " + sendTime);
-        countDownLatch.await();
+        countDownLatch.await(timeout, TimeUnit.MILLISECONDS);
 
         long consumeTime = System.currentTimeMillis() - start_time;
 

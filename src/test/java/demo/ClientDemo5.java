@@ -2,7 +2,6 @@ package demo;
 
 import org.noear.folkmq.client.MqClient;
 import org.noear.folkmq.client.MqClientImpl;
-import org.noear.folkmq.client.MqSubscription;
 
 /**
  * @author noear
@@ -16,8 +15,8 @@ public class ClientDemo5 {
                 "folkmq://127.0.0.1:9393?accessKey=folkmq&accessSecretKey=YapLHTx19RlsEE16");
 
         //订阅
-        client.subscribe("demo3", new MqSubscription("c",  ((topic, message) -> {
-            System.out.println("ClientDemo5::" + topic + " - " + message);
-        })));
+        client.subscribe("demo3", "c", message -> {
+            System.out.println("ClientDemo5::" + message);
+        });
     }
 }

@@ -180,7 +180,9 @@ public class MqServerImpl extends BuilderListener implements MqServer {
     public void onError(Session session, Throwable error) {
         super.onError(session, error);
 
-        log.error("Channel error, session={}", session.sessionId(), error);
+        if (log.isWarnEnabled()) {
+            log.warn("Channel error, session={}", session.sessionId(), error);
+        }
     }
 
     /**

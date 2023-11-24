@@ -182,7 +182,7 @@ public class MqClientImpl extends BuilderListener implements MqClientInternal {
         super.onError(session, error);
 
         if (log.isWarnEnabled()) {
-            log.warn("{}", error);
+            log.warn("Client error, session={}", session.sessionId(), error);
         }
     }
 }

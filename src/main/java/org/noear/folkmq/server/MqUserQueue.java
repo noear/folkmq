@@ -3,6 +3,8 @@ package org.noear.folkmq.server;
 import org.noear.socketd.transport.core.Session;
 
 /**
+ * 用户队列（一个用户一个队列，一个用户可多个会话）
+ *
  * @author noear
  * @since 1.0
  */

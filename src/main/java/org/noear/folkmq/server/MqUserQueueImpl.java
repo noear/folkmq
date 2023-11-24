@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.util.*;
 
 /**
+ * 用户队列（一个用户一个队列，一个用户可多个会话）
+ *
  * @author noear
  * @since 1.0
  */

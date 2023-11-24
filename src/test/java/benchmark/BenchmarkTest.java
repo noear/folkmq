@@ -2,16 +2,12 @@ package benchmark;
 
 import org.noear.folkmq.client.MqClient;
 import org.noear.folkmq.client.MqClientImpl;
-import org.noear.folkmq.client.Subscription;
+import org.noear.folkmq.client.MqSubscription;
 import org.noear.folkmq.server.MqServer;
 import org.noear.folkmq.server.MqServerImpl;
 
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
-/**
- * @author noear 2023/11/21 created
- */
 public class BenchmarkTest {
     public static void main(String[] args) throws Exception {
         //服务端
@@ -20,7 +16,7 @@ public class BenchmarkTest {
                 .start(9393);
 
         Thread.sleep(1000);
-        int count = 10_000;
+        int count = 100_000;
         CountDownLatch countDownLatch = new CountDownLatch(count);
 
         //客户端
@@ -28,18 +24,18 @@ public class BenchmarkTest {
                 "folkmq://127.0.0.1:9393?accessKey=folkmq&accessSecretKey=YapLHTx19RlsEE16");
 
         //订阅
-        client.subscribe("hot", new Subscription("a", ((topic, message) -> {
-            System.out.println("::" + topic + " - " + message);
+        client.subscribe("hot", new MqSubscription("a", ((topic, message) -> {
+            //System.out.println("::" + topic + " - " + message);
         })));
 
-        client.subscribe("test", new Subscription("a", ((topic, message) -> {
-            System.out.println("::" + topic + " - " + message);
+        client.subscribe("test", new MqSubscription("a", ((topic, message) -> {
+            //System.out.println("::" + topic + " - " + message);
             countDownLatch.countDown();
         })));
 
         //发布预热
         for (int i = 0; i < 100; i++) {
-            client.publish("hot", "hot-" + i);
+            client.publish("hot", "hot-" + i).get();
         }
 
         //发布测试

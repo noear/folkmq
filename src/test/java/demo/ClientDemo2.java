@@ -2,7 +2,7 @@ package demo;
 
 import org.noear.folkmq.client.MqClient;
 import org.noear.folkmq.client.MqClientImpl;
-import org.noear.folkmq.client.Subscription;
+import org.noear.folkmq.client.MqSubscription;
 
 /**
  * @author noear
@@ -18,7 +18,7 @@ public class ClientDemo2 {
 
         //订阅
         //订阅
-        client.subscribe("demo", new Subscription("b",  ((topic, message) -> {
+        client.subscribe("demo", new MqSubscription("b",  ((topic, message) -> {
             if(message.getTimes() < 2){
                 System.out.println("ClientDemo2-no::" + topic + " - " + message);
                 message.acknowledge(false);

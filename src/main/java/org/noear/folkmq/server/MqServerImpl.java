@@ -7,10 +7,11 @@ import org.noear.socketd.transport.core.Session;
 import org.noear.socketd.transport.core.entity.StringEntity;
 import org.noear.socketd.transport.core.listener.BuilderListener;
 import org.noear.socketd.transport.server.Server;
-import org.noear.socketd.utils.RunUtils;
+import org.noear.socketd.utils.NamedThreadFactory;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.*;
 
 /**
  * @author noear
@@ -18,9 +19,10 @@ import java.util.*;
  */
 public class MqServerImpl extends BuilderListener implements MqServer {
     private Server server;
+    private ExecutorService distributeExecutor;
+
     private Map<String, Set<String>> subscribeMap = new HashMap<>();
     private Map<String, MqUserQueue> userMap = new HashMap<>();
-
     private Map<String, String> accessMap = new HashMap<>();
 
 
@@ -31,6 +33,25 @@ public class MqServerImpl extends BuilderListener implements MqServer {
     }
 
     @Override
+    public MqServer distributeExecutor(ExecutorService distributeExecutor) {
+        if (distributeExecutor != null) {
+            this.distributeExecutor = distributeExecutor;
+        }
+
+        return this;
+    }
+
+    private void initDistributeExecutor() {
+        if (distributeExecutor == null) {
+            int distributePoolSize = Runtime.getRuntime().availableProcessors() * 2;
+            distributeExecutor = new ThreadPoolExecutor(distributePoolSize, distributePoolSize,
+                    0L, TimeUnit.MILLISECONDS,
+                    new LinkedBlockingQueue(),
+                    new NamedThreadFactory("FolkMQ-distributeExecutor-"));
+        }
+    }
+
+    @Override
     public MqServer stop() {
         server.stop();
         return this;
@@ -38,6 +59,10 @@ public class MqServerImpl extends BuilderListener implements MqServer {
 
     @Override
     public MqServer start(int port) throws Exception {
+        //初始化派发执行器
+        initDistributeExecutor();
+
+        //启动服务
         server = SocketD.createServer("sd:tcp")
                 .config(c -> c.port(port))
                 .listen(this)
@@ -63,11 +88,11 @@ public class MqServerImpl extends BuilderListener implements MqServer {
                 s.replyEnd(m, new StringEntity(""));
             }
 
-            RunUtils.async(() -> {
+            distributeExecutor.submit(() -> {
                 String topic = m.meta(MqConstants.MQ_TOPIC);
                 long scheduled = Long.parseLong(m.metaOrDefault(MqConstants.MQ_SCHEDULED, "0"));
 
-                onPublish(topic, scheduled, m);
+                distribute(topic, scheduled, m);
             });
         });
 
@@ -137,7 +162,7 @@ public class MqServerImpl extends BuilderListener implements MqServer {
     /**
      * 当发布时
      */
-    private void onPublish(String topic, long scheduled, Message message) {
+    private void distribute(String topic, long scheduled, Message message) {
         //取出所有订阅的身份
         Set<String> userSet = subscribeMap.get(topic);
         if (userSet != null) {

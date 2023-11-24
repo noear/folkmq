@@ -17,7 +17,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
 
-        <socketd.version>2.0.17</socketd.version>
+        <socketd.version>2.0.18</socketd.version>
 
         <maven-compiler.version>3.11.0</maven-compiler.version>
         <maven-assembly.version>3.6.0</maven-assembly.version>

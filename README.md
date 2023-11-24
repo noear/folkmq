@@ -108,6 +108,8 @@ public class ClientDemo1 {
 
         //发布
         client.publish("demo", "hi");
+        //发布，并指定5秒后派发
+        client.publish("demo", "hi", new Date(System.currentTimeMillis() + 5000));
 
         for (int i = 0; i < 10; i++) {
             Thread.sleep(100);

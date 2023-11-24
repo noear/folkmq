@@ -8,7 +8,7 @@ import org.noear.folkmq.client.MqSubscription;
  * @author noear
  * @since 1.0
  */
-public class ClientDemo3 {
+public class ClientDemo5 {
     public static void main(String[] args) throws Exception {
 
         //客户端
@@ -16,8 +16,8 @@ public class ClientDemo3 {
                 "folkmq://127.0.0.1:9393?accessKey=folkmq&accessSecretKey=YapLHTx19RlsEE16");
 
         //订阅
-        client.subscribe("demo2", new MqSubscription("c",  ((topic, message) -> {
-            System.out.println("ClientDemo3::" + topic + " - " + message);
+        client.subscribe("demo3", new MqSubscription("c",  ((topic, message) -> {
+            System.out.println("ClientDemo5::" + topic + " - " + message);
         })));
     }
 }

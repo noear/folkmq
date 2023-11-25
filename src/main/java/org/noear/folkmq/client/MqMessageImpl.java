@@ -60,7 +60,7 @@ public class MqMessageImpl implements MqMessage {
     @Override
     public String toString() {
         return "MqMessage{" +
-                "id='" + tid + '\'' +
+                "tid='" + tid + '\'' +
                 ", topic='" + topic + '\'' +
                 ", times=" + times +
                 ", content='" + content + '\'' +

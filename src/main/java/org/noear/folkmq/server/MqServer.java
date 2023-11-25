@@ -15,6 +15,11 @@ public interface MqServer {
     MqServer config(ServerConfigHandler configHandler);
 
     /**
+     * 配置执久化实现
+     */
+    MqServer persistent(MqPersistent persistent);
+
+    /**
      * 配置访问账号
      *
      * @param ak 访问者身份

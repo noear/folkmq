@@ -29,7 +29,7 @@ public class MqConsumerQueueImpl implements MqConsumerQueue {
     protected final DelayQueue<MqMessageHolder> queue = new DelayQueue<>();
     private final Thread thread;
 
-    public MqConsumerQueueImpl(MqPersistent persistent,String consumer) {
+    public MqConsumerQueueImpl(MqPersistent persistent, String consumer) {
         this.persistent = persistent;
         this.consumer = consumer;
         this.consumerSessions = new ArrayList<>();
@@ -79,13 +79,20 @@ public class MqConsumerQueueImpl implements MqConsumerQueue {
      */
     @Override
     public void add(MqMessageHolder messageHolder) {
-        if(messageHolder.isDone()){
+        if (messageHolder.isDone()) {
             return;
         }
 
         queue.add(messageHolder);
 
         //distribute(messageHolder);
+    }
+
+    /**
+     * 消息数量
+     */
+    public int size() {
+        return queue.size();
     }
 
     /**
@@ -170,7 +177,7 @@ public class MqConsumerQueueImpl implements MqConsumerQueue {
 
     @Override
     public void close() throws IOException {
-        if(thread != null){
+        if (thread != null) {
             thread.interrupt();
         }
     }

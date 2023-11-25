@@ -30,4 +30,9 @@ public interface MqConsumerQueue extends Closeable {
      * 添加消息
      */
     void add(MqMessageHolder messageHolder);
+
+    /**
+     * 消息数量
+     */
+    int size();
 }

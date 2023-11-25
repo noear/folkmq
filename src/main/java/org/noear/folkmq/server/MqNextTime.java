@@ -7,6 +7,15 @@ package org.noear.folkmq.server;
  * @since 1.0
  */
 public class MqNextTime {
+    private static long maxDelayMillis = 1000 * 60 * 60 * 2;
+
+    /**
+     * 最大延时毫秒数（2小时）
+     * */
+    public static long getMaxDelayMillis() {
+        return maxDelayMillis;
+    }
+
     /**
      * 获取下次派发时间
      *

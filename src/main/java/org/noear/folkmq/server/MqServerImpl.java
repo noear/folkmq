@@ -20,29 +20,46 @@ import java.util.*;
  * @author noear
  * @since 1.0
  */
-public class MqServerImpl extends EventListener implements MqServer {
+public class MqServerImpl extends EventListener implements MqServerInternal {
     private static final Logger log = LoggerFactory.getLogger(MqServerImpl.class);
 
+    //服务端
     private Server server;
+    //服务端访问账号
+    private Map<String, String> serverAccessMap = new HashMap<>();
+    //服务端配置处理
     private ServerConfigHandler serverConfigHandler;
 
+    //持久化接口
+    private MqPersistent persistent;
+
+    //订阅关系表
     private Map<String, Set<String>> subscribeMap = new HashMap<>();
+    //消费队列表
     private Map<String, MqConsumerQueue> consumerMap = new HashMap<>();
-    private Map<String, String> accessMap = new HashMap<>();
 
 
     public MqServerImpl() {
+        //::初始化 Persistent 接口
+
+        persistent = new MqPersistentDefault();
+        persistent.init(this);
+
         //::初始化 BuilderListener(self) 的路由监听
 
         //接收订阅指令
         on(MqConstants.MQ_EVENT_SUBSCRIBE, (s, m) -> {
+            String topic = m.meta(MqConstants.MQ_META_TOPIC);
+            String consumer = m.meta(MqConstants.MQ_META_CONSUMER);
+
+            //持久化::订阅时
+            persistent.onSubscribe(topic, consumer, s);
+
+            //持久化后，再答复（以支持原子性）
             if (m.isRequest() || m.isSubscribe()) {
                 //表示我收到了
                 s.replyEnd(m, new StringEntity(""));
             }
-
-            String topic = m.meta(MqConstants.MQ_META_TOPIC);
-            String consumer = m.meta(MqConstants.MQ_META_CONSUMER);
 
             //执行订阅
             subscribeDo(topic, consumer, s);
@@ -50,17 +67,20 @@ public class MqServerImpl extends EventListener implements MqServer {
 
         //接收发布指令
         on(MqConstants.MQ_EVENT_PUBLISH, (s, m) -> {
+            //执行派发
+            String topic = m.meta(MqConstants.MQ_META_TOPIC);
+
+            //持久化::发布时
+            persistent.onPublish(topic, m);
+
+            //持久化后，再答复（以支持原子性）
             if (m.isRequest() || m.isSubscribe()) {
                 //表示我收到了
                 s.replyEnd(m, new StringEntity(""));
             }
 
-            //执行派发
-            String topic = m.meta(MqConstants.MQ_META_TOPIC);
-            long scheduled = Long.parseLong(m.metaOrDefault(MqConstants.MQ_META_SCHEDULED, "0"));
-
             //执行交换
-            exchangeDo(topic, scheduled, m);
+            exchangeDo(topic, m);
         });
     }
 
@@ -73,6 +93,15 @@ public class MqServerImpl extends EventListener implements MqServer {
         return this;
     }
 
+    @Override
+    public MqServer persistent(MqPersistent persistent) {
+        if (persistent != null) {
+            this.persistent = persistent;
+        }
+
+        return this;
+    }
+
     /**
      * 配置访问账号
      *
@@ -81,7 +110,7 @@ public class MqServerImpl extends EventListener implements MqServer {
      */
     @Override
     public MqServer addAccess(String accessKey, String accessSecretKey) {
-        accessMap.put(accessKey, accessSecretKey);
+        serverAccessMap.put(accessKey, accessSecretKey);
         return this;
     }
 
@@ -91,16 +120,23 @@ public class MqServerImpl extends EventListener implements MqServer {
     @Override
     public MqServer start(int port) throws Exception {
 
-        //启动 SocketD 服务（使用 tpc 通讯）
+        //创建 SocketD 服务并配置（使用 tpc 通讯）
         server = SocketD.createServer("sd:tcp");
 
         if (serverConfigHandler != null) {
             server.config(serverConfigHandler);
         }
 
-        server.config(c -> c.port(port))
-                .listen(this)
-                .start();
+        server.config(c -> c.port(port)).listen(this);
+
+        //持久化::服务启动之前
+        persistent.onStartBefore();
+
+        //启动
+        server.start();
+
+        //持久化::服务启动之后
+        persistent.onStartAfter();
 
         return this;
     }
@@ -120,7 +156,7 @@ public class MqServerImpl extends EventListener implements MqServer {
     public void onOpen(Session session) throws IOException {
         super.onOpen(session);
 
-        if (accessMap.size() > 0) {
+        if (serverAccessMap.size() > 0) {
             //如果有 ak/sk 配置，则进行鉴权
             String accessKey = session.param(MqConstants.PARAM_ACCESS_KEY);
             String accessSecretKey = session.param(MqConstants.PARAM_ACCESS_SECRET_KEY);
@@ -130,7 +166,7 @@ public class MqServerImpl extends EventListener implements MqServer {
                 return;
             }
 
-            if (accessSecretKey.equals(accessMap.get(accessKey)) == false) {
+            if (accessSecretKey.equals(serverAccessMap.get(accessKey)) == false) {
                 session.close();
                 return;
             }
@@ -173,14 +209,28 @@ public class MqServerImpl extends EventListener implements MqServer {
         }
     }
 
+    @Override
+    public Map<String, Set<String>> getSubscribeMap() {
+        return Collections.unmodifiableMap(subscribeMap);
+    }
+
+    @Override
+    public Map<String, MqConsumerQueue> getConsumerMap() {
+        return Collections.unmodifiableMap(consumerMap);
+    }
+
     /**
      * 执行订阅
      */
-    private synchronized void subscribeDo(String topic, String consumer, Session session) {
-        log.info("Server channel subscribe topic={}, consumer={}, session={}", topic, consumer, session.sessionId());
+    @Override
+    public synchronized void subscribeDo(String topic, String consumer, Session session) {
+        //::从持久层恢复时，会话为 null
+        if (session != null) {
+            log.info("Server channel subscribe topic={}, consumer={}, session={}", topic, consumer, session.sessionId());
 
-        //给会话添加身份（可以有多个不同的身份）
-        session.attr(consumer, "1");
+            //给会话添加身份（可以有多个不同的身份）
+            session.attr(consumer, "1");
+        }
 
         //以身份进行订阅(topic -> consumer)
         Set<String> consumerSet = subscribeMap.get(topic);
@@ -194,21 +244,27 @@ public class MqServerImpl extends EventListener implements MqServer {
         //为身份建立队列(consumer -> queue)
         MqConsumerQueue consumerQueue = consumerMap.get(consumer);
         if (consumerQueue == null) {
-            consumerQueue = new MqConsumerQueueImpl(consumer);
+            consumerQueue = new MqConsumerQueueImpl(persistent, consumer);
             consumerMap.put(consumer, consumerQueue);
         }
 
-        consumerQueue.addSession(session);
+        //::从持久层恢复时，会话为 null
+        if (session != null) {
+            consumerQueue.addSession(session);
+        }
     }
 
     /**
      * 执行交换
      *
      * @param topic     主题
-     * @param scheduled 预定派发时间
      * @param message   消息源
      */
-    private void exchangeDo(String topic, long scheduled, Message message) {
+    @Override
+    public void exchangeDo(String topic, Message message) {
+        //计划派发时间
+        long scheduled = Long.parseLong(message.metaOrDefault(MqConstants.MQ_META_SCHEDULED, "0"));
+
         //取出所有订阅的身份
         Set<String> consumerSet = subscribeMap.get(topic);
         if (consumerSet != null) {

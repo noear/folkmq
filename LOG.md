@@ -1,4 +1,10 @@
 
+### 1.0.2
+* 调整 delayedFuture:cancel 为 false（异步发时，避免会关掉通道）
+* 调整 规范化异步类型
+* 简化 MqConsumerQueue 的实现方式（改用延时队列）
+* 优化 日志打印与变量命名
+
 ### 1.0.0-M3
 
 * user 概念改为 comsumer 概念

@@ -22,12 +22,15 @@ public class MqConsumerQueueImpl implements MqConsumerQueue {
     private final String consumer;
     //用户会话（多个）
     private final List<Session> consumerSessions;
+    //持久化
+    private final MqPersistent persistent;
 
 
     protected final DelayQueue<MqMessageHolder> queue = new DelayQueue<>();
     private final Thread thread;
 
-    public MqConsumerQueueImpl(String consumer) {
+    public MqConsumerQueueImpl(MqPersistent persistent,String consumer) {
+        this.persistent = persistent;
         this.consumer = consumer;
         this.consumerSessions = new ArrayList<>();
 
@@ -124,17 +127,22 @@ public class MqConsumerQueueImpl implements MqConsumerQueue {
                 .meta(MqConstants.MQ_META_TIMES, String.valueOf(messageHolder.getDistributeCount()));
 
 
-        //添加延时任务：30秒后，如果没有没有回执就重发
-        addDelayed(messageHolder, 1000 * 30);
+        //持久化::派发时（在元信息调整之后，持久化）
+        persistent.onDistribute(consumer, messageHolder);
+
+        //添加延时任务：2小时后，如果没有回执就重发（即消息最长不能超过2小时）
+        addDelayed(messageHolder, MqNextTime.getMaxDelayMillis());
 
         //给会话发送消息
         s1.sendAndSubscribe(MqConstants.MQ_EVENT_DISTRIBUTE, messageHolder.getContent(), m -> {
             int ack = Integer.parseInt(m.metaOrDefault(MqConstants.MQ_META_ACK, "0"));
+
+            //持久化::回执时
+            persistent.onAcknowledge(consumer, messageHolder, ack == 1);
+
             if (ack == 0) {
-                //no, 进入延后队列，之后再试
-                queue.remove(messageHolder);
-                addDelayed(messageHolder.delayed());
-                //messageHolder.delayed();//刚加过，不用再加了
+                //no （如果在队列改时间即可；如果不在队列说明有补发过）
+                messageHolder.delayed();
             } else {
                 //ok
                 messageHolder.setDone(true);

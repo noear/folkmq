@@ -5,7 +5,7 @@ import org.noear.socketd.SocketD;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
 import org.noear.socketd.transport.core.entity.StringEntity;
-import org.noear.socketd.transport.core.listener.BuilderListener;
+import org.noear.socketd.transport.core.listener.EventListener;
 import org.noear.socketd.transport.server.Server;
 import org.noear.socketd.transport.server.ServerConfigHandler;
 import org.slf4j.Logger;
@@ -20,7 +20,7 @@ import java.util.*;
  * @author noear
  * @since 1.0
  */
-public class MqServerImpl extends BuilderListener implements MqServer {
+public class MqServerImpl extends EventListener implements MqServer {
     private static final Logger log = LoggerFactory.getLogger(MqServerImpl.class);
 
     private Server server;
@@ -35,29 +35,29 @@ public class MqServerImpl extends BuilderListener implements MqServer {
         //::初始化 BuilderListener(self) 的路由监听
 
         //接收订阅指令
-        on(MqConstants.MQ_CMD_SUBSCRIBE, (s, m) -> {
+        on(MqConstants.MQ_EVENT_SUBSCRIBE, (s, m) -> {
             if (m.isRequest() || m.isSubscribe()) {
                 //表示我收到了
                 s.replyEnd(m, new StringEntity(""));
             }
 
-            String topic = m.meta(MqConstants.MQ_TOPIC);
-            String consumer = m.meta(MqConstants.MQ_CONSUMER);
+            String topic = m.meta(MqConstants.MQ_META_TOPIC);
+            String consumer = m.meta(MqConstants.MQ_META_CONSUMER);
 
             //执行订阅
             subscribeDo(topic, consumer, s);
         });
 
         //接收发布指令
-        on(MqConstants.MQ_CMD_PUBLISH, (s, m) -> {
+        on(MqConstants.MQ_EVENT_PUBLISH, (s, m) -> {
             if (m.isRequest() || m.isSubscribe()) {
                 //表示我收到了
                 s.replyEnd(m, new StringEntity(""));
             }
 
             //执行派发
-            String topic = m.meta(MqConstants.MQ_TOPIC);
-            long scheduled = Long.parseLong(m.metaOrDefault(MqConstants.MQ_SCHEDULED, "0"));
+            String topic = m.meta(MqConstants.MQ_META_TOPIC);
+            long scheduled = Long.parseLong(m.metaOrDefault(MqConstants.MQ_META_SCHEDULED, "0"));
 
             //执行交换
             exchangeDo(topic, scheduled, m);
@@ -136,7 +136,7 @@ public class MqServerImpl extends BuilderListener implements MqServer {
             }
         }
 
-        log.info("Channel session opened, session={}", session.sessionId());
+        log.info("Server channel opened, session={}", session.sessionId());
     }
 
     /**
@@ -146,13 +146,15 @@ public class MqServerImpl extends BuilderListener implements MqServer {
     public void onClose(Session session) {
         super.onClose(session);
 
-        log.info("Channel session closed, session={}", session.sessionId());
+        log.info("Server channel closed, session={}", session.sessionId());
 
-        //遍历这个会话身上的身份记录（有些可能不是）
-        for (String consumer : session.attrMap().keySet()) {
+        //遍历这个会话身上的消费者身份（有些可能不是）
+        //避免遍历 Set 时，出现 add or remove 而异常
+        List<String> consumerList = new ArrayList<>(session.attrMap().keySet());
+        for (String consumer : consumerList) {
             MqConsumerQueue messageQueue = consumerMap.get(consumer);
 
-            //如果找到对应的队列
+            //如果找到对应的队列（如果没有，表示这个属性不是消费者）
             if (messageQueue != null) {
                 messageQueue.removeSession(session);
             }
@@ -167,7 +169,7 @@ public class MqServerImpl extends BuilderListener implements MqServer {
         super.onError(session, error);
 
         if (log.isWarnEnabled()) {
-            log.warn("Channel error, session={}", session.sessionId(), error);
+            log.warn("Server channel error, session={}", session.sessionId(), error);
         }
     }
 
@@ -175,7 +177,7 @@ public class MqServerImpl extends BuilderListener implements MqServer {
      * 执行订阅
      */
     private synchronized void subscribeDo(String topic, String consumer, Session session) {
-        log.info("Channel subscribe topic={}, consumer={}, session={}", topic, consumer, session.sessionId());
+        log.info("Server channel subscribe topic={}, consumer={}, session={}", topic, consumer, session.sessionId());
 
         //给会话添加身份（可以有多个不同的身份）
         session.attr(consumer, "1");
@@ -210,7 +212,9 @@ public class MqServerImpl extends BuilderListener implements MqServer {
         //取出所有订阅的身份
         Set<String> consumerSet = subscribeMap.get(topic);
         if (consumerSet != null) {
-            for (String consumer : consumerSet) {
+            //避免遍历 Set 时，出现 add or remove 而异常
+            List<String> consumerList = new ArrayList<>(consumerSet);
+            for (String consumer : consumerList) {
                 MqConsumerQueue queue = consumerMap.get(consumer);
                 if (queue != null) {
                     MqMessageHolder messageHolder = new MqMessageHolder(message, scheduled);

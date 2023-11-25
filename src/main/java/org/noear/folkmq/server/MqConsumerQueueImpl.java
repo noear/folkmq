@@ -20,8 +20,8 @@ public class MqConsumerQueueImpl implements MqConsumerQueue {
 
     //用户
     private final String consumer;
-    //用户会话
-    private final List<Session> userSessionSet;
+    //用户会话（多个）
+    private final List<Session> consumerSessions;
 
 
     protected final DelayQueue<MqMessageHolder> queue = new DelayQueue<>();
@@ -29,7 +29,7 @@ public class MqConsumerQueueImpl implements MqConsumerQueue {
 
     public MqConsumerQueueImpl(String consumer) {
         this.consumer = consumer;
-        this.userSessionSet = new ArrayList<>();
+        this.consumerSessions = new ArrayList<>();
 
         thread = new Thread(this::queueTake);
         thread.start();
@@ -40,9 +40,9 @@ public class MqConsumerQueueImpl implements MqConsumerQueue {
             try {
                 MqMessageHolder messageHolder = queue.take();
                 distribute(messageHolder);
-            } catch (InterruptedException e) {
+            } catch (Exception e) {
                 if (log.isWarnEnabled()) {
-                    log.warn("{}", e);
+                    log.warn("MqConsumerQueue queueTake error", e);
                 }
             }
         }
@@ -60,7 +60,7 @@ public class MqConsumerQueueImpl implements MqConsumerQueue {
      */
     @Override
     public void addSession(Session session) {
-        userSessionSet.add(session);
+        consumerSessions.add(session);
     }
 
     /**
@@ -68,7 +68,7 @@ public class MqConsumerQueueImpl implements MqConsumerQueue {
      */
     @Override
     public void removeSession(Session session) {
-        userSessionSet.remove(session);
+        consumerSessions.remove(session);
     }
 
     /**
@@ -90,9 +90,9 @@ public class MqConsumerQueueImpl implements MqConsumerQueue {
      */
     protected void distribute(MqMessageHolder messageHolder) {
         //找到此身份的其中一个会话（如果是 ip 就一个；如果是集群名则任选一个）
-        if (userSessionSet.size() > 0) {
+        if (consumerSessions.size() > 0) {
             try {
-                distributeDo(messageHolder, userSessionSet);
+                distributeDo(messageHolder, consumerSessions);
             } catch (Throwable e) {
                 //进入延后队列
                 addDelayed(messageHolder.delayed());
@@ -100,7 +100,11 @@ public class MqConsumerQueueImpl implements MqConsumerQueue {
         } else {
             //进入延后队列
             addDelayed(messageHolder.delayed());
-            log.warn("No sessions!");
+
+            //记日志
+            if (log.isWarnEnabled()) {
+                log.warn("MqConsumerQueue distribute: no sessions!");
+            }
         }
     }
 
@@ -117,15 +121,15 @@ public class MqConsumerQueueImpl implements MqConsumerQueue {
 
         //设置新的派发次数
         messageHolder.getContent()
-                .meta(MqConstants.MQ_TIMES, String.valueOf(messageHolder.getDistributeCount()));
+                .meta(MqConstants.MQ_META_TIMES, String.valueOf(messageHolder.getDistributeCount()));
 
 
         //添加延时任务：30秒后，如果没有没有回执就重发
         addDelayed(messageHolder, 1000 * 30);
 
         //给会话发送消息
-        s1.sendAndSubscribe(MqConstants.MQ_CMD_DISTRIBUTE, messageHolder.getContent(), m -> {
-            int ack = Integer.parseInt(m.metaOrDefault(MqConstants.MQ_ACK, "0"));
+        s1.sendAndSubscribe(MqConstants.MQ_EVENT_DISTRIBUTE, messageHolder.getContent(), m -> {
+            int ack = Integer.parseInt(m.metaOrDefault(MqConstants.MQ_META_ACK, "0"));
             if (ack == 0) {
                 //no, 进入延后队列，之后再试
                 queue.remove(messageHolder);
@@ -154,5 +158,12 @@ public class MqConsumerQueueImpl implements MqConsumerQueue {
     protected void addDelayed(MqMessageHolder messageHolder, long millisDelay) {
         messageHolder.setDistributeTime(System.currentTimeMillis() + millisDelay);
         queue.add(messageHolder);
+    }
+
+    @Override
+    public void close() throws IOException {
+        if(thread != null){
+            thread.interrupt();
+        }
     }
 }

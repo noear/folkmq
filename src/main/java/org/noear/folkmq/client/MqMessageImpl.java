@@ -25,9 +25,9 @@ public class MqMessageImpl implements MqMessage {
         this.clientInternal = clientInternal;
         this.from = from;
 
-        this.tid = from.metaOrDefault(MqConstants.MQ_TID, "");
-        this.topic = from.metaOrDefault(MqConstants.MQ_TOPIC, "");
-        this.times = Integer.parseInt(from.metaOrDefault(MqConstants.MQ_TIMES, "0"));
+        this.tid = from.metaOrDefault(MqConstants.MQ_META_TID, "");
+        this.topic = from.metaOrDefault(MqConstants.MQ_META_TOPIC, "");
+        this.times = Integer.parseInt(from.metaOrDefault(MqConstants.MQ_META_TIMES, "0"));
         this.content = from.dataAsString();
     }
 

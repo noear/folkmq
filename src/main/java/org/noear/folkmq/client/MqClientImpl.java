@@ -9,7 +9,7 @@ import org.noear.socketd.transport.core.Entity;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
 import org.noear.socketd.transport.core.entity.StringEntity;
-import org.noear.socketd.transport.core.listener.BuilderListener;
+import org.noear.socketd.transport.core.listener.EventListener;
 import org.noear.socketd.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +26,7 @@ import java.util.concurrent.CompletableFuture;
  * @author noear
  * @since 1.0
  */
-public class MqClientImpl extends BuilderListener implements MqClientInternal {
+public class MqClientImpl extends EventListener implements MqClientInternal {
     private static final Logger log = LoggerFactory.getLogger(MqClientImpl.class);
 
     //服务端地址
@@ -45,9 +45,9 @@ public class MqClientImpl extends BuilderListener implements MqClientInternal {
         this.serverUrl = serverUrl.replace("folkmq://", "sd:tcp://");
 
         //接收派发指令
-        on(MqConstants.MQ_CMD_DISTRIBUTE, (s, m) -> {
+        on(MqConstants.MQ_EVENT_DISTRIBUTE, (s, m) -> {
             try {
-                String topic = m.meta(MqConstants.MQ_TOPIC);
+                String topic = m.meta(MqConstants.MQ_META_TOPIC);
                 MqSubscription subscription = subscriptionMap.get(topic);
 
                 if (subscription != null) {
@@ -117,10 +117,10 @@ public class MqClientImpl extends BuilderListener implements MqClientInternal {
 
         if (clientSession != null && clientSession.isValid()) {
             Entity entity = new StringEntity("")
-                    .meta(MqConstants.MQ_TOPIC, subscription.getTopic())
-                    .meta(MqConstants.MQ_CONSUMER, subscription.getConsumer());
+                    .meta(MqConstants.MQ_META_TOPIC, subscription.getTopic())
+                    .meta(MqConstants.MQ_META_CONSUMER, subscription.getConsumer());
 
-            clientSession.sendAndRequest(MqConstants.MQ_CMD_SUBSCRIBE, entity);
+            clientSession.sendAndRequest(MqConstants.MQ_EVENT_SUBSCRIBE, entity);
         }
     }
 
@@ -150,16 +150,16 @@ public class MqClientImpl extends BuilderListener implements MqClientInternal {
 
         //支持Qos1
         StringEntity entity = new StringEntity(content);
-        entity.meta(MqConstants.MQ_TID, Utils.guid());
-        entity.meta(MqConstants.MQ_TOPIC, topic);
+        entity.meta(MqConstants.MQ_META_TID, Utils.guid());
+        entity.meta(MqConstants.MQ_META_TOPIC, topic);
         if (scheduled == null) {
-            entity.meta(MqConstants.MQ_SCHEDULED, "0");
+            entity.meta(MqConstants.MQ_META_SCHEDULED, "0");
         } else {
-            entity.meta(MqConstants.MQ_SCHEDULED, String.valueOf(scheduled.getTime()));
+            entity.meta(MqConstants.MQ_META_SCHEDULED, String.valueOf(scheduled.getTime()));
         }
 
         CompletableFuture<?> future = new CompletableFuture<>();
-        clientSession.sendAndSubscribe(MqConstants.MQ_CMD_PUBLISH, entity, r -> {
+        clientSession.sendAndSubscribe(MqConstants.MQ_EVENT_PUBLISH, entity, r -> {
             future.complete(null);
         });
 
@@ -173,7 +173,7 @@ public class MqClientImpl extends BuilderListener implements MqClientInternal {
     @Override
     public void acknowledge(Message message, boolean isOk) throws IOException {
         clientSession.replyEnd(message, new StringEntity("")
-                .meta(MqConstants.MQ_ACK, isOk ? "1" : "0"));
+                .meta(MqConstants.MQ_META_ACK, isOk ? "1" : "0"));
     }
 
     /**
@@ -188,10 +188,10 @@ public class MqClientImpl extends BuilderListener implements MqClientInternal {
         //用于重连时重新订阅
         for (MqSubscription subscription : subscriptionMap.values()) {
             Entity entity = new StringEntity("")
-                    .meta(MqConstants.MQ_TOPIC, subscription.getTopic())
-                    .meta(MqConstants.MQ_CONSUMER, subscription.getConsumer());
+                    .meta(MqConstants.MQ_META_TOPIC, subscription.getTopic())
+                    .meta(MqConstants.MQ_META_CONSUMER, subscription.getConsumer());
 
-            session.send(MqConstants.MQ_CMD_SUBSCRIBE, entity);
+            session.send(MqConstants.MQ_EVENT_SUBSCRIBE, entity);
         }
     }
 

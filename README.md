@@ -124,9 +124,9 @@ public class ClientDemo1 {
                 .connect();
 
         //订阅
-        client.subscribe("demo", ((topic, message) -> {
-            System.out.println("ClientDemo1::" + topic + " - " + message);
-        }));
+        client.subscribe("demo", "(ip or cluster-name)", message -> {
+            System.out.println("ClientDemo1::" + message);
+        });
 
         //发布
         client.publish("demo", "hi");

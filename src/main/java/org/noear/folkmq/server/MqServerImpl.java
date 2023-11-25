@@ -146,7 +146,14 @@ public class MqServerImpl extends EventListener implements MqServerInternal {
      */
     @Override
     public void stop() {
+        //持久化::服务停止之前
+        persistent.onStopAfter();
+
+        //停止
         server.stop();
+
+        //持久化::服务停止之后
+        persistent.onStopAfter();
     }
 
     /**
@@ -257,8 +264,8 @@ public class MqServerImpl extends EventListener implements MqServerInternal {
     /**
      * 执行交换
      *
-     * @param topic     主题
-     * @param message   消息源
+     * @param topic   主题
+     * @param message 消息源
      */
     @Override
     public void exchangeDo(String topic, Message message) {

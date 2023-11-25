@@ -26,6 +26,16 @@ public interface MqPersistent {
     void onStartAfter();
 
     /**
+     * 服务停止之前
+     */
+    void onStopBefore();
+
+    /**
+     * 服务停止之后
+     */
+    void onStopAfter();
+
+    /**
      * 订阅时
      */
     void onSubscribe(String topic, String consumer, Session session);

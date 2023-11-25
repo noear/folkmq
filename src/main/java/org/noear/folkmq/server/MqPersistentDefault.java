@@ -28,6 +28,16 @@ public class MqPersistentDefault implements MqPersistent{
     }
 
     @Override
+    public void onStopBefore() {
+
+    }
+
+    @Override
+    public void onStopAfter() {
+
+    }
+
+    @Override
     public void onSubscribe(String topic, String consumer, Session session) {
 
     }

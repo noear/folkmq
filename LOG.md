@@ -1,4 +1,9 @@
 
+### 1.0.3
+
+* 添加 MqPersistent (持久化接口)支持
+* 优化 ack 保障策略
+
 ### 1.0.2
 * 调整 delayedFuture:cancel 为 false（异步发时，避免会关掉通道）
 * 调整 规范化异步类型

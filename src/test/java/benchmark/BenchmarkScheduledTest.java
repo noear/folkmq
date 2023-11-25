@@ -17,8 +17,7 @@ public class BenchmarkScheduledTest {
                 .start(9393);
 
         Thread.sleep(1000);
-        int count = 1000_000;
-        int timeout = 1000 * 100;
+        int count = 100_000;
         CountDownLatch countDownLatch = new CountDownLatch(count);
 
         //客户端
@@ -48,7 +47,7 @@ public class BenchmarkScheduledTest {
         long sendTime = System.currentTimeMillis() - start_time;
 
         System.out.println("sendTime: " + sendTime);
-        countDownLatch.await(timeout, TimeUnit.MILLISECONDS);
+        countDownLatch.await();
 
         long consumeTime = System.currentTimeMillis() - start_time;
 

@@ -6,7 +6,7 @@
 
     <groupId>org.noear</groupId>
     <artifactId>folkmq</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
 
     <name>${project.artifactId}</name>
     <description>Java project for folkmq</description>

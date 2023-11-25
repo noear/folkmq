@@ -45,8 +45,8 @@
 ## 简介
 
 * 基于 [Socket.D 通讯应用协议](https://gitee.com/noear/socketd) 开发的内存型消息队列。俗称：民谣消息队列（FolkMQ）
-* 支持 发布、订阅、定时、ACK，重试、延时
-* 没有 集群和持久化
+* 支持 发布、订阅、定时、ACK，重试、延时（支持事务性）
+* 没有 集群和持久化（支持持久化接口适配）
 * 大约 100_000 TPS（使用 MacBook pro 2020 款本机测试，单客户端发与收）
 
 ## 开发过程视频
@@ -88,7 +88,7 @@
     <dependency>
         <groupId>org.noear</groupId>
         <artifactId>folkmq</artifactId>
-        <version>1.0.2</version>
+        <version>1.0.3</version>
     </dependency>
 
     <!-- 可选传输包：java-tcp（90kb左右）, smartsocket（260Kb左右）, netty（2.5Mb左右） -->
@@ -142,34 +142,16 @@ public class ClientDemo1 {
 
 ### 自动重试与延时策略
 
-```java
-public class MqNextTime {
-    /**
-     * 获取下次派发时间
-     *
-     * @param messageHolder 消息
-     * */
-    public static long getNextTime(MqMessageHolder messageHolder) {
-        switch (messageHolder.getDistributeCount()) {
-            case 0:
-                return 0;
-            case 1:
-                return System.currentTimeMillis() + 1000 * 5; //5s
-            case 2:
-                return System.currentTimeMillis() + 1000 * 30; //30s
-            case 3:
-                return System.currentTimeMillis() + 1000 * 60 * 3; //3m
-            case 4:
-                return System.currentTimeMillis() + 1000 * 60 * 9; //9m
-            case 5:
-                return System.currentTimeMillis() + 1000 * 60 * 15; //15m
-            case 6:
-                return System.currentTimeMillis() + 1000 * 60 * 30; //30m
-            case 7:
-                return System.currentTimeMillis() + 1000 * 60 * 60; //60m
-            default:
-                return System.currentTimeMillis() + 1000 * 60 * 60 * 2; //120m
-        }
-    }
-}
-```
+| 派发次数 | 自动延时 |            |
+|------|------|------------|
+| 0    | 0s   | 相当于马上发     |
+| 1    | 5s   |            |
+| 2    | 30s  |            |
+| 3    | 3m   |            |
+| 4    | 9m   |            |
+| 5    | 15m  |            |
+| 6    | 30m  |            |
+| 7    | 1h   |            |
+| n..  | 2h   | 第八次之后都是2小时 |
+
+

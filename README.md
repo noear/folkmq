@@ -2,7 +2,7 @@
   FolkMQ
 </h1>
 <p align="center">
-	<strong>一个新起的内存型消息队列（大约 100_000 TPS）</strong>
+	<strong>一个新起的内存型消息队列</strong>
 </p>
 
 <p align="center">
@@ -78,9 +78,30 @@
   * 完成压测 100万 收发不丢消息
   * 组织测试用例，构建单测
 
-## 成果示例
+## 应用示例
 
-* server
+
+* maven
+
+```xml
+<dependencies>
+    <dependency>
+        <groupId>org.noear</groupId>
+        <artifactId>folkmq</artifactId>
+        <version>1.0.2</version>
+    </dependency>
+
+    <!-- 可选传输包：java-tcp（90kb左右）, smartsocket（260Kb左右）, netty（2.5Mb左右） -->
+    <dependency>
+        <groupId>org.noear</groupId>
+        <artifactId>socketd-transport-java-tcp</artifactId>
+        <version>2.0.20</version>
+    </dependency>
+</dependencies>
+```
+
+
+* server demo
 
 ```java
 public class ServerDemo {
@@ -92,7 +113,7 @@ public class ServerDemo {
 }
 ```
 
-* client
+* client demo
 
 ```java
 public class ClientDemo1 {

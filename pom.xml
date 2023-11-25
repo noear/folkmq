@@ -31,14 +31,15 @@
             <version>${socketd.version}</version>
         </dependency>
 
-        <!-- 默认传输方案（包小） -->
+        <!-- 可选传输方案（90kb左右） -->
         <dependency>
             <groupId>org.noear</groupId>
             <artifactId>socketd-transport-java-tcp</artifactId>
             <version>${socketd.version}</version>
+            <optional>true</optional>
         </dependency>
 
-        <!-- 可选传输方案 -->
+        <!-- 可选传输方案（260Kb左右）  -->
         <dependency>
             <groupId>org.noear</groupId>
             <artifactId>socketd-transport-smartsocket</artifactId>
@@ -46,7 +47,7 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- 可选传输方案 -->
+        <!-- 可选传输方案（2.5Mb左右） -->
         <dependency>
             <groupId>org.noear</groupId>
             <artifactId>socketd-transport-netty</artifactId>
@@ -60,7 +61,6 @@
             <version>2.0.9</version>
             <scope>test</scope>
         </dependency>
-
     </dependencies>
 
     <build>

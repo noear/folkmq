@@ -85,6 +85,7 @@
 
 ```xml
 <dependencies>
+  <!-- 主包：（21kb左右） -->
     <dependency>
         <groupId>org.noear</groupId>
         <artifactId>folkmq</artifactId>

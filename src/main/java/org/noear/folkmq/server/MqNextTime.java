@@ -8,19 +8,6 @@ package org.noear.folkmq.server;
  */
 public class MqNextTime {
     /**
-     * 检查下次派发时间
-     *
-     * @param messageHolder 消息
-     * */
-    public static boolean chkNextTime(MqMessageHolder messageHolder) {
-        if (messageHolder.getDistributeTime() <= System.currentTimeMillis()) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
      * 获取下次派发时间
      *
      * @param messageHolder 消息

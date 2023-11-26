@@ -87,7 +87,7 @@
 ```
 
 
-* server demo
+* server(broker) demo
 
 ```java
 public class ServerDemo {
@@ -99,7 +99,7 @@ public class ServerDemo {
 }
 ```
 
-* client demo
+* client(consumer + producer)  demo
 
 ```java
 public class ClientDemo1 {

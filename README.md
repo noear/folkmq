@@ -81,7 +81,7 @@
   <!-- 主包：（24kb左右） -->
     <dependency>
         <groupId>org.noear</groupId>
-        <artifactId>folkmq</artifactId>
+        <artifactId>folkmq-pro</artifactId>
         <version>1.0.5</version>
     </dependency>
 
@@ -103,7 +103,14 @@ public class ServerDemo {
         //服务端（鉴权为可选。不添加则不鉴权）
         MqServer server = new MqServerImpl()
                 .addAccess("folkmq", "YapLHTx19RlsEE16")
+                .persistent(new MqPersistentSnapshot())
                 .start(9393);
+
+        //添加定义快照
+        RunUtils.delayAndRepeat(server::save, 1000 * 30);
+
+        //添加关机勾子
+        Runtime.getRuntime().addShutdownHook(new Thread(server::stop));
     }
 }
 ```

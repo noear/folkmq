@@ -71,6 +71,12 @@
 
 详见： [DEV-RECORD.md](DEV-RECORD.md)
 
+## 服务端镜像
+
+| 镜像                           | 说明            |
+|------------------------------|---------------|
+| noearorg/folkmq-server:1.0.5 | 服务端（端口：13602） |
+
 ## 示例
 
 
@@ -78,10 +84,10 @@
 
 ```xml
 <dependencies>
-  <!-- 主包：（33kb左右） -->
+  <!-- 主包：（24kb左右） -->
     <dependency>
         <groupId>org.noear</groupId>
-        <artifactId>folkmq-pro</artifactId>
+        <artifactId>folkmq</artifactId>
         <version>1.0.5</version>
     </dependency>
 
@@ -95,7 +101,9 @@
 ```
 
 
-* server(broker) demo
+* server(broker) custom demo
+
+建议直接使用 folkmq-server.jar 或者 folkmq-server 容器镜像
 
 ```java
 public class ServerDemo {
@@ -103,8 +111,8 @@ public class ServerDemo {
         //服务端（鉴权为可选。不添加则不鉴权）
         MqServer server = new MqServerDefault()
                 .addAccess("folkmq", "YapLHTx19RlsEE16")
-                .persistent(new MqPersistentSnapshot())
-                .start(9393);
+                .persistent(new MqPersistentSnapshot()) //需要 folkmq-pro 包
+                .start(13602);
 
         //添加定时快照
         RunUtils.delayAndRepeat(server::save, 1000 * 30);
@@ -121,7 +129,7 @@ public class ServerDemo {
 public class ClientDemo1 {
     public static void main(String[] args) throws Exception {
         //客户端（鉴权为可选。服务端，不添加则不鉴权）
-        MqClient client = new MqClientDefault("folkmq://127.0.0.1:9393?ak=folkmq&sk=YapLHTx19RlsEE16")
+        MqClient client = new MqClientDefault("folkmq://127.0.0.1:13602?ak=folkmq&sk=YapLHTx19RlsEE16")
                 .connect();
 
         //订阅

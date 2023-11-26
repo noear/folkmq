@@ -2,7 +2,7 @@
   FolkMQ
 </h1>
 <p align="center">
-	<strong>一个新起的内存型消息队列（支持持久化快照）</strong>
+	<strong>一个新起的内存型消息队列（支持快照持久化）</strong>
 </p>
 
 <p align="center">
@@ -45,7 +45,8 @@
 ## 简介
 
 * 基于 [Socket.D 通讯应用协议](https://gitee.com/noear/socketd) 开发的内存型消息队列。俗称：民谣消息队列（FolkMQ）
-* 支持 订阅、取消订阅、发布消息、发布定时消息、ACK，重试、延时、Qos0、Qos1，支持持久化快照
+* 支持 快照持久化
+* 功能 订阅、取消订阅、发布消息、发布定时消息、ACK，重试、延时、Qos0、Qos1
 * 没有 集群功能（用户可以自建）
 
 

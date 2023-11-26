@@ -3,7 +3,6 @@ package features.cases;
 import org.noear.folkmq.client.MqClientImpl;
 import org.noear.folkmq.server.MqServerImpl;
 
-import java.util.Date;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -11,8 +10,8 @@ import java.util.concurrent.TimeUnit;
  * @author noear
  * @since 1.0
  */
-public class TestCase02_scheduled extends BaseTestCase {
-    public TestCase02_scheduled(int port) {
+public class TestCase13_ack_retry_n extends BaseTestCase {
+    public TestCase13_ack_retry_n(int port) {
         super(port);
     }
 
@@ -25,19 +24,30 @@ public class TestCase02_scheduled extends BaseTestCase {
                 .start(getPort());
 
         //客户端
-        CountDownLatch countDownLatch = new CountDownLatch(1);
+        CountDownLatch countDownLatch = new CountDownLatch(5);
 
         client = new MqClientImpl("folkmq://127.0.0.1:" + getPort())
+                .autoAcknowledge(false)
                 .connect();
 
         client.subscribe("demo", "a", ((message) -> {
             System.out.println(message);
-            countDownLatch.countDown();
+
+            if(message.getTimes() > 1) {
+                countDownLatch.countDown();
+                message.acknowledge(true);
+            }else{
+                message.acknowledge(false);
+            }
         }));
 
-        client.publish("demo", "demo1", new Date(System.currentTimeMillis() + 5000));
+        client.publish("demo", "demo1");
+        client.publish("demo", "demo2");
+        client.publish("demo", "demo3");
+        client.publish("demo", "demo4");
+        client.publish("demo", "demo5");
 
-        countDownLatch.await(6, TimeUnit.SECONDS);
+        countDownLatch.await(40, TimeUnit.SECONDS);
 
         assert countDownLatch.getCount() == 0;
 

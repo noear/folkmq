@@ -11,8 +11,8 @@ import java.util.concurrent.TimeUnit;
  * @author noear
  * @since 1.0
  */
-public class TestCase02_scheduled extends BaseTestCase {
-    public TestCase02_scheduled(int port) {
+public class TestCase12_scheduled_n extends BaseTestCase {
+    public TestCase12_scheduled_n(int port) {
         super(port);
     }
 
@@ -25,7 +25,7 @@ public class TestCase02_scheduled extends BaseTestCase {
                 .start(getPort());
 
         //客户端
-        CountDownLatch countDownLatch = new CountDownLatch(1);
+        CountDownLatch countDownLatch = new CountDownLatch(5);
 
         client = new MqClientImpl("folkmq://127.0.0.1:" + getPort())
                 .connect();
@@ -36,6 +36,10 @@ public class TestCase02_scheduled extends BaseTestCase {
         }));
 
         client.publish("demo", "demo1", new Date(System.currentTimeMillis() + 5000));
+        client.publish("demo", "demo2", new Date(System.currentTimeMillis() + 5000));
+        client.publish("demo", "demo3", new Date(System.currentTimeMillis() + 5000));
+        client.publish("demo", "demo4", new Date(System.currentTimeMillis() + 5000));
+        client.publish("demo", "demo5", new Date(System.currentTimeMillis() + 5000));
 
         countDownLatch.await(6, TimeUnit.SECONDS);
 

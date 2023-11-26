@@ -35,4 +35,36 @@ public class CaseTest {
         testCase.start();
         testCase.stop();
     }
+
+    ///
+
+    @Test
+    public void TestCase11_send_n() throws Exception {
+        BaseTestCase testCase = new TestCase11_send_n(2011);
+        testCase.start();
+        testCase.stop();
+    }
+
+    @Test
+    public void TestCase12_scheduled_n() throws Exception {
+        BaseTestCase testCase = new TestCase12_scheduled_n(2012);
+        testCase.start();
+        testCase.stop();
+    }
+
+    @Test
+    public void TestCase13_ack_retry_n() throws Exception {
+        BaseTestCase testCase = new TestCase13_ack_retry_n(2013);
+        testCase.start();
+        testCase.stop();
+    }
+
+    @Test
+    public void TestCase14_qos0_n() throws Exception {
+        BaseTestCase testCase = new TestCase14_qos0_n(2014);
+        testCase.start();
+        testCase.stop();
+    }
+
+
 }

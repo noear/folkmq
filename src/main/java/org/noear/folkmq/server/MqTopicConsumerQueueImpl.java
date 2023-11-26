@@ -10,14 +10,16 @@ import java.util.*;
 import java.util.concurrent.DelayQueue;
 
 /**
- * 消费者队列（服务端给一个消费者安排一个队列，一个消费者可多个会话，只随机给一个会话派发）
+ * 主题消费者队列（服务端给 [一个主题+一个消费者] 安排一个队列，一个消费者可多个会话，只随机给一个会话派发）
  *
  * @author noear
  * @since 1.0
  */
-public class MqConsumerQueueImpl implements MqConsumerQueue {
-    private static final Logger log = LoggerFactory.getLogger(MqConsumerQueueImpl.class);
+public class MqTopicConsumerQueueImpl implements MqTopicConsumerQueue {
+    private static final Logger log = LoggerFactory.getLogger(MqTopicConsumerQueueImpl.class);
 
+    //主题
+    private final String topic;
     //用户
     private final String consumer;
     //用户会话（多个）
@@ -25,23 +27,25 @@ public class MqConsumerQueueImpl implements MqConsumerQueue {
     //持久化
     private final MqPersistent persistent;
 
+    //内部真实队列与处理线程
+    private final DelayQueue<MqMessageHolder> realQueue;
+    private final Thread realQueueThread;
 
-    protected final DelayQueue<MqMessageHolder> queue = new DelayQueue<>();
-    private final Thread thread;
-
-    public MqConsumerQueueImpl(MqPersistent persistent, String consumer) {
+    public MqTopicConsumerQueueImpl(MqPersistent persistent, String topic , String consumer) {
         this.persistent = persistent;
+        this.topic = topic;
         this.consumer = consumer;
         this.consumerSessions = new ArrayList<>();
 
-        thread = new Thread(this::queueTake);
-        thread.start();
+        this.realQueue = new DelayQueue<>();
+        this.realQueueThread = new Thread(this::queueTake);
+        this.realQueueThread.start();
     }
 
     private void queueTake() {
-        while (!thread.isInterrupted()) {
+        while (!realQueueThread.isInterrupted()) {
             try {
-                MqMessageHolder messageHolder = queue.take();
+                MqMessageHolder messageHolder = realQueue.take();
                 distribute(messageHolder);
             } catch (Exception e) {
                 if (log.isWarnEnabled()) {
@@ -49,6 +53,13 @@ public class MqConsumerQueueImpl implements MqConsumerQueue {
                 }
             }
         }
+    }
+
+    /**
+     * 获取主题
+     */
+    public String getTopic() {
+        return topic;
     }
 
     /**
@@ -83,7 +94,7 @@ public class MqConsumerQueueImpl implements MqConsumerQueue {
             return;
         }
 
-        queue.add(messageHolder);
+        realQueue.add(messageHolder);
 
         //distribute(messageHolder);
     }
@@ -92,7 +103,7 @@ public class MqConsumerQueueImpl implements MqConsumerQueue {
      * 消息数量
      */
     public int size() {
-        return queue.size();
+        return realQueue.size();
     }
 
     /**
@@ -149,11 +160,12 @@ public class MqConsumerQueueImpl implements MqConsumerQueue {
 
             if (ack == 0) {
                 //no （如果在队列改时间即可；如果不在队列说明有补发过）
-                messageHolder.delayed();
+                realQueue.remove(messageHolder);
+                addDelayed(messageHolder.delayed());
             } else {
                 //ok
                 messageHolder.setDone(true);
-                queue.remove(messageHolder);
+                realQueue.remove(messageHolder);
             }
         });
     }
@@ -162,7 +174,7 @@ public class MqConsumerQueueImpl implements MqConsumerQueue {
      * 添加延时处理
      */
     protected void addDelayed(MqMessageHolder messageHolder) {
-        queue.add(messageHolder);
+        realQueue.add(messageHolder);
     }
 
     /**
@@ -172,13 +184,13 @@ public class MqConsumerQueueImpl implements MqConsumerQueue {
      */
     protected void addDelayed(MqMessageHolder messageHolder, long millisDelay) {
         messageHolder.setDistributeTime(System.currentTimeMillis() + millisDelay);
-        queue.add(messageHolder);
+        realQueue.add(messageHolder);
     }
 
     @Override
     public void close() throws IOException {
-        if (thread != null) {
-            thread.interrupt();
+        if (realQueueThread != null) {
+            realQueueThread.interrupt();
         }
     }
 }

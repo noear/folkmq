@@ -65,12 +65,6 @@ public class MqClientImpl extends EventListener implements MqClientInternal {
     }
 
     @Override
-    public MqClient config(ClientConfigHandler configHandler) {
-        clientConfigHandler = configHandler;
-        return this;
-    }
-
-    @Override
     public MqClient connect() throws IOException {
         Client client = SocketD.createClient(this.serverUrl);
 
@@ -78,8 +72,7 @@ public class MqClientImpl extends EventListener implements MqClientInternal {
             client.config(clientConfigHandler);
         }
 
-        clientSession = client.config(c -> c.heartbeatInterval(5_000))
-                .listen(this)
+        clientSession = client.listen(this)
                 .open();
 
         return this;
@@ -90,6 +83,12 @@ public class MqClientImpl extends EventListener implements MqClientInternal {
         if (clientSession != null) {
             clientSession.close();
         }
+    }
+
+    @Override
+    public MqClient config(ClientConfigHandler configHandler) {
+        clientConfigHandler = configHandler;
+        return this;
     }
 
     /**

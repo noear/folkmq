@@ -33,10 +33,10 @@ public class MqServerImpl extends EventListener implements MqServerInternal {
     //持久化接口
     private MqPersistent persistent;
 
-    //订阅关系表
+    //订阅关系表(topicConsumer=>MqTopicConsumerQueue)
     private Map<String, Set<String>> subscribeMap = new HashMap<>();
-    //消费队列表
-    private Map<String, MqConsumerQueue> consumerMap = new HashMap<>();
+    //主题消费队列表(topicConsumer=>MqTopicConsumerQueue)
+    private Map<String, MqTopicConsumerQueue> topicConsumerMap = new HashMap<>();
 
 
     public MqServerImpl() {
@@ -193,13 +193,13 @@ public class MqServerImpl extends EventListener implements MqServerInternal {
 
         //遍历这个会话身上的消费者身份（有些可能不是）
         //避免遍历 Set 时，出现 add or remove 而异常
-        List<String> consumerList = new ArrayList<>(session.attrMap().keySet());
-        for (String consumer : consumerList) {
-            MqConsumerQueue messageQueue = consumerMap.get(consumer);
+        List<String> topicConsumerList = new ArrayList<>(session.attrMap().keySet());
+        for (String topicConsumer : topicConsumerList) {
+            MqTopicConsumerQueue topicConsumerQueue = topicConsumerMap.get(topicConsumer);
 
             //如果找到对应的队列（如果没有，表示这个属性不是消费者）
-            if (messageQueue != null) {
-                messageQueue.removeSession(session);
+            if (topicConsumerQueue != null) {
+                topicConsumerQueue.removeSession(session);
             }
         }
     }
@@ -222,8 +222,8 @@ public class MqServerImpl extends EventListener implements MqServerInternal {
     }
 
     @Override
-    public Map<String, MqConsumerQueue> getConsumerMap() {
-        return Collections.unmodifiableMap(consumerMap);
+    public Map<String, MqTopicConsumerQueue> getTopicConsumerMap() {
+        return Collections.unmodifiableMap(topicConsumerMap);
     }
 
     /**
@@ -231,33 +231,36 @@ public class MqServerImpl extends EventListener implements MqServerInternal {
      */
     @Override
     public synchronized void subscribeDo(String topic, String consumer, Session session) {
-        //::从持久层恢复时，会话为 null
+        String topicConsumer = topic + "#" + consumer;
+
+        //::1.构建订阅关系
+
+        //以身份进行订阅(topic=>[topicConsumer])
+        Set<String> topicConsumerSet = subscribeMap.get(topic);
+        if (topicConsumerSet == null) {
+            topicConsumerSet = new HashSet<>();
+            subscribeMap.put(topic, topicConsumerSet);
+        }
+
+        topicConsumerSet.add(topicConsumer);
+
+        //为身份建立队列(topicConsumer=>MqTopicConsumerQueue)
+        MqTopicConsumerQueue topicConsumerQueue = topicConsumerMap.get(topicConsumer);
+        if (topicConsumerQueue == null) {
+            topicConsumerQueue = new MqTopicConsumerQueueImpl(persistent, topic, consumer);
+            topicConsumerMap.put(topicConsumer, topicConsumerQueue);
+        }
+
+        //::2.标识会话身份（从持久层恢复时，会话可能为 null）
+
         if (session != null) {
             log.info("Server channel subscribe topic={}, consumer={}, session={}", topic, consumer, session.sessionId());
 
             //给会话添加身份（可以有多个不同的身份）
-            session.attr(consumer, "1");
-        }
+            session.attr(topicConsumer, "1");
 
-        //以身份进行订阅(topic -> consumer)
-        Set<String> consumerSet = subscribeMap.get(topic);
-        if (consumerSet == null) {
-            consumerSet = new HashSet<>();
-            subscribeMap.put(topic, consumerSet);
-        }
-
-        consumerSet.add(consumer);
-
-        //为身份建立队列(consumer -> queue)
-        MqConsumerQueue consumerQueue = consumerMap.get(consumer);
-        if (consumerQueue == null) {
-            consumerQueue = new MqConsumerQueueImpl(persistent, consumer);
-            consumerMap.put(consumer, consumerQueue);
-        }
-
-        //::从持久层恢复时，会话为 null
-        if (session != null) {
-            consumerQueue.addSession(session);
+            //加入主题消息队列
+            topicConsumerQueue.addSession(session);
         }
     }
 
@@ -272,16 +275,16 @@ public class MqServerImpl extends EventListener implements MqServerInternal {
         //计划派发时间
         long scheduled = Long.parseLong(message.metaOrDefault(MqConstants.MQ_META_SCHEDULED, "0"));
 
-        //取出所有订阅的身份
-        Set<String> consumerSet = subscribeMap.get(topic);
-        if (consumerSet != null) {
+        //取出所有订阅的主题消息者
+        Set<String> topicConsumerSet = subscribeMap.get(topic);
+        if (topicConsumerSet != null) {
             //避免遍历 Set 时，出现 add or remove 而异常
-            List<String> consumerList = new ArrayList<>(consumerSet);
-            for (String consumer : consumerList) {
-                MqConsumerQueue queue = consumerMap.get(consumer);
-                if (queue != null) {
+            List<String> topicConsumerList = new ArrayList<>(topicConsumerSet);
+            for (String topicConsumer : topicConsumerList) {
+                MqTopicConsumerQueue topicConsumerQueue = topicConsumerMap.get(topicConsumer);
+                if (topicConsumerQueue != null) {
                     MqMessageHolder messageHolder = new MqMessageHolder(message, scheduled);
-                    queue.add(messageHolder);
+                    topicConsumerQueue.add(messageHolder);
                 }
             }
         }

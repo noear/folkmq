@@ -5,12 +5,12 @@ import org.noear.socketd.transport.core.Session;
 import java.io.Closeable;
 
 /**
- * 消费者队列（服务端给一个消费者安排一个队列，一个消费者可多个会话，只随机给一个会话派发）
+ * 主题消费者队列（服务端给 [一个主题+一个消费者] 安排一个队列，一个消费者可多个会话，只随机给一个会话派发）
  *
  * @author noear
  * @since 1.0
  */
-public interface MqConsumerQueue extends Closeable {
+public interface MqTopicConsumerQueue extends Closeable {
     /**
      * 获取消费者
      */

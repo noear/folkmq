@@ -14,11 +14,6 @@ import java.util.concurrent.CompletableFuture;
  */
 public interface MqClient {
     /**
-     * 客户端配置
-     */
-    MqClient config(ClientConfigHandler configHandler);
-
-    /**
      * 连接
      */
     MqClient connect() throws IOException;
@@ -27,6 +22,11 @@ public interface MqClient {
      * 断开连接
      */
     void disconnect() throws IOException;
+
+    /**
+     * 客户端配置
+     */
+    MqClient config(ClientConfigHandler configHandler);
 
     /**
      * 自动回执

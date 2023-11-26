@@ -14,14 +14,14 @@ import java.util.Set;
  */
 public interface MqServerInternal extends MqServer {
     /**
-     * 获取订阅关系表
+     * 获取订阅关系表(topic=>[topicConsumer])
      * */
     Map<String, Set<String>> getSubscribeMap();
 
     /**
-     * 获取消息队列表
+     * 获取主题消息者队列表(topicConsumer=>MqTopicConsumerQueue)
      * */
-    Map<String, MqConsumerQueue> getConsumerMap();
+    Map<String, MqTopicConsumerQueue> getTopicConsumerMap();
 
     /**
      * 执行订阅

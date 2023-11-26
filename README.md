@@ -100,6 +100,7 @@
 ```java
 public class ServerDemo {
     public static void main(String[] args) throws Exception {
+        //服务端（鉴权为可选。不添加则不鉴权）
         MqServer server = new MqServerImpl()
                 .addAccess("folkmq", "YapLHTx19RlsEE16")
                 .start(9393);
@@ -112,7 +113,7 @@ public class ServerDemo {
 ```java
 public class ClientDemo1 {
     public static void main(String[] args) throws Exception {
-        //客户端
+        //客户端（鉴权为可选。服务端，不添加则不鉴权）
         MqClient client = new MqClientImpl("folkmq://127.0.0.1:9393?ak=folkmq&sk=YapLHTx19RlsEE16")
                 .connect();
 
@@ -121,15 +122,15 @@ public class ClientDemo1 {
             System.out.println("ClientDemo1::" + message);
         });
 
-        //发布
+        //发布(Qos1)
         client.publish("demo", "hi");
-        //发布，并指定5秒后派发
+        //发布(Qos1)，并指定5秒后派发
         client.publish("demo", "hi", new Date(System.currentTimeMillis() + 5000));
-
-        for (int i = 0; i < 10; i++) {
-            Thread.sleep(100);
-            client.publish("demo", "hi");
-        }
+        
+        //发布(Qos0) 
+        client.publish("demo", "hi", 0);
+        //发布(Qos0)，并指定5秒后派发
+        client.publish("demo", "hi", new Date(System.currentTimeMillis() + 5000), 0);
     }
 }
 ```

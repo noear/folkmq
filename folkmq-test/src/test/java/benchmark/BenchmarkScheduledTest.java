@@ -45,12 +45,12 @@ public class BenchmarkScheduledTest {
         }
         long sendTime = System.currentTimeMillis() - start_time;
 
-        System.out.println("sendTime: " + sendTime);
+        System.out.println("sendTime: " + sendTime + "ms");
         countDownLatch.await();
 
         long consumeTime = System.currentTimeMillis() - start_time;
 
-        System.out.println("sendTime: " + sendTime);
-        System.out.println("consumeTime: " + consumeTime + ", count: " + (count - countDownLatch.getCount()));
+        System.out.println("sendTime: " + sendTime + "ms");
+        System.out.println("consumeTime: " + consumeTime + "ms, count: " + (count - countDownLatch.getCount()));
     }
 }

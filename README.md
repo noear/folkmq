@@ -106,7 +106,7 @@ public class ServerDemo {
                 .persistent(new MqPersistentSnapshot())
                 .start(9393);
 
-        //添加定义快照
+        //添加定时快照
         RunUtils.delayAndRepeat(server::save, 1000 * 30);
 
         //添加关机勾子

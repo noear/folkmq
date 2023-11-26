@@ -1,0 +1,21 @@
+server.port: 13692
+
+solon.app:
+  group: folkmq
+  name: folkmq-server
+
+solon.logging.appender:
+  console:
+    level: DEBUG
+  cloud:
+    level: INFO
+
+solon.logging.logger:
+  "root": #默认记录器配置
+    level: DEBUG
+  "io.netty":
+    level: WARN
+
+#folkmq.access:
+#  user1 : "YapLHTx19RlsEE16"
+#  user2 : "YapLHTx19RlsEE16"

@@ -41,6 +41,11 @@ public class MqPersistentDefault implements MqPersistent{
     }
 
     @Override
+    public void onSave() {
+
+    }
+
+    @Override
     public void onSubscribe(String topic, String consumer, Session session) {
 
     }

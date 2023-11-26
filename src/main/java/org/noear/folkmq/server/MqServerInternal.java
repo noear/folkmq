@@ -15,12 +15,12 @@ import java.util.Set;
 public interface MqServerInternal extends MqServer {
     /**
      * 获取订阅关系表(topic=>[topicConsumer])
-     * */
+     */
     Map<String, Set<String>> getSubscribeMap();
 
     /**
      * 获取主题消息者队列表(topicConsumer=>MqTopicConsumerQueue)
-     * */
+     */
     Map<String, MqTopicConsumerQueue> getTopicConsumerMap();
 
     /**
@@ -32,4 +32,9 @@ public interface MqServerInternal extends MqServer {
      * 执行交换
      */
     void exchangeDo(String topic, Message message);
+
+    /**
+     * 执行保存
+     */
+    void saveDo();
 }

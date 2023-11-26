@@ -82,6 +82,12 @@ public class MqServerImpl extends EventListener implements MqServerInternal {
             //执行交换
             exchangeDo(topic, m);
         });
+
+        //接收保存指令
+        on(MqConstants.MQ_EVENT_SAVE, (s, m) -> {
+            //执行保存
+            saveDo();
+        });
     }
 
     /**
@@ -292,5 +298,11 @@ public class MqServerImpl extends EventListener implements MqServerInternal {
                 }
             }
         }
+    }
+
+    @Override
+    public void saveDo() {
+        //持久化::保存时
+        persistent.onSave();
     }
 }

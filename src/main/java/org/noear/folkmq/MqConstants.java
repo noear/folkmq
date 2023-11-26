@@ -48,6 +48,10 @@ public interface MqConstants {
      * 事件：派发
      */
     String MQ_EVENT_DISTRIBUTE = "mq.event.distribute";
+    /**
+     * 事件：保存
+     */
+    String MQ_EVENT_SAVE = "mq.event.save";
 
     /**
      * 连接参数：ak

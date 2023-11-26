@@ -39,6 +39,11 @@ public interface MqPersistent {
     void onStopAfter();
 
     /**
+     * 保存时
+     */
+    void onSave();
+
+    /**
      * 订阅时
      */
     void onSubscribe(String topic, String consumer, Session session);

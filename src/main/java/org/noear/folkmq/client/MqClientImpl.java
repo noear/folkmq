@@ -172,6 +172,7 @@ public class MqClientImpl extends EventListener implements MqClientInternal {
      */
     @Override
     public void acknowledge(Message message, boolean isOk) throws IOException {
+        //发送“回执”，向服务端反馈消费情况
         clientSession.replyEnd(message, new StringEntity("")
                 .meta(MqConstants.MQ_META_ACK, isOk ? "1" : "0"));
     }

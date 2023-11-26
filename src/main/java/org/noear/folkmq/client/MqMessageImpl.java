@@ -31,29 +31,44 @@ public class MqMessageImpl implements MqMessage {
         this.content = from.dataAsString();
     }
 
+    /**
+     * 事务ID
+     */
     @Override
     public String getTid() {
         return tid;
     }
 
+    /**
+     * 主题
+     */
     @Override
     public String getTopic() {
         return topic;
     }
 
-    @Override
-    public int getTimes() {
-        return times;
-    }
-
+    /**
+     * 内容
+     */
     @Override
     public String getContent() {
         return content;
     }
 
+    /**
+     * 已派发次数
+     */
+    @Override
+    public int getTimes() {
+        return times;
+    }
 
+    /**
+     * 回执
+     */
     @Override
     public void acknowledge(boolean isOk) throws IOException {
+        //发送“回执”，向服务端反馈消费情况
         clientInternal.acknowledge(from, isOk);
     }
 

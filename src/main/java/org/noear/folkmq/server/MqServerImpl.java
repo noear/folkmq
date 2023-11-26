@@ -57,7 +57,7 @@ public class MqServerImpl extends EventListener implements MqServerInternal {
 
             //持久化后，再答复（以支持原子性）
             if (m.isRequest() || m.isSubscribe()) {
-                //表示我收到了
+                //发送“确认”，表示服务端收到了
                 s.replyEnd(m, new StringEntity(""));
             }
 
@@ -75,7 +75,7 @@ public class MqServerImpl extends EventListener implements MqServerInternal {
 
             //持久化后，再答复（以支持原子性）
             if (m.isRequest() || m.isSubscribe()) {
-                //表示我收到了
+                //发送“确认”，表示服务端收到了
                 s.replyEnd(m, new StringEntity(""));
             }
 

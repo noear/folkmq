@@ -140,6 +140,19 @@ public class MqServerDefault extends EventListener implements MqServerInternal {
     }
 
     /**
+     * 配置访问账号
+     *
+     * @param accessMap 访问账号集合
+     */
+    @Override
+    public MqServer addAccessAll(Map<String, String> accessMap) {
+        if (accessMap != null) {
+            serverAccessMap.putAll(accessMap);
+        }
+        return this;
+    }
+
+    /**
      * 启动
      */
     @Override

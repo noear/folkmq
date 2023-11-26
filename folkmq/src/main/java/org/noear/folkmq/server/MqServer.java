@@ -2,6 +2,8 @@ package org.noear.folkmq.server;
 
 import org.noear.socketd.transport.server.ServerConfigHandler;
 
+import java.util.Map;
+
 /**
  * 消息服务端
  *
@@ -26,6 +28,13 @@ public interface MqServer {
      * @param sk 访问者密钥
      */
     MqServer addAccess(String ak, String sk);
+
+    /**
+     * 配置访问账号
+     *
+     * @param accessMap 访问账号集合
+     */
+    MqServer addAccessAll(Map<String, String> accessMap);
 
     /**
      * 启动

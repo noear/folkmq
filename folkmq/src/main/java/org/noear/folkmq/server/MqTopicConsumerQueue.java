@@ -2,7 +2,7 @@ package org.noear.folkmq.server;
 
 import org.noear.socketd.transport.core.Session;
 
-import java.io.Closeable;
+import java.util.Map;
 
 /**
  * 主题消费者队列（服务端给 [一个主题+一个消费者] 安排一个队列，一个消费者可多个会话，只随机给一个会话派发）
@@ -10,11 +10,21 @@ import java.io.Closeable;
  * @author noear
  * @since 1.0
  */
-public interface MqTopicConsumerQueue extends Closeable {
+public interface MqTopicConsumerQueue {
+    /**
+     * 获取主题
+     */
+    String getTopic();
+
     /**
      * 获取消费者
      */
     String getConsumer();
+
+    /**
+     * 获取消息表
+     */
+    Map<String, MqMessageHolder> getMessageMap();
 
     /**
      * 添加消费者会话
@@ -35,4 +45,9 @@ public interface MqTopicConsumerQueue extends Closeable {
      * 消息数量
      */
     int size();
+
+    /**
+     * 关闭
+     */
+    void close();
 }

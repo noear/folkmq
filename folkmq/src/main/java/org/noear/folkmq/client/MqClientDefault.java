@@ -1,6 +1,6 @@
 package org.noear.folkmq.client;
 
-import org.noear.folkmq.MqConstants;
+import org.noear.folkmq.common.MqConstants;
 import org.noear.socketd.SocketD;
 import org.noear.socketd.exception.SocketdConnectionException;
 import org.noear.socketd.transport.client.Client;
@@ -20,13 +20,13 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * 消息客户端
+ * 消息客户端默认实现
  *
  * @author noear
  * @since 1.0
  */
-public class MqClientImpl extends EventListener implements MqClientInternal {
-    private static final Logger log = LoggerFactory.getLogger(MqClientImpl.class);
+public class MqClientDefault extends EventListener implements MqClientInternal {
+    private static final Logger log = LoggerFactory.getLogger(MqClientDefault.class);
 
     //服务端地址
     private String serverUrl;
@@ -40,15 +40,15 @@ public class MqClientImpl extends EventListener implements MqClientInternal {
     //自动回执
     private boolean autoAcknowledge = true;
 
-    public MqClientImpl(String serverUrl) {
+    public MqClientDefault(String serverUrl) {
         this.serverUrl = serverUrl.replace("folkmq://", "sd:tcp://");
 
         //接收派发指令
         on(MqConstants.MQ_EVENT_DISTRIBUTE, (s, m) -> {
-            MqMessageImpl message = null;
+            MqMessageDefault message = null;
 
             try {
-                message = new MqMessageImpl(this, m);
+                message = new MqMessageDefault(this, m);
                 MqSubscription subscription = subscriptionMap.get(message.getTopic());
 
                 if (subscription != null) {
@@ -169,7 +169,7 @@ public class MqClientImpl extends EventListener implements MqClientInternal {
      * 消费回执
      */
     @Override
-    public void acknowledge(MqMessageImpl message, boolean isOk) throws IOException {
+    public void acknowledge(MqMessageDefault message, boolean isOk) throws IOException {
         //发送“回执”，向服务端反馈消费情况
         if (message.getQos() > 0) {
             clientSession.replyEnd(message.from, new StringEntity("")

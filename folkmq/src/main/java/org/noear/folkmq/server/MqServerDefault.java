@@ -1,6 +1,6 @@
 package org.noear.folkmq.server;
 
-import org.noear.folkmq.MqConstants;
+import org.noear.folkmq.common.MqConstants;
 import org.noear.socketd.SocketD;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
@@ -8,6 +8,7 @@ import org.noear.socketd.transport.core.entity.StringEntity;
 import org.noear.socketd.transport.core.listener.EventListener;
 import org.noear.socketd.transport.server.Server;
 import org.noear.socketd.transport.server.ServerConfigHandler;
+import org.noear.socketd.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,13 +16,13 @@ import java.io.IOException;
 import java.util.*;
 
 /**
- * 消息服务端
+ * 消息服务端默认实现
  *
  * @author noear
  * @since 1.0
  */
-public class MqServerImpl extends EventListener implements MqServerInternal {
-    private static final Logger log = LoggerFactory.getLogger(MqServerImpl.class);
+public class MqServerDefault extends EventListener implements MqServerInternal {
+    private static final Logger log = LoggerFactory.getLogger(MqServerDefault.class);
 
     //服务端
     private Server server;
@@ -39,7 +40,7 @@ public class MqServerImpl extends EventListener implements MqServerInternal {
     private Map<String, MqTopicConsumerQueue> topicConsumerMap = new HashMap<>();
 
 
-    public MqServerImpl() {
+    public MqServerDefault() {
         //::初始化 Persistent 接口
 
         persistent = new MqPersistentDefault();
@@ -85,8 +86,7 @@ public class MqServerImpl extends EventListener implements MqServerInternal {
 
         //接收保存指令
         on(MqConstants.MQ_EVENT_SAVE, (s, m) -> {
-            //执行保存
-            saveDo();
+            save();
         });
     }
 
@@ -148,6 +148,15 @@ public class MqServerImpl extends EventListener implements MqServerInternal {
     }
 
     /**
+     * 保存
+     */
+    @Override
+    public void save() {
+        //持久化::保存时
+        persistent.onSave();
+    }
+
+    /**
      * 停止
      */
     @Override
@@ -157,6 +166,12 @@ public class MqServerImpl extends EventListener implements MqServerInternal {
 
         //停止
         server.stop();
+
+        //关闭队列
+        List<MqTopicConsumerQueue> queueList = new ArrayList<>(topicConsumerMap.values());
+        for (MqTopicConsumerQueue queue : queueList) {
+            queue.close();
+        }
 
         //持久化::服务停止之后
         persistent.onStopAfter();
@@ -253,7 +268,7 @@ public class MqServerImpl extends EventListener implements MqServerInternal {
         //为身份建立队列(topicConsumer=>MqTopicConsumerQueue)
         MqTopicConsumerQueue topicConsumerQueue = topicConsumerMap.get(topicConsumer);
         if (topicConsumerQueue == null) {
-            topicConsumerQueue = new MqTopicConsumerQueueImpl(persistent, topic, consumer);
+            topicConsumerQueue = new MqTopicConsumerQueueDefault(persistent, topic, consumer);
             topicConsumerMap.put(topicConsumer, topicConsumerQueue);
         }
 
@@ -279,8 +294,15 @@ public class MqServerImpl extends EventListener implements MqServerInternal {
     @Override
     public void exchangeDo(String topic, Message message) {
         //复用解析
-        long scheduled = Long.parseLong(message.metaOrDefault(MqConstants.MQ_META_SCHEDULED, "0"));
+        String tid = message.meta(MqConstants.MQ_META_TID);
         int qos = Integer.parseInt(message.metaOrDefault(MqConstants.MQ_META_QOS, "1"));
+        long scheduled = Long.parseLong(message.metaOrDefault(MqConstants.MQ_META_SCHEDULED, "0"));
+
+        //可能是非法消息
+        if (Utils.isEmpty(tid)) {
+            log.warn("The tid cannot be null, sid={}", message.sid());
+            return;
+        }
 
         //取出所有订阅的主题消息者
         Set<String> topicConsumerSet = subscribeMap.get(topic);
@@ -293,16 +315,10 @@ public class MqServerImpl extends EventListener implements MqServerInternal {
                 MqTopicConsumerQueue topicConsumerQueue = topicConsumerMap.get(topicConsumer);
 
                 if (topicConsumerQueue != null) {
-                    MqMessageHolder messageHolder = new MqMessageHolder(message, qos, scheduled);
+                    MqMessageHolder messageHolder = new MqMessageHolder(message, tid, qos, scheduled);
                     topicConsumerQueue.add(messageHolder);
                 }
             }
         }
-    }
-
-    @Override
-    public void saveDo() {
-        //持久化::保存时
-        persistent.onSave();
     }
 }

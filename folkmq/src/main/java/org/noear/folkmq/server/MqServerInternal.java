@@ -32,9 +32,4 @@ public interface MqServerInternal extends MqServer {
      * 执行交换
      */
     void exchangeDo(String topic, Message message);
-
-    /**
-     * 执行保存
-     */
-    void saveDo();
 }

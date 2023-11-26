@@ -33,6 +33,11 @@ public interface MqServer {
     MqServer start(int port) throws Exception;
 
     /**
+     * 保存
+     */
+    void save();
+
+    /**
      * 停止
      */
     void stop();

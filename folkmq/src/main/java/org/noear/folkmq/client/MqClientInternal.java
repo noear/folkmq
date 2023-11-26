@@ -1,7 +1,5 @@
 package org.noear.folkmq.client;
 
-import org.noear.socketd.transport.core.Message;
-
 import java.io.IOException;
 
 /**
@@ -17,5 +15,5 @@ public interface MqClientInternal extends MqClient {
      * @param message 消息
      * @param isOk    回执
      */
-    void acknowledge(MqMessageImpl message, boolean isOk) throws IOException;
+    void acknowledge(MqMessageDefault message, boolean isOk) throws IOException;
 }

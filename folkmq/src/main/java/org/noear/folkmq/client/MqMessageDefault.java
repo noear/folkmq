@@ -1,18 +1,18 @@
 package org.noear.folkmq.client;
 
 
-import org.noear.folkmq.MqConstants;
+import org.noear.folkmq.common.MqConstants;
 import org.noear.socketd.transport.core.Message;
 
 import java.io.IOException;
 
 /**
- * 消息结构体实现
+ * 消息结构体默认实现
  *
  * @author noear
  * @since 1.0
  */
-public class MqMessageImpl implements MqMessage {
+public class MqMessageDefault implements MqMessage {
     protected final transient MqClientInternal clientInternal;
     protected final transient Message from;
 
@@ -22,7 +22,7 @@ public class MqMessageImpl implements MqMessage {
     private final int qos;
     private final int times;
 
-    public MqMessageImpl(MqClientInternal clientInternal, Message from) {
+    public MqMessageDefault(MqClientInternal clientInternal, Message from) {
         this.clientInternal = clientInternal;
         this.from = from;
 

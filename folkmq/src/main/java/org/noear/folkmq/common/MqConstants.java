@@ -1,4 +1,4 @@
-package org.noear.folkmq;
+package org.noear.folkmq.common;
 
 /**
  * 常量

@@ -1,6 +1,5 @@
 package org.noear.folkmq.server;
 
-import org.noear.folkmq.MqConstants;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.entity.EntityDefault;
 
@@ -15,10 +14,10 @@ import java.util.concurrent.TimeUnit;
  * @since 1.0
  */
 public class MqMessageHolder implements Delayed {
-    //来源
-    private final Message from;
     //消息内容
     private final EntityDefault content;
+    //事务Id
+    private final String tid;
     //质量等级（0 或 1）
     private final int qos;
 
@@ -29,19 +28,19 @@ public class MqMessageHolder implements Delayed {
     //是否完成
     private boolean isDone;
 
-    public MqMessageHolder(Message from, int qos,  long distributeTime) {
-        this.from = from;
+    public MqMessageHolder(Message from, String tid, int qos,  long distributeTime) {
         this.content = new EntityDefault().data(from.dataAsBytes()).metaMap(from.metaMap());
 
+        this.tid = tid;
         this.qos = qos;
         this.distributeTime = distributeTime;
     }
 
     /**
-     * 获取流Id
-     */
-    public String getSid() {
-        return from.sid();
+     * 获取事务Id
+     * */
+    public String getTid() {
+        return tid;
     }
 
     /**

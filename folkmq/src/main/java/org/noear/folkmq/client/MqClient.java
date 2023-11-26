@@ -43,6 +43,14 @@ public interface MqClient {
     void subscribe(String topic, String consumer, MqConsumerHandler consumerHandler) throws IOException;
 
     /**
+     * 取消订阅主题
+     *
+     * @param topic    主题
+     * @param consumer 消费者（实例 ip 或 集群 name）
+     */
+    void unsubscribe(String topic, String consumer) throws IOException;
+
+    /**
      * 发布消息
      *
      * @param topic   主题

@@ -14,6 +14,7 @@ import java.util.concurrent.TimeUnit;
  * @since 1.0
  */
 public class MqMessageHolder implements Delayed {
+    private final Message from;
     //消息内容
     private final EntityDefault content;
     //事务Id
@@ -28,7 +29,8 @@ public class MqMessageHolder implements Delayed {
     //是否完成
     private boolean isDone;
 
-    public MqMessageHolder(Message from, String tid, int qos,  long distributeTime) {
+    public MqMessageHolder(Message from, String tid, int qos, long distributeTime) {
+        this.from = from;
         this.content = new EntityDefault().data(from.dataAsBytes()).metaMap(from.metaMap());
 
         this.tid = tid;
@@ -37,8 +39,15 @@ public class MqMessageHolder implements Delayed {
     }
 
     /**
+     * 获取流Id
+     */
+    public String getSid() {
+        return from.sid();
+    }
+
+    /**
      * 获取事务Id
-     * */
+     */
     public String getTid() {
         return tid;
     }

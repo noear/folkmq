@@ -51,6 +51,11 @@ public class MqPersistentDefault implements MqPersistent{
     }
 
     @Override
+    public void onUnSubscribe(String topic, String consumer, Session session) {
+
+    }
+
+    @Override
     public void onPublish(String topic, Message message) {
 
     }

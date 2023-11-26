@@ -29,6 +29,11 @@ public interface MqServerInternal extends MqServer {
     void subscribeDo(String topic, String consumer, Session session);
 
     /**
+     * 执行取消订阅
+     */
+    void unsubscribeDo(String topic, String consumer, Session session);
+
+    /**
      * 执行交换
      */
     void exchangeDo(String topic, Message message);

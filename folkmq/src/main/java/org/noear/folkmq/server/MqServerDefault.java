@@ -66,6 +66,24 @@ public class MqServerDefault extends EventListener implements MqServerInternal {
             subscribeDo(topic, consumer, s);
         });
 
+        //接收取消订阅指令
+        on(MqConstants.MQ_EVENT_UNSUBSCRIBE, (s, m) -> {
+            String topic = m.meta(MqConstants.MQ_META_TOPIC);
+            String consumer = m.meta(MqConstants.MQ_META_CONSUMER);
+
+            //持久化::取消订阅时（适配时，可选择同步或异步。同步可靠性高，异步性能好）
+            persistent.onUnSubscribe(topic, consumer, s);
+
+            //持久化后，再答复（以支持同步的原子性需求。同步或异步，由用户按需控制）
+            if (m.isRequest() || m.isSubscribe()) {
+                //发送“确认”，表示服务端收到了
+                s.replyEnd(m, new StringEntity(""));
+            }
+
+            //执行取消订阅
+            unsubscribeDo(topic, consumer, s);
+        });
+
         //接收发布指令
         on(MqConstants.MQ_EVENT_PUBLISH, (s, m) -> {
             //执行派发
@@ -103,6 +121,7 @@ public class MqServerDefault extends EventListener implements MqServerInternal {
     public MqServer persistent(MqPersistent persistent) {
         if (persistent != null) {
             this.persistent = persistent;
+            this.persistent.init(this);
         }
 
         return this;
@@ -162,7 +181,7 @@ public class MqServerDefault extends EventListener implements MqServerInternal {
     @Override
     public void stop() {
         //持久化::服务停止之前
-        persistent.onStopAfter();
+        persistent.onStopBefore();
 
         //停止
         server.stop();
@@ -252,7 +271,7 @@ public class MqServerDefault extends EventListener implements MqServerInternal {
      */
     @Override
     public synchronized void subscribeDo(String topic, String consumer, Session session) {
-        String topicConsumer = topic + "#" + consumer;
+        String topicConsumer = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER + consumer;
 
         //::1.构建订阅关系
 
@@ -277,11 +296,36 @@ public class MqServerDefault extends EventListener implements MqServerInternal {
         if (session != null) {
             log.info("Server channel subscribe topic={}, consumer={}, session={}", topic, consumer, session.sessionId());
 
-            //给会话添加身份（可以有多个不同的身份）
+            //会话添加身份（可以有多个不同的身份）
             session.attr(topicConsumer, "1");
 
             //加入主题消息队列
             topicConsumerQueue.addSession(session);
+        }
+    }
+
+    /**
+     * 执行取消订阅
+     */
+    @Override
+    public synchronized void unsubscribeDo(String topic, String consumer, Session session) {
+        String topicConsumer = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER + consumer;
+
+        //1.获取身份建立队列(topicConsumer=>MqTopicConsumerQueue)
+        MqTopicConsumerQueue topicConsumerQueue = topicConsumerMap.get(topicConsumer);
+
+        //::2.移除会话身份（从持久层恢复时，会话可能为 null）
+
+        if (session != null) {
+            log.info("Server channel unsubscribe topic={}, consumer={}, session={}", topic, consumer, session.sessionId());
+
+            //会话移除身份（可以有多个不同的身份）
+            session.attrMap().remove(topicConsumer);
+
+            //退出主题消息队列
+            if (topicConsumerQueue != null) {
+                topicConsumerQueue.removeSession(session);
+            }
         }
     }
 

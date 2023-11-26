@@ -41,6 +41,10 @@ public interface MqConstants {
      */
     String MQ_EVENT_SUBSCRIBE = "mq.event.subscribe";
     /**
+     * 事件：取消订阅
+     */
+    String MQ_EVENT_UNSUBSCRIBE = "mq.event.unsubscribe";
+    /**
      * 事件：发布
      */
     String MQ_EVENT_PUBLISH = "mq.event.publish";
@@ -61,4 +65,9 @@ public interface MqConstants {
      * 连接参数: sk
      */
     String PARAM_ACCESS_SECRET_KEY = "sk";
+
+    /**
+     * 主题与消息者间隔符
+     */
+    String SEPARATOR_TOPIC_CONSUMER = "#";
 }

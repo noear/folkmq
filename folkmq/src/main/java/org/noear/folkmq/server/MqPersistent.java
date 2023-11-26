@@ -49,6 +49,11 @@ public interface MqPersistent {
     void onSubscribe(String topic, String consumer, Session session);
 
     /**
+     * 取消订阅时
+     */
+    void onUnSubscribe(String topic, String consumer, Session session);
+
+    /**
      * 发布时
      */
     void onPublish(String topic, Message message);

@@ -125,6 +125,19 @@ public class MqClientDefault extends EventListener implements MqClientInternal {
         }
     }
 
+    @Override
+    public void unsubscribe(String topic, String consumer) throws IOException {
+        subscriptionMap.remove(topic);
+
+        if (clientSession != null && clientSession.isValid()) {
+            Entity entity = new StringEntity("")
+                    .meta(MqConstants.MQ_META_TOPIC, topic)
+                    .meta(MqConstants.MQ_META_CONSUMER, consumer);
+
+            clientSession.sendAndRequest(MqConstants.MQ_EVENT_UNSUBSCRIBE, entity);
+        }
+    }
+
     /**
      * 发布消息
      *

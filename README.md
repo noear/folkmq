@@ -71,7 +71,7 @@
 
 详见： [DEV-RECORD.md](DEV-RECORD.md)
 
-## 服务端镜像
+## 服务端容器镜像
 
 | 镜像                           | 说明            |
 |------------------------------|---------------|
@@ -87,7 +87,7 @@
 添加环境变量：`folkmq.access.ak1=sk1`，`folkmq.access.ak2=sk2`
 
 
-## 示例
+## 代码示例
 
 
 * maven
@@ -133,7 +133,7 @@ public class ServerDemo {
 }
 ```
 
-* client(consumer + producer)  demo
+* client(consumer + producer) use  demo
 
 ```java
 public class ClientDemo1 {

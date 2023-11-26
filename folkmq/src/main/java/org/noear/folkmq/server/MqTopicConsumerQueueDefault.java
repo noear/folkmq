@@ -193,6 +193,8 @@ public class MqTopicConsumerQueueDefault implements MqTopicConsumerQueue {
             s1.send(MqConstants.MQ_EVENT_DISTRIBUTE, messageHolder.getContent());
             //持久化::回执时
             persistent.onAcknowledge(consumer, messageHolder, true);
+            messageHolder.setDone(true);
+            messageMap.remove(messageHolder.getTid());
         }
     }
 

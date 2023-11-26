@@ -2,7 +2,7 @@
   FolkMQ
 </h1>
 <p align="center">
-	<strong>一个新起的内存型消息队列</strong>
+	<strong>一个新起的内存型消息队列（支持持久化快照）</strong>
 </p>
 
 <p align="center">
@@ -45,11 +45,17 @@
 ## 简介
 
 * 基于 [Socket.D 通讯应用协议](https://gitee.com/noear/socketd) 开发的内存型消息队列。俗称：民谣消息队列（FolkMQ）
-* 特点 快、快、特别的快
-* 支持 发布、订阅、定时、ACK，重试、延时、Qos0、Qos1
-* 没有 集群和持久化（但，开放了持久化适配接口）
-* 大约 100_000 TPS（使用 MacBook pro 2020 + JDK8 本机测试，单客户端发与收）
+* 支持 订阅、取消订阅、发布消息、发布定时消息、ACK，重试、延时、Qos0、Qos1，支持持久化快照
+* 没有 集群功能（用户可以自建）
 
+
+## 特点
+
+快、特别的快（大约 100_000 TPS）。基于内存，有点像 redis 之于 mysql。
+
+<img src="DEV-TEST.png" width="500" />
+
+//使用 MacBook pro 2020 + JDK8 本机测试，单客户端发与收
 
 ### 加入到社区交流群
 
@@ -75,7 +81,7 @@
     <dependency>
         <groupId>org.noear</groupId>
         <artifactId>folkmq</artifactId>
-        <version>1.0.4</version>
+        <version>1.0.5</version>
     </dependency>
 
     <!-- 可选传输包：java-tcp（90kb左右）, smartsocket（260Kb左右）, netty（2.5Mb左右） -->

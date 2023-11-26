@@ -30,8 +30,8 @@ public class MqMessageImpl implements MqMessage {
         this.topic = from.metaOrDefault(MqConstants.MQ_META_TOPIC, "");
         this.content = from.dataAsString();
 
-        this.times = Integer.parseInt(from.metaOrDefault(MqConstants.MQ_META_TIMES, "0"));
         this.qos = Integer.parseInt(from.metaOrDefault(MqConstants.MQ_META_QOS, "1"));
+        this.times = Integer.parseInt(from.metaOrDefault(MqConstants.MQ_META_TIMES, "0"));
     }
 
     /**
@@ -60,7 +60,7 @@ public class MqMessageImpl implements MqMessage {
 
     @Override
     public int getQos() {
-        return 0;
+        return qos;
     }
 
     /**

@@ -24,7 +24,7 @@ public class TestCase01_send extends BaseTestCase {
                 .start(getPort());
 
         //客户端
-        CountDownLatch countDownLatch = new CountDownLatch(1);
+        CountDownLatch countDownLatch = new CountDownLatch(5);
 
         client = new MqClientImpl("folkmq://127.0.0.1:" + getPort())
                 .connect();
@@ -34,7 +34,11 @@ public class TestCase01_send extends BaseTestCase {
             countDownLatch.countDown();
         }));
 
-        client.publish("demo", "demo");
+        client.publish("demo", "demo1");
+        client.publish("demo", "demo2");
+        client.publish("demo", "demo3");
+        client.publish("demo", "demo4");
+        client.publish("demo", "demo5");
 
         countDownLatch.await(1, TimeUnit.SECONDS);
 

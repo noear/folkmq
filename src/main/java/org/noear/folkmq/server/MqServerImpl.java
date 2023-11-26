@@ -74,7 +74,7 @@ public class MqServerImpl extends EventListener implements MqServerInternal {
             persistent.onPublish(topic, m);
 
             //持久化后，再答复（以支持同步的原子性需求。同步或异步，由用户按需控制）
-            if (m.isRequest() || m.isSubscribe()) {
+            if (m.isRequest() || m.isSubscribe()) { //此判断兼容 Qos0, Qos1
                 //发送“确认”，表示服务端收到了
                 s.replyEnd(m, new StringEntity(""));
             }
@@ -272,18 +272,22 @@ public class MqServerImpl extends EventListener implements MqServerInternal {
      */
     @Override
     public void exchangeDo(String topic, Message message) {
-        //计划派发时间
+        //复用解析
         long scheduled = Long.parseLong(message.metaOrDefault(MqConstants.MQ_META_SCHEDULED, "0"));
+        int qos = Integer.parseInt(message.metaOrDefault(MqConstants.MQ_META_QOS, "1"));
 
         //取出所有订阅的主题消息者
         Set<String> topicConsumerSet = subscribeMap.get(topic);
+
         if (topicConsumerSet != null) {
             //避免遍历 Set 时，出现 add or remove 而异常
             List<String> topicConsumerList = new ArrayList<>(topicConsumerSet);
+
             for (String topicConsumer : topicConsumerList) {
                 MqTopicConsumerQueue topicConsumerQueue = topicConsumerMap.get(topicConsumer);
+
                 if (topicConsumerQueue != null) {
-                    MqMessageHolder messageHolder = new MqMessageHolder(message, scheduled);
+                    MqMessageHolder messageHolder = new MqMessageHolder(message, qos, scheduled);
                     topicConsumerQueue.add(messageHolder);
                 }
             }

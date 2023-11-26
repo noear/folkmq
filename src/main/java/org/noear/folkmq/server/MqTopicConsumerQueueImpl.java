@@ -148,26 +148,33 @@ public class MqTopicConsumerQueueImpl implements MqTopicConsumerQueue {
         //持久化::派发时（在元信息调整之后，持久化）
         persistent.onDistribute(consumer, messageHolder);
 
-        //添加延时任务：2小时后，如果没有回执就重发（即消息最长不能超过2小时）
-        addDelayed(messageHolder, MqNextTime.getMaxDelayMillis());
+        if (messageHolder.getQos() > 0) {
+            //::Qos1
 
-        //给会话发送消息
-        s1.sendAndSubscribe(MqConstants.MQ_EVENT_DISTRIBUTE, messageHolder.getContent(), m -> {
-            int ack = Integer.parseInt(m.metaOrDefault(MqConstants.MQ_META_ACK, "0"));
+            //添加延时任务：2小时后，如果没有回执就重发（即消息最长不能超过2小时）
+            addDelayed(messageHolder, MqNextTime.getMaxDelayMillis());
 
-            //持久化::回执时
-            persistent.onAcknowledge(consumer, messageHolder, ack == 1);
+            //给会话发送消息
+            s1.sendAndSubscribe(MqConstants.MQ_EVENT_DISTRIBUTE, messageHolder.getContent(), m -> {
+                int ack = Integer.parseInt(m.metaOrDefault(MqConstants.MQ_META_ACK, "0"));
 
-            if (ack == 0) {
-                //no （如果在队列改时间即可；如果不在队列说明有补发过）
-                realQueue.remove(messageHolder);
-                addDelayed(messageHolder.delayed());
-            } else {
-                //ok
-                messageHolder.setDone(true);
-                realQueue.remove(messageHolder);
-            }
-        });
+                //持久化::回执时
+                persistent.onAcknowledge(consumer, messageHolder, ack == 1);
+
+                if (ack == 0) {
+                    //no （如果在队列改时间即可；如果不在队列说明有补发过）
+                    realQueue.remove(messageHolder);
+                    addDelayed(messageHolder.delayed());
+                } else {
+                    //ok
+                    messageHolder.setDone(true);
+                    realQueue.remove(messageHolder);
+                }
+            });
+        } else {
+            //::Qos0
+            s1.send(MqConstants.MQ_EVENT_DISTRIBUTE, messageHolder.getContent());
+        }
     }
 
     /**

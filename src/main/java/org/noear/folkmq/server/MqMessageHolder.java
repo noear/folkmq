@@ -1,11 +1,11 @@
 package org.noear.folkmq.server;
 
+import org.noear.folkmq.MqConstants;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.entity.EntityDefault;
 
 import java.io.IOException;
 import java.util.concurrent.Delayed;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -16,9 +16,12 @@ import java.util.concurrent.TimeUnit;
  */
 public class MqMessageHolder implements Delayed {
     //来源
-    private transient Message from;
+    private final Message from;
     //消息内容
-    private EntityDefault content;
+    private final EntityDefault content;
+    //质量等级（0 或 1）
+    private final int qos;
+
     //派发时间
     private long distributeTime;
     //派发次数
@@ -26,9 +29,11 @@ public class MqMessageHolder implements Delayed {
     //是否完成
     private boolean isDone;
 
-    public MqMessageHolder(Message from, long distributeTime) {
+    public MqMessageHolder(Message from, int qos,  long distributeTime) {
         this.from = from;
         this.content = new EntityDefault().data(from.dataAsBytes()).metaMap(from.metaMap());
+
+        this.qos = qos;
         this.distributeTime = distributeTime;
     }
 
@@ -45,6 +50,13 @@ public class MqMessageHolder implements Delayed {
     public EntityDefault getContent() throws IOException {
         content.data().reset();
         return content;
+    }
+
+    /**
+     * 质量等级（0 或 1）
+     */
+    public int getQos() {
+        return qos;
     }
 
     public void setDistributeTime(long distributeTime) {

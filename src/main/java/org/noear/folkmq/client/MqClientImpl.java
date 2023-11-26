@@ -75,8 +75,7 @@ public class MqClientImpl extends EventListener implements MqClientInternal {
             client.config(clientConfigHandler);
         }
 
-        clientSession = client.listen(this)
-                .open();
+        clientSession = client.listen(this).open();
 
         return this;
     }
@@ -153,12 +152,12 @@ public class MqClientImpl extends EventListener implements MqClientInternal {
         CompletableFuture<?> future = new CompletableFuture<>();
 
         if (qos > 0) {
-            //Qos1
+            //::Qos1
             clientSession.sendAndSubscribe(MqConstants.MQ_EVENT_PUBLISH, entity, r -> {
                 future.complete(null);
             });
         } else {
-            //Qos0
+            //::Qos0
             clientSession.send(MqConstants.MQ_EVENT_PUBLISH, entity);
             future.complete(null);
         }

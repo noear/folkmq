@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.noear</groupId>
+        <artifactId>folkmq-parent</artifactId>
+        <version>1.0.4</version>
+        <relativePath>../folkmq-parent/pom.xml</relativePath>
+    </parent>
+
+    <artifactId>folkmq</artifactId>
+    <packaging>jar</packaging>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.noear</groupId>
+            <artifactId>socketd</artifactId>
+        </dependency>
+
+        <!-- 可选传输方案（90kb左右） -->
+        <dependency>
+            <groupId>org.noear</groupId>
+            <artifactId>socketd-transport-java-tcp</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- 可选传输方案（260Kb左右）  -->
+        <dependency>
+            <groupId>org.noear</groupId>
+            <artifactId>socketd-transport-smartsocket</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- 可选传输方案（2.5Mb左右） -->
+        <dependency>
+            <groupId>org.noear</groupId>
+            <artifactId>socketd-transport-netty</artifactId>
+            <optional>true</optional>
+        </dependency>
+    </dependencies>
+</project>

@@ -5,7 +5,7 @@ import org.noear.socketd.transport.core.Session;
 import java.io.Closeable;
 
 /**
- * 消费者队列（一个消费者一个队列，一个消费者可多个会话）
+ * 消费者队列（服务端给一个消费者安排一个队列，一个消费者可多个会话，只随机给一个会话派发）
  *
  * @author noear
  * @since 1.0

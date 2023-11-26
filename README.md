@@ -74,7 +74,7 @@
     <dependency>
         <groupId>org.noear</groupId>
         <artifactId>folkmq</artifactId>
-        <version>1.0.3</version>
+        <version>1.0.4</version>
     </dependency>
 
     <!-- 可选传输包：java-tcp（90kb左右）, smartsocket（260Kb左右）, netty（2.5Mb左右） -->

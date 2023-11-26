@@ -1,7 +1,7 @@
 package features.cases;
 
-import org.noear.folkmq.client.MqClientImpl;
-import org.noear.folkmq.server.MqServerImpl;
+import org.noear.folkmq.client.MqClientDefault;
+import org.noear.folkmq.server.MqServerDefault;
 
 import java.util.Date;
 import java.util.concurrent.CountDownLatch;
@@ -21,13 +21,13 @@ public class TestCase02_scheduled extends BaseTestCase {
         super.start();
 
         //服务端
-        server = new MqServerImpl()
+        server = new MqServerDefault()
                 .start(getPort());
 
         //客户端
         CountDownLatch countDownLatch = new CountDownLatch(1);
 
-        client = new MqClientImpl("folkmq://127.0.0.1:" + getPort())
+        client = new MqClientDefault("folkmq://127.0.0.1:" + getPort())
                 .connect();
 
         client.subscribe("demo", "a", ((message) -> {

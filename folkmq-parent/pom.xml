@@ -19,6 +19,7 @@
         <java.version>1.8</java.version>
 
         <socketd.version>2.0.20</socketd.version>
+        <snack3.version>3.2.83</snack3.version>
 
         <slf4j.version>2.0.9</slf4j.version>
         <junit5.version>5.9.1</junit5.version>
@@ -44,6 +45,12 @@
                 <groupId>org.noear</groupId>
                 <artifactId>folkmq-pro</artifactId>
                 <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.noear</groupId>
+                <artifactId>snack3</artifactId>
+                <version>${snack3.version}</version>
             </dependency>
 
             <dependency>

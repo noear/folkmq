@@ -36,6 +36,13 @@ public class CaseTest {
         testCase.stop();
     }
 
+    @Test
+    public void TestCase09_persistent() throws Exception {
+        BaseTestCase testCase = new TestCase09_persistent(2009);
+        testCase.start();
+        testCase.stop();
+    }
+
     ///
 
     @Test

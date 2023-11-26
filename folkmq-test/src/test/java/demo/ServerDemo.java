@@ -1,7 +1,7 @@
 package demo;
 
 import org.noear.folkmq.server.MqServer;
-import org.noear.folkmq.server.MqServerImpl;
+import org.noear.folkmq.server.MqServerDefault;
 
 /**
  * @author noear
@@ -9,7 +9,7 @@ import org.noear.folkmq.server.MqServerImpl;
  */
 public class ServerDemo {
     public static void main(String[] args) throws Exception {
-        MqServer server = new MqServerImpl()
+        MqServer server = new MqServerDefault()
                 .addAccess("folkmq", "YapLHTx19RlsEE16")
                 .start(9393);
     }

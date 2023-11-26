@@ -1,18 +1,17 @@
 package benchmark;
 
 import org.noear.folkmq.client.MqClient;
-import org.noear.folkmq.client.MqClientImpl;
+import org.noear.folkmq.client.MqClientDefault;
 import org.noear.folkmq.server.MqServer;
-import org.noear.folkmq.server.MqServerImpl;
+import org.noear.folkmq.server.MqServerDefault;
 
 import java.util.Date;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 public class BenchmarkScheduledTest {
     public static void main(String[] args) throws Exception {
         //服务端
-        MqServer server = new MqServerImpl()
+        MqServer server = new MqServerDefault()
                 .addAccess("folkmq", "YapLHTx19RlsEE16")
                 .start(9393);
 
@@ -21,7 +20,7 @@ public class BenchmarkScheduledTest {
         CountDownLatch countDownLatch = new CountDownLatch(count);
 
         //客户端
-        MqClient client = new MqClientImpl("folkmq://127.0.0.1:9393?ak=folkmq&sk=YapLHTx19RlsEE16")
+        MqClient client = new MqClientDefault("folkmq://127.0.0.1:9393?ak=folkmq&sk=YapLHTx19RlsEE16")
                 .connect();
 
         //订阅

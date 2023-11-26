@@ -101,7 +101,7 @@
 public class ServerDemo {
     public static void main(String[] args) throws Exception {
         //服务端（鉴权为可选。不添加则不鉴权）
-        MqServer server = new MqServerImpl()
+        MqServer server = new MqServerDefault()
                 .addAccess("folkmq", "YapLHTx19RlsEE16")
                 .persistent(new MqPersistentSnapshot())
                 .start(9393);
@@ -121,7 +121,7 @@ public class ServerDemo {
 public class ClientDemo1 {
     public static void main(String[] args) throws Exception {
         //客户端（鉴权为可选。服务端，不添加则不鉴权）
-        MqClient client = new MqClientImpl("folkmq://127.0.0.1:9393?ak=folkmq&sk=YapLHTx19RlsEE16")
+        MqClient client = new MqClientDefault("folkmq://127.0.0.1:9393?ak=folkmq&sk=YapLHTx19RlsEE16")
                 .connect();
 
         //订阅

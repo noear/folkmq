@@ -7,8 +7,12 @@ solon.app:
 solon.logging.appender:
   console:
     level: DEBUG
-  cloud:
+  file:
     level: INFO
+    name: "logs/${solon.app.name}"
+    rolling: "logs/${solon.app.name}_%d{yyyy-MM-dd}/%i.log"
+    maxFileSize: "10 MB"
+    maxHistory: "7"
 
 solon.logging.logger:
   "root": #默认记录器配置

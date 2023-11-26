@@ -52,10 +52,10 @@ public class MqServerImpl extends EventListener implements MqServerInternal {
             String topic = m.meta(MqConstants.MQ_META_TOPIC);
             String consumer = m.meta(MqConstants.MQ_META_CONSUMER);
 
-            //持久化::订阅时
+            //持久化::订阅时（适配时，可选择同步或异步。同步可靠性高，异步性能好）
             persistent.onSubscribe(topic, consumer, s);
 
-            //持久化后，再答复（以支持原子性）
+            //持久化后，再答复（以支持同步的原子性需求。同步或异步，由用户按需控制）
             if (m.isRequest() || m.isSubscribe()) {
                 //发送“确认”，表示服务端收到了
                 s.replyEnd(m, new StringEntity(""));
@@ -70,10 +70,10 @@ public class MqServerImpl extends EventListener implements MqServerInternal {
             //执行派发
             String topic = m.meta(MqConstants.MQ_META_TOPIC);
 
-            //持久化::发布时
+            //持久化::发布时（适配时，可选择同步或异步。同步可靠性高，异步性能好）
             persistent.onPublish(topic, m);
 
-            //持久化后，再答复（以支持原子性）
+            //持久化后，再答复（以支持同步的原子性需求。同步或异步，由用户按需控制）
             if (m.isRequest() || m.isSubscribe()) {
                 //发送“确认”，表示服务端收到了
                 s.replyEnd(m, new StringEntity(""));

@@ -1,11 +1,16 @@
 package features.cases;
 
+import org.noear.folkmq.client.MqClient;
+import org.noear.folkmq.server.MqServer;
+
 /**
  * @author noear
  * @since 1.0
  */
 public abstract class BaseTestCase {
     private final int port;
+    protected MqServer server;
+    protected MqClient client;
 
     public int getPort() {
         return port;
@@ -26,6 +31,14 @@ public abstract class BaseTestCase {
      * 停止测试
      */
     public void stop() throws Exception {
+        if (server != null) {
+            server.stop();
+        }
+
+        if (client != null) {
+            client.disconnect();
+        }
+
         System.out.println("------------------ (test stop: port=" + getPort() + ")------------------");
     }
 }

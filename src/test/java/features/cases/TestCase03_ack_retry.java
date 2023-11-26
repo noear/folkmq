@@ -10,8 +10,8 @@ import java.util.concurrent.TimeUnit;
  * @author noear
  * @since 1.0
  */
-public class TestCase01_send extends BaseTestCase {
-    public TestCase01_send(int port) {
+public class TestCase03_ack_retry extends BaseTestCase {
+    public TestCase03_ack_retry(int port) {
         super(port);
     }
 
@@ -27,16 +27,23 @@ public class TestCase01_send extends BaseTestCase {
         CountDownLatch countDownLatch = new CountDownLatch(1);
 
         client = new MqClientImpl("folkmq://127.0.0.1:" + getPort())
+                .autoAcknowledge(false)
                 .connect();
 
         client.subscribe("demo", "a", ((message) -> {
             System.out.println(message);
-            countDownLatch.countDown();
+
+            if(message.getTimes() > 1) {
+                countDownLatch.countDown();
+                message.acknowledge(true);
+            }else{
+                message.acknowledge(false);
+            }
         }));
 
         client.publish("demo", "demo");
 
-        countDownLatch.await(1, TimeUnit.SECONDS);
+        countDownLatch.await(40, TimeUnit.SECONDS);
 
         assert countDownLatch.getCount() == 0;
 

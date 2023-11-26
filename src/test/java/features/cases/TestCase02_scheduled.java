@@ -3,6 +3,7 @@ package features.cases;
 import org.noear.folkmq.client.MqClientImpl;
 import org.noear.folkmq.server.MqServerImpl;
 
+import java.util.Date;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -10,8 +11,8 @@ import java.util.concurrent.TimeUnit;
  * @author noear
  * @since 1.0
  */
-public class TestCase01_send extends BaseTestCase {
-    public TestCase01_send(int port) {
+public class TestCase02_scheduled extends BaseTestCase {
+    public TestCase02_scheduled(int port) {
         super(port);
     }
 
@@ -34,9 +35,9 @@ public class TestCase01_send extends BaseTestCase {
             countDownLatch.countDown();
         }));
 
-        client.publish("demo", "demo");
+        client.publish("demo", "demo", new Date(System.currentTimeMillis() + 5000));
 
-        countDownLatch.await(1, TimeUnit.SECONDS);
+        countDownLatch.await(6, TimeUnit.SECONDS);
 
         assert countDownLatch.getCount() == 0;
 

@@ -13,13 +13,14 @@ import java.io.IOException;
  * @since 1.0
  */
 public class MqMessageImpl implements MqMessage {
-    private final transient MqClientInternal clientInternal;
-    private final transient Message from;
+    protected final transient MqClientInternal clientInternal;
+    protected final transient Message from;
 
     private final String tid;
     private final String topic;
-    private final int times;
     private final String content;
+    private final int qos;
+    private final int times;
 
     public MqMessageImpl(MqClientInternal clientInternal, Message from) {
         this.clientInternal = clientInternal;
@@ -27,8 +28,10 @@ public class MqMessageImpl implements MqMessage {
 
         this.tid = from.metaOrDefault(MqConstants.MQ_META_TID, "");
         this.topic = from.metaOrDefault(MqConstants.MQ_META_TOPIC, "");
-        this.times = Integer.parseInt(from.metaOrDefault(MqConstants.MQ_META_TIMES, "0"));
         this.content = from.dataAsString();
+
+        this.times = Integer.parseInt(from.metaOrDefault(MqConstants.MQ_META_TIMES, "0"));
+        this.qos = Integer.parseInt(from.metaOrDefault(MqConstants.MQ_META_QOS, "1"));
     }
 
     /**
@@ -55,6 +58,11 @@ public class MqMessageImpl implements MqMessage {
         return content;
     }
 
+    @Override
+    public int getQos() {
+        return 0;
+    }
+
     /**
      * 已派发次数
      */
@@ -69,7 +77,7 @@ public class MqMessageImpl implements MqMessage {
     @Override
     public void acknowledge(boolean isOk) throws IOException {
         //发送“回执”，向服务端反馈消费情况
-        clientInternal.acknowledge(from, isOk);
+        clientInternal.acknowledge(this, isOk);
     }
 
     @Override
@@ -77,8 +85,9 @@ public class MqMessageImpl implements MqMessage {
         return "MqMessage{" +
                 "tid='" + tid + '\'' +
                 ", topic='" + topic + '\'' +
-                ", times=" + times +
                 ", content='" + content + '\'' +
+                ", qos=" + qos +
+                ", times=" + times +
                 '}';
     }
 }

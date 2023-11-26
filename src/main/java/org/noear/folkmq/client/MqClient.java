@@ -48,7 +48,20 @@ public interface MqClient {
      * @param topic   主题
      * @param content 消息内容
      */
-    CompletableFuture<?> publish(String topic, String content) throws IOException;
+    default CompletableFuture<?> publish(String topic, String content) throws IOException {
+        return publish(topic, content, null, 1);
+    }
+
+    /**
+     * 发布消息
+     *
+     * @param topic   主题
+     * @param content 消息内容
+     * @param qos     质量等级（0 或 1）
+     */
+    default CompletableFuture<?> publish(String topic, String content, int qos) throws IOException {
+        return publish(topic, content, null, qos);
+    }
 
     /**
      * 发布消息
@@ -57,5 +70,17 @@ public interface MqClient {
      * @param content   消息内容
      * @param scheduled 预定派发时间
      */
-    CompletableFuture<?> publish(String topic, String content, Date scheduled) throws IOException;
+    default CompletableFuture<?> publish(String topic, String content, Date scheduled) throws IOException {
+        return publish(topic, content, scheduled, 1);
+    }
+
+    /**
+     * 发布消息
+     *
+     * @param topic     主题
+     * @param content   消息内容
+     * @param scheduled 预定派发时间
+     * @param qos       质量等级（0 或 1）
+     */
+    CompletableFuture<?> publish(String topic, String content, Date scheduled, int qos) throws IOException;
 }

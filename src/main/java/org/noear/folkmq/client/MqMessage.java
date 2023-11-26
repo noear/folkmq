@@ -25,6 +25,11 @@ public interface MqMessage {
     String getContent();
 
     /**
+     * 质量等级（0 或 1）
+     */
+    int getQos();
+
+    /**
      * 已派发次数
      */
     int getTimes();

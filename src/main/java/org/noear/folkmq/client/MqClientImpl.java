@@ -6,7 +6,6 @@ import org.noear.socketd.exception.SocketdConnectionException;
 import org.noear.socketd.transport.client.Client;
 import org.noear.socketd.transport.client.ClientConfigHandler;
 import org.noear.socketd.transport.core.Entity;
-import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
 import org.noear.socketd.transport.core.entity.StringEntity;
 import org.noear.socketd.transport.core.listener.EventListener;
@@ -46,20 +45,24 @@ public class MqClientImpl extends EventListener implements MqClientInternal {
 
         //接收派发指令
         on(MqConstants.MQ_EVENT_DISTRIBUTE, (s, m) -> {
+            MqMessageImpl message = null;
+
             try {
-                String topic = m.meta(MqConstants.MQ_META_TOPIC);
-                MqSubscription subscription = subscriptionMap.get(topic);
+                message = new MqMessageImpl(this, m);
+                MqSubscription subscription = subscriptionMap.get(message.getTopic());
 
                 if (subscription != null) {
-                    subscription.handle(new MqMessageImpl(this, m));
+                    subscription.handle(message);
                 }
 
                 //是否自动回执
                 if (autoAcknowledge) {
-                    acknowledge(m, true);
+                    acknowledge(message, true);
                 }
             } catch (Throwable e) {
-                acknowledge(m, false);
+                if (message != null) {
+                    acknowledge(message, false);
+                }
             }
         });
     }
@@ -126,31 +129,21 @@ public class MqClientImpl extends EventListener implements MqClientInternal {
     /**
      * 发布消息
      *
-     * @param topic   主题
-     * @param content 消息内容
-     */
-    @Override
-    public CompletableFuture<?> publish(String topic, String content) throws IOException {
-        return publish(topic, content, null);
-    }
-
-    /**
-     * 发布消息
-     *
      * @param topic     主题
      * @param content   消息内容
      * @param scheduled 预定派发时间
+     * @param qos       质量等级（0 或 1）
      */
     @Override
-    public CompletableFuture<?> publish(String topic, String content, Date scheduled) throws IOException {
-        if(clientSession == null){
+    public CompletableFuture<?> publish(String topic, String content, Date scheduled, int qos) throws IOException {
+        if (clientSession == null) {
             throw new SocketdConnectionException("Not connected!");
         }
 
-        //支持Qos1
         StringEntity entity = new StringEntity(content);
         entity.meta(MqConstants.MQ_META_TID, Utils.guid());
         entity.meta(MqConstants.MQ_META_TOPIC, topic);
+        entity.meta(MqConstants.MQ_META_QOS, String.valueOf(qos));
         if (scheduled == null) {
             entity.meta(MqConstants.MQ_META_SCHEDULED, "0");
         } else {
@@ -158,22 +151,31 @@ public class MqClientImpl extends EventListener implements MqClientInternal {
         }
 
         CompletableFuture<?> future = new CompletableFuture<>();
-        clientSession.sendAndSubscribe(MqConstants.MQ_EVENT_PUBLISH, entity, r -> {
+
+        if (qos > 0) {
+            //Qos1
+            clientSession.sendAndSubscribe(MqConstants.MQ_EVENT_PUBLISH, entity, r -> {
+                future.complete(null);
+            });
+        } else {
+            //Qos0
+            clientSession.send(MqConstants.MQ_EVENT_PUBLISH, entity);
             future.complete(null);
-        });
+        }
 
         return future;
     }
-
 
     /**
      * 消费回执
      */
     @Override
-    public void acknowledge(Message message, boolean isOk) throws IOException {
+    public void acknowledge(MqMessageImpl message, boolean isOk) throws IOException {
         //发送“回执”，向服务端反馈消费情况
-        clientSession.replyEnd(message, new StringEntity("")
-                .meta(MqConstants.MQ_META_ACK, isOk ? "1" : "0"));
+        if (message.getQos() > 0) {
+            clientSession.replyEnd(message.from, new StringEntity("")
+                    .meta(MqConstants.MQ_META_ACK, isOk ? "1" : "0"));
+        }
     }
 
     /**

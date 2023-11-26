@@ -20,6 +20,10 @@ public interface MqConstants {
      */
     String MQ_META_SCHEDULED = "mq.scheduled";
     /**
+     * 元信息：消息质量等级
+     */
+    String MQ_META_QOS = "mq.qos";
+    /**
      * 元信息：消息者
      */
     String MQ_META_CONSUMER = "mq.consumer";

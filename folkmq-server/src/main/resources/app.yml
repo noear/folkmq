@@ -1,4 +1,4 @@
-server.port: 13692
+server.port: 13602
 
 solon.app:
   group: folkmq

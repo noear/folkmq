@@ -21,15 +21,17 @@ public class MqWatcherComposite implements MqWatcher {
     /**
      * 添加持久化
      */
-    public void addPersistent(MqWatcher persistent) {
+    public MqWatcherComposite add(MqWatcher persistent) {
         persistentList.add(persistent);
+        return this;
     }
 
     /**
      * 移除持久化
      */
-    public void removePersistent(MqWatcher persistent) {
+    public MqWatcherComposite remove(MqWatcher persistent) {
         persistentList.remove(persistent);
+        return this;
     }
 
     @Override

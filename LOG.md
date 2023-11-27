@@ -2,6 +2,7 @@
 ### 1.0.8
 * 调整 "持久化" 概念改为 "观查者" 概念
 * 调整 MqPersistent 改为 MqWatcher
+* 调整 MqPersistentSnapshot 改为 MqWatcherSnapshot
 
 ### 1.0.7
 * 添加 后端管理功能（主要是查看）

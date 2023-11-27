@@ -5,6 +5,7 @@
 * 调整 MqPersistentSnapshot 改为 MqWatcherSnapshot
 * 调整 MqConsumerHandler 改为 MqConsumeHandler
 * 添加 MqWatcherMetrics 做数据监视
+* 恢复 由 sendAndSubscribe 实现 ACK（跑分更高点）
 
 ### 1.0.7
 * 添加 后端管理功能（主要是查看）

@@ -49,6 +49,13 @@
 * 功能 订阅、取消订阅、发布消息、发布定时消息、ACK，重试、延时、Qos0、Qos1
 * 没有 集群功能（用户可以自建）
 
+## 声明
+
+此为商业开源项目。授权声明如下：
+
+* 源码可用于学习研究
+* 参与开发的用户（及所在企业）可永久免费使用（欢迎更多的人参与开发）
+* 2024年6月前企业用户可免费使用（欢迎评估、试用）
 
 ## 特点
 
@@ -80,12 +87,12 @@
 
 | 镜像                           | 说明                        |
 |------------------------------|---------------------------|
-| noearorg/folkmq-server:1.0.7 | 服务端（管理端口：8602，消息端口：18602） |
+| noearorg/folkmq-server:1.0.8 | 服务端（管理端口：8602，消息端口：18602） |
 
 * 运行示例
 
 ```
-docker run -p 18602:18602 -p 8602:8602 noearorg/folkmq-server:1.0.7 
+docker run -p 18602:18602 -p 8602:8602 noearorg/folkmq-server:1.0.8 
 ```
 
 * 可选配置
@@ -111,7 +118,7 @@ docker run -p 18602:18602 -p 8602:8602 noearorg/folkmq-server:1.0.7
     <dependency>
         <groupId>org.noear</groupId>
         <artifactId>folkmq</artifactId>
-        <version>1.0.7</version>
+        <version>1.0.8</version>
     </dependency>
 
     <!-- 可选传输包：java-tcp（90kb左右）, smartsocket（260Kb左右）, netty（2.5Mb左右） -->

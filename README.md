@@ -106,18 +106,11 @@ docker run -p 18602:18602 -p 8602:8602 noearorg/folkmq-server:1.0.8
 
 ```xml
 <dependencies>
-  <!-- 主包：（24kb左右） -->
+    <!-- 可选包：java-tcp（90kb左右）, smartsocket（260Kb左右）, netty（2.5Mb左右） -->
     <dependency>
         <groupId>org.noear</groupId>
-        <artifactId>folkmq</artifactId>
+        <artifactId>folkmq-transport-java-tcp</artifactId>
         <version>1.0.8</version>
-    </dependency>
-
-    <!-- 可选传输包：java-tcp（90kb左右）, smartsocket（260Kb左右）, netty（2.5Mb左右） -->
-    <dependency>
-        <groupId>org.noear</groupId>
-        <artifactId>socketd-transport-java-tcp</artifactId>
-        <version>2.0.21</version>
     </dependency>
 </dependencies>
 ```
@@ -133,7 +126,7 @@ public class ServerDemo {
         //服务端（鉴权为可选。不添加则不鉴权）
         MqServer server = FolkMQ.createServer()
                 .addAccess("folkmq", "YapLHTx19RlsEE16")
-                .persistent(new MqPersistentSnapshot()) //需要 folkmq-pro 包
+                .watcher(new MqWatcherSnapshot()) //持久化需要添加 folkmq-pro 包
                 .start(13602);
 
         //添加定时快照

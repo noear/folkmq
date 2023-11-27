@@ -85,11 +85,10 @@
 | `server.port`                 |  8602   | 管理端口(http)           |
 |                               |  18602   | 消息端口(tcp)，管理端口+10000 |
 | `folkmq.admin`                |  admin   | 管理密码                 |
-| （此为示例） |     | 消息访问账号               |
 
-* 访问账号：
+* 消息访问账号：
 
-添属性或环境变量 `folkmq.access.ak1=sk1`，`folkmq.access.ak2=sk2`
+添属性或环境变量，例： `folkmq.access.ak1=sk1`，`folkmq.access.ak2=sk2`
 
 ## 代码示例
 

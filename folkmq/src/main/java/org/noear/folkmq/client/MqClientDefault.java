@@ -30,6 +30,8 @@ public class MqClientDefault extends EventListener implements MqClientInternal {
 
     //服务端地址
     private String serverUrl;
+    //客户端
+    private Client client;
     //客户端会话
     private Session clientSession;
     //客户端配置
@@ -72,7 +74,7 @@ public class MqClientDefault extends EventListener implements MqClientInternal {
 
     @Override
     public MqClient connect() throws IOException {
-        Client client = SocketD.createClient(this.serverUrl);
+        client = SocketD.createClient(this.serverUrl);
 
         if (clientConfigHandler != null) {
             client.config(clientConfigHandler);
@@ -158,7 +160,7 @@ public class MqClientDefault extends EventListener implements MqClientInternal {
         StringEntity entity = new StringEntity(content);
         entity.meta(MqConstants.MQ_META_TID, Utils.guid());
         entity.meta(MqConstants.MQ_META_TOPIC, topic);
-        entity.meta(MqConstants.MQ_META_QOS, String.valueOf(qos));
+        entity.meta(MqConstants.MQ_META_QOS, (qos == 0 ? "0" : "1"));
         if (scheduled == null) {
             entity.meta(MqConstants.MQ_META_SCHEDULED, "0");
         } else {

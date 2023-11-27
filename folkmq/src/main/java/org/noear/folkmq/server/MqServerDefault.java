@@ -94,7 +94,7 @@ public class MqServerDefault extends EventListener implements MqServerInternal {
                 return;
             }
 
-            MDC.put("tid", tid);
+            //MDC.put("tid", tid);
 
             //持久化::发布时（适配时，可选择同步或异步。同步可靠性高，异步性能好）
             persistent.onPublish(m);
@@ -117,7 +117,7 @@ public class MqServerDefault extends EventListener implements MqServerInternal {
                 return;
             }
 
-            MDC.put("tid", tid);
+            //MDC.put("tid", tid);
 
             //持久化后，再答复（以支持同步的原子性需求。同步或异步，由用户按需控制）
             if (m.isRequest() || m.isSubscribe()) { //此判断兼容 Qos0, Qos1
@@ -375,8 +375,12 @@ public class MqServerDefault extends EventListener implements MqServerInternal {
     public void exchangeDo(String tid, Message message) {
         //复用解析
         String topic = message.meta(MqConstants.MQ_META_TOPIC);
-        int qos = Integer.parseInt(message.metaOrDefault(MqConstants.MQ_META_QOS, "1"));
-        long scheduled = Long.parseLong(message.metaOrDefault(MqConstants.MQ_META_SCHEDULED, "0"));
+        int qos = "0".equals(message.meta(MqConstants.MQ_META_QOS)) ? 0 : 1;
+        long scheduled = 0;
+        String scheduledStr = message.meta(MqConstants.MQ_META_SCHEDULED);
+        if (Utils.isNotEmpty(scheduledStr)) {
+            scheduled = Long.parseLong(scheduledStr);
+        }
 
 
         //取出所有订阅的主题消息者

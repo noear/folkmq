@@ -3,7 +3,6 @@ package org.noear.folkmq.server;
 import org.noear.folkmq.common.MqConstants;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
-import org.noear.socketd.transport.core.entity.EntityDefault;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -57,7 +56,7 @@ public class MqTopicConsumerQueueDefault implements MqTopicConsumerQueue {
             try {
                 MqMessageHolder messageHolder = messageQueue.take();
                 distribute(messageHolder);
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 if (log.isWarnEnabled()) {
                     log.warn("MqConsumerQueue queueTake error", e);
                 }
@@ -110,10 +109,6 @@ public class MqTopicConsumerQueueDefault implements MqTopicConsumerQueue {
      */
     @Override
     public void add(MqMessageHolder messageHolder) {
-        if (messageHolder.isDone()) {
-            return;
-        }
-
         messageMap.put(messageHolder.getTid(), messageHolder);
         messageQueue.add(messageHolder);
     }
@@ -130,10 +125,11 @@ public class MqTopicConsumerQueueDefault implements MqTopicConsumerQueue {
      */
     protected void distribute(MqMessageHolder messageHolder) {
         if (messageHolder.isDone()) {
+            messageMap.remove(messageHolder.getTid());
             return;
         }
 
-        MDC.put("tid", messageHolder.getTid());
+        //MDC.put("tid", messageHolder.getTid());
 
         //找到此身份的其中一个会话（如果是 ip 就一个；如果是集群名则任选一个）
         if (consumerSessions.size() > 0) {
@@ -143,6 +139,12 @@ public class MqTopicConsumerQueueDefault implements MqTopicConsumerQueue {
                 //进入延后队列
                 messageQueue.remove(messageHolder);
                 messageQueue.add(messageHolder.delayed());
+
+                //记日志
+                if (log.isWarnEnabled()) {
+                    log.warn("MqConsumerQueue distribute error, tid={}",
+                            messageHolder.getTid(), e);
+                }
             }
         } else {
             //进入延后队列
@@ -204,8 +206,8 @@ public class MqTopicConsumerQueueDefault implements MqTopicConsumerQueue {
         MqMessageHolder messageHolder = messageMap.get(tid);
 
         if (messageHolder == null) {
-            if (log.isDebugEnabled()) {
-                log.debug("Server {}#{} queue not found, tid={}", topic, consumer, tid);
+            if (log.isWarnEnabled()) {
+                log.warn("Server {}#{} queue not found, tid={}", topic, consumer, tid);
             }
             return;
         }

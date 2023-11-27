@@ -42,13 +42,6 @@ public class MqMessageHolder implements Delayed {
     }
 
     /**
-     * 获取流Id
-     */
-    public String getSid() {
-        return from.sid();
-    }
-
-    /**
      * 获取事务Id
      */
     public String getTid() {

@@ -191,10 +191,7 @@ public class MqClientDefault extends EventListener implements MqClientInternal {
         //发送“回执”，向服务端反馈消费情况
         if (message.getQos() > 0) {
             //此处用 replyEnd 不安全，时间长久可能会话断连过（流就无效了）
-            clientSession.send(MqConstants.MQ_EVENT_ACKNOWLEDGE, new StringEntity("")
-                    .meta(MqConstants.MQ_META_TOPIC, message.getTopic())
-                    .meta(MqConstants.MQ_META_CONSUMER, message.getConsumer())
-                    .meta(MqConstants.MQ_META_TID, message.getTid())
+            clientSession.replyEnd(message.from, new StringEntity("")
                     .meta(MqConstants.MQ_META_ACK, isOk ? "1" : "0"));
         }
     }

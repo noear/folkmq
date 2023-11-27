@@ -24,7 +24,7 @@ public class TestCase09_persistent extends BaseTestCase {
 
         //服务端
         server = new MqServerDefault()
-                .persistent(new MqWatcherSnapshot())
+                .watcher(new MqWatcherSnapshot())
                 .start(getPort());
 
         //客户端
@@ -45,7 +45,7 @@ public class TestCase09_persistent extends BaseTestCase {
 
         server.stop();
         server = new MqServerDefault() //相当于服务器重启了
-                .persistent(new MqWatcherSnapshot())
+                .watcher(new MqWatcherSnapshot())
                 .start(getPort());
 
         //上面已有有订阅记录了
@@ -59,7 +59,7 @@ public class TestCase09_persistent extends BaseTestCase {
 
         server.stop();
         server = new MqServerDefault() //相当于服务器重启了
-                .persistent(new MqWatcherSnapshot())
+                .watcher(new MqWatcherSnapshot())
                 .start(getPort());
 
 

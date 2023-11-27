@@ -43,11 +43,6 @@ public interface MqTopicConsumerQueue {
     void add(MqMessageHolder messageHolder);
 
     /**
-     * 消息确认
-     */
-    void acknowledge(Message message);
-
-    /**
      * 消息数量
      */
     int messageCount();

@@ -53,10 +53,6 @@ public interface MqConstants {
      */
     String MQ_EVENT_DISTRIBUTE = "mq.event.distribute";
     /**
-     * 事件：回执
-     */
-    String MQ_EVENT_ACKNOWLEDGE = "mq.event.acknowledge";
-    /**
      * 事件：保存
      */
     String MQ_EVENT_SAVE = "mq.event.save";

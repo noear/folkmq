@@ -99,16 +99,6 @@ public class MqServerDefault extends EventListener implements MqServerInternal {
             exchangeDo(m);
         });
 
-        on(MqConstants.MQ_EVENT_ACKNOWLEDGE, (s, m) -> {
-            //观察后，再答复（以支持同步的原子性需求。同步或异步，由用户按需控制）
-            if (m.isRequest() || m.isSubscribe()) { //此判断兼容 Qos0, Qos1
-                //发送“确认”，表示服务端收到了
-                s.replyEnd(m, new StringEntity(""));
-            }
-
-            acknowledgeDo(m);
-        });
-
         //接收保存指令
         on(MqConstants.MQ_EVENT_SAVE, (s, m) -> {
             save();
@@ -386,21 +376,6 @@ public class MqServerDefault extends EventListener implements MqServerInternal {
                     topicConsumerQueue.add(messageHolder);
                 }
             }
-        }
-    }
-
-    /**
-     * 执行回执
-     */
-    public void acknowledgeDo(Message message) {
-        String topic = message.meta(MqConstants.MQ_META_TOPIC);
-        String consumer = message.meta(MqConstants.MQ_META_CONSUMER);
-        String topicConsumer = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER + consumer;
-
-        MqTopicConsumerQueue topicConsumerQueue = topicConsumerMap.get(topicConsumer);
-
-        if (topicConsumerQueue != null) {
-            topicConsumerQueue.acknowledge(message);
         }
     }
 }

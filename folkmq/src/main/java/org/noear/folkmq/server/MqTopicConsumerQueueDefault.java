@@ -1,6 +1,7 @@
 package org.noear.folkmq.server;
 
 import org.noear.folkmq.common.MqConstants;
+import org.noear.socketd.transport.core.Entity;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
 import org.noear.socketd.utils.Utils;
@@ -191,7 +192,10 @@ public class MqTopicConsumerQueueDefault implements MqTopicConsumerQueue {
             messageQueue.add(messageHolder);
 
             //给会话发送消息 //用 sendAndSubscribe 不安全，时间太久可能断连过（流就不能用了）
-            s1.send(MqConstants.MQ_EVENT_DISTRIBUTE, messageHolder.getContent());
+            s1.sendAndSubscribe(MqConstants.MQ_EVENT_DISTRIBUTE, messageHolder.getContent(), m -> {
+                int ack = Integer.parseInt(m.metaOrDefault(MqConstants.MQ_META_ACK, "0"));
+                acknowledgeDo(messageHolder, ack);
+            });
         } else {
             //::Qos0
             s1.send(MqConstants.MQ_EVENT_DISTRIBUTE, messageHolder.getContent());
@@ -205,32 +209,13 @@ public class MqTopicConsumerQueueDefault implements MqTopicConsumerQueue {
         }
     }
 
-    @Override
-    public void acknowledge(Message message) {
-        String tid = message.meta(MqConstants.MQ_META_TID);
-        //可能是非法消息
-        if (Utils.isEmpty(tid)) {
-            log.warn("The tid cannot be null, sid={}", message.sid());
-            return;
-        }
-
-        int ack = Integer.parseInt(message.metaOrDefault(MqConstants.MQ_META_ACK, "0"));
-
-        MqMessageHolder messageHolder = messageMap.get(tid);
-
-        if (messageHolder == null) {
-            if (log.isWarnEnabled()) {
-                log.warn("Server {}#{} queue not found, tid={}", topic, consumer, tid);
-            }
-            return;
-        }
-
+    private void acknowledgeDo(MqMessageHolder messageHolder, int ack) {
         //观察者::回执时
         watcher.onAcknowledge(consumer, messageHolder, ack > 0);
 
         if (ack > 0) {
             //ok
-            messageMap.remove(tid);
+            messageMap.remove(messageHolder.getTid());
             messageQueue.remove(messageHolder);
 
             //移除前，不要改移性

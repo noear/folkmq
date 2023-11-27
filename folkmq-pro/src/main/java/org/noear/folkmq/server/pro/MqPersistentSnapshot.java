@@ -126,11 +126,12 @@ public class MqPersistentSnapshot extends MqPersistentDefault {
             String data = messageJson.get("data").getString();
 
             Entity entity = new StringEntity(data).metaString(metaString);
+            String tid = entity.meta(MqConstants.MQ_META_TID);
             Message message = new MessageDefault()
                     .sid(Utils.guid())
                     .flag(Flags.Message)
                     .entity(entity);
-            serverInternal.exchangeDo(message);
+            serverInternal.exchangeDo(tid, message);
         }
 
         return true;
@@ -219,10 +220,10 @@ public class MqPersistentSnapshot extends MqPersistentDefault {
     private void saveTopicConsumerQueue1(String topicConsumer, MqTopicConsumerQueue topicConsumerQueue) throws IOException {
         ONode topicConsumerQueueJson = new ONode(Options.def().add(Feature.PrettyFormat)).asArray();
 
-        if(topicConsumerQueue != null) {
+        if (topicConsumerQueue != null) {
             List<MqMessageHolder> messageList = new ArrayList<>(topicConsumerQueue.getMessageMap().values());
             for (MqMessageHolder messageHolder : messageList) {
-                if(messageHolder.isDone()){
+                if (messageHolder.isDone()) {
                     continue;
                 }
 

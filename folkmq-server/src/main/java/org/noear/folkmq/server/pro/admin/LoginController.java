@@ -41,6 +41,7 @@ public class LoginController extends BaseController {
 
     @Mapping("/login") //视图 返回
     public ModelAndView login(Context ctx) throws Throwable {
+        ctx.sessionClear();
         return view("login");
     }
     //-----------------

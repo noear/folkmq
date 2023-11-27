@@ -17,9 +17,9 @@ public interface MqServer {
     MqServer config(ServerConfigHandler configHandler);
 
     /**
-     * 配置执久化实现
+     * 配置观察者
      */
-    MqServer persistent(MqPersistent persistent);
+    MqServer watcher(MqWatcher watcher);
 
     /**
      * 配置访问账号

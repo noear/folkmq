@@ -4,7 +4,7 @@ import org.noear.folkmq.client.MqClientDefault;
 import org.noear.folkmq.server.MqServerDefault;
 import org.noear.folkmq.server.MqServerInternal;
 import org.noear.folkmq.server.MqTopicConsumerQueue;
-import org.noear.folkmq.server.pro.MqPersistentSnapshot;
+import org.noear.folkmq.server.pro.MqWatcherSnapshot;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -24,7 +24,7 @@ public class TestCase09_persistent extends BaseTestCase {
 
         //服务端
         server = new MqServerDefault()
-                .persistent(new MqPersistentSnapshot())
+                .persistent(new MqWatcherSnapshot())
                 .start(getPort());
 
         //客户端
@@ -45,7 +45,7 @@ public class TestCase09_persistent extends BaseTestCase {
 
         server.stop();
         server = new MqServerDefault() //相当于服务器重启了
-                .persistent(new MqPersistentSnapshot())
+                .persistent(new MqWatcherSnapshot())
                 .start(getPort());
 
         //上面已有有订阅记录了
@@ -59,7 +59,7 @@ public class TestCase09_persistent extends BaseTestCase {
 
         server.stop();
         server = new MqServerDefault() //相当于服务器重启了
-                .persistent(new MqPersistentSnapshot())
+                .persistent(new MqWatcherSnapshot())
                 .start(getPort());
 
 

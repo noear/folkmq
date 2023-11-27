@@ -2,10 +2,8 @@ package org.noear.folkmq.server.pro.mq;
 
 import org.noear.folkmq.FolkMQ;
 import org.noear.folkmq.server.MqServer;
-import org.noear.folkmq.server.MqServerDefault;
 import org.noear.folkmq.server.MqServerInternal;
-import org.noear.folkmq.server.pro.MqPersistentSnapshot;
-import org.noear.socketd.utils.RunUtils;
+import org.noear.folkmq.server.pro.MqWatcherSnapshot;
 import org.noear.solon.Solon;
 import org.noear.solon.annotation.Component;
 import org.noear.solon.annotation.Inject;
@@ -32,7 +30,7 @@ public class FolkmqLifecycleBean implements LifecycleBean {
         //服务端（鉴权为可选。不添加则不鉴权）
         server = FolkMQ.createServer()
                 .addAccessAll(Solon.cfg().getMap("folkmq.access."))
-                .persistent(new MqPersistentSnapshot())
+                .watcher(new MqWatcherSnapshot())
                 .start(Solon.cfg().serverPort() + 10000);
 
         //添加定时快照

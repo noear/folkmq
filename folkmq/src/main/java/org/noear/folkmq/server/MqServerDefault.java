@@ -31,8 +31,8 @@ public class MqServerDefault extends EventListener implements MqServerInternal {
     //服务端配置处理
     private ServerConfigHandler serverConfigHandler;
 
-    //持久化接口
-    private MqPersistent persistent;
+    //观察者
+    private MqWatcher watcher;
 
     //订阅关系表(topicConsumer=>MqTopicConsumerQueue)
     private Map<String, Set<String>> subscribeMap = new HashMap<>();
@@ -41,10 +41,10 @@ public class MqServerDefault extends EventListener implements MqServerInternal {
 
 
     public MqServerDefault() {
-        //::初始化 Persistent 接口
+        //::初始化 Watcher 接口
 
-        persistent = new MqPersistentDefault();
-        persistent.init(this);
+        watcher = new MqWatcherDefault();
+        watcher.init(this);
 
         //::初始化 BuilderListener(self) 的路由监听
 
@@ -53,10 +53,10 @@ public class MqServerDefault extends EventListener implements MqServerInternal {
             String topic = m.meta(MqConstants.MQ_META_TOPIC);
             String consumer = m.meta(MqConstants.MQ_META_CONSUMER);
 
-            //持久化::订阅时（适配时，可选择同步或异步。同步可靠性高，异步性能好）
-            persistent.onSubscribe(topic, consumer, s);
+            //观察者::订阅时（适配时，可选择同步或异步。同步可靠性高，异步性能好）
+            watcher.onSubscribe(topic, consumer, s);
 
-            //持久化后，再答复（以支持同步的原子性需求。同步或异步，由用户按需控制）
+            //观察后，再答复（以支持同步的原子性需求。同步或异步，由用户按需控制）
             if (m.isRequest() || m.isSubscribe()) {
                 //发送“确认”，表示服务端收到了
                 s.replyEnd(m, new StringEntity(""));
@@ -71,10 +71,10 @@ public class MqServerDefault extends EventListener implements MqServerInternal {
             String topic = m.meta(MqConstants.MQ_META_TOPIC);
             String consumer = m.meta(MqConstants.MQ_META_CONSUMER);
 
-            //持久化::取消订阅时（适配时，可选择同步或异步。同步可靠性高，异步性能好）
-            persistent.onUnSubscribe(topic, consumer, s);
+            //观察者::取消订阅时（适配时，可选择同步或异步。同步可靠性高，异步性能好）
+            watcher.onUnSubscribe(topic, consumer, s);
 
-            //持久化后，再答复（以支持同步的原子性需求。同步或异步，由用户按需控制）
+            //观察后，再答复（以支持同步的原子性需求。同步或异步，由用户按需控制）
             if (m.isRequest() || m.isSubscribe()) {
                 //发送“确认”，表示服务端收到了
                 s.replyEnd(m, new StringEntity(""));
@@ -86,10 +86,10 @@ public class MqServerDefault extends EventListener implements MqServerInternal {
 
         //接收发布指令
         on(MqConstants.MQ_EVENT_PUBLISH, (s, m) -> {
-            //持久化::发布时（适配时，可选择同步或异步。同步可靠性高，异步性能好）
-            persistent.onPublish(m);
+            //观察者::发布时（适配时，可选择同步或异步。同步可靠性高，异步性能好）
+            watcher.onPublish(m);
 
-            //持久化后，再答复（以支持同步的原子性需求。同步或异步，由用户按需控制）
+            //观察后，再答复（以支持同步的原子性需求。同步或异步，由用户按需控制）
             if (m.isRequest() || m.isSubscribe()) { //此判断兼容 Qos0, Qos1
                 //发送“确认”，表示服务端收到了
                 s.replyEnd(m, new StringEntity(""));
@@ -100,7 +100,7 @@ public class MqServerDefault extends EventListener implements MqServerInternal {
         });
 
         on(MqConstants.MQ_EVENT_ACKNOWLEDGE, (s, m) -> {
-            //持久化后，再答复（以支持同步的原子性需求。同步或异步，由用户按需控制）
+            //观察后，再答复（以支持同步的原子性需求。同步或异步，由用户按需控制）
             if (m.isRequest() || m.isSubscribe()) { //此判断兼容 Qos0, Qos1
                 //发送“确认”，表示服务端收到了
                 s.replyEnd(m, new StringEntity(""));
@@ -125,10 +125,10 @@ public class MqServerDefault extends EventListener implements MqServerInternal {
     }
 
     @Override
-    public MqServer persistent(MqPersistent persistent) {
-        if (persistent != null) {
-            this.persistent = persistent;
-            this.persistent.init(this);
+    public MqServer watcher(MqWatcher watcher) {
+        if (watcher != null) {
+            this.watcher = watcher;
+            this.watcher.init(this);
         }
 
         return this;
@@ -174,14 +174,14 @@ public class MqServerDefault extends EventListener implements MqServerInternal {
 
         server.config(c -> c.port(port)).listen(this);
 
-        //持久化::服务启动之前
-        persistent.onStartBefore();
+        //观察者::服务启动之前
+        watcher.onStartBefore();
 
         //启动
         server.start();
 
-        //持久化::服务启动之后
-        persistent.onStartAfter();
+        //观察者::服务启动之后
+        watcher.onStartAfter();
 
         return this;
     }
@@ -191,8 +191,8 @@ public class MqServerDefault extends EventListener implements MqServerInternal {
      */
     @Override
     public void save() {
-        //持久化::保存时
-        persistent.onSave();
+        //观察者::保存时
+        watcher.onSave();
     }
 
     /**
@@ -200,14 +200,14 @@ public class MqServerDefault extends EventListener implements MqServerInternal {
      */
     @Override
     public void stop() {
-        //持久化::服务停止之前
-        persistent.onStopBefore();
+        //观察者::服务停止之前
+        watcher.onStopBefore();
 
         //停止
         server.stop();
 
-        //持久化::服务停止之后
-        persistent.onStopAfter();
+        //观察者::服务停止之后
+        watcher.onStopAfter();
 
         //关闭队列
         List<MqTopicConsumerQueue> queueList = new ArrayList<>(topicConsumerMap.values());
@@ -307,7 +307,7 @@ public class MqServerDefault extends EventListener implements MqServerInternal {
         //为身份建立队列(topicConsumer=>MqTopicConsumerQueue)
         MqTopicConsumerQueue topicConsumerQueue = topicConsumerMap.get(topicConsumer);
         if (topicConsumerQueue == null) {
-            topicConsumerQueue = new MqTopicConsumerQueueDefault(persistent, topic, consumer);
+            topicConsumerQueue = new MqTopicConsumerQueueDefault(watcher, topic, consumer);
             topicConsumerMap.put(topicConsumer, topicConsumerQueue);
         }
 

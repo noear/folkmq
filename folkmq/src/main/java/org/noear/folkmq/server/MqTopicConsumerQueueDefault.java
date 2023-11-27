@@ -27,8 +27,8 @@ public class MqTopicConsumerQueueDefault implements MqTopicConsumerQueue {
     private final String consumer;
     //用户会话（多个）
     private final List<Session> consumerSessions;
-    //持久化
-    private final MqPersistent persistent;
+    //观察者
+    private final MqWatcher watcher;
 
 
     //消息字典
@@ -38,8 +38,8 @@ public class MqTopicConsumerQueueDefault implements MqTopicConsumerQueue {
     private final DelayQueue<MqMessageHolder> messageQueue;
     private final Thread messageQueueThread;
 
-    public MqTopicConsumerQueueDefault(MqPersistent persistent, String topic, String consumer) {
-        this.persistent = persistent;
+    public MqTopicConsumerQueueDefault(MqWatcher watcher, String topic, String consumer) {
+        this.watcher = watcher;
         this.topic = topic;
         this.consumer = consumer;
         this.consumerSessions = new ArrayList<>();
@@ -180,8 +180,8 @@ public class MqTopicConsumerQueueDefault implements MqTopicConsumerQueue {
                 .meta(MqConstants.MQ_META_TIMES, String.valueOf(messageHolder.getDistributeCount()));
 
 
-        //持久化::派发时（在元信息调整之后，持久化）
-        persistent.onDistribute(consumer, messageHolder);
+        //观察者::派发时（在元信息调整之后，再观察）
+        watcher.onDistribute(consumer, messageHolder);
 
         if (messageHolder.getQos() > 0) {
             //::Qos1
@@ -195,8 +195,8 @@ public class MqTopicConsumerQueueDefault implements MqTopicConsumerQueue {
         } else {
             //::Qos0
             s1.send(MqConstants.MQ_EVENT_DISTRIBUTE, messageHolder.getContent());
-            //持久化::回执时
-            persistent.onAcknowledge(consumer, messageHolder, true);
+            //观察者::回执时
+            watcher.onAcknowledge(consumer, messageHolder, true);
 
             messageMap.remove(messageHolder.getTid());
 
@@ -225,8 +225,8 @@ public class MqTopicConsumerQueueDefault implements MqTopicConsumerQueue {
             return;
         }
 
-        //持久化::回执时
-        persistent.onAcknowledge(consumer, messageHolder, ack > 0);
+        //观察者::回执时
+        watcher.onAcknowledge(consumer, messageHolder, ack > 0);
 
         if (ack > 0) {
             //ok

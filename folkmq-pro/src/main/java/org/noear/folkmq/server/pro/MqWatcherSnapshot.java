@@ -20,23 +20,26 @@ import java.io.IOException;
 import java.util.*;
 
 /**
- * 持久化 - 快照实现
+ * 消息观察者 - 快照持久化（持久化定位为副本，只要重启时能恢复订阅关系与消息即可）
+ * <br/>
+ * 关键：onStart.., onStop.., onSubscribe, onPublish。
+ * 提示：onSubscribe, onPublish 做同步处理（可靠性高），做异步处理（性能高）。具体看场景需求
  *
  * @author noear
  * @since 1.0
  */
-public class MqPersistentSnapshot extends MqPersistentDefault {
-    private static final Logger log = LoggerFactory.getLogger(MqPersistentSnapshot.class);
+public class MqWatcherSnapshot extends MqWatcherDefault {
+    private static final Logger log = LoggerFactory.getLogger(MqWatcherSnapshot.class);
     private static final String file_suffix = ".fdb";
 
     private MqServerInternal serverInternal;
     private File directory;
 
-    public MqPersistentSnapshot() {
+    public MqWatcherSnapshot() {
         this("./data/fdb/");
     }
 
-    public MqPersistentSnapshot(String dataPath) {
+    public MqWatcherSnapshot(String dataPath) {
         this.directory = new File(dataPath);
 
         if (this.directory.exists() == false) {

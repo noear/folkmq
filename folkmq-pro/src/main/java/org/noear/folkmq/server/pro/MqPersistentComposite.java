@@ -89,9 +89,9 @@ public class MqPersistentComposite implements MqPersistent {
     }
 
     @Override
-    public void onPublish(String topic, Message message) {
+    public void onPublish(Message message) {
         for (MqPersistent persistent : persistentList) {
-            persistent.onPublish(topic, message);
+            persistent.onPublish(message);
         }
     }
 

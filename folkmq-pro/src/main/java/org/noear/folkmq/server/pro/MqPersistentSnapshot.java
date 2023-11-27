@@ -10,11 +10,11 @@ import org.noear.socketd.transport.core.Flags;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.entity.StringEntity;
 import org.noear.socketd.transport.core.internal.MessageDefault;
+import org.noear.socketd.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 
@@ -122,17 +122,15 @@ public class MqPersistentSnapshot extends MqPersistentDefault {
         ONode topicConsumerQueueJson = ONode.loadStr(topicConsumerQueueJsonStr);
 
         for (ONode messageJson : topicConsumerQueueJson.ary()) {
-            String sid = messageJson.get("sid").getString();
             String metaString = messageJson.get("meta").getString();
             String data = messageJson.get("data").getString();
 
             Entity entity = new StringEntity(data).metaString(metaString);
-            String topic = entity.meta(MqConstants.MQ_META_TOPIC);
             Message message = new MessageDefault()
-                    .sid(sid)
+                    .sid(Utils.guid())
                     .flag(Flags.Message)
                     .entity(entity);
-            serverInternal.exchangeDo(topic, message);
+            serverInternal.exchangeDo(message);
         }
 
         return true;
@@ -186,20 +184,30 @@ public class MqPersistentSnapshot extends MqPersistentDefault {
      * 保存主题消费队列记录（确保线程安全）
      */
     private void saveTopicConsumerQueue() {
-        Map<String, MqTopicConsumerQueue> topicConsumerMap = serverInternal.getTopicConsumerMap();
-        if (topicConsumerMap.size() == 0) {
+        Map<String, Set<String>> subscribeMap = serverInternal.getSubscribeMap();
+        if (subscribeMap.size() == 0) {
             return;
         }
 
-        List<String> topicConsumerList = new ArrayList<>(topicConsumerMap.keySet());
+        List<String> topicList = new ArrayList<>(subscribeMap.keySet());
 
-        for (String topicConsumer : topicConsumerList) {
+        Set<String> topicConsumerSet = new HashSet<>();
+        for (String topic : topicList) {
+            Set<String> topicConsumerSetTmp = subscribeMap.get(topic);
+            if (topicConsumerSetTmp != null) {
+                topicConsumerSet.addAll(topicConsumerSetTmp);
+            }
+        }
+
+        Map<String, MqTopicConsumerQueue> topicConsumerMap = serverInternal.getTopicConsumerMap();
+
+        for (String topicConsumer : topicConsumerSet) {
             MqTopicConsumerQueue topicConsumerQueue = topicConsumerMap.get(topicConsumer);
 
             try {
                 saveTopicConsumerQueue1(topicConsumer, topicConsumerQueue);
 
-                log.warn("Server persistent messageQueue completed, topicConsumer={}", topicConsumer);
+                log.info("Server persistent messageQueue completed, topicConsumer={}", topicConsumer);
             } catch (IOException e) {
                 log.warn("Server persistent messageQueue failed, topicConsumer={}", topicConsumer, e);
             }
@@ -211,16 +219,21 @@ public class MqPersistentSnapshot extends MqPersistentDefault {
     private void saveTopicConsumerQueue1(String topicConsumer, MqTopicConsumerQueue topicConsumerQueue) throws IOException {
         ONode topicConsumerQueueJson = new ONode(Options.def().add(Feature.PrettyFormat)).asArray();
 
-        List<MqMessageHolder> messageList = new ArrayList<>(topicConsumerQueue.getMessageMap().values());
-        for (MqMessageHolder messageHolder : messageList) {
-            try {
-                Entity entity = messageHolder.getContent();
-                ONode entityJson = topicConsumerQueueJson.addNew();
-                entityJson.set("sid", messageHolder.getSid());
-                entityJson.set("meta", entity.metaString());
-                entityJson.set("data", entity.dataAsString());
-            } catch (IOException e) {
-                log.warn("Server persistent message failed, tid={}", messageHolder.getTid(), e);
+        if(topicConsumerQueue != null) {
+            List<MqMessageHolder> messageList = new ArrayList<>(topicConsumerQueue.getMessageMap().values());
+            for (MqMessageHolder messageHolder : messageList) {
+                if(messageHolder.isDone()){
+                    continue;
+                }
+
+                try {
+                    Entity entity = messageHolder.getContent();
+                    ONode entityJson = topicConsumerQueueJson.addNew();
+                    entityJson.set("meta", entity.metaString());
+                    entityJson.set("data", entity.dataAsString());
+                } catch (IOException e) {
+                    log.warn("Server persistent message failed, tid={}", messageHolder.getTid(), e);
+                }
             }
         }
 

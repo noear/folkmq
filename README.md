@@ -54,7 +54,7 @@
 
 快、特别的快（大约 100_000 TPS）。基于内存，有点像 redis 之于 mysql。
 
-<img src="DEV-TEST.png" width="800" />
+<img src="DEV-TEST.png" width="600" />
 
 //使用 MacBook pro 2020 + JDK8 本机测试，单客户端发与收（跑分难免有波动，我是选了好看点的）
 

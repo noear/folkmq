@@ -27,5 +27,4 @@
         <module>folkmq-server</module>
         <module>folkmq-test</module>
     </modules>
-
 </project>

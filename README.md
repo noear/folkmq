@@ -52,7 +52,7 @@
 
 ## 特点
 
-快、特别的快（大约 100_000 TPS）。基于内存，有点像 redis 之于 mysql。
+简单、特简单；快、特别的快（大约 100_000 TPS）。基于内存，有点像 redis 之于 mysql。
 
 <img src="DEV-TEST.png" width="700" />
 
@@ -73,19 +73,23 @@
 
 ## 服务端容器镜像
 
-| 镜像                           | 说明            |
-|------------------------------|---------------|
-| noearorg/folkmq-server:1.0.6 | 服务端（端口：13602） |
+| 镜像                           | 说明                        |
+|------------------------------|---------------------------|
+| noearorg/folkmq-server:1.0.7 | 服务端（管理端口：8602，消息端口：18602） |
 
 
-* 修改端口
+* 可选配置
 
-添加环境变量：`server.port=13603`
+| 属性或环境变量                       | 默认值 |                      |
+|-------------------------------|-----|----------------------|
+| `server.port`                 |  8602   | 管理端口(http)           |
+|                               |  18602   | 消息端口(tcp)，管理端口+10000 |
+| `folkmq.admin`                |  admin   | 管理密码                 |
+| （此为示例） |     | 消息访问账号               |
 
-* 添加账号
+* 访问账号：
 
-添加环境变量：`folkmq.access.ak1=sk1`，`folkmq.access.ak2=sk2`
-
+添属性或环境变量 `folkmq.access.ak1=sk1`，`folkmq.access.ak2=sk2`
 
 ## 代码示例
 
@@ -98,7 +102,7 @@
     <dependency>
         <groupId>org.noear</groupId>
         <artifactId>folkmq</artifactId>
-        <version>1.0.6</version>
+        <version>1.0.7</version>
     </dependency>
 
     <!-- 可选传输包：java-tcp（90kb左右）, smartsocket（260Kb左右）, netty（2.5Mb左右） -->

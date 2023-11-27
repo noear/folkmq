@@ -13,14 +13,14 @@ public class BenchmarkTest {
         //服务端
         MqServer server = new MqServerDefault()
                 .addAccess("folkmq", "YapLHTx19RlsEE16")
-                .start(9393);
+                .start(18602);
 
         Thread.sleep(1000);
         int count = 100_000;
         CountDownLatch countDownLatch = new CountDownLatch(count);
 
         //客户端
-        MqClient client = FolkMQ.createClient("folkmq://127.0.0.1:9393?ak=folkmq&sk=YapLHTx19RlsEE16")
+        MqClient client = FolkMQ.createClient("folkmq://127.0.0.1:18602?ak=folkmq&sk=YapLHTx19RlsEE16")
                 .connect();
 
         //订阅

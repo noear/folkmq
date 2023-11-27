@@ -113,7 +113,7 @@ docker run -p 18602:18602 -p 8602:8602 noearorg/folkmq-server:1.0.7
     <dependency>
         <groupId>org.noear</groupId>
         <artifactId>socketd-transport-java-tcp</artifactId>
-        <version>2.0.20</version>
+        <version>2.0.21</version>
     </dependency>
 </dependencies>
 ```
@@ -127,7 +127,7 @@ docker run -p 18602:18602 -p 8602:8602 noearorg/folkmq-server:1.0.7
 public class ServerDemo {
     public static void main(String[] args) throws Exception {
         //服务端（鉴权为可选。不添加则不鉴权）
-        MqServer server = new MqServerDefault()
+        MqServer server = FolkMQ.createServer()
                 .addAccess("folkmq", "YapLHTx19RlsEE16")
                 .persistent(new MqPersistentSnapshot()) //需要 folkmq-pro 包
                 .start(13602);
@@ -147,7 +147,7 @@ public class ServerDemo {
 public class ClientDemo1 {
     public static void main(String[] args) throws Exception {
         //客户端（鉴权为可选。服务端，不添加则不鉴权）
-        MqClient client = new MqClientDefault("folkmq://127.0.0.1:13602?ak=folkmq&sk=YapLHTx19RlsEE16")
+        MqClient client = FolkMQ.createClient("folkmq://127.0.0.1:13602?ak=folkmq&sk=YapLHTx19RlsEE16")
                 .connect();
 
         //订阅

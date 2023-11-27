@@ -62,6 +62,9 @@ public class MqClientDefault extends EventListener implements MqClientInternal {
             } catch (Throwable e) {
                 if (message != null) {
                     acknowledge(message, false);
+                    log.warn("Client consumer handle error, tid={}", message.getTid(), e);
+                }else {
+                    log.warn("Client consumer handle error", e);
                 }
             }
         });
@@ -185,7 +188,12 @@ public class MqClientDefault extends EventListener implements MqClientInternal {
     public void acknowledge(MqMessageDefault message, boolean isOk) throws IOException {
         //发送“回执”，向服务端反馈消费情况
         if (message.getQos() > 0) {
-            clientSession.replyEnd(message.from, new StringEntity("")
+            //此处用 replyEnd 不安全，时间长久可能会话断连过（流就无效了）
+            clientSession.send(MqConstants.MQ_EVENT_ACKNOWLEDGE, new StringEntity("")
+                    .meta(MqConstants.MQ_META_TOPIC, message.getTopic())
+                    .meta(MqConstants.MQ_META_CONSUMER, message.getConsumer())
+                    .meta(MqConstants.MQ_META_SID, message.getSid())
+                    .meta(MqConstants.MQ_META_TID, message.getTid())
                     .meta(MqConstants.MQ_META_ACK, isOk ? "1" : "0"));
         }
     }
@@ -197,7 +205,7 @@ public class MqClientDefault extends EventListener implements MqClientInternal {
     public void onOpen(Session session) throws IOException {
         super.onOpen(session);
 
-        log.info("Client session opened, session={}", session.sessionId());
+        log.info("Client session opened, sessionId={}", session.sessionId());
 
         //用于重连时重新订阅
         for (MqSubscription subscription : subscriptionMap.values()) {
@@ -216,7 +224,7 @@ public class MqClientDefault extends EventListener implements MqClientInternal {
     public void onClose(Session session) {
         super.onClose(session);
 
-        log.info("Client session closed, session={}", session.sessionId());
+        log.info("Client session closed, sessionId={}", session.sessionId());
     }
 
     /**
@@ -227,7 +235,7 @@ public class MqClientDefault extends EventListener implements MqClientInternal {
         super.onError(session, error);
 
         if (log.isWarnEnabled()) {
-            log.warn("Client error, session={}", session.sessionId(), error);
+            log.warn("Client error, sessionId={}", session.sessionId(), error);
         }
     }
 }

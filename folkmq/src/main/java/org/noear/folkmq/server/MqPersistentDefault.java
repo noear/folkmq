@@ -56,7 +56,7 @@ public class MqPersistentDefault implements MqPersistent{
     }
 
     @Override
-    public void onPublish(String topic, Message message) {
+    public void onPublish(Message message) {
 
     }
 

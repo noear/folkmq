@@ -56,7 +56,7 @@ public interface MqPersistent {
     /**
      * 发布时
      */
-    void onPublish(String topic, Message message);
+    void onPublish(Message message);
 
     /**
      * 派发时

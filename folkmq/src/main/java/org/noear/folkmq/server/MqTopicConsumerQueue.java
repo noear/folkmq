@@ -1,5 +1,6 @@
 package org.noear.folkmq.server;
 
+import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
 
 import java.util.Map;
@@ -42,6 +43,11 @@ public interface MqTopicConsumerQueue {
     void add(MqMessageHolder messageHolder);
 
     /**
+     * 消息确认
+     * */
+    void acknowledge(Message message);
+
+    /**
      * 消息数量
      */
     int size();
@@ -50,4 +56,5 @@ public interface MqTopicConsumerQueue {
      * 关闭
      */
     void close();
+
 }

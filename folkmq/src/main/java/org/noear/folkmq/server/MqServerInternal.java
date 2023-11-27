@@ -36,5 +36,10 @@ public interface MqServerInternal extends MqServer {
     /**
      * 执行交换
      */
-    void exchangeDo(String topic, Message message);
+    void exchangeDo(Message message);
+
+    /**
+     * 执行回执
+     */
+    void acknowledgeDo(Message message);
 }

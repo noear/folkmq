@@ -12,6 +12,10 @@ public interface MqConstants {
      */
     String MQ_META_TID = "mq.tid";
     /**
+     * 元信息：消息流Id
+     */
+    String MQ_META_SID = "mq.sid";
+    /**
      * 元信息：消息主题
      */
     String MQ_META_TOPIC = "mq.topic";
@@ -52,6 +56,10 @@ public interface MqConstants {
      * 事件：派发
      */
     String MQ_EVENT_DISTRIBUTE = "mq.event.distribute";
+    /**
+     * 事件：回执
+     */
+    String MQ_EVENT_ACKNOWLEDGE = "mq.event.acknowledge";
     /**
      * 事件：保存
      */

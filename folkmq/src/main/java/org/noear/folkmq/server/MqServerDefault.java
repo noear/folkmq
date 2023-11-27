@@ -86,11 +86,8 @@ public class MqServerDefault extends EventListener implements MqServerInternal {
 
         //接收发布指令
         on(MqConstants.MQ_EVENT_PUBLISH, (s, m) -> {
-            //执行派发
-            String topic = m.meta(MqConstants.MQ_META_TOPIC);
-
             //持久化::发布时（适配时，可选择同步或异步。同步可靠性高，异步性能好）
-            persistent.onPublish(topic, m);
+            persistent.onPublish(m);
 
             //持久化后，再答复（以支持同步的原子性需求。同步或异步，由用户按需控制）
             if (m.isRequest() || m.isSubscribe()) { //此判断兼容 Qos0, Qos1
@@ -99,7 +96,17 @@ public class MqServerDefault extends EventListener implements MqServerInternal {
             }
 
             //执行交换
-            exchangeDo(topic, m);
+            exchangeDo(m);
+        });
+
+        on(MqConstants.MQ_EVENT_ACKNOWLEDGE, (s, m) -> {
+            //持久化后，再答复（以支持同步的原子性需求。同步或异步，由用户按需控制）
+            if (m.isRequest() || m.isSubscribe()) { //此判断兼容 Qos0, Qos1
+                //发送“确认”，表示服务端收到了
+                s.replyEnd(m, new StringEntity(""));
+            }
+
+            acknowledgeDo(m);
         });
 
         //接收保存指令
@@ -199,14 +206,14 @@ public class MqServerDefault extends EventListener implements MqServerInternal {
         //停止
         server.stop();
 
+        //持久化::服务停止之后
+        persistent.onStopAfter();
+
         //关闭队列
         List<MqTopicConsumerQueue> queueList = new ArrayList<>(topicConsumerMap.values());
         for (MqTopicConsumerQueue queue : queueList) {
             queue.close();
         }
-
-        //持久化::服务停止之后
-        persistent.onStopAfter();
     }
 
     /**
@@ -232,7 +239,7 @@ public class MqServerDefault extends EventListener implements MqServerInternal {
             }
         }
 
-        log.info("Server channel opened, session={}", session.sessionId());
+        log.info("Server channel opened, sessionId={}", session.sessionId());
     }
 
     /**
@@ -242,7 +249,7 @@ public class MqServerDefault extends EventListener implements MqServerInternal {
     public void onClose(Session session) {
         super.onClose(session);
 
-        log.info("Server channel closed, session={}", session.sessionId());
+        log.info("Server channel closed, sessionId={}", session.sessionId());
 
         //遍历这个会话身上的消费者身份（有些可能不是）
         //避免遍历 Set 时，出现 add or remove 而异常
@@ -265,7 +272,7 @@ public class MqServerDefault extends EventListener implements MqServerInternal {
         super.onError(session, error);
 
         if (log.isWarnEnabled()) {
-            log.warn("Server channel error, session={}", session.sessionId(), error);
+            log.warn("Server channel error, sessionId={}", session.sessionId(), error);
         }
     }
 
@@ -307,7 +314,7 @@ public class MqServerDefault extends EventListener implements MqServerInternal {
         //::2.标识会话身份（从持久层恢复时，会话可能为 null）
 
         if (session != null) {
-            log.info("Server channel subscribe topic={}, consumer={}, session={}", topic, consumer, session.sessionId());
+            log.info("Server channel subscribe topic={}, consumer={}, sessionId={}", topic, consumer, session.sessionId());
 
             //会话添加身份（可以有多个不同的身份）
             session.attr(topicConsumer, "1");
@@ -330,7 +337,7 @@ public class MqServerDefault extends EventListener implements MqServerInternal {
         //::2.移除会话身份（从持久层恢复时，会话可能为 null）
 
         if (session != null) {
-            log.info("Server channel unsubscribe topic={}, consumer={}, session={}", topic, consumer, session.sessionId());
+            log.info("Server channel unsubscribe topic={}, consumer={}, sessionId={}", topic, consumer, session.sessionId());
 
             //会话移除身份（可以有多个不同的身份）
             session.attrMap().remove(topicConsumer);
@@ -344,13 +351,11 @@ public class MqServerDefault extends EventListener implements MqServerInternal {
 
     /**
      * 执行交换
-     *
-     * @param topic   主题
-     * @param message 消息源
      */
     @Override
-    public void exchangeDo(String topic, Message message) {
+    public void exchangeDo(Message message) {
         //复用解析
+        String topic = message.meta(MqConstants.MQ_META_TOPIC);
         String tid = message.meta(MqConstants.MQ_META_TID);
         int qos = Integer.parseInt(message.metaOrDefault(MqConstants.MQ_META_QOS, "1"));
         long scheduled = Long.parseLong(message.metaOrDefault(MqConstants.MQ_META_SCHEDULED, "0"));
@@ -376,6 +381,21 @@ public class MqServerDefault extends EventListener implements MqServerInternal {
                     topicConsumerQueue.add(messageHolder);
                 }
             }
+        }
+    }
+
+    /**
+     * 执行回执
+     */
+    public void acknowledgeDo(Message message) {
+        String topic = message.meta(MqConstants.MQ_META_TOPIC);
+        String consumer = message.meta(MqConstants.MQ_META_CONSUMER);
+        String topicConsumer = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER + consumer;
+
+        MqTopicConsumerQueue topicConsumerQueue = topicConsumerMap.get(topicConsumer);
+
+        if (topicConsumerQueue != null) {
+            topicConsumerQueue.acknowledge(message);
         }
     }
 }

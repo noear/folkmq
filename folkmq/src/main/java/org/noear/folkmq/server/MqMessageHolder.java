@@ -4,6 +4,7 @@ import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.entity.EntityDefault;
 
 import java.io.IOException;
+import java.util.Objects;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
 
@@ -111,5 +112,18 @@ public class MqMessageHolder implements Delayed {
     public int compareTo(Delayed o) {
         long f = this.distributeTime - ((MqMessageHolder) o).distributeTime;
         return (int) f;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MqMessageHolder that = (MqMessageHolder) o;
+        return Objects.equals(tid, that.tid);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(tid);
     }
 }

@@ -1,7 +1,9 @@
 package org.noear.folkmq.server;
 
 import org.noear.folkmq.common.MqConstants;
+import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
+import org.noear.socketd.transport.core.entity.EntityDefault;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -132,15 +134,18 @@ public class MqTopicConsumerQueueDefault implements MqTopicConsumerQueue {
                 distributeDo(messageHolder, consumerSessions);
             } catch (Throwable e) {
                 //进入延后队列
-                addDelayed(messageHolder.delayed());
+                messageQueue.remove(messageHolder);
+                messageQueue.add(messageHolder.delayed());
             }
         } else {
             //进入延后队列
-            addDelayed(messageHolder.delayed());
+            messageQueue.add(messageHolder.delayed());
 
             //记日志
             if (log.isWarnEnabled()) {
-                log.warn("MqConsumerQueue distribute: no sessions!");
+                log.warn("MqConsumerQueue distribute: no sessions, sid={}, tid={}",
+                        messageHolder.getSid(),
+                        messageHolder.getTid());
             }
         }
     }
@@ -168,51 +173,53 @@ public class MqTopicConsumerQueueDefault implements MqTopicConsumerQueue {
             //::Qos1
 
             //添加延时任务：2小时后，如果没有回执就重发（即消息最长不能超过2小时）
-            addDelayed(messageHolder, MqNextTime.getMaxDelayMillis());
+            EntityDefault messageEntity = messageHolder.getContent();
+            messageEntity.meta(MqConstants.MQ_META_CONSUMER, consumer);
 
-            //给会话发送消息
-            s1.sendAndSubscribe(MqConstants.MQ_EVENT_DISTRIBUTE, messageHolder.getContent(), m -> {
-                int ack = Integer.parseInt(m.metaOrDefault(MqConstants.MQ_META_ACK, "0"));
+            messageHolder.setDistributeTime(System.currentTimeMillis() + MqNextTime.getMaxDelayMillis());
+            messageQueue.add(messageHolder);
 
-                //持久化::回执时
-                persistent.onAcknowledge(consumer, messageHolder, ack == 1);
-
-                if (ack == 0) {
-                    //no （如果在队列改时间即可；如果不在队列说明有补发过）
-                    messageQueue.remove(messageHolder);
-                    addDelayed(messageHolder.delayed());
-                } else {
-                    //ok
-                    messageHolder.setDone(true);
-                    messageMap.remove(messageHolder.getTid());
-                    messageQueue.remove(messageHolder);
-                }
-            });
+            //给会话发送消息 //用 sendAndSubscribe 不安全，时间太久可能断连过（流就不能用了）
+            s1.send(MqConstants.MQ_EVENT_DISTRIBUTE, messageEntity);
         } else {
             //::Qos0
             s1.send(MqConstants.MQ_EVENT_DISTRIBUTE, messageHolder.getContent());
             //持久化::回执时
             persistent.onAcknowledge(consumer, messageHolder, true);
-            messageHolder.setDone(true);
+
             messageMap.remove(messageHolder.getTid());
+
+            //移除前，不要改移性
+            messageHolder.setDone(true);
         }
     }
 
-    /**
-     * 添加延时处理
-     */
-    protected void addDelayed(MqMessageHolder messageHolder) {
-        messageQueue.add(messageHolder);
-    }
+    @Override
+    public void acknowledge(Message message) {
+        int ack = Integer.parseInt(message.metaOrDefault(MqConstants.MQ_META_ACK, "0"));
+        String tid = message.meta(MqConstants.MQ_META_TID);
 
-    /**
-     * 添加延时处理
-     *
-     * @param millisDelay 延时（单位：毫秒）
-     */
-    protected void addDelayed(MqMessageHolder messageHolder, long millisDelay) {
-        messageHolder.setDistributeTime(System.currentTimeMillis() + millisDelay);
-        messageQueue.add(messageHolder);
+        MqMessageHolder messageHolder = messageMap.get(tid);
+
+        if (messageHolder == null) {
+            return;
+        }
+
+        //持久化::回执时
+        persistent.onAcknowledge(consumer, messageHolder, ack > 0);
+
+        if (ack > 0) {
+            //ok
+            messageMap.remove(tid);
+            messageQueue.remove(messageHolder);
+
+            //移除前，不要改移性
+            messageHolder.setDone(true);
+        } else {
+            //no （如果在队列改时间即可；如果不在队列说明有补发过）
+            messageQueue.remove(messageHolder);
+            messageQueue.add(messageHolder.delayed());
+        }
     }
 
     /**
@@ -223,5 +230,10 @@ public class MqTopicConsumerQueueDefault implements MqTopicConsumerQueue {
         if (messageQueueThread != null) {
             messageQueueThread.interrupt();
         }
+
+        messageQueue.clear();
+        messageMap.clear();
+
+        consumerSessions.clear();
     }
 }

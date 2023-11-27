@@ -11,7 +11,6 @@ import org.noear.socketd.transport.server.ServerConfigHandler;
 import org.noear.socketd.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
 
 import java.io.IOException;
 import java.util.*;
@@ -87,15 +86,6 @@ public class MqServerDefault extends EventListener implements MqServerInternal {
 
         //接收发布指令
         on(MqConstants.MQ_EVENT_PUBLISH, (s, m) -> {
-            String tid = m.meta(MqConstants.MQ_META_TID);
-            //可能是非法消息
-            if (Utils.isEmpty(tid)) {
-                log.warn("The tid cannot be null, sid={}", m.sid());
-                return;
-            }
-
-            MDC.put("tid", tid);
-
             //持久化::发布时（适配时，可选择同步或异步。同步可靠性高，异步性能好）
             persistent.onPublish(m);
 
@@ -106,26 +96,17 @@ public class MqServerDefault extends EventListener implements MqServerInternal {
             }
 
             //执行交换
-            exchangeDo(tid, m);
+            exchangeDo(m);
         });
 
         on(MqConstants.MQ_EVENT_ACKNOWLEDGE, (s, m) -> {
-            String tid = m.meta(MqConstants.MQ_META_TID);
-            //可能是非法消息
-            if (Utils.isEmpty(tid)) {
-                log.warn("The tid cannot be null, sid={}", m.sid());
-                return;
-            }
-
-            MDC.put("tid", tid);
-
             //持久化后，再答复（以支持同步的原子性需求。同步或异步，由用户按需控制）
             if (m.isRequest() || m.isSubscribe()) { //此判断兼容 Qos0, Qos1
                 //发送“确认”，表示服务端收到了
                 s.replyEnd(m, new StringEntity(""));
             }
 
-            acknowledgeDo(tid, m);
+            acknowledgeDo(m);
         });
 
         //接收保存指令
@@ -372,7 +353,14 @@ public class MqServerDefault extends EventListener implements MqServerInternal {
      * 执行交换
      */
     @Override
-    public void exchangeDo(String tid, Message message) {
+    public void exchangeDo(Message message) {
+        String tid = message.meta(MqConstants.MQ_META_TID);
+        //可能是非法消息
+        if (Utils.isEmpty(tid)) {
+            log.warn("The tid cannot be null, sid={}", message.sid());
+            return;
+        }
+
         //复用解析
         String topic = message.meta(MqConstants.MQ_META_TOPIC);
         int qos = "0".equals(message.meta(MqConstants.MQ_META_QOS)) ? 0 : 1;
@@ -404,7 +392,7 @@ public class MqServerDefault extends EventListener implements MqServerInternal {
     /**
      * 执行回执
      */
-    public void acknowledgeDo(String tid, Message message) {
+    public void acknowledgeDo(Message message) {
         String topic = message.meta(MqConstants.MQ_META_TOPIC);
         String consumer = message.meta(MqConstants.MQ_META_CONSUMER);
         String topicConsumer = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER + consumer;
@@ -412,7 +400,7 @@ public class MqServerDefault extends EventListener implements MqServerInternal {
         MqTopicConsumerQueue topicConsumerQueue = topicConsumerMap.get(topicConsumer);
 
         if (topicConsumerQueue != null) {
-            topicConsumerQueue.acknowledge(tid, message);
+            topicConsumerQueue.acknowledge(message);
         }
     }
 }

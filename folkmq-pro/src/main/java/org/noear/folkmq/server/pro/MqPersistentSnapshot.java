@@ -126,12 +126,11 @@ public class MqPersistentSnapshot extends MqPersistentDefault {
             String data = messageJson.get("data").getString();
 
             Entity entity = new StringEntity(data).metaString(metaString);
-            String tid = entity.meta(MqConstants.MQ_META_TID);
             Message message = new MessageDefault()
                     .sid(Utils.guid())
                     .flag(Flags.Message)
                     .entity(entity);
-            serverInternal.exchangeDo(tid, message);
+            serverInternal.exchangeDo(message);
         }
 
         return true;

@@ -45,7 +45,7 @@ public interface MqTopicConsumerQueue {
     /**
      * 消息确认
      */
-    void acknowledge(String tid, Message message);
+    void acknowledge(Message message);
 
     /**
      * 消息数量

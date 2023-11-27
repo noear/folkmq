@@ -3,9 +3,9 @@ package org.noear.folkmq.server;
 import org.noear.folkmq.common.MqConstants;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
+import org.noear.socketd.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
 
 import java.io.IOException;
 import java.util.*;
@@ -129,8 +129,6 @@ public class MqTopicConsumerQueueDefault implements MqTopicConsumerQueue {
             return;
         }
 
-        MDC.put("tid", messageHolder.getTid());
-
         //找到此身份的其中一个会话（如果是 ip 就一个；如果是集群名则任选一个）
         if (consumerSessions.size() > 0) {
             try {
@@ -200,7 +198,14 @@ public class MqTopicConsumerQueueDefault implements MqTopicConsumerQueue {
     }
 
     @Override
-    public void acknowledge(String tid, Message message) {
+    public void acknowledge(Message message) {
+        String tid = message.meta(MqConstants.MQ_META_TID);
+        //可能是非法消息
+        if (Utils.isEmpty(tid)) {
+            log.warn("The tid cannot be null, sid={}", message.sid());
+            return;
+        }
+
         int ack = Integer.parseInt(message.metaOrDefault(MqConstants.MQ_META_ACK, "0"));
 
         MqMessageHolder messageHolder = messageMap.get(tid);

@@ -5,7 +5,6 @@ import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.entity.EntityDefault;
 
 import java.io.IOException;
-import java.util.Objects;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
 
@@ -16,7 +15,6 @@ import java.util.concurrent.TimeUnit;
  * @since 1.0
  */
 public class MqMessageHolder implements Delayed {
-    private final Message from;
     //消息内容
     private final EntityDefault content;
     //事务Id
@@ -32,7 +30,6 @@ public class MqMessageHolder implements Delayed {
     private boolean isDone;
 
     public MqMessageHolder(String consumer, Message from, String tid, int qos, long distributeTime) {
-        this.from = from;
         this.content = new EntityDefault().data(from.dataAsBytes()).metaMap(from.metaMap());
         this.content.meta(MqConstants.MQ_META_CONSUMER, consumer);
 
@@ -109,16 +106,5 @@ public class MqMessageHolder implements Delayed {
         return (int) f;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        MqMessageHolder that = (MqMessageHolder) o;
-        return Objects.equals(tid, that.tid);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(tid);
-    }
+    //不要加 hashCode, equals 重写！
 }

@@ -94,7 +94,7 @@ public class MqServerDefault extends EventListener implements MqServerInternal {
                 return;
             }
 
-            //MDC.put("tid", tid);
+            MDC.put("tid", tid);
 
             //持久化::发布时（适配时，可选择同步或异步。同步可靠性高，异步性能好）
             persistent.onPublish(m);
@@ -117,7 +117,7 @@ public class MqServerDefault extends EventListener implements MqServerInternal {
                 return;
             }
 
-            //MDC.put("tid", tid);
+            MDC.put("tid", tid);
 
             //持久化后，再答复（以支持同步的原子性需求。同步或异步，由用户按需控制）
             if (m.isRequest() || m.isSubscribe()) { //此判断兼容 Qos0, Qos1

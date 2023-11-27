@@ -129,7 +129,7 @@ public class MqTopicConsumerQueueDefault implements MqTopicConsumerQueue {
             return;
         }
 
-        //MDC.put("tid", messageHolder.getTid());
+        MDC.put("tid", messageHolder.getTid());
 
         //找到此身份的其中一个会话（如果是 ip 就一个；如果是集群名则任选一个）
         if (consumerSessions.size() > 0) {

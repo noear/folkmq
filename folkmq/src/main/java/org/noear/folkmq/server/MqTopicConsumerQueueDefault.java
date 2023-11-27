@@ -116,8 +116,16 @@ public class MqTopicConsumerQueueDefault implements MqTopicConsumerQueue {
     /**
      * 消息数量
      */
-    public int size() {
+    public int messageCount() {
         return messageQueue.size();
+    }
+
+    /**
+     * 会话数量
+     */
+    @Override
+    public int sessionCount() {
+        return consumerSessions.size();
     }
 
     /**

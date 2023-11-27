@@ -50,7 +50,12 @@ public interface MqTopicConsumerQueue {
     /**
      * 消息数量
      */
-    int size();
+    int messageCount();
+
+    /**
+     * 会话数量
+     */
+    int sessionCount();
 
     /**
      * 关闭

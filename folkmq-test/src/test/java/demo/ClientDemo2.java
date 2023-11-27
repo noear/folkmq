@@ -11,7 +11,7 @@ public class ClientDemo2 {
     public static void main(String[] args) throws Exception {
 
         //客户端
-        MqClient client = new MqClientDefault("folkmq://127.0.0.1:9393?ak=folkmq&sk=YapLHTx19RlsEE16")
+        MqClient client = new MqClientDefault("folkmq://127.0.0.1:18602?ak=folkmq&sk=YapLHTx19RlsEE16")
                 .autoAcknowledge(false)
                 .connect();
 

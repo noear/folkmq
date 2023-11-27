@@ -11,6 +11,6 @@ public class ServerDemo {
     public static void main(String[] args) throws Exception {
         MqServer server = new MqServerDefault()
                 .addAccess("folkmq", "YapLHTx19RlsEE16")
-                .start(9393);
+                .start(18602);
     }
 }

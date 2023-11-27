@@ -62,8 +62,8 @@ public class TestCase04_qos0 extends BaseTestCase {
         assert serverInternal.getTopicConsumerMap().size() == 1;
 
         MqTopicConsumerQueue topicConsumerQueue = serverInternal.getTopicConsumerMap().values().toArray(new MqTopicConsumerQueue[1])[0];
-        System.out.println("server topicConsumerQueue.size=" + topicConsumerQueue.size());
+        System.out.println("server topicConsumerQueue.size=" + topicConsumerQueue.messageCount());
         assert topicConsumerQueue.getMessageMap().size() == 0;
-        assert topicConsumerQueue.size() == 0;
+        assert topicConsumerQueue.messageCount() == 0;
     }
 }

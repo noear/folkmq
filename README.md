@@ -69,7 +69,8 @@
 
 ## 开发过程视频记录
 
-详见： [DEV-RECORD.md](DEV-RECORD.md)
+* 开发过程视频： [《DEV-RECORD.md》](DEV-RECORD.md)
+* 成果演示：[《[FolkMQ] 一个新的内存型消息队列（快，特别的快）》](https://www.bilibili.com/video/BV1mc411D7pY/)
 
 ## 服务端容器镜像
 

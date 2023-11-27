@@ -14,6 +14,10 @@
     <artifactId>folkmq-server</artifactId>
     <packaging>jar</packaging>
 
+    <properties>
+        <solon.version>2.6.1-M3</solon.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.noear</groupId>
@@ -27,14 +31,14 @@
 
         <dependency>
             <groupId>org.noear</groupId>
-            <artifactId>solon-lib</artifactId>
-            <version>2.6.1-M3</version>
+            <artifactId>solon-web</artifactId>
+            <version>${solon.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.noear</groupId>
             <artifactId>solon.logging.logback</artifactId>
-            <version>2.6.1-M3</version>
+            <version>${solon.version}</version>
         </dependency>
     </dependencies>
 
@@ -98,7 +102,7 @@
                     <!--镜像的FROM，使用java官方镜像-->
                     <baseImage>adoptopenjdk/openjdk11</baseImage>
                     <!--该镜像的容器启动后，直接运行spring boot工程-->
-                    <entryPoint>["java", "-jar", "/${project.build.finalName}.jar", "--server.port=13602","--drift=1"]</entryPoint>
+                    <entryPoint>["java", "-jar", "/${project.build.finalName}.jar", "--server.port=8602","--drift=1"]</entryPoint>
                     <!--构建镜像的配置信息-->
                     <resources>
                         <resource>

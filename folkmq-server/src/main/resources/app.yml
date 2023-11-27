@@ -1,4 +1,4 @@
-server.port: 13602
+server.port: 8602
 
 solon.app:
   group: folkmq
@@ -19,6 +19,8 @@ solon.logging.logger:
     level: DEBUG
   "io.netty":
     level: WARN
+
+folkmq.admin: admin
 
 #folkmq.access:
 #  user1 : "YapLHTx19RlsEE16"

@@ -192,7 +192,6 @@ public class MqClientDefault extends EventListener implements MqClientInternal {
             clientSession.send(MqConstants.MQ_EVENT_ACKNOWLEDGE, new StringEntity("")
                     .meta(MqConstants.MQ_META_TOPIC, message.getTopic())
                     .meta(MqConstants.MQ_META_CONSUMER, message.getConsumer())
-                    .meta(MqConstants.MQ_META_SID, message.getSid())
                     .meta(MqConstants.MQ_META_TID, message.getTid())
                     .meta(MqConstants.MQ_META_ACK, isOk ? "1" : "0"));
         }

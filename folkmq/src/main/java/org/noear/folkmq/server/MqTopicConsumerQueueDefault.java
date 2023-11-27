@@ -6,6 +6,7 @@ import org.noear.socketd.transport.core.Session;
 import org.noear.socketd.transport.core.entity.EntityDefault;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 import java.io.IOException;
 import java.util.*;
@@ -128,6 +129,12 @@ public class MqTopicConsumerQueueDefault implements MqTopicConsumerQueue {
      * 执行派发
      */
     protected void distribute(MqMessageHolder messageHolder) {
+        if (messageHolder.isDone()) {
+            return;
+        }
+
+        MDC.put("tid", messageHolder.getTid());
+
         //找到此身份的其中一个会话（如果是 ip 就一个；如果是集群名则任选一个）
         if (consumerSessions.size() > 0) {
             try {
@@ -143,8 +150,7 @@ public class MqTopicConsumerQueueDefault implements MqTopicConsumerQueue {
 
             //记日志
             if (log.isWarnEnabled()) {
-                log.warn("MqConsumerQueue distribute: no sessions, sid={}, tid={}",
-                        messageHolder.getSid(),
+                log.warn("MqConsumerQueue distribute: no sessions, tid={}",
                         messageHolder.getTid());
             }
         }
@@ -173,14 +179,11 @@ public class MqTopicConsumerQueueDefault implements MqTopicConsumerQueue {
             //::Qos1
 
             //添加延时任务：2小时后，如果没有回执就重发（即消息最长不能超过2小时）
-            EntityDefault messageEntity = messageHolder.getContent();
-            messageEntity.meta(MqConstants.MQ_META_CONSUMER, consumer);
-
             messageHolder.setDistributeTime(System.currentTimeMillis() + MqNextTime.getMaxDelayMillis());
             messageQueue.add(messageHolder);
 
             //给会话发送消息 //用 sendAndSubscribe 不安全，时间太久可能断连过（流就不能用了）
-            s1.send(MqConstants.MQ_EVENT_DISTRIBUTE, messageEntity);
+            s1.send(MqConstants.MQ_EVENT_DISTRIBUTE, messageHolder.getContent());
         } else {
             //::Qos0
             s1.send(MqConstants.MQ_EVENT_DISTRIBUTE, messageHolder.getContent());
@@ -195,13 +198,15 @@ public class MqTopicConsumerQueueDefault implements MqTopicConsumerQueue {
     }
 
     @Override
-    public void acknowledge(Message message) {
+    public void acknowledge(String tid, Message message) {
         int ack = Integer.parseInt(message.metaOrDefault(MqConstants.MQ_META_ACK, "0"));
-        String tid = message.meta(MqConstants.MQ_META_TID);
 
         MqMessageHolder messageHolder = messageMap.get(tid);
 
         if (messageHolder == null) {
+            if (log.isDebugEnabled()) {
+                log.debug("Server {}#{} queue not found, tid={}", topic, consumer, tid);
+            }
             return;
         }
 

@@ -34,10 +34,6 @@ public class MqMessageDefault implements MqMessage {
         this.times = Integer.parseInt(from.metaOrDefault(MqConstants.MQ_META_TIMES, "0"));
     }
 
-    public String getSid(){
-        return from.sid();
-    }
-
     public String getConsumer(){
         return from.meta(MqConstants.MQ_META_CONSUMER);
     }

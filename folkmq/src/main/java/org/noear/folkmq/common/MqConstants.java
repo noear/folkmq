@@ -12,10 +12,6 @@ public interface MqConstants {
      */
     String MQ_META_TID = "mq.tid";
     /**
-     * 元信息：消息流Id
-     */
-    String MQ_META_SID = "mq.sid";
-    /**
      * 元信息：消息主题
      */
     String MQ_META_TOPIC = "mq.topic";

@@ -1,5 +1,6 @@
 package org.noear.folkmq.server;
 
+import org.noear.folkmq.common.MqConstants;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.entity.EntityDefault;
 
@@ -30,9 +31,10 @@ public class MqMessageHolder implements Delayed {
     //是否完成
     private boolean isDone;
 
-    public MqMessageHolder(Message from, String tid, int qos, long distributeTime) {
+    public MqMessageHolder(String consumer, Message from, String tid, int qos, long distributeTime) {
         this.from = from;
         this.content = new EntityDefault().data(from.dataAsBytes()).metaMap(from.metaMap());
+        this.content.meta(MqConstants.MQ_META_CONSUMER, consumer);
 
         this.tid = tid;
         this.qos = qos;

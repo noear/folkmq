@@ -54,7 +54,7 @@ public class MqClientDefault extends EventListener implements MqClientInternal {
                 MqSubscription subscription = subscriptionMap.get(message.getTopic());
 
                 if (subscription != null) {
-                    subscription.handle(message);
+                    subscription.consume(message);
                 }
 
                 //是否自动回执
@@ -115,7 +115,7 @@ public class MqClientDefault extends EventListener implements MqClientInternal {
      * @param consumerHandler 消费处理
      */
     @Override
-    public void subscribe(String topic, String consumer, MqConsumerHandler consumerHandler) throws IOException {
+    public void subscribe(String topic, String consumer, MqConsumeHandler consumerHandler) throws IOException {
         MqSubscription subscription = new MqSubscription(topic, consumer, consumerHandler);
 
         //支持Qos1

@@ -4,7 +4,6 @@ import org.noear.folkmq.common.MqConstants;
 import org.noear.folkmq.server.MqWatcherDefault;
 import org.noear.socketd.transport.core.Message;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;

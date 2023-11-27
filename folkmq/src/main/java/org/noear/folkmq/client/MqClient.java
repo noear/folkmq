@@ -40,7 +40,7 @@ public interface MqClient {
      * @param consumer        消费者（实例 ip 或 集群 name）
      * @param consumerHandler 消费处理
      */
-    void subscribe(String topic, String consumer, MqConsumerHandler consumerHandler) throws IOException;
+    void subscribe(String topic, String consumer, MqConsumeHandler consumerHandler) throws IOException;
 
     /**
      * 取消订阅主题

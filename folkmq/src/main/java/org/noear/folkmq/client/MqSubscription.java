@@ -8,10 +8,10 @@ import java.io.IOException;
  * @author noear
  * @since 1.0
  */
-public class MqSubscription implements MqConsumerHandler {
+public class MqSubscription implements MqConsumeHandler {
     private final String topic;
     private final String consumer;
-    private final MqConsumerHandler consumerHandler;
+    private final MqConsumeHandler consumerHandler;
 
 
     /**
@@ -29,9 +29,9 @@ public class MqSubscription implements MqConsumerHandler {
     }
 
     /**
-     * 消息处理器
+     * 消费处理器
      */
-    public MqConsumerHandler getConsumerHandler() {
+    public MqConsumeHandler getConsumerHandler() {
         return consumerHandler;
     }
 
@@ -40,14 +40,14 @@ public class MqSubscription implements MqConsumerHandler {
      * @param consumer        消费者（实例 ip 或 集群 name）
      * @param consumerHandler 消费处理器
      */
-    public MqSubscription(String topic, String consumer, MqConsumerHandler consumerHandler) {
+    public MqSubscription(String topic, String consumer, MqConsumeHandler consumerHandler) {
         this.topic = topic;
         this.consumer = consumer;
         this.consumerHandler = consumerHandler;
     }
 
     @Override
-    public void handle(MqMessage message) throws IOException {
-        consumerHandler.handle(message);
+    public void consume(MqMessage message) throws IOException {
+        consumerHandler.consume(message);
     }
 }

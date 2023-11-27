@@ -34,6 +34,9 @@
     <modules>
         <module>../folkmq</module>
         <module>../folkmq-pro</module>
+        <module>../folkmq-transport-java-tcp</module>
+        <module>../folkmq-transport-netty</module>
+        <module>../folkmq-transport-smartsocket</module>
     </modules>
 
     <dependencyManagement>
@@ -47,6 +50,24 @@
             <dependency>
                 <groupId>org.noear</groupId>
                 <artifactId>folkmq-pro</artifactId>
+                <version>${folkmq.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.noear</groupId>
+                <artifactId>folkmq-transport-java-tcp</artifactId>
+                <version>${folkmq.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.noear</groupId>
+                <artifactId>folkmq-transport-netty</artifactId>
+                <version>${folkmq.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.noear</groupId>
+                <artifactId>folkmq-transport-smartsocket</artifactId>
                 <version>${folkmq.version}</version>
             </dependency>
 

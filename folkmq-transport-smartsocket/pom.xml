@@ -11,13 +11,19 @@
         <relativePath>../folkmq-parent/pom.xml</relativePath>
     </parent>
 
-    <artifactId>folkmq</artifactId>
+    <artifactId>folkmq-transport-smartsocket</artifactId>
     <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
             <groupId>org.noear</groupId>
-            <artifactId>socketd</artifactId>
+            <artifactId>folkmq</artifactId>
+        </dependency>
+
+        <!-- 可选传输方案（260Kb左右）  -->
+        <dependency>
+            <groupId>org.noear</groupId>
+            <artifactId>socketd-transport-smartsocket</artifactId>
         </dependency>
     </dependencies>
 </project>

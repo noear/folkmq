@@ -52,11 +52,15 @@
 
 ## 特点
 
-简单、是真的简单；快、是真的特别快（大约 100_000 TPS）。基于内存，有点像 redis 之于 mysql。
+* 快、是真的特别快（大约 100_000 TPS）。有点像 redis 之于 mysql。
 
-<img src="DEV-TEST.png" width="700" />
+<img src="DEV-TEST.png" width="600" />
 
 //使用 MacBook pro 2020 + JDK8 本机测试，单客户端发与收（跑分难免有波动，我是选了好看点的）
+
+* 简单的管理后台
+
+<img src="DEV-PREVIEW.png" width="600" />
 
 ### 加入到社区交流群
 

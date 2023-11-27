@@ -126,7 +126,7 @@ public class ServerDemo {
         //服务端（鉴权为可选。不添加则不鉴权）
         MqServer server = FolkMQ.createServer()
                 .addAccess("folkmq", "YapLHTx19RlsEE16")
-                .watcher(new MqWatcherSnapshot()) //持久化需要添加 folkmq-pro 包
+                .watcher(new MqWatcherSnapshot()) //快照持久化需要添加 folkmq-pro 包
                 .start(13602);
 
         //添加定时快照

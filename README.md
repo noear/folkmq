@@ -45,7 +45,7 @@
 ## 简介
 
 * 基于 [Socket.D 通讯应用协议](https://gitee.com/noear/socketd) 开发的内存型消息队列。俗称：民谣消息队列（FolkMQ）
-* 支持 快照持久化
+* 支持 快照持久化（类似 redis 的策略）
 * 功能 订阅、取消订阅、发布消息、发布定时消息、ACK，重试、延时、Qos0、Qos1
 * 没有 集群功能（用户可以自建）
 
@@ -160,14 +160,18 @@ public class ClientDemo1 {
             System.out.println("ClientDemo1::" + message);
         });
 
-        //发布(Qos1)
+        //::Qos1
+        //发布（异步）
         client.publish("demo", "hi");
-        //发布(Qos1)，并指定5秒后派发
+        //发布（异步），并指定5秒后派发
         client.publish("demo", "hi", new Date(System.currentTimeMillis() + 5000));
+        //发布（同步），可以确保发送顺序与服务端有效确认
+        client.publish("demo", "hi").get(); //或 .get(1,TimeUnit.SECONDS)，限定超时
         
-        //发布(Qos0) 
+        //::Qos0
+        //发布（异步）
         client.publish("demo", "hi", 0);
-        //发布(Qos0)，并指定5秒后派发
+        //发布（异步），并指定5秒后派发
         client.publish("demo", "hi", new Date(System.currentTimeMillis() + 5000), 0);
     }
 }

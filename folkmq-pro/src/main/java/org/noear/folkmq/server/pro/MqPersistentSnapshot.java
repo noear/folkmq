@@ -10,6 +10,7 @@ import org.noear.socketd.transport.core.Flags;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.entity.StringEntity;
 import org.noear.socketd.transport.core.internal.MessageDefault;
+import org.noear.socketd.utils.RunUtils;
 import org.noear.socketd.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +52,11 @@ public class MqPersistentSnapshot extends MqPersistentDefault {
     @Override
     public synchronized void onStartBefore() {
         loadSubscribeMap();
-        loadTopicConsumerQueue();
+    }
+
+    @Override
+    public void onStartAfter() {
+        RunUtils.asyncAndTry(this::loadTopicConsumerQueue);
     }
 
     /**
@@ -75,9 +80,9 @@ public class MqPersistentSnapshot extends MqPersistentDefault {
                 }
             }
 
-            log.info("Server persistent loadSubscribeMap completed");
+            log.info("Server persistent load subscribeMap completed");
         } catch (Exception e) {
-            log.warn("Server persistent loadSubscribeMap failed", e);
+            log.warn("Server persistent load subscribeMap failed", e);
         }
     }
 

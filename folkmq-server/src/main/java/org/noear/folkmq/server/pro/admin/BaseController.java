@@ -1,5 +1,6 @@
 package org.noear.folkmq.server.pro.admin;
 
+import org.noear.folkmq.FolkMQ;
 import org.noear.solon.annotation.Singleton;
 import org.noear.solon.core.handle.ModelAndView;
 
@@ -22,7 +23,7 @@ public abstract class BaseController {
 
         viewModel.put("title", "FolkMQ");
         viewModel.put("app", "FolkMQ");
-        viewModel.put("_version", "1.0.6");
+        viewModel.put("_version", FolkMQ.version());
 
         viewModel.put("css", "/_static/css");
         viewModel.put("js", "/_static/js");

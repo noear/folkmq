@@ -1,5 +1,6 @@
 package org.noear.folkmq.server.pro.mq;
 
+import org.noear.folkmq.FolkMQ;
 import org.noear.folkmq.server.MqServer;
 import org.noear.folkmq.server.MqServerDefault;
 import org.noear.folkmq.server.MqServerInternal;
@@ -29,7 +30,7 @@ public class FolkmqLifecycleBean implements LifecycleBean {
     @Override
     public void start() throws Throwable {
         //服务端（鉴权为可选。不添加则不鉴权）
-        server = new MqServerDefault()
+        server = FolkMQ.createServer()
                 .addAccessAll(Solon.cfg().getMap("folkmq.access."))
                 .persistent(new MqPersistentSnapshot())
                 .start(Solon.cfg().serverPort() + 10000);

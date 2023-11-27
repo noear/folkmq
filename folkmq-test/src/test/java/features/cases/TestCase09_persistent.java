@@ -2,6 +2,8 @@ package features.cases;
 
 import org.noear.folkmq.client.MqClientDefault;
 import org.noear.folkmq.server.MqServerDefault;
+import org.noear.folkmq.server.MqServerInternal;
+import org.noear.folkmq.server.MqTopicConsumerQueue;
 import org.noear.folkmq.server.pro.MqPersistentSnapshot;
 
 import java.util.concurrent.CountDownLatch;
@@ -31,42 +33,65 @@ public class TestCase09_persistent extends BaseTestCase {
         client = new MqClientDefault("folkmq://127.0.0.1:" + getPort())
                 .connect();
 
-        client.subscribe("demo", "a", ((message) -> {
+        client.subscribe("demo", "127.0.0.1", ((message) -> {
             System.out.println(message);
             countDownLatch.countDown();
         }));
 
         client.publish("demo", "demo0").get(); //停连前，确保发完了
+        Thread.sleep(100);//确保上面的消费完成
         client.disconnect();
+        Thread.sleep(100);//确保断连
 
         server.stop();
-        server.start(getPort());
+        server = new MqServerDefault() //相当于服务器重启了
+                .persistent(new MqPersistentSnapshot())
+                .start(getPort());
 
         //上面已有有订阅记录了
-        client.connect();
-        client.unsubscribe("demo", "a"); //取消订阅； 为了不马上被派发掉
+        client.connect(); //新的会话
+        client.unsubscribe("demo", "127.0.0.1"); //取消订阅； 为了不马上被派发掉
+        Thread.sleep(100); //确保完成取消订阅了
         client.publish("demo", "demo1").get();
         client.publish("demo", "demo2").get();
 
+        Thread.sleep(100);//确保断连
+
         server.stop();
-        server.start(getPort()); //恢复三条数据
+        server = new MqServerDefault() //相当于服务器重启了
+                .persistent(new MqPersistentSnapshot())
+                .start(getPort());
 
 
         //上面已有有订阅记录了（有两条记录未发了）
-        client.connect();
+        client.connect(); //新的会话
 
-        client.subscribe("demo", "a", ((message) -> {
+        client.subscribe("demo", "127.0.0.1", ((message) -> {
             System.out.println(message);
             countDownLatch.countDown();
         }));
 
-        client.publish("demo", "demo3");
+        client.publish("demo", "demo3").get();
 
-        countDownLatch.await(10, TimeUnit.SECONDS);//持久化恢复后的数据，会自动延后
+        Thread.sleep(100);
 
+        countDownLatch.await(45, TimeUnit.SECONDS);//持久化恢复后的数据，会自动延后
+
+
+        //检验客户端
         System.out.println(countDownLatch.getCount());
         assert countDownLatch.getCount() == 0;
 
-        assert true;
+        Thread.sleep(100);
+
+        //检验服务端
+        MqServerInternal serverInternal = (MqServerInternal) server;
+        System.out.println("server topicConsumerMap.size=" + serverInternal.getTopicConsumerMap().size());
+        assert serverInternal.getTopicConsumerMap().size() == 1;
+
+        MqTopicConsumerQueue topicConsumerQueue = serverInternal.getTopicConsumerMap().values().toArray(new MqTopicConsumerQueue[1])[0];
+        System.out.println("server topicConsumerQueue.size=" + topicConsumerQueue.size());
+        assert topicConsumerQueue.getMessageMap().size() == 0;
+        assert topicConsumerQueue.size() == 0;
     }
 }

@@ -2,6 +2,8 @@ package features.cases;
 
 import org.noear.folkmq.client.MqClientDefault;
 import org.noear.folkmq.server.MqServerDefault;
+import org.noear.folkmq.server.MqServerInternal;
+import org.noear.folkmq.server.MqTopicConsumerQueue;
 
 import java.util.Date;
 import java.util.concurrent.CountDownLatch;
@@ -43,8 +45,19 @@ public class TestCase12_scheduled_n extends BaseTestCase {
 
         countDownLatch.await(6, TimeUnit.SECONDS);
 
+        //检验客户端
         assert countDownLatch.getCount() == 0;
 
-        assert true;
+        Thread.sleep(100);
+
+        //检验服务端
+        MqServerInternal serverInternal = (MqServerInternal) server;
+        System.out.println("server topicConsumerMap.size=" + serverInternal.getTopicConsumerMap().size());
+        assert serverInternal.getTopicConsumerMap().size() == 1;
+
+        MqTopicConsumerQueue topicConsumerQueue = serverInternal.getTopicConsumerMap().values().toArray(new MqTopicConsumerQueue[1])[0];
+        System.out.println("server topicConsumerQueue.size=" + topicConsumerQueue.size());
+        assert topicConsumerQueue.getMessageMap().size() == 0;
+        assert topicConsumerQueue.size() == 0;
     }
 }

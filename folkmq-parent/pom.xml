@@ -20,7 +20,7 @@
 
         <folkmq.version>1.0.8</folkmq.version>
         <socketd.version>2.0.22</socketd.version>
-        <snack3.version>3.2.83</snack3.version>
+        <snack3.version>3.2.84</snack3.version>
 
         <slf4j.version>2.0.9</slf4j.version>
         <junit5.version>5.9.1</junit5.version>

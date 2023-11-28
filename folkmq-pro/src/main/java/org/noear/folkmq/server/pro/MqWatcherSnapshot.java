@@ -10,13 +10,15 @@ import org.noear.socketd.transport.core.Flags;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.entity.StringEntity;
 import org.noear.socketd.transport.core.internal.MessageDefault;
+import org.noear.socketd.utils.GzipUtils;
+import org.noear.socketd.utils.IoUtils;
 import org.noear.socketd.utils.RunUtils;
 import org.noear.socketd.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -82,7 +84,7 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
         }
 
         try {
-            String subscribeMapJsonStr = IoUtils.readFile(subscribeMapFile);
+            String subscribeMapJsonStr = readSnapshotFile(subscribeMapFile);
 
             ONode subscribeMapJson = ONode.loadStr(subscribeMapJsonStr);
             for (String topic : subscribeMapJson.obj().keySet()) {
@@ -136,7 +138,7 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
             return false;
         }
 
-        String topicConsumerQueueJsonStr = IoUtils.readFile(topicConsumerQueueFile);
+        String topicConsumerQueueJsonStr = readSnapshotFile(topicConsumerQueueFile);
         ONode topicConsumerQueueJson = ONode.loadStr(topicConsumerQueueJsonStr);
 
         for (ONode messageJson : topicConsumerQueueJson.ary()) {
@@ -198,7 +200,7 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
                 subscribeMapFile.createNewFile();
             }
 
-            IoUtils.saveFile(subscribeMapFile, subscribeMapJson.toJson());
+            saveSnapshotFile(subscribeMapFile, subscribeMapJson.toJson());
 
             log.info("Server persistent saveSubscribeMap completed");
         } catch (Exception e) {
@@ -234,7 +236,7 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
                 saveTopicConsumerQueue1(topicConsumer, topicConsumerQueue);
 
                 log.info("Server persistent messageQueue completed, topicConsumer={}", topicConsumer);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 log.warn("Server persistent messageQueue failed, topicConsumer={}", topicConsumer, e);
             }
         }
@@ -257,7 +259,7 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
                     ONode entityJson = topicConsumerQueueJson.addNew();
                     entityJson.set("meta", entity.metaString());
                     entityJson.set("data", entity.dataAsString());
-                } catch (IOException e) {
+                } catch (Exception e) {
                     log.warn("Server persistent message failed, tid={}", messageHolder.getTid(), e);
                 }
             }
@@ -275,6 +277,33 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
             topicConsumerQueueFile.createNewFile();
         }
 
-        IoUtils.saveFile(topicConsumerQueueFile, topicConsumerQueueJson.toJson());
+        saveSnapshotFile(topicConsumerQueueFile, topicConsumerQueueJson.toJson());
+    }
+
+    /**
+     * 读取快照文件
+     */
+    private static String readSnapshotFile(File file) throws IOException {
+        try (InputStream input = new FileInputStream(file)) {
+            byte[] bytes = IoUtils.transferToBytes(input);
+
+            //解压
+            byte[] contentBytes = GzipUtils.decompress(bytes);
+            return new String(contentBytes, StandardCharsets.UTF_8);
+        }
+    }
+
+    /**
+     * 保存快照文件
+     */
+    private static void saveSnapshotFile(File file, String content) throws IOException {
+        //压缩
+        byte[] contentBytes = content.getBytes(StandardCharsets.UTF_8);
+        byte[] bytes = GzipUtils.compress(contentBytes);
+
+        try (ByteArrayInputStream input = new ByteArrayInputStream(bytes);
+             OutputStream out = new FileOutputStream(file)) {
+            IoUtils.transferTo(input, out);
+        }
     }
 }

@@ -45,7 +45,7 @@
 ## Introduction
 
 * Adopt a Redis-like strategy (run in memory + snapshot persistence)
-* Features subscribe, unsubscribe, publish messages, publish timed messages, ACK, retry, Delay, Qos0, Qos1
+* Functions Subscribe, unsubscribe, publish message, publish timed message, ACK, automatic retry, delay policy, Qos0, Qos1
 * No clustering yet (you can build your own)
 
 ## Features

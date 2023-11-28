@@ -70,8 +70,9 @@
 
 ## 开发过程视频记录
 
-* 开发过程视频： [《DEV-RECORD.md》](DEV-RECORD.md)
-* 成果演示：[《[FolkMQ] 一个新的内存型消息队列（快，特别的快）》](https://www.bilibili.com/video/BV1mc411D7pY/)
+* 开发过程视频：[《DEV-RECORD.md》](DEV-RECORD.md)
+* 成果展示：[《[FolkMQ] 一个新的内存型消息队列（快，特别的快）》](https://www.bilibili.com/video/BV1mc411D7pY/)
+* 快速入门：[《FolkMQ - Helloworld 入门》](https://www.bilibili.com/video/BV1Yj411L7fB/)
 
 ## 服务端容器镜像
 

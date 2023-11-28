@@ -124,7 +124,7 @@ public class ClientDemo1 {
         MqClient client = FolkMQ.createClient("folkmq://127.0.0.1:18602?ak=folkmq&sk=YapLHTx19RlsEE16")
                 .connect();
 
-        //订阅
+        //订阅（consumer = ip or cluster name）
         client.subscribe("demo", "demoapp", message -> {
             System.out.println(message);
         });

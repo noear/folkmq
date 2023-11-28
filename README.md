@@ -2,7 +2,7 @@
   FolkMQ
 </h1>
 <p align="center">
-	<strong>A new in-memory messaging middleware (with snapshot persistence)</strong>
+	<strong>An in-memory messaging middleware (supports snapshot persistence)</strong>
 </p>
 
 <p align="center">

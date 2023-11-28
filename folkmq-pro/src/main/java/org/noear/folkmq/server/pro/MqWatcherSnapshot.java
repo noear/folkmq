@@ -18,38 +18,48 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * 消息观察者 - 快照持久化（持久化定位为副本，只要重启时能恢复订阅关系与消息即可）
- * <br/>
- * 关键：onStart.., onStop.., onSubscribe, onPublish。
- * 提示：onSubscribe, onPublish 做同步处理（可靠性高），做异步处理（性能高）。具体看场景需求
+ * 消息观察者 - 快照持久化（实现持久化）
  *
  * @author noear
  * @since 1.0
  */
 public class MqWatcherSnapshot extends MqWatcherDefault {
-    private static final Logger log = LoggerFactory.getLogger(MqWatcherSnapshot.class);
+    protected static final Logger log = LoggerFactory.getLogger(MqWatcherSnapshot.class);
     private static final String file_suffix = ".fdb";
 
-    private MqServerInternal serverInternal;
-    private File directory;
+    //服务端引用
+    private MqServerInternal serverRef;
+
+    //文件目录
+    private final File directory;
+
+    //正在保持中
+    private final AtomicBoolean inSaveProcess;
 
     public MqWatcherSnapshot() {
-        this("./data/fdb/");
+        this(null);
     }
 
     public MqWatcherSnapshot(String dataPath) {
+        if (Utils.isEmpty(dataPath)) {
+            dataPath = "./data/fdb/";
+        }
+
         this.directory = new File(dataPath);
 
         if (this.directory.exists() == false) {
             this.directory.mkdirs();
         }
+
+        this.inSaveProcess = new AtomicBoolean(false);
     }
 
     @Override
     public void init(MqServerInternal serverInternal) {
-        this.serverInternal = serverInternal;
+        this.serverRef = serverInternal;
     }
 
     @Override
@@ -79,7 +89,7 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
                 ONode topicConsumerList = subscribeMapJson.get(topic);
                 for (ONode topicConsumer : topicConsumerList.ary()) {
                     String consumer = topicConsumer.getString().split(MqConstants.SEPARATOR_TOPIC_CONSUMER)[1];
-                    serverInternal.subscribeDo(topic, consumer, null);
+                    serverRef.subscribeDo(topic, consumer, null);
                 }
             }
 
@@ -93,7 +103,7 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
      * 加载主题消费队列记录（确保线程安全）
      */
     private void loadTopicConsumerQueue() {
-        Map<String, Set<String>> subscribeMap = serverInternal.getSubscribeMap();
+        Map<String, Set<String>> subscribeMap = serverRef.getSubscribeMap();
         if (subscribeMap.size() == 0) {
             return;
         }
@@ -138,7 +148,7 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
                     .sid(Utils.guid())
                     .flag(Flags.Message)
                     .entity(entity);
-            serverInternal.exchangeDo(message);
+            serverRef.exchangeDo(message);
         }
 
         return true;
@@ -154,15 +164,23 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
 
     @Override
     public synchronized void onSave() {
+        if (inSaveProcess.get()) {
+            return;
+        } else {
+            inSaveProcess.set(true);
+        }
+
         saveSubscribeMap();
         saveTopicConsumerQueue();
+
+        inSaveProcess.set(false);
     }
 
     /**
      * 保存订阅关系（确保线程安全）
      */
     private void saveSubscribeMap() {
-        Map<String, Set<String>> subscribeMap = serverInternal.getSubscribeMap();
+        Map<String, Set<String>> subscribeMap = serverRef.getSubscribeMap();
         if (subscribeMap.size() == 0) {
             return;
         }
@@ -192,7 +210,7 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
      * 保存主题消费队列记录（确保线程安全）
      */
     private void saveTopicConsumerQueue() {
-        Map<String, Set<String>> subscribeMap = serverInternal.getSubscribeMap();
+        Map<String, Set<String>> subscribeMap = serverRef.getSubscribeMap();
         if (subscribeMap.size() == 0) {
             return;
         }
@@ -207,7 +225,7 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
             }
         }
 
-        Map<String, MqTopicConsumerQueue> topicConsumerMap = serverInternal.getTopicConsumerMap();
+        Map<String, MqTopicConsumerQueue> topicConsumerMap = serverRef.getTopicConsumerMap();
 
         for (String topicConsumer : topicConsumerSet) {
             MqTopicConsumerQueue topicConsumerQueue = topicConsumerMap.get(topicConsumer);

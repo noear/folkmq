@@ -21,6 +21,10 @@ solon.logging.logger:
     level: WARN
 
 folkmq.admin: admin
+folkmq.snapshot:
+  save900: 1
+  save300: 10
+  save60: 10000
 
 #folkmq.access:
 #  user1 : "YapLHTx19RlsEE16"

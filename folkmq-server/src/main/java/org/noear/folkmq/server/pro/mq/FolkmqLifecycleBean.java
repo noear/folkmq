@@ -3,7 +3,7 @@ package org.noear.folkmq.server.pro.mq;
 import org.noear.folkmq.FolkMQ;
 import org.noear.folkmq.server.MqServer;
 import org.noear.folkmq.server.MqServerInternal;
-import org.noear.folkmq.server.pro.MqWatcherSnapshot;
+import org.noear.folkmq.server.pro.MqWatcherSnapshotPlus;
 import org.noear.solon.Solon;
 import org.noear.solon.annotation.Component;
 import org.noear.solon.annotation.Inject;
@@ -27,15 +27,21 @@ public class FolkmqLifecycleBean implements LifecycleBean {
 
     @Override
     public void start() throws Throwable {
+        long save900 = Solon.cfg().getLong("folkmq.snapshot.save900", 0);
+        long save300 = Solon.cfg().getLong("folkmq.snapshot.save300", 0);
+        long save60 = Solon.cfg().getLong("folkmq.snapshot.save60", 0);
+
+        //初始化快照持久化
+        MqWatcherSnapshotPlus snapshotPlus = new MqWatcherSnapshotPlus();
+        snapshotPlus.save900Condition(save900);
+        snapshotPlus.save300Condition(save300);
+        snapshotPlus.save60Condition(save60);
+
         //服务端（鉴权为可选。不添加则不鉴权）
         server = FolkMQ.createServer()
                 .addAccessAll(Solon.cfg().getMap("folkmq.access."))
-                .watcher(new MqWatcherSnapshot())
+                .watcher(snapshotPlus)
                 .start(Solon.cfg().serverPort() + 10000);
-
-        //添加定时快照
-        snapshotFuture = RunUtil.scheduleWithFixedDelay(server::save, 1000 * 30, 1000 * 30);
-
         //加入容器
         appContext.wrapAndPut(MqServerInternal.class, server);
     }
@@ -43,6 +49,7 @@ public class FolkmqLifecycleBean implements LifecycleBean {
     @Override
     public void stop() throws Throwable {
         if (server != null) {
+            //停止时会触发快照
             server.stop();
         }
 

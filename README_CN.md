@@ -78,7 +78,7 @@
 
 | 镜像                           | 说明                        |
 |------------------------------|---------------------------|
-| noearorg/folkmq-server:1.0.8 | 服务端（管理端口：8602，消息端口：18602） |
+| noearorg/folkmq-server:1.0.9 | 服务端（管理端口：8602，消息端口：18602） |
 
 * 可选配置
 
@@ -97,7 +97,7 @@
 ### 1、启动服务
 
 ```
-docker run -p 18602:18602 -p 8602:8602 noearorg/folkmq-server:1.0.8 
+docker run -p 18602:18602 -p 8602:8602 noearorg/folkmq-server:1.0.9 
 ```
 
 ### 2、编写客户端代码
@@ -110,7 +110,7 @@ docker run -p 18602:18602 -p 8602:8602 noearorg/folkmq-server:1.0.8
     <dependency>
         <groupId>org.noear</groupId>
         <artifactId>folkmq-transport-java-tcp</artifactId>
-        <version>1.0.8</version>
+        <version>1.0.9</version>
     </dependency>
 </dependencies>
 ```

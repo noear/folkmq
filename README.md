@@ -2,7 +2,7 @@
   FolkMQ
 </h1>
 <p align="center">
-	<strong>一个新起的内存型消息队列（支持快照持久化）</strong>
+	<strong>A new in-memory messaging middleware (with snapshot persistence)</strong>
 </p>
 
 <p align="center">
@@ -42,70 +42,70 @@
 
 <hr />
 
-## 简介
+## Introduction
 
-* 采用 类似 Redis 的策略（内存运行 + 快照持久化）
-* 功能 订阅、取消订阅、发布消息、发布定时消息、ACK，重试、延时、Qos0、Qos1
-* 暂无 集群功能（用户可以自建）
+* Adopt a Redis-like strategy (run in memory + snapshot persistence)
+* Features subscribe, unsubscribe, publish messages, publish timed messages, ACK, retry, Delay, Qos0, Qos1
+* No clustering yet (you can build your own)
 
-## 特点
+## Features
 
-* 快、是真的快（大约 100_000 TPS）。有点像 Redis 之于 MySql。
+* Fast, really fast (~ 100_000 TPS). A bit like Redis is to MySql.
 
 <img src="DEV-TEST.png" width="600" />
 
-//使用 MacBook pro 2020 + JDK8 本机测试，单客户端发与收（跑分难免有波动，我是选了好看点的）
+//Using MacBook pro 2020 + JDK8 native test, single client sending and receiving (running points inevitably have fluctuations, I chose the better one)
 
-* 简单的管理后台
+* Simple management
 
 <img src="DEV-PREVIEW.png" width="600" />
 
-### 加入到社区交流群
+### Join a community exchange group
 
-| QQ交流群：316697724                       | 微信交流群（申请时输入：FolkMQ）          |
+| QQ communication group：316697724                       | Wechat communication group (input: FolkMQ when applying)          |
 |---------------------------|----------------------------------------|
 |        | <img src="group_wx.png" width="120" /> 
 
 
 
-## 开发过程视频记录
+## Video recording of development process
 
-* 开发过程视频： [《DEV-RECORD.md》](DEV-RECORD.md)
-* 成果演示：[《[FolkMQ] 一个新的内存型消息队列（快，特别的快）》](https://www.bilibili.com/video/BV1mc411D7pY/)
+* Development process video： [《DEV-RECORD.md》](DEV-RECORD.md)
+* Demonstration of results：[《[FolkMQ] 一个新的内存型消息队列（快，特别的快）》](https://www.bilibili.com/video/BV1mc411D7pY/)
 
-## 服务端容器镜像
+## Server-side container image
 
-| 镜像                           | 说明                        |
+| Docker                       | Remarks                      |
 |------------------------------|---------------------------|
-| noearorg/folkmq-server:1.0.8 | 服务端（管理端口：8602，消息端口：18602） |
+| noearorg/folkmq-server:1.0.8 | Server (management port: 8602, message port: 18602) |
 
-* 可选配置
+* Optional configuration
 
-| 属性或环境变量                       | 默认值 |                      |
-|-------------------------------|-----|----------------------|
-| `server.port`                 |  8602   | 管理端口(http)           |
-|                               |  18602   | 消息端口(tcp)，管理端口+10000 |
-| `folkmq.admin`                |  admin   | 管理密码                 |
+| Properties or environment variables  | Default values | Remarks                                                          |
+|--------------------------------------|-----|------------------------------------------------------------------|
+| `server.port`                        |  8602   | management port (http)                                           |
+|                                      |  18602   | Message port (tcp), which is equal to administrative port +10000 |
+| `folkmq.admin`                       |  admin   | management password                                              |
 
-* 消息访问账号：
+* Add a message access account：
 
-添属性或环境变量，例： `folkmq.access.ak1=sk1`，`folkmq.access.ak2=sk2`
+Adding attributes or environment variables, for example： `folkmq.access.ak1=sk1`，`folkmq.access.ak2=sk2`
 
 ## Helloworld
 
-### 1、启动服务
+### 1、Starting the server
 
 ```
 docker run -p 18602:18602 -p 8602:8602 noearorg/folkmq-server:1.0.8 
 ```
 
-### 2、编写客户端
+### 2、Write client-side code
 
 * maven import
 
 ```xml
 <dependencies>
-    <!-- 可选包：java-tcp（90kb左右）, smartsocket（260Kb左右）, netty（2.5Mb左右） -->
+    <!-- Optional packages: java-tcp (~ 90kb), smartsocket (~ 260Kb), netty (~ 2.5Mb) -->
     <dependency>
         <groupId>org.noear</groupId>
         <artifactId>folkmq-transport-java-tcp</artifactId>
@@ -120,26 +120,26 @@ docker run -p 18602:18602 -p 8602:8602 noearorg/folkmq-server:1.0.8
 ```java
 public class ClientDemo1 {
     public static void main(String[] args) throws Exception {
-        //客户端（鉴权为可选。服务端，不添加则不鉴权）
+        //Client (Authentication is optional. Server-side, do not add, do not authenticate)
         MqClient client = FolkMQ.createClient("folkmq://127.0.0.1:18602?ak=folkmq&sk=YapLHTx19RlsEE16")
                 .connect();
 
-        //订阅
+        //Subscribe
         client.subscribe("demo", "demoapp", message -> {
             System.out.println(message);
         });
 
-        //发送
+        //Publish
         client.publish("demo", "helloworld!").get();
     }
 }
 ```
 
-## 自动重试与延时策略
+## Automatic retry and delay policies
 
-| 派发次数 | 自动延时 |            |
+| Number of distribution | Automatic delay |            |
 |------|------|------------|
-| 0    | 0s   | 相当于马上发     |
+| 0    | 0s   | It is equivalent to sending out immediately.     |
 | 1    | 5s   |            |
 | 2    | 30s  |            |
 | 3    | 3m   |            |
@@ -147,48 +147,38 @@ public class ClientDemo1 {
 | 5    | 15m  |            |
 | 6    | 30m  |            |
 | 7    | 1h   |            |
-| n..  | 2h   | 第八次之后都是2小时 |
+| n..  | 2h   | It's 2 hours after the 8th time |
 
 
-## 客户端接口字典
+## Dictionary of client interfaces
 
 ```java
-//消息客户端接口
+//Message client interface
 public interface MqClient {
-    //连接
     MqClient connect() throws IOException;
 
-    //断开连接
     void disconnect() throws IOException;
 
-    //客户端配置
     MqClient config(ClientConfigHandler configHandler);
 
-    //自动回执
     MqClient autoAcknowledge(boolean auto);
 
-    //订阅主题
     void subscribe(String topic, String consumer, MqConsumeHandler consumerHandler) throws IOException;
 
-    //取消订阅主题
     void unsubscribe(String topic, String consumer) throws IOException;
     
-    //发布消息
     default CompletableFuture<?> publish(String topic, String content) throws IOException {
         return publish(topic, content, null, 1);
     }
     
-    //发布消息
     default CompletableFuture<?> publish(String topic, String content, int qos) throws IOException {
         return publish(topic, content, null, qos);
     }
     
-    //发布消息
     default CompletableFuture<?> publish(String topic, String content, Date scheduled) throws IOException {
         return publish(topic, content, scheduled, 1);
     }
     
-    //发布消息
     CompletableFuture<?> publish(String topic, String content, Date scheduled, int qos) throws IOException;
 }
 ```

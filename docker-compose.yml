@@ -3,7 +3,7 @@ version: '3'
 
 services:
   folkmq-server:
-    image: noearorg/folkmq-server:1.0.8
+    image: noearorg/folkmq-server:1.0.9
     container_name: folkmq-server
     environment:
       - folkmq.admin=admin  #管理后台密码

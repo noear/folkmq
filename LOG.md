@@ -4,7 +4,7 @@
 * 添加 folkmq-transport-smartsocket 模块
 * 完善 快照策略（借鉴 redis 的策略）
 * 完善 快照压缩处理
-* socket.d 升为 2.0.23
+* socket.d 升为 2.0.24
 
 ### 1.0.8
 * 调整 "持久化" 概念改为 "观查者" 概念（更通用，后面要做监视）

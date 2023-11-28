@@ -2,7 +2,7 @@
   FolkMQ
 </h1>
 <p align="center">
-	<strong>一个新的内存型消息中间件（支持快照持久化）</strong>
+	<strong>一个内存型消息中间件（支持快照持久化）</strong>
 </p>
 
 <p align="center">

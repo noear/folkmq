@@ -1,0 +1,15 @@
+version: '3'
+
+
+services:
+  folkmq-server:
+    image: noearorg/folkmq-server:1.0.8
+    container_name: folkmq-server
+    environment:
+      - folkmq.admin=admin  #管理后台密码
+      - TZ=Asia/Shanghai
+    ports:
+      - 8602:8602           #管理后台端口
+      - 18602:18602         #消息服务端口  
+    volumes:
+      - "./data:/data"      #快照持久化目录

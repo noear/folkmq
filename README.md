@@ -71,7 +71,8 @@
 ## Video recording of development process
 
 * Development process video： [《DEV-RECORD.md》](DEV-RECORD.md)
-* Demonstration of results：[《[FolkMQ] 一个新的内存型消息队列（快，特别的快）》](https://www.bilibili.com/video/BV1mc411D7pY/)
+* Presentation of results：[《[FolkMQ] 一个新的内存型消息队列（快，特别的快）》](https://www.bilibili.com/video/BV1mc411D7pY/)
+* Quick start：[《FolkMQ - Helloworld 入门》](https://www.bilibili.com/video/BV1Yj411L7fB/)
 
 ## Server-side container image
 

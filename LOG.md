@@ -6,7 +6,7 @@
 * 完善 快照压缩处理
 * socket.d 升为 2.0.23
 
-### 1.0.9
+### 1.0.8
 * 调整 "持久化" 概念改为 "观查者" 概念（更通用，后面要做监视）
 * 调整 MqPersistent 改为 MqWatcher
 * 调整 MqPersistentSnapshot 改为 MqWatcherSnapshot

@@ -98,7 +98,7 @@
 
 ## Helloworld
 
-### 1、启动服务
+### 1、启动服务 (更多部署参考：[部署说明](deploy))
 
 ```
 docker run -p 18602:18602 -p 8602:8602 noearorg/folkmq-server:1.0.10 

@@ -1,5 +1,4 @@
-version: '3'
-
+version: '3.5'
 
 services:
   folkmq-server:
@@ -10,6 +9,7 @@ services:
       - TZ=Asia/Shanghai
     ports:
       - 8602:8602           #管理后台端口
-      - 18602:18602         #消息服务端口  
+      - 18602:18602         #消息服务端口
     volumes:
-      - "./data:/data"      #快照持久化目录
+      - ./logs/server:/logs
+      - ./data/server:/data

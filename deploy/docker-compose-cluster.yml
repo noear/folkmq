@@ -1,0 +1,52 @@
+version: '3.5'
+services:
+  folkmq-broker:
+    image: noearorg/folkmq-broker:1.0.10
+    container_name: folkmq-broker
+    ports:
+      - 18602:18602
+    volumes:
+      - ./data/broker:/data
+      - ./logs/broker:/logs
+    networks:
+      folkmq:
+        aliases:
+          - folkmq-broker
+  folkmq-server1:
+    image: noearorg/folkmq-server:1.0.10
+    container_name: folkmq-server1
+    ports:
+      - 18611:18602
+    volumes:
+      - ./logs/server1:/logs
+      - ./data/server1:/data
+    environment:
+      # @=folkmq-server 请勿修改
+      folkmq.broker: "sd:tcp://folkmq-broker:18602?@=folkmq-server"
+    depends_on:
+      - folkmq-broker
+    networks:
+      folkmq:
+        aliases:
+          - folkmq-server1
+  folkmq-server2:
+    image: noearorg/folkmq-server:1.0.10
+    container_name: folkmq-server2
+    ports:
+      - 18612:18602
+    volumes:
+      - ./data/server2:/data
+      - ./logs/server2:/logs
+    environment:
+      # @=folkmq-server 请勿修改
+      folkmq.broker: "sd:tcp://folkmq-broker:18602?@=folkmq-server"
+    depends_on:
+      - folkmq-broker
+    networks:
+      folkmq:
+        aliases:
+          - folkmq-server2
+networks:
+  folkmq:
+    name: folkmq
+    driver: bridge

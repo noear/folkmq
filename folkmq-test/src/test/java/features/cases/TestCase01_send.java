@@ -2,7 +2,7 @@ package features.cases;
 
 import org.noear.folkmq.client.MqClientDefault;
 import org.noear.folkmq.server.MqServerDefault;
-import org.noear.folkmq.server.MqServerInternal;
+import org.noear.folkmq.server.MqServiceInternal;
 import org.noear.folkmq.server.MqTopicConsumerQueue;
 
 import java.util.concurrent.CountDownLatch;
@@ -46,7 +46,7 @@ public class TestCase01_send extends BaseTestCase {
         Thread.sleep(100);
 
         //检验服务端
-        MqServerInternal serverInternal = (MqServerInternal) server;
+        MqServiceInternal serverInternal = server.getServerInternal();
         System.out.println("server topicConsumerMap.size=" + serverInternal.getTopicConsumerMap().size());
         assert serverInternal.getTopicConsumerMap().size() == 1;
 

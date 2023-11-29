@@ -63,6 +63,10 @@ public class MqTopicConsumerQueueDefault implements MqTopicConsumerQueue {
                 }
             }
         }
+
+        if (log.isWarnEnabled()) {
+            log.warn("MqConsumerQueue queueTake stoped!");
+        }
     }
 
     /**
@@ -159,7 +163,8 @@ public class MqTopicConsumerQueueDefault implements MqTopicConsumerQueue {
 
             //记日志
             if (log.isWarnEnabled()) {
-                log.warn("MqConsumerQueue distribute: no sessions, tid={}",
+                log.warn("MqConsumerQueue distribute: {} no sessions, tid={}",
+                        consumer,
                         messageHolder.getTid());
             }
         }

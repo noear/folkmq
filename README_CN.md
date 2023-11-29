@@ -2,7 +2,7 @@
   FolkMQ
 </h1>
 <p align="center">
-	<strong>一个内存型消息中间件（支持快照持久化）</strong>
+	<strong>一个内存型消息中间件（支持快照持久化、Broker 集群）</strong>
 </p>
 
 <p align="center">
@@ -46,7 +46,8 @@
 
 * 采用 类似 Redis 的策略（内存运行 + 快照持久化）
 * 功能 订阅、取消订阅、发布消息、发布定时消息、ACK，自动重试、延时策略、Qos0、Qos1
-* 暂无 集群功能（用户可以自建）
+* 集群 采用 Socket.D Broker 集群模式
+* 支持 使用 ws,udp 通讯（或许，也可用于物联网）
 
 ## 特点
 
@@ -78,7 +79,7 @@
 
 | 镜像                           | 说明                        |
 |------------------------------|---------------------------|
-| noearorg/folkmq-server:1.0.9 | 服务端（管理端口：8602，消息端口：18602） |
+| noearorg/folkmq-server:1.0.10 | 服务端（管理端口：8602，消息端口：18602） |
 
 * 可选配置
 
@@ -97,7 +98,7 @@
 ### 1、启动服务
 
 ```
-docker run -p 18602:18602 -p 8602:8602 noearorg/folkmq-server:1.0.9 
+docker run -p 18602:18602 -p 8602:8602 noearorg/folkmq-server:1.0.10 
 ```
 
 ### 2、编写客户端代码
@@ -110,7 +111,7 @@ docker run -p 18602:18602 -p 8602:8602 noearorg/folkmq-server:1.0.9
     <dependency>
         <groupId>org.noear</groupId>
         <artifactId>folkmq-transport-java-tcp</artifactId>
-        <version>1.0.9</version>
+        <version>1.0.10</version>
     </dependency>
 </dependencies>
 ```

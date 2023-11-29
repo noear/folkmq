@@ -78,7 +78,7 @@
 
 | Docker                       | Remarks                      |
 |------------------------------|---------------------------|
-| noearorg/folkmq-server:1.0.9 | Server (management port: 8602, message port: 18602) |
+| noearorg/folkmq-server:1.0.10 | Server (management port: 8602, message port: 18602) |
 
 * Optional configuration
 
@@ -97,7 +97,7 @@ Adding attributes or environment variables, for example： `folkmq.access.ak1=sk
 ### 1、Starting the server
 
 ```
-docker run -p 18602:18602 -p 8602:8602 noearorg/folkmq-server:1.0.9 
+docker run -p 18602:18602 -p 8602:8602 noearorg/folkmq-server:1.0.10 
 ```
 
 ### 2、Write client-side code
@@ -110,7 +110,7 @@ docker run -p 18602:18602 -p 8602:8602 noearorg/folkmq-server:1.0.9
     <dependency>
         <groupId>org.noear</groupId>
         <artifactId>folkmq-transport-java-tcp</artifactId>
-        <version>1.0.9</version>
+        <version>1.0.10</version>
     </dependency>
 </dependencies>
 ```

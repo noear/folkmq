@@ -1,4 +1,5 @@
 ### 1.0.10
+* 完成 Socket.D Broker 集群模式!
 * socket.d 升为 2.1.0
 
 

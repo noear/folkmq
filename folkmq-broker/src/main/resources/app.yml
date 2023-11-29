@@ -2,7 +2,7 @@ server.port: 8602
 
 solon.app:
   group: folkmq
-  name: folkmq-server
+  name: folkmq-broker
 
 solon.logging.appender:
   console:
@@ -19,15 +19,6 @@ solon.logging.logger:
     level: INFO
   "io.netty":
     level: WARN
-
-folkmq.admin: admin
-folkmq.snapshot:
-  save900: 1
-  save300: 10
-  save60: 10000
-
-
-#folkmq.broker: "sd:tcp://127.0.0.1:18602?@=folkmq-server"
 
 #folkmq.access:
 #  user1 : "YapLHTx19RlsEE16"

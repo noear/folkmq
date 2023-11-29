@@ -13,6 +13,8 @@ import org.noear.solon.annotation.Component;
 import org.noear.solon.annotation.Inject;
 import org.noear.solon.core.AppContext;
 import org.noear.solon.core.bean.LifecycleBean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author noear
@@ -20,6 +22,8 @@ import org.noear.solon.core.bean.LifecycleBean;
  */
 @Component
 public class FolkmqLifecycleBean implements LifecycleBean {
+    private static final Logger log = LoggerFactory.getLogger(FolkmqLifecycleBean.class);
+
     @Inject
     private AppContext appContext;
 
@@ -48,6 +52,8 @@ public class FolkmqLifecycleBean implements LifecycleBean {
 
             //加入容器
             appContext.wrapAndPut(MqServiceInternal.class, localServer.getServerInternal());
+
+            log.info("FlokMQ local server started!");
         } else {
             MqServiceListener serviceListener = new MqServiceListener(true);
             serviceListener.watcher(snapshotPlus);
@@ -58,6 +64,8 @@ public class FolkmqLifecycleBean implements LifecycleBean {
 
             //加入容器
             appContext.wrapAndPut(MqServiceInternal.class, serviceListener);
+
+            log.info("FlokMQ broker service started!");
         }
     }
 

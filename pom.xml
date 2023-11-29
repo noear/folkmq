@@ -24,6 +24,7 @@
 
     <modules>
         <module>folkmq-parent</module>
+        <module>folkmq-broker</module>
         <module>folkmq-server</module>
         <module>folkmq-test</module>
     </modules>

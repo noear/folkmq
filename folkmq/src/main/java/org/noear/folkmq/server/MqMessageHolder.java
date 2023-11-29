@@ -31,7 +31,7 @@ public class MqMessageHolder implements Delayed {
 
     public MqMessageHolder(String consumer, Message from, String tid, int qos, long distributeTime) {
         this.content = new EntityDefault().data(from.dataAsBytes()).metaMap(from.metaMap());
-        this.content.meta(MqConstants.MQ_META_CONSUMER, consumer);
+        this.content.meta(MqConstants.MQ_META_CONSUMER, consumer).at(consumer);
 
         this.tid = tid;
         this.qos = qos;

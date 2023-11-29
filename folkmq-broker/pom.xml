@@ -11,7 +11,7 @@
         <relativePath>../folkmq-parent/pom.xml</relativePath>
     </parent>
 
-    <artifactId>folkmq-server</artifactId>
+    <artifactId>folkmq-broker</artifactId>
     <packaging>jar</packaging>
 
     <properties>
@@ -21,17 +21,12 @@
     <dependencies>
         <dependency>
             <groupId>org.noear</groupId>
-            <artifactId>folkmq-pro</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.noear</groupId>
             <artifactId>folkmq-transport-netty</artifactId>
         </dependency>
 
         <dependency>
             <groupId>org.noear</groupId>
-            <artifactId>solon-web</artifactId>
+            <artifactId>solon-lib</artifactId>
             <version>${solon.version}</version>
         </dependency>
 

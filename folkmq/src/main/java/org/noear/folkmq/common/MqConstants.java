@@ -70,4 +70,14 @@ public interface MqConstants {
      * 主题与消息者间隔符
      */
     String SEPARATOR_TOPIC_CONSUMER = "#";
+
+    /**
+     * 经理人服务
+     */
+    String BROKER_AT_SERVER = "folkmq-server";
+
+    /**
+     * 经理人所有服务
+     */
+    String BROKER_AT_SERVER_ALL = "folkmq-server*";
 }

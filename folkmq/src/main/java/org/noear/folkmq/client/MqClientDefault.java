@@ -2,6 +2,7 @@ package org.noear.folkmq.client;
 
 import org.noear.folkmq.common.MqConstants;
 import org.noear.socketd.SocketD;
+import org.noear.socketd.exception.SocketdAlarmException;
 import org.noear.socketd.exception.SocketdConnectionException;
 import org.noear.socketd.transport.client.Client;
 import org.noear.socketd.transport.client.ClientConfigHandler;
@@ -65,7 +66,7 @@ public class MqClientDefault extends EventListener implements MqClientInternal {
                 if (message != null) {
                     acknowledge(message, false);
                     log.warn("Client consumer handle error, tid={}", message.getTid(), e);
-                }else {
+                } else {
                     log.warn("Client consumer handle error", e);
                 }
             }
@@ -124,7 +125,8 @@ public class MqClientDefault extends EventListener implements MqClientInternal {
         if (clientSession != null && clientSession.isValid()) {
             Entity entity = new StringEntity("")
                     .meta(MqConstants.MQ_META_TOPIC, subscription.getTopic())
-                    .meta(MqConstants.MQ_META_CONSUMER, subscription.getConsumer());
+                    .meta(MqConstants.MQ_META_CONSUMER, subscription.getConsumer())
+                    .at(MqConstants.BROKER_AT_SERVER_ALL);
 
             clientSession.sendAndRequest(MqConstants.MQ_EVENT_SUBSCRIBE, entity);
         }
@@ -137,7 +139,8 @@ public class MqClientDefault extends EventListener implements MqClientInternal {
         if (clientSession != null && clientSession.isValid()) {
             Entity entity = new StringEntity("")
                     .meta(MqConstants.MQ_META_TOPIC, topic)
-                    .meta(MqConstants.MQ_META_CONSUMER, consumer);
+                    .meta(MqConstants.MQ_META_CONSUMER, consumer)
+                    .at(MqConstants.BROKER_AT_SERVER_ALL);
 
             clientSession.sendAndRequest(MqConstants.MQ_EVENT_UNSUBSCRIBE, entity);
         }
@@ -166,6 +169,7 @@ public class MqClientDefault extends EventListener implements MqClientInternal {
         } else {
             entity.meta(MqConstants.MQ_META_SCHEDULED, String.valueOf(scheduled.getTime()));
         }
+        entity.at(MqConstants.BROKER_AT_SERVER);
 
         CompletableFuture<?> future = new CompletableFuture<>();
 
@@ -209,7 +213,8 @@ public class MqClientDefault extends EventListener implements MqClientInternal {
         for (MqSubscription subscription : subscriptionMap.values()) {
             Entity entity = new StringEntity("")
                     .meta(MqConstants.MQ_META_TOPIC, subscription.getTopic())
-                    .meta(MqConstants.MQ_META_CONSUMER, subscription.getConsumer());
+                    .meta(MqConstants.MQ_META_CONSUMER, subscription.getConsumer())
+                    .at(MqConstants.BROKER_AT_SERVER);
 
             session.send(MqConstants.MQ_EVENT_SUBSCRIBE, entity);
         }
@@ -233,7 +238,12 @@ public class MqClientDefault extends EventListener implements MqClientInternal {
         super.onError(session, error);
 
         if (log.isWarnEnabled()) {
-            log.warn("Client error, sessionId={}", session.sessionId(), error);
+            if (error instanceof SocketdAlarmException) {
+                SocketdAlarmException alarmException = (SocketdAlarmException) error;
+                log.warn("Client error, sessionId={}, from={}", session.sessionId(), alarmException.getFrom(), error);
+            } else {
+                log.warn("Client error, sessionId={}", session.sessionId(), error);
+            }
         }
     }
 }

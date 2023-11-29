@@ -76,17 +76,20 @@
 
 ## Server-side container image
 
-| Docker                       | Remarks                      |
-|------------------------------|---------------------------|
-| noearorg/folkmq-server:1.0.10 | Server (management port: 8602, message port: 18602) |
+| Docker                       | Remarks                                             |
+|------------------------------|-----------------------------------------------------|
+| noearorg/folkmq-server:1.0.10 | Server (main port: 8602, message port: 18602) |
+| noearorg/folkmq-broker:1.0.10 | Server (main port: 8602, message port: 18602)       |
+
+When using broker cluster, change folkmq-server port to 8601
 
 * Optional configuration
 
-| Properties or environment variables  | Default values | Remarks                                                          |
-|--------------------------------------|-----|------------------------------------------------------------------|
-| `server.port`                        |  8602   | management port (http)                                           |
-|                                      |  18602   | Message port (tcp), which is equal to administrative port +10000 |
-| `folkmq.admin`                       |  admin   | management password                                              |
+| Properties or environment variables  | Default values | Remarks                                           |
+|--------------------------------------|-----|---------------------------------------------------|
+| `server.port`                        |  8602   | main port (http)                                  |
+|                                      |  18602   | message port (tcp), equal to the main port +10000 |
+| `folkmq.admin`                       |  admin   | management password                               |
 
 * Add a message access account：
 

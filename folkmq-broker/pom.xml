@@ -65,7 +65,7 @@
                     </descriptorRefs>
                     <archive>
                         <manifest>
-                            <mainClass>org.noear.folkmq.server.pro.App</mainClass>
+                            <mainClass>org.noear.folkmq.broker.App</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

@@ -43,6 +43,8 @@ public class FolkmqLifecycleBean implements LifecycleBean {
         snapshotPlus.save300Condition(save300);
         snapshotPlus.save60Condition(save60);
 
+        appContext.wrapAndPut(MqWatcherSnapshotPlus.class, snapshotPlus);
+
         if (Utils.isEmpty(brokerServer)) {
             //服务端（鉴权为可选。不添加则不鉴权）
             localServer = FolkMQ.createServer()

@@ -2,8 +2,10 @@ package org.noear.folkmq.server.pro.admin;
 
 import org.noear.folkmq.server.MqServiceInternal;
 import org.noear.folkmq.server.MqTopicConsumerQueue;
+import org.noear.folkmq.server.pro.MqWatcherSnapshotPlus;
 import org.noear.folkmq.server.pro.admin.model.QueueVo;
 import org.noear.folkmq.server.pro.admin.model.TopicVo;
+import org.noear.socketd.utils.RunUtils;
 import org.noear.solon.annotation.Controller;
 import org.noear.solon.annotation.Inject;
 import org.noear.solon.annotation.Mapping;
@@ -26,6 +28,9 @@ import java.util.*;
 public class AdminController extends BaseController {
     @Inject
     MqServiceInternal server;
+
+    @Inject
+    MqWatcherSnapshotPlus snapshotPlus;
 
     @Mapping("/admin")
     public ModelAndView admin() {
@@ -94,9 +99,15 @@ public class AdminController extends BaseController {
     }
 
     @Mapping("/admin/save")
-    public Result save() {
-        server.save();
+    public String save() {
+        if (snapshotPlus.inSaveProcess()) {
+            return "save in process";
+        } else {
+            RunUtils.asyncAndTry(() -> {
+                server.save();
+            });
 
-        return Result.succeed("Save successfully!");
+            return "A new save processing task begins";
+        }
     }
 }

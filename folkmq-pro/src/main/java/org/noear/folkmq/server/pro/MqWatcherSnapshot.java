@@ -59,6 +59,10 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
         this.inSaveProcess = new AtomicBoolean(false);
     }
 
+    public boolean inSaveProcess(){
+        return inSaveProcess.get();
+    }
+
     @Override
     public void init(MqServiceInternal serverInternal) {
         this.serverRef = serverInternal;

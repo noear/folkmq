@@ -33,6 +33,18 @@
             <groupId>org.noear</groupId>
             <artifactId>solon-web</artifactId>
             <version>${solon.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.noear</groupId>
+                    <artifactId>solon.sessionstate.local</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.noear</groupId>
+            <artifactId>solon.sessionstate.jwt</artifactId>
+            <version>${solon.version}</version>
         </dependency>
 
         <dependency>

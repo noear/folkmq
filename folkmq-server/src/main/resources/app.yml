@@ -1,5 +1,8 @@
 server.port: 8602
 
+server.session:
+  state.jwt.secret: "YTkBY+iXQxPt6e3UG4/VRHAHXePJZTSyc3cAE6btwfI="
+
 solon.app:
   group: folkmq
   name: folkmq-server
@@ -19,6 +22,7 @@ solon.logging.logger:
     level: INFO
   "io.netty":
     level: WARN
+
 
 folkmq.admin: admin
 folkmq.snapshot:

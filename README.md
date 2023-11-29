@@ -97,7 +97,7 @@ Adding attributes or environment variables, for example： `folkmq.access.ak1=sk
 
 ## Helloworld
 
-### 1、Starting the server
+### 1、Start the server (more deployment references: [deployment Notes](deploy))
 
 ```
 docker run -p 18602:18602 -p 8602:8602 noearorg/folkmq-server:1.0.10 

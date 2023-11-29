@@ -1,6 +1,6 @@
 package org.noear.folkmq.server.pro.admin;
 
-import org.noear.folkmq.server.MqServerInternal;
+import org.noear.folkmq.server.MqServiceInternal;
 import org.noear.folkmq.server.MqTopicConsumerQueue;
 import org.noear.folkmq.server.pro.admin.model.QueueVo;
 import org.noear.folkmq.server.pro.admin.model.TopicVo;
@@ -25,7 +25,7 @@ import java.util.*;
 @Controller
 public class AdminController extends BaseController {
     @Inject
-    MqServerInternal server;
+    MqServiceInternal server;
 
     @Mapping("/admin")
     public ModelAndView admin() {

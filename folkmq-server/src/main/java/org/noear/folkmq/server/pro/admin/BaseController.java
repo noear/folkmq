@@ -25,9 +25,9 @@ public abstract class BaseController {
         viewModel.put("app", "FolkMQ");
         viewModel.put("_version", FolkMQ.version());
 
-        viewModel.put("css", "/_static/css");
-        viewModel.put("js", "/_static/js");
-        viewModel.put("img", "/_static/img");
+        viewModel.put("css", "/css");
+        viewModel.put("js", "/js");
+        viewModel.put("img", "/img");
 
         return viewModel;
     }

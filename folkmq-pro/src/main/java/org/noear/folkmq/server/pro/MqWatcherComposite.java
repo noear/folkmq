@@ -2,7 +2,7 @@ package org.noear.folkmq.server.pro;
 
 import org.noear.folkmq.server.MqMessageHolder;
 import org.noear.folkmq.server.MqWatcher;
-import org.noear.folkmq.server.MqServerInternal;
+import org.noear.folkmq.server.MqServiceInternal;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
 
@@ -35,7 +35,7 @@ public class MqWatcherComposite implements MqWatcher {
     }
 
     @Override
-    public void init(MqServerInternal serverInternal) {
+    public void init(MqServiceInternal serverInternal) {
         for (MqWatcher persistent : persistentList) {
             persistent.init(serverInternal);
         }

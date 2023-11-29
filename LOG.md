@@ -1,3 +1,7 @@
+### 1.0.10
+* socket.d 升为 2.1.0
+
+
 ### 1.0.9
 * 添加 folkmq-transport-java-tcp 模块
 * 添加 folkmq-transport-netty 模块

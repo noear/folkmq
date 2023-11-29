@@ -13,7 +13,7 @@ public interface MqWatcher {
     /**
      * 初始化
      */
-    void init(MqServerInternal serverInternal);
+    void init(MqServiceInternal serverInternal);
 
     /**
      * 服务启动之前

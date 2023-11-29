@@ -26,6 +26,9 @@ folkmq.snapshot:
   save300: 10
   save60: 10000
 
+
+#folkmq.broker: "sd:tcp://127.0.0.1:18600"
+
 #folkmq.access:
 #  user1 : "YapLHTx19RlsEE16"
 #  user2 : "YapLHTx19RlsEE16"

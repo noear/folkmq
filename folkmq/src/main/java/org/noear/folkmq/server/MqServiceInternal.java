@@ -7,12 +7,12 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * 消息服务端内部接口
+ * 消息服务内部接口
  *
  * @author noear
  * @since 1.0
  */
-public interface MqServerInternal extends MqServer {
+public interface MqServiceInternal {
     /**
      * 获取订阅关系表(topic=>[topicConsumer])
      */
@@ -37,4 +37,9 @@ public interface MqServerInternal extends MqServer {
      * 执行交换
      */
     void exchangeDo(Message message);
+
+    /**
+     * 保存
+     */
+    void save();
 }

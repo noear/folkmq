@@ -33,7 +33,7 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
     private static final String file_suffix = ".fdb";
 
     //服务端引用
-    private MqServerInternal serverRef;
+    private MqServiceInternal serverRef;
 
     //文件目录
     private final File directory;
@@ -60,7 +60,7 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
     }
 
     @Override
-    public void init(MqServerInternal serverInternal) {
+    public void init(MqServiceInternal serverInternal) {
         this.serverRef = serverInternal;
     }
 

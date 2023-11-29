@@ -2,16 +2,17 @@ package org.noear.folkmq.server.pro.mq;
 
 import org.noear.folkmq.FolkMQ;
 import org.noear.folkmq.server.MqServer;
-import org.noear.folkmq.server.MqServerInternal;
+import org.noear.folkmq.server.MqServiceInternal;
+import org.noear.folkmq.server.MqServiceListener;
 import org.noear.folkmq.server.pro.MqWatcherSnapshotPlus;
+import org.noear.socketd.SocketD;
+import org.noear.socketd.transport.core.Session;
 import org.noear.solon.Solon;
+import org.noear.solon.Utils;
 import org.noear.solon.annotation.Component;
 import org.noear.solon.annotation.Inject;
 import org.noear.solon.core.AppContext;
 import org.noear.solon.core.bean.LifecycleBean;
-import org.noear.solon.core.util.RunUtil;
-
-import java.util.concurrent.ScheduledFuture;
 
 /**
  * @author noear
@@ -22,11 +23,12 @@ public class FolkmqLifecycleBean implements LifecycleBean {
     @Inject
     private AppContext appContext;
 
-    private MqServer server;
-    private ScheduledFuture<?> snapshotFuture;
+    private MqServer localServer;
+    private Session brokerSession;
 
     @Override
     public void start() throws Throwable {
+        String brokerServer = Solon.cfg().get("folkmq.broker");
         long save900 = Solon.cfg().getLong("folkmq.snapshot.save900", 0);
         long save300 = Solon.cfg().getLong("folkmq.snapshot.save300", 0);
         long save60 = Solon.cfg().getLong("folkmq.snapshot.save60", 0);
@@ -37,24 +39,37 @@ public class FolkmqLifecycleBean implements LifecycleBean {
         snapshotPlus.save300Condition(save300);
         snapshotPlus.save60Condition(save60);
 
-        //服务端（鉴权为可选。不添加则不鉴权）
-        server = FolkMQ.createServer()
-                .addAccessAll(Solon.cfg().getMap("folkmq.access."))
-                .watcher(snapshotPlus)
-                .start(Solon.cfg().serverPort() + 10000);
-        //加入容器
-        appContext.wrapAndPut(MqServerInternal.class, server);
+        if (Utils.isEmpty(brokerServer)) {
+            //服务端（鉴权为可选。不添加则不鉴权）
+            localServer = FolkMQ.createServer()
+                    .addAccessAll(Solon.cfg().getMap("folkmq.access."))
+                    .watcher(snapshotPlus)
+                    .start(Solon.cfg().serverPort() + 10000);
+
+            //加入容器
+            appContext.wrapAndPut(MqServiceInternal.class, localServer.getServerInternal());
+        } else {
+            MqServiceListener serviceListener = new MqServiceListener(true);
+            serviceListener.watcher(snapshotPlus);
+
+            brokerSession = SocketD.createClient(brokerServer)
+                    .listen(serviceListener)
+                    .open();
+
+            //加入容器
+            appContext.wrapAndPut(MqServiceInternal.class, serviceListener);
+        }
     }
 
     @Override
     public void stop() throws Throwable {
-        if (server != null) {
+        if (localServer != null) {
             //停止时会触发快照
-            server.stop();
+            localServer.stop();
         }
 
-        if (snapshotFuture != null) {
-            snapshotFuture.cancel(false);
+        if (brokerSession != null) {
+            brokerSession.close();
         }
     }
 }

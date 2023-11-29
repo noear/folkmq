@@ -13,7 +13,7 @@ public class MqWatcherDefault implements MqWatcher {
 
 
     @Override
-    public void init(MqServerInternal serverInternal) {
+    public void init(MqServiceInternal serverInternal) {
 
     }
 

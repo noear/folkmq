@@ -42,7 +42,7 @@
         }
 
         function reloadimg(img) {
-            $(img).attr("src","/grit/login/validation/img?date"+Date());
+            $(img).attr("src","/login/validation/img?date"+Date());
         }
     </script>
 </head>

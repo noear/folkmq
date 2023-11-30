@@ -22,6 +22,8 @@ import java.util.*;
 public class MqServiceListener extends EventListener implements MqServiceInternal {
     private static final Logger log = LoggerFactory.getLogger(MqServerDefault.class);
 
+    private Object SUBSCRIBE_LOCK = new Object();
+
     //服务端访问账号
     private Map<String, String> serverAccessMap = new HashMap<>();
     //观察者
@@ -264,37 +266,39 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
      * 执行订阅
      */
     @Override
-    public synchronized void subscribeDo(String topic, String consumer, Session session) {
+    public void subscribeDo(String topic, String consumer, Session session) {
         String topicConsumer = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER + consumer;
 
-        //::1.构建订阅关系
+        synchronized (SUBSCRIBE_LOCK) {
+            //::1.构建订阅关系
 
-        //以身份进行订阅(topic=>[topicConsumer])
-        Set<String> topicConsumerSet = subscribeMap.get(topic);
-        if (topicConsumerSet == null) {
-            topicConsumerSet = new HashSet<>();
-            subscribeMap.put(topic, topicConsumerSet);
-        }
+            //以身份进行订阅(topic=>[topicConsumer])
+            Set<String> topicConsumerSet = subscribeMap.get(topic);
+            if (topicConsumerSet == null) {
+                topicConsumerSet = new HashSet<>();
+                subscribeMap.put(topic, topicConsumerSet);
+            }
 
-        topicConsumerSet.add(topicConsumer);
+            topicConsumerSet.add(topicConsumer);
 
-        //为身份建立队列(topicConsumer=>MqTopicConsumerQueue)
-        MqTopicConsumerQueue topicConsumerQueue = topicConsumerMap.get(topicConsumer);
-        if (topicConsumerQueue == null) {
-            topicConsumerQueue = new MqTopicConsumerQueueDefault(watcher, topic, consumer);
-            topicConsumerMap.put(topicConsumer, topicConsumerQueue);
-        }
+            //为身份建立队列(topicConsumer=>MqTopicConsumerQueue)
+            MqTopicConsumerQueue topicConsumerQueue = topicConsumerMap.get(topicConsumer);
+            if (topicConsumerQueue == null) {
+                topicConsumerQueue = new MqTopicConsumerQueueDefault(watcher, topic, consumer);
+                topicConsumerMap.put(topicConsumer, topicConsumerQueue);
+            }
 
-        //::2.标识会话身份（从持久层恢复时，会话可能为 null）
+            //::2.标识会话身份（从持久层恢复时，会话可能为 null）
 
-        if (session != null) {
-            log.info("Server channel subscribe topic={}, consumer={}, sessionId={}", topic, consumer, session.sessionId());
+            if (session != null) {
+                log.info("Server channel subscribe topic={}, consumer={}, sessionId={}", topic, consumer, session.sessionId());
 
-            //会话添加身份（可以有多个不同的身份）
-            session.attr(topicConsumer, "1");
+                //会话添加身份（可以有多个不同的身份）
+                session.attr(topicConsumer, "1");
 
-            //加入主题消息队列
-            topicConsumerQueue.addSession(session);
+                //加入主题消息队列
+                topicConsumerQueue.addSession(session);
+            }
         }
     }
 
@@ -302,24 +306,24 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
      * 执行取消订阅
      */
     @Override
-    public synchronized void unsubscribeDo(String topic, String consumer, Session session) {
+    public void unsubscribeDo(String topic, String consumer, Session session) {
+        if (session == null) {
+            return;
+        }
+
+        log.info("Server channel unsubscribe topic={}, consumer={}, sessionId={}", topic, consumer, session.sessionId());
+
         String topicConsumer = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER + consumer;
 
         //1.获取身份建立队列(topicConsumer=>MqTopicConsumerQueue)
         MqTopicConsumerQueue topicConsumerQueue = topicConsumerMap.get(topicConsumer);
 
-        //::2.移除会话身份（从持久层恢复时，会话可能为 null）
+        //2.移除会话身份（从持久层恢复时，会话可能为 null）
+        session.attrMap().remove(topicConsumer);
 
-        if (session != null) {
-            log.info("Server channel unsubscribe topic={}, consumer={}, sessionId={}", topic, consumer, session.sessionId());
-
-            //会话移除身份（可以有多个不同的身份）
-            session.attrMap().remove(topicConsumer);
-
-            //退出主题消息队列
-            if (topicConsumerQueue != null) {
-                topicConsumerQueue.removeSession(session);
-            }
+        //退出主题消息队列
+        if (topicConsumerQueue != null) {
+            topicConsumerQueue.removeSession(session);
         }
     }
 

@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.DelayQueue;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * 主题消费者队列默认实现（服务端给 [一个主题+一个消费者] 安排一个队列，一个消费者可多个会话，只随机给一个会话派发）
@@ -18,6 +20,8 @@ import java.util.concurrent.DelayQueue;
  */
 public class MqTopicConsumerQueueDefault implements MqTopicConsumerQueue {
     private static final Logger log = LoggerFactory.getLogger(MqTopicConsumerQueueDefault.class);
+
+    private Object SESSION_LOCK = new Object();
 
     //主题
     private final String topic;
@@ -49,19 +53,27 @@ public class MqTopicConsumerQueueDefault implements MqTopicConsumerQueue {
         this.messageQueueThread.start();
     }
 
+    AtomicLong queueTakeRef = new AtomicLong();
+
     private void queueTake() {
         while (!messageQueueThread.isInterrupted()) {
             try {
                 MqMessageHolder messageHolder = messageQueue.poll();
 
                 if (messageHolder != null) {
+                    queueTakeRef.set(0);
                     distribute(messageHolder);
                 } else {
+                    if (queueTakeRef.incrementAndGet() > 100) {
+                        log.info("MqConsumerQueue queueTake as null *100, queue={}#{}", topic, consumer);
+                        queueTakeRef.set(0);
+                    }
+
                     Thread.sleep(100);
                 }
             } catch (Throwable e) {
                 if (log.isWarnEnabled()) {
-                    log.warn("MqConsumerQueue queueTake error", e);
+                    log.warn("MqConsumerQueue queueTake error, queue={}#{}", topic, consumer, e);
                 }
             }
         }
@@ -95,12 +107,6 @@ public class MqTopicConsumerQueueDefault implements MqTopicConsumerQueue {
         return messageQueueThread.getState();
     }
 
-    public void restart(){
-        if(messageQueueThread.isAlive() == false){
-            messageQueueThread.start();
-        }
-    }
-
     /**
      * 获取消息表
      */
@@ -122,7 +128,22 @@ public class MqTopicConsumerQueueDefault implements MqTopicConsumerQueue {
      */
     @Override
     public void removeSession(Session session) {
-        consumerSessions.remove(session);
+        //removeSession 可能会对 get(idx) 带来安全，所以锁一下
+        synchronized (SESSION_LOCK) {
+            consumerSessions.remove(session);
+        }
+    }
+
+    public Session getSession() {
+        //removeSession 可能会对 get(idx) 带来安全，所以锁一下
+        synchronized (SESSION_LOCK) {
+            int idx = 0;
+            if (consumerSessions.size() > 1) {
+                idx = ThreadLocalRandom.current().nextInt(0, consumerSessions.size());
+            }
+
+            return consumerSessions.get(idx);
+        }
     }
 
     /**
@@ -161,7 +182,7 @@ public class MqTopicConsumerQueueDefault implements MqTopicConsumerQueue {
         //找到此身份的其中一个会话（如果是 ip 就一个；如果是集群名则任选一个）
         if (consumerSessions.size() > 0) {
             try {
-                distributeDo(messageHolder, consumerSessions);
+                distributeDo(messageHolder);
             } catch (Throwable e) {
                 //进入延后队列
                 messageQueue.remove(messageHolder);
@@ -179,7 +200,7 @@ public class MqTopicConsumerQueueDefault implements MqTopicConsumerQueue {
 
             //记日志
             if (log.isWarnEnabled()) {
-                log.warn("MqConsumerQueue distribute: {} no sessions, tid={}",
+                log.warn("MqConsumerQueue distribute: @{} no sessions, tid={}",
                         consumer,
                         messageHolder.getTid());
             }
@@ -189,13 +210,10 @@ public class MqTopicConsumerQueueDefault implements MqTopicConsumerQueue {
     /**
      * 派发执行
      */
-    private void distributeDo(MqMessageHolder messageHolder, List<Session> sessions) throws IOException {
+    private void distributeDo(MqMessageHolder messageHolder) throws IOException {
         //随机取一个会话（集群会有多个会话，实例有时也会有多个会话）
-        int idx = 0;
-        if (sessions.size() > 1) {
-            idx = new Random().nextInt(sessions.size());
-        }
-        Session s1 = sessions.get(idx);
+
+        Session s1 = getSession();
 
         //观察者::派发时（在元信息调整之后，再观察）
         watcher.onDistribute(consumer, messageHolder);

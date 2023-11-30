@@ -7,6 +7,7 @@ import org.noear.socketd.transport.core.entity.EntityDefault;
 import java.io.IOException;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * 消息持有人（为消息添加状态信息）
@@ -27,11 +28,13 @@ public class MqMessageHolder implements Delayed {
     //派发次数
     private int distributeCount;
     //是否完成
-    private boolean isDone;
+    private AtomicBoolean isDone;
 
     public MqMessageHolder(String consumer, Message from, String tid, int qos, int distributeCount, long distributeTime) {
         this.content = new EntityDefault().data(from.dataAsBytes()).metaMap(from.metaMap());
         this.content.meta(MqConstants.MQ_META_CONSUMER, consumer).at(consumer);
+
+        this.isDone = new AtomicBoolean();
 
         this.tid = tid;
         this.qos = qos;
@@ -50,7 +53,6 @@ public class MqMessageHolder implements Delayed {
      * 获取消息内容
      */
     public EntityDefault getContent() throws IOException {
-        content.data().reset();
         return content;
     }
 
@@ -79,12 +81,12 @@ public class MqMessageHolder implements Delayed {
         return distributeCount;
     }
 
-    public synchronized boolean isDone() {
-        return isDone;
+    public boolean isDone() {
+        return isDone.get();
     }
 
-    public synchronized void setDone(boolean done) {
-        isDone = done;
+    public void setDone(boolean done) {
+        isDone.set(done);
     }
 
     /**

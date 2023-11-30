@@ -195,9 +195,11 @@ public class MqTopicConsumerQueueDefault implements MqTopicConsumerQueue {
         }
         Session s1 = sessions.get(idx);
 
-        //设置新的派发次数
+        //设置新的派发次数和下次时间
         messageHolder.getContent()
                 .meta(MqConstants.MQ_META_TIMES, String.valueOf(messageHolder.getDistributeCount()));
+        messageHolder.getContent()
+                .meta(MqConstants.MQ_META_SCHEDULED, String.valueOf(messageHolder.getDistributeTime()));
 
 
         //观察者::派发时（在元信息调整之后，再观察）

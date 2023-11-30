@@ -44,7 +44,7 @@ docker run -p 18602:18602 -p 8602:8602 noearorg/folkmq-server:1.0.10
 java -jar folkmq-server.jar
 ```
 
-## 三、集群部署说明（正测试用中...）
+## 三、集群部署说明
 
 
 ### 1、docker-compose 部署方式

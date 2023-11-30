@@ -184,7 +184,7 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
     public void onOpen(Session session) throws IOException {
         super.onOpen(session);
 
-        if(brokerMode){
+        if (brokerMode) {
             return;
         }
 
@@ -214,7 +214,7 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
     public void onClose(Session session) {
         super.onClose(session);
 
-        if(brokerMode){
+        if (brokerMode) {
             return;
         }
 
@@ -353,13 +353,17 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
             List<String> topicConsumerList = new ArrayList<>(topicConsumerSet);
 
             for (String topicConsumer : topicConsumerList) {
-                MqTopicConsumerQueue topicConsumerQueue = topicConsumerMap.get(topicConsumer);
-
-                if (topicConsumerQueue != null) {
-                    MqMessageHolder messageHolder = new MqMessageHolder(topicConsumerQueue.getConsumer(), message, tid, qos, scheduled);
-                    topicConsumerQueue.add(messageHolder);
-                }
+                exchangeDo(topicConsumer, message, tid, qos, scheduled);
             }
+        }
+    }
+
+    public void exchangeDo(String topicConsumer, Message message, String tid, int qos, long scheduled) {
+        MqTopicConsumerQueue topicConsumerQueue = topicConsumerMap.get(topicConsumer);
+
+        if (topicConsumerQueue != null) {
+            MqMessageHolder messageHolder = new MqMessageHolder(topicConsumerQueue.getConsumer(), message, tid, qos, scheduled);
+            topicConsumerQueue.add(messageHolder);
         }
     }
 }

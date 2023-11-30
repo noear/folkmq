@@ -154,7 +154,17 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
                     .sid(Utils.guid())
                     .flag(Flags.Message)
                     .entity(entity);
-            serverRef.exchangeDo(message);
+
+
+            String tid = message.meta(MqConstants.MQ_META_TID);
+            int qos = "0".equals(message.meta(MqConstants.MQ_META_QOS)) ? 0 : 1;
+            long scheduled = 0;
+            String scheduledStr = message.meta(MqConstants.MQ_META_SCHEDULED);
+            if (Utils.isNotEmpty(scheduledStr)) {
+                scheduled = Long.parseLong(scheduledStr);
+            }
+
+            serverRef.exchangeDo(topicConsumer, message, tid, qos, scheduled);
         }
 
         return true;

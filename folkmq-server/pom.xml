@@ -16,7 +16,20 @@
 
     <properties>
         <solon.version>2.6.1</solon.version>
+        <micrometer.version>1.11.1</micrometer.version>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.noear</groupId>
+                <artifactId>solon-parent</artifactId>
+                <version>${solon.version}</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <dependency>
@@ -32,7 +45,6 @@
         <dependency>
             <groupId>org.noear</groupId>
             <artifactId>solon-web</artifactId>
-            <version>${solon.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.noear</groupId>
@@ -44,13 +56,22 @@
         <dependency>
             <groupId>org.noear</groupId>
             <artifactId>solon.sessionstate.jwt</artifactId>
-            <version>${solon.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.noear</groupId>
+            <artifactId>solon.cloud.metrics</artifactId>
         </dependency>
 
         <dependency>
             <groupId>org.noear</groupId>
             <artifactId>solon.logging.logback</artifactId>
-            <version>${solon.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
+            <version>${micrometer.version}</version>
         </dependency>
     </dependencies>
 

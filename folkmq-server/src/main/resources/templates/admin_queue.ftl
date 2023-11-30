@@ -25,7 +25,7 @@
             <td width="100px" class="center">延时1</td>
             <td width="100px" class="center">延时2</td>
             <td width="100px" class="center">延时3</td>
-            <td width="100px" class="center">延时4</td>
+            <td width="80px" class="center">延时4</td>
             <td width="80px" class="center">延时5</td>
             <td width="80px" class="center">延时6</td>
             <td width="60px" class="center">延时7</td>

@@ -21,8 +21,17 @@
         <thead>
         <tr>
             <td class="left">队列</td>
-            <td width="200px" class="center">消息数量</td>
-            <td width="200px" class="center">会话数量</td>
+            <td width="100px" class="center">消息数量</td>
+            <td width="100px" class="center">延时1</td>
+            <td width="100px" class="center">延时2</td>
+            <td width="100px" class="center">延时3</td>
+            <td width="100px" class="center">延时4</td>
+            <td width="80px" class="center">延时5</td>
+            <td width="80px" class="center">延时6</td>
+            <td width="60px" class="center">延时7</td>
+            <td width="60px" class="center">延时8</td>
+            <td width="50px" class="center">会话</td>
+            <td width="130px" class="center">状态</td>
         </tr>
         </thead>
         <tbody id="tbody">
@@ -30,7 +39,16 @@
             <tr>
                 <td class="left">${item.queue}</td>
                 <td class="center">${item.messageCount}</td>
+                <td class="center">${item.messageDelayedCount1}</td>
+                <td class="center">${item.messageDelayedCount2}</td>
+                <td class="center">${item.messageDelayedCount3}</td>
+                <td class="center">${item.messageDelayedCount4}</td>
+                <td class="center">${item.messageDelayedCount5}</td>
+                <td class="center">${item.messageDelayedCount6}</td>
+                <td class="center">${item.messageDelayedCount7}</td>
+                <td class="center">${item.messageDelayedCount8}</td>
                 <td class="center">${item.sessionCount}</td>
+                <td class="center">${item.state}</td>
             </tr>
         </#list>
         </tbody>

@@ -85,6 +85,20 @@ public class MqTopicConsumerQueueDefault implements MqTopicConsumerQueue {
         return consumer;
     }
 
+    public boolean isAlive() {
+        return messageQueueThread.isAlive();
+    }
+
+    public Thread.State state(){
+        return messageQueueThread.getState();
+    }
+
+    public void restart(){
+        if(messageQueueThread.isAlive() == false){
+            messageQueueThread.start();
+        }
+    }
+
     /**
      * 获取消息表
      */

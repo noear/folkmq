@@ -1,7 +1,9 @@
 package org.noear.folkmq.server.pro.admin;
 
+import org.noear.folkmq.server.MqMessageHolder;
 import org.noear.folkmq.server.MqServiceInternal;
 import org.noear.folkmq.server.MqTopicConsumerQueue;
+import org.noear.folkmq.server.MqTopicConsumerQueueDefault;
 import org.noear.folkmq.server.pro.MqWatcherSnapshotPlus;
 import org.noear.folkmq.server.pro.admin.model.QueueVo;
 import org.noear.folkmq.server.pro.admin.model.TopicVo;
@@ -77,17 +79,26 @@ public class AdminController extends BaseController {
         List<QueueVo> list = new ArrayList<>();
 
         for (String queue : new ArrayList<String>(topicConsumerMap.keySet())) {
-            MqTopicConsumerQueue consumerQueue = topicConsumerMap.get(queue);
+            MqTopicConsumerQueueDefault consumerQueue = (MqTopicConsumerQueueDefault)topicConsumerMap.get(queue);
 
             QueueVo queueVo = new QueueVo();
-            queueVo.setQueue(queue);
+            queueVo.queue = (queue);
 
             if (consumerQueue != null) {
-                queueVo.setMessageCount(consumerQueue.messageCount());
-                queueVo.setSessionCount(consumerQueue.sessionCount());
-            } else {
-                queueVo.setMessageCount(0);
-                queueVo.setSessionCount(0);
+                queueVo.isAlive = (consumerQueue.isAlive());
+                queueVo.state = (consumerQueue.state().name());
+                queueVo.messageCount = (consumerQueue.messageCount());
+                queueVo.sessionCount = (consumerQueue.sessionCount());
+
+                List<MqMessageHolder> messageList = new ArrayList<>(consumerQueue.getMessageMap().values());
+                queueVo.messageDelayedCount1 = messageList.stream().filter(m -> m.getDistributeCount() == 1).count();
+                queueVo.messageDelayedCount2 = messageList.stream().filter(m -> m.getDistributeCount() == 2).count();
+                queueVo.messageDelayedCount3 = messageList.stream().filter(m -> m.getDistributeCount() == 3).count();
+                queueVo.messageDelayedCount4 = messageList.stream().filter(m -> m.getDistributeCount() == 4).count();
+                queueVo.messageDelayedCount5 = messageList.stream().filter(m -> m.getDistributeCount() == 5).count();
+                queueVo.messageDelayedCount6 = messageList.stream().filter(m -> m.getDistributeCount() == 6).count();
+                queueVo.messageDelayedCount7 = messageList.stream().filter(m -> m.getDistributeCount() == 7).count();
+                queueVo.messageDelayedCount8 = messageList.stream().filter(m -> m.getDistributeCount() > 7).count();
             }
 
             list.add(queueVo);

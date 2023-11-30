@@ -1,9 +1,7 @@
-package benchmark;
+package labs;
 
 import org.noear.folkmq.FolkMQ;
 import org.noear.folkmq.client.MqClient;
-
-import java.util.concurrent.CountDownLatch;
 
 public class ProducerTest {
     public static void main(String[] args) throws Exception {

@@ -1,4 +1,4 @@
-package benchmark;
+package labs;
 
 import org.noear.folkmq.FolkMQ;
 import org.noear.folkmq.client.MqClient;

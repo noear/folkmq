@@ -54,3 +54,7 @@ java -jar folkmq-server.jar
 ```
 docker-compose -f docker-compose-cluster.yml up
 ```
+
+通过 `docker-compose-cluster.yml`，我们可以了解集群部署时 `folkmq-server` 与 `folkmq-broker` 的关系如下：
+
+<img src="DEV-BROKER.png" width="400">

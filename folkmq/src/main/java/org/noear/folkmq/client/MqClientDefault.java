@@ -129,6 +129,8 @@ public class MqClientDefault extends EventListener implements MqClientInternal {
                     .at(MqConstants.BROKER_AT_SERVER_ALL);
 
             clientSession.sendAndRequest(MqConstants.MQ_EVENT_SUBSCRIBE, entity);
+
+            log.info("Client subscribe successfully: {}#{}", topic, consumer);
         }
     }
 
@@ -143,6 +145,8 @@ public class MqClientDefault extends EventListener implements MqClientInternal {
                     .at(MqConstants.BROKER_AT_SERVER_ALL);
 
             clientSession.sendAndRequest(MqConstants.MQ_EVENT_UNSUBSCRIBE, entity);
+
+            log.info("Client unsubscribe successfully: {}#{}", topic, consumer);
         }
     }
 

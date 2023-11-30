@@ -29,12 +29,13 @@ public class MqMessageHolder implements Delayed {
     //是否完成
     private boolean isDone;
 
-    public MqMessageHolder(String consumer, Message from, String tid, int qos, long distributeTime) {
+    public MqMessageHolder(String consumer, Message from, String tid, int qos, int distributeCount, long distributeTime) {
         this.content = new EntityDefault().data(from.dataAsBytes()).metaMap(from.metaMap());
         this.content.meta(MqConstants.MQ_META_CONSUMER, consumer).at(consumer);
 
         this.tid = tid;
         this.qos = qos;
+        this.distributeCount = distributeCount;
         this.distributeTime = distributeTime;
     }
 
@@ -92,6 +93,12 @@ public class MqMessageHolder implements Delayed {
     public MqMessageHolder delayed() {
         distributeCount++;
         distributeTime = MqNextTime.getNextTime(this);
+
+        //设置新的派发次数和下次时间
+        content.meta(MqConstants.MQ_META_TIMES, String.valueOf(distributeCount));
+        content.meta(MqConstants.MQ_META_SCHEDULED, String.valueOf(distributeTime));
+
+
         return this;
     }
 

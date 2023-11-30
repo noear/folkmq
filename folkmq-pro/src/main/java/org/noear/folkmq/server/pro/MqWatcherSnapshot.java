@@ -2,6 +2,7 @@ package org.noear.folkmq.server.pro;
 
 import org.noear.folkmq.common.MqConstants;
 import org.noear.folkmq.server.*;
+import org.noear.folkmq.server.pro.utils.IoUtils;
 import org.noear.snack.ONode;
 import org.noear.snack.core.Feature;
 import org.noear.snack.core.Options;
@@ -10,8 +11,6 @@ import org.noear.socketd.transport.core.Flags;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.entity.StringEntity;
 import org.noear.socketd.transport.core.internal.MessageDefault;
-import org.noear.socketd.utils.GzipUtils;
-import org.noear.socketd.utils.IoUtils;
 import org.noear.socketd.utils.RunUtils;
 import org.noear.socketd.utils.Utils;
 import org.slf4j.Logger;
@@ -69,7 +68,7 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
     }
 
     @Override
-    public synchronized void onStartBefore() {
+    public void onStartBefore() {
         loadSubscribeMap();
     }
 
@@ -180,7 +179,7 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
     }
 
     @Override
-    public synchronized void onSave() {
+    public void onSave() {
         if (inSaveProcess.get()) {
             return;
         } else {

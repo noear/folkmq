@@ -1,10 +1,7 @@
 package org.noear.folkmq.server;
 
 import org.noear.folkmq.common.MqConstants;
-import org.noear.socketd.transport.core.Entity;
-import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
-import org.noear.socketd.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,8 +52,13 @@ public class MqTopicConsumerQueueDefault implements MqTopicConsumerQueue {
     private void queueTake() {
         while (!messageQueueThread.isInterrupted()) {
             try {
-                MqMessageHolder messageHolder = messageQueue.take();
-                distribute(messageHolder);
+                MqMessageHolder messageHolder = messageQueue.poll();
+
+                if (messageHolder != null) {
+                    distribute(messageHolder);
+                } else {
+                    Thread.sleep(100);
+                }
             } catch (Throwable e) {
                 if (log.isWarnEnabled()) {
                     log.warn("MqConsumerQueue queueTake error", e);
@@ -194,13 +196,6 @@ public class MqTopicConsumerQueueDefault implements MqTopicConsumerQueue {
             idx = new Random().nextInt(sessions.size());
         }
         Session s1 = sessions.get(idx);
-
-        //设置新的派发次数和下次时间
-        messageHolder.getContent()
-                .meta(MqConstants.MQ_META_TIMES, String.valueOf(messageHolder.getDistributeCount()));
-        messageHolder.getContent()
-                .meta(MqConstants.MQ_META_SCHEDULED, String.valueOf(messageHolder.getDistributeTime()));
-
 
         //观察者::派发时（在元信息调整之后，再观察）
         watcher.onDistribute(consumer, messageHolder);

@@ -158,13 +158,14 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
 
             String tid = message.meta(MqConstants.MQ_META_TID);
             int qos = "0".equals(message.meta(MqConstants.MQ_META_QOS)) ? 0 : 1;
+            int times = Integer.parseInt(message.metaOrDefault(MqConstants.MQ_META_TIMES, "0"));
             long scheduled = 0;
             String scheduledStr = message.meta(MqConstants.MQ_META_SCHEDULED);
             if (Utils.isNotEmpty(scheduledStr)) {
                 scheduled = Long.parseLong(scheduledStr);
             }
 
-            serverRef.exchangeDo(topicConsumer, message, tid, qos, scheduled);
+            serverRef.exchangeDo(topicConsumer, message, tid, qos, times, scheduled);
         }
 
         return true;
@@ -302,7 +303,7 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
             byte[] bytes = IoUtils.transferToBytes(input);
 
             //解压
-            byte[] contentBytes = GzipUtils.decompress(bytes);
+            byte[] contentBytes = bytes;//GzipUtils.decompress(bytes);
             return new String(contentBytes, StandardCharsets.UTF_8);
         }
     }
@@ -313,7 +314,7 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
     private static void saveSnapshotFile(File file, String content) throws IOException {
         //压缩
         byte[] contentBytes = content.getBytes(StandardCharsets.UTF_8);
-        byte[] bytes = GzipUtils.compress(contentBytes);
+        byte[] bytes = contentBytes;//GzipUtils.compress(contentBytes);
 
         try (ByteArrayInputStream input = new ByteArrayInputStream(bytes);
              OutputStream out = new FileOutputStream(file)) {

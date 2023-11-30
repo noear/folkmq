@@ -41,7 +41,7 @@ public interface MqServiceInternal {
     /**
      * 执行交换
      */
-    void exchangeDo(String topicConsumer, Message message, String tid, int qos, long scheduled);
+    void exchangeDo(String topicConsumer, Message message, String tid, int qos, int times, long scheduled);
 
     /**
      * 保存

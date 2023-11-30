@@ -20,8 +20,13 @@
     <table>
         <thead>
         <tr>
-            <td class="left">队列</td>
-            <td width="100px" class="center">消息数量</td>
+            <td class="left" rowspan="2">队列</td>
+            <td colspan="9">消息</td>
+            <td width="50px" rowspan="2" class="center">会话</td>
+            <td width="130px" rowspan="2" class="center">状态</td>
+        </tr>
+        <tr>
+            <td width="100px" class="center">总数</td>
             <td width="100px" class="center">延时1</td>
             <td width="100px" class="center">延时2</td>
             <td width="100px" class="center">延时3</td>
@@ -30,8 +35,6 @@
             <td width="80px" class="center">延时6</td>
             <td width="60px" class="center">延时7</td>
             <td width="60px" class="center">延时8</td>
-            <td width="50px" class="center">会话</td>
-            <td width="130px" class="center">状态</td>
         </tr>
         </thead>
         <tbody id="tbody">

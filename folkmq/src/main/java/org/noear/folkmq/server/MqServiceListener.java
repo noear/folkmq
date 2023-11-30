@@ -338,6 +338,7 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
         //复用解析
         String topic = message.meta(MqConstants.MQ_META_TOPIC);
         int qos = "0".equals(message.meta(MqConstants.MQ_META_QOS)) ? 0 : 1;
+        int times = Integer.parseInt(message.metaOrDefault(MqConstants.MQ_META_TIMES, "0"));
         long scheduled = 0;
         String scheduledStr = message.meta(MqConstants.MQ_META_SCHEDULED);
         if (Utils.isNotEmpty(scheduledStr)) {
@@ -353,16 +354,16 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
             List<String> topicConsumerList = new ArrayList<>(topicConsumerSet);
 
             for (String topicConsumer : topicConsumerList) {
-                exchangeDo(topicConsumer, message, tid, qos, scheduled);
+                exchangeDo(topicConsumer, message, tid, qos, times, scheduled);
             }
         }
     }
 
-    public void exchangeDo(String topicConsumer, Message message, String tid, int qos, long scheduled) {
+    public void exchangeDo(String topicConsumer, Message message, String tid, int qos, int times, long scheduled) {
         MqTopicConsumerQueue topicConsumerQueue = topicConsumerMap.get(topicConsumer);
 
         if (topicConsumerQueue != null) {
-            MqMessageHolder messageHolder = new MqMessageHolder(topicConsumerQueue.getConsumer(), message, tid, qos, scheduled);
+            MqMessageHolder messageHolder = new MqMessageHolder(topicConsumerQueue.getConsumer(), message, tid, qos, times, scheduled);
             topicConsumerQueue.add(messageHolder);
         }
     }

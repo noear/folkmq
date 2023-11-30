@@ -1,10 +1,9 @@
-package org.noear.folkmq.broker;
+package org.noear.folkmq.broker.mq;
 
 import org.noear.folkmq.common.MqConstants;
 import org.noear.socketd.broker.BrokerListener;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
-import org.noear.socketd.transport.core.entity.StringEntity;
 
 import java.io.IOException;
 import java.util.Collection;

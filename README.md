@@ -2,7 +2,7 @@
   FolkMQ
 </h1>
 <p align="center">
-	<strong>An in-memory messaging middleware (support for snapshot persistence, Broker clustering), currently in preview</strong>
+	<strong>An in-memory messaging middleware (support for snapshot persistence, Broker clustering)</strong>
 </p>
 
 <p align="center">

@@ -54,7 +54,7 @@
 | Consumer | Subscribe, unsubscribe                                                            |            |
 | Consumer | Consume - ACK                                                                     |            |
 |          |                                                                                   |            |
-| Server   | Distribute - Retry, Distribute - Delayed                                                 | Dispatch retry and delay policies |
+| Server   | Distribute - Retry, Distribute - Delayed                                                 | Have a strategy |
 | Server   | In-memory running, snapshot persistence (automatic, offline, manual)        |            |
 
 

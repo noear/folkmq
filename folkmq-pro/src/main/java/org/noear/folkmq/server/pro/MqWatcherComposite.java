@@ -98,16 +98,16 @@ public class MqWatcherComposite implements MqWatcher {
     }
 
     @Override
-    public void onDistribute(String consumer, MqMessageHolder messageHolder) {
+    public void onDistribute(String topic, String consumer, MqMessageHolder messageHolder) {
         for (MqWatcher persistent : persistentList) {
-            persistent.onDistribute(consumer, messageHolder);
+            persistent.onDistribute(topic, consumer, messageHolder);
         }
     }
 
     @Override
-    public void onAcknowledge(String consumer, MqMessageHolder messageHolder, boolean isOk) {
+    public void onAcknowledge(String topic, String consumer, MqMessageHolder messageHolder, boolean isOk) {
         for (MqWatcher persistent : persistentList) {
-            persistent.onAcknowledge(consumer, messageHolder, isOk);
+            persistent.onAcknowledge(topic, consumer, messageHolder, isOk);
         }
     }
 }

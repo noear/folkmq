@@ -58,12 +58,12 @@ public class MqWatcherDefault implements MqWatcher {
     }
 
     @Override
-    public void onDistribute(String consumer, MqMessageHolder messageHolder) {
+    public void onDistribute(String topic, String consumer, MqMessageHolder messageHolder) {
 
     }
 
     @Override
-    public void onAcknowledge(String consumer, MqMessageHolder messageHolder, boolean isOk) {
+    public void onAcknowledge(String topic, String consumer, MqMessageHolder messageHolder, boolean isOk) {
 
     }
 }

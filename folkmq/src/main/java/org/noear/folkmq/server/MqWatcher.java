@@ -58,10 +58,10 @@ public interface MqWatcher {
     /**
      * 派发时
      */
-    void onDistribute(String consumer, MqMessageHolder messageHolder);
+    void onDistribute(String topic, String consumer, MqMessageHolder messageHolder);
 
     /**
      * 回执时
      */
-    void onAcknowledge(String consumer, MqMessageHolder messageHolder, boolean isOk);
+    void onAcknowledge(String topic, String consumer, MqMessageHolder messageHolder, boolean isOk);
 }

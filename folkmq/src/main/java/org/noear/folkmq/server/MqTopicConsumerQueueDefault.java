@@ -128,7 +128,7 @@ public class MqTopicConsumerQueueDefault extends MqTopicConsumerQueueBase implem
     }
 
     private void internalRemove(MqMessageHolder mh) {
-        if(messageQueue.remove(mh)){
+        if (messageQueue.remove(mh)) {
             messageCounterSub(mh);
         }
     }
@@ -194,7 +194,7 @@ public class MqTopicConsumerQueueDefault extends MqTopicConsumerQueueBase implem
         Session s1 = getSession();
 
         //观察者::派发时（在元信息调整之后，再观察）
-        watcher.onDistribute(consumer, messageHolder);
+        watcher.onDistribute(topic, consumer, messageHolder);
 
         if (messageHolder.getQos() > 0) {
             //::Qos1
@@ -212,7 +212,7 @@ public class MqTopicConsumerQueueDefault extends MqTopicConsumerQueueBase implem
             //::Qos0
             s1.send(MqConstants.MQ_EVENT_DISTRIBUTE, messageHolder.getContent());
             //观察者::回执时
-            watcher.onAcknowledge(consumer, messageHolder, true);
+            watcher.onAcknowledge(topic, consumer, messageHolder, true);
 
             messageMap.remove(messageHolder.getTid());
 
@@ -223,7 +223,7 @@ public class MqTopicConsumerQueueDefault extends MqTopicConsumerQueueBase implem
 
     private void acknowledgeDo(MqMessageHolder messageHolder, int ack) {
         //观察者::回执时
-        watcher.onAcknowledge(consumer, messageHolder, ack > 0);
+        watcher.onAcknowledge(topic, consumer, messageHolder, ack > 0);
 
         if (ack > 0) {
             //ok

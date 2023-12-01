@@ -44,7 +44,7 @@ public class MqClientDefault extends EventListener implements MqClientInternal {
     //自动回执
     private boolean autoAcknowledge = true;
     //发布重试
-    private int publishRetryTimes = 2;
+    private int publishRetryTimes = 0;
 
     public MqClientDefault(String serverUrl) {
         this.serverUrl = serverUrl.replace("folkmq://", "sd:tcp://");
@@ -173,6 +173,7 @@ public class MqClientDefault extends EventListener implements MqClientInternal {
             throw new SocketdConnectionException("Not connected!");
         }
 
+        //构建消息实体
         StringEntity entity = new StringEntity(content);
         entity.meta(MqConstants.MQ_META_TID, Utils.guid());
         entity.meta(MqConstants.MQ_META_TOPIC, topic);
@@ -184,18 +185,35 @@ public class MqClientDefault extends EventListener implements MqClientInternal {
         }
         entity.at(MqConstants.BROKER_AT_SERVER);
 
+        //执行
+        return publishDo(entity, qos);
+    }
+
+    /**
+     * 执行发布消息
+     *
+     * @param qos    qos
+     * @param entity 消息实体
+     */
+    private CompletableFuture<?> publishDo(StringEntity entity, int qos) throws IOException {
         CompletableFuture<?> future = new CompletableFuture<>();
 
         if (qos > 0) {
             //::Qos1
             if (publishRetryTimes > 0) {
-                //添加重试支持（采用同步）
+                //采用同步 + 重试支持
                 int times = publishRetryTimes;
                 while (times > 0) {
                     try {
-                        clientSession.sendAndRequest(MqConstants.MQ_EVENT_PUBLISH, entity);
-                        future.complete(null);
-                        break;
+                        Entity resp = clientSession.sendAndRequest(MqConstants.MQ_EVENT_PUBLISH, entity);
+                        int confirm = Integer.parseInt(resp.metaOrDefault(MqConstants.MQ_META_CONFIRM, "0"));
+                        if (confirm == 1) {
+                            future.complete(null);
+                            break;
+                        } else {
+                            String messsage = "Client message publish confirm failed: " + resp.dataAsString();
+                            throw new FolkmqException(messsage);
+                        }
                     } catch (Throwable e) {
                         times--;
                         if (times == 0) {
@@ -204,14 +222,13 @@ public class MqClientDefault extends EventListener implements MqClientInternal {
                     }
                 }
             } else {
-                //采用异常+可选等待
+                //采用异常 + 可选等待
                 clientSession.sendAndRequest(MqConstants.MQ_EVENT_PUBLISH, entity, r -> {
-                    int ack = Integer.parseInt(r.metaOrDefault(MqConstants.MQ_META_ACK, "0"));
-
-                    if (ack == 1) {
+                    int confirm = Integer.parseInt(r.metaOrDefault(MqConstants.MQ_META_CONFIRM, "0"));
+                    if (confirm == 1) {
                         future.complete(null);
                     } else {
-                        String messsage = "Client message publish confirmation failed: " + r.dataAsString();
+                        String messsage = "Client message publish confirm failed: " + r.dataAsString();
                         future.completeExceptionally(new FolkmqException(messsage));
                     }
                 });

@@ -38,7 +38,7 @@ public interface MqClient {
     /**
      * 发布重试
      *
-     * @param times 次数（默认为 2）
+     * @param times 次数（默认为 0）
      * */
     MqClient publishRetryTimes(int times);
 

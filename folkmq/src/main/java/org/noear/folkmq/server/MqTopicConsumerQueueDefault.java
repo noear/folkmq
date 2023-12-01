@@ -61,7 +61,9 @@ public class MqTopicConsumerQueueDefault extends MqTopicConsumerQueueBase implem
                     distribute(messageHolder);
                 } else {
                     if ((queueTakeRef++) > 1000) {
-                        log.info("MqConsumerQueue queueTake as null *1000, queue={}#{}", topic, consumer);
+                        if (log.isDebugEnabled()) {
+                            log.debug("MqConsumerQueue queueTake as null *1000, queue={}#{}", topic, consumer);
+                        }
                         queueTakeRef = 0;
                     }
 

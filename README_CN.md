@@ -139,7 +139,7 @@ public class ClientDemo1 {
 }
 ```
 
-## 自动重试与延时策略
+## 消费自动重试与延时策略
 
 | 派发次数 | 自动延时 |            |
 |------|------|------------|
@@ -154,47 +154,10 @@ public class ClientDemo1 {
 | n..  | 2h   | 第8次之后都是2小时 |
 
 
-## 客户端接口字典
+## 客户端主要接口字典
 
-```java
-//消息客户端接口
-public interface MqClient {
-    //连接
-    MqClient connect() throws IOException;
+详见：[《API.md》](API.md)
 
-    //断开连接
-    void disconnect() throws IOException;
+## 架构图
 
-    //客户端配置
-    MqClient config(ClientConfigHandler configHandler);
-
-    //自动回执
-    MqClient autoAcknowledge(boolean auto);
-
-    //订阅主题
-    void subscribe(String topic, String consumer, MqConsumeHandler consumerHandler) throws IOException;
-
-    //取消订阅主题
-    void unsubscribe(String topic, String consumer) throws IOException;
-    
-    //发布消息
-    default CompletableFuture<?> publish(String topic, String content) throws IOException {
-        return publish(topic, content, null, 1);
-    }
-    
-    //发布消息
-    default CompletableFuture<?> publish(String topic, String content, int qos) throws IOException {
-        return publish(topic, content, null, qos);
-    }
-    
-    //发布消息
-    default CompletableFuture<?> publish(String topic, String content, Date scheduled) throws IOException {
-        return publish(topic, content, scheduled, 1);
-    }
-    
-    //发布消息
-    CompletableFuture<?> publish(String topic, String content, Date scheduled, int qos) throws IOException;
-}
-```
-
-
+<img src="folkmq_schema.png" width="500" />

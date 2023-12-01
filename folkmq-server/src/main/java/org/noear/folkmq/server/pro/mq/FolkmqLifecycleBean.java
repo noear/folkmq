@@ -33,24 +33,31 @@ public class FolkmqLifecycleBean implements LifecycleBean {
     @Override
     public void start() throws Throwable {
         String brokerServer = Solon.cfg().get("folkmq.broker");
+
+        boolean saveEnable = Solon.cfg().getBool("folkmq.snapshot.enable", true);
+
         long save900 = Solon.cfg().getLong("folkmq.snapshot.save900", 0);
         long save300 = Solon.cfg().getLong("folkmq.snapshot.save300", 0);
-        long save60 = Solon.cfg().getLong("folkmq.snapshot.save60", 0);
+        long save100 = Solon.cfg().getLong("folkmq.snapshot.save100", 0);
 
         //初始化快照持久化
         MqWatcherSnapshotPlus snapshotPlus = new MqWatcherSnapshotPlus();
         snapshotPlus.save900Condition(save900);
         snapshotPlus.save300Condition(save300);
-        snapshotPlus.save60Condition(save60);
+        snapshotPlus.save100Condition(save100);
 
         appContext.wrapAndPut(MqWatcherSnapshotPlus.class, snapshotPlus);
 
         if (Utils.isEmpty(brokerServer)) {
             //服务端（鉴权为可选。不添加则不鉴权）
             localServer = FolkMQ.createServer()
-                    .addAccessAll(Solon.cfg().getMap("folkmq.access."))
-                    .watcher(snapshotPlus)
-                    .start(Solon.cfg().serverPort() + 10000);
+                    .addAccessAll(Solon.cfg().getMap("folkmq.access."));
+
+            if (saveEnable) {
+                localServer.watcher(snapshotPlus);
+            }
+
+            localServer.start(Solon.cfg().serverPort() + 10000);
 
             //加入容器
             appContext.wrapAndPut(MqServiceInternal.class, localServer.getServerInternal());
@@ -58,7 +65,10 @@ public class FolkmqLifecycleBean implements LifecycleBean {
             log.info("FlokMQ local server started!");
         } else {
             MqServiceListener serviceListener = new MqServiceListener(true);
-            serviceListener.watcher(snapshotPlus);
+
+            if (saveEnable) {
+                serviceListener.watcher(snapshotPlus);
+            }
 
             brokerSession = SocketD.createClient(brokerServer)
                     .listen(serviceListener)

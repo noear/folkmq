@@ -26,9 +26,10 @@ solon.logging.logger:
 
 folkmq.admin: admin
 folkmq.snapshot:
+  enable: true
   save900: 1
   save300: 10
-  save60: 10000
+  save100: 10000
 
 
 #folkmq.broker: "sd:tcp://127.0.0.1:18602?@=folkmq-server"

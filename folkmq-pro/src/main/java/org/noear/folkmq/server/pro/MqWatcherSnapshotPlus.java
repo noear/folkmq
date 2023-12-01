@@ -20,15 +20,15 @@ import java.util.concurrent.atomic.LongAdder;
 public class MqWatcherSnapshotPlus extends MqWatcherSnapshot{
     private final LongAdder save900Count;
     private final LongAdder save300Count;
-    private final LongAdder save60Count;
+    private final LongAdder save100Count;
 
     private final ScheduledFuture<?> save900Future;
     private final ScheduledFuture<?> save300Future;
-    private final ScheduledFuture<?> save60Future;
+    private final ScheduledFuture<?> save100Future;
 
     protected long save900Condition = 1L;
     protected long save300Condition = 10L;
-    protected long save60Condition = 10000L;
+    protected long save100Condition = 10000L;
 
     public MqWatcherSnapshotPlus() {
         this(null);
@@ -39,7 +39,7 @@ public class MqWatcherSnapshotPlus extends MqWatcherSnapshot{
 
         this.save900Count = new LongAdder();
         this.save300Count = new LongAdder();
-        this.save60Count = new LongAdder();
+        this.save100Count = new LongAdder();
 
         int fixedDelay900 = 1000 * 900; //900秒
         this.save900Future = RunUtils.scheduleWithFixedDelay(this::onSave900, fixedDelay900, fixedDelay900);
@@ -47,8 +47,8 @@ public class MqWatcherSnapshotPlus extends MqWatcherSnapshot{
         int fixedDelay300 = 1000 * 300; //300秒
         this.save300Future = RunUtils.scheduleWithFixedDelay(this::onSave300, fixedDelay300, fixedDelay300);
 
-        int fixedDelay60 = 1000 * 60; //60秒
-        this.save60Future = RunUtils.scheduleWithFixedDelay(this::onSave60, fixedDelay60, fixedDelay60);
+        int fixedDelay100 = 1000 * 100; //100秒
+        this.save100Future = RunUtils.scheduleWithFixedDelay(this::onSave100, fixedDelay100, fixedDelay100);
     }
 
     public MqWatcherSnapshotPlus save900Condition(long save900Condition) {
@@ -66,9 +66,9 @@ public class MqWatcherSnapshotPlus extends MqWatcherSnapshot{
         return this;
     }
 
-    public MqWatcherSnapshotPlus save60Condition(long save60Condition) {
-        if (save60Condition >= 1L) {
-            this.save60Condition = save60Condition;
+    public MqWatcherSnapshotPlus save100Condition(long save100Condition) {
+        if (save100Condition >= 1L) {
+            this.save100Condition = save100Condition;
         }
 
         return this;
@@ -82,8 +82,8 @@ public class MqWatcherSnapshotPlus extends MqWatcherSnapshot{
         return save300Count.longValue();
     }
 
-    public long getSave60Count() {
-        return save60Count.longValue();
+    public long getSave100Count() {
+        return save100Count.longValue();
     }
 
     private void onSave900() {
@@ -110,14 +110,14 @@ public class MqWatcherSnapshotPlus extends MqWatcherSnapshot{
         }
     }
 
-    private void onSave60() {
-        long count = save60Count.sumThenReset();
+    private void onSave100() {
+        long count = save100Count.sumThenReset();
 
-        if (count >= save60Condition) {
+        if (count >= save100Condition) {
             onSave();
         } else {
             if (log.isDebugEnabled()) {
-                log.debug("No trigger save60 condition!");
+                log.debug("No trigger save100 condition!");
             }
         }
     }
@@ -132,8 +132,8 @@ public class MqWatcherSnapshotPlus extends MqWatcherSnapshot{
             save300Future.cancel(false);
         }
 
-        if (save60Future != null) {
-            save60Future.cancel(false);
+        if (save100Future != null) {
+            save100Future.cancel(false);
         }
     }
 
@@ -165,6 +165,6 @@ public class MqWatcherSnapshotPlus extends MqWatcherSnapshot{
         //记数
         save900Count.increment();
         save300Count.increment();
-        save60Count.increment();
+        save100Count.increment();
     }
 }

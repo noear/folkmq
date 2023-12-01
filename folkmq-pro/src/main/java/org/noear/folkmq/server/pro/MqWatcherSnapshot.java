@@ -38,7 +38,9 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
     private final File directory;
 
     //正在保持中
-    private final AtomicBoolean inSaveProcess;
+    private final AtomicBoolean inSaveProcess = new AtomicBoolean(false);
+    //正在保存中
+    private final AtomicBoolean inLoadProcess = new AtomicBoolean(false);
 
     public MqWatcherSnapshot() {
         this(null);
@@ -54,8 +56,6 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
         if (this.directory.exists() == false) {
             this.directory.mkdirs();
         }
-
-        this.inSaveProcess = new AtomicBoolean(false);
     }
 
     public boolean inSaveProcess(){
@@ -69,12 +69,14 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
 
     @Override
     public void onStartBefore() {
+        inLoadProcess.set(true);
         loadSubscribeMap();
     }
 
     @Override
     public void onStartAfter() {
         RunUtils.asyncAndTry(this::loadTopicConsumerQueue);
+        inLoadProcess.set(false);
     }
 
     /**
@@ -180,6 +182,11 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
 
     @Override
     public void onSave() {
+        if(inLoadProcess.get()){
+            //正在加载中（不可保存，否则会盖掉加载中的数据）
+            return;
+        }
+
         if (inSaveProcess.get()) {
             return;
         } else {

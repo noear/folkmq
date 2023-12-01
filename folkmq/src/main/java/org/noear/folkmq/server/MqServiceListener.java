@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 消息服务监听器
@@ -30,9 +31,9 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
     private MqWatcher watcher;
 
     //订阅关系表(topicConsumer=>MqTopicConsumerQueue)
-    private Map<String, Set<String>> subscribeMap = new HashMap<>();
+    private Map<String, Set<String>> subscribeMap = new ConcurrentHashMap<>();
     //主题消费队列表(topicConsumer=>MqTopicConsumerQueue)
-    private Map<String, MqTopicConsumerQueue> topicConsumerMap = new HashMap<>();
+    private Map<String, MqTopicConsumerQueue> topicConsumerMap = new ConcurrentHashMap<>();
 
     private boolean brokerMode;
 
@@ -273,12 +274,7 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
             //::1.构建订阅关系
 
             //以身份进行订阅(topic=>[topicConsumer])
-            Set<String> topicConsumerSet = subscribeMap.get(topic);
-            if (topicConsumerSet == null) {
-                topicConsumerSet = new HashSet<>();
-                subscribeMap.put(topic, topicConsumerSet);
-            }
-
+            Set<String> topicConsumerSet = subscribeMap.computeIfAbsent(topic, n-> Collections.newSetFromMap(new ConcurrentHashMap<>()));
             topicConsumerSet.add(topicConsumer);
 
             //为身份建立队列(topicConsumer=>MqTopicConsumerQueue)

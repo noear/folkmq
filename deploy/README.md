@@ -5,8 +5,8 @@
 
 | 镜像                            | 说明                       |
 |-------------------------------|--------------------------|
-| noearorg/folkmq-server:1.0.10 | 服务端（主端口：8602，消息端口：18602） |
-| noearorg/folkmq-broker:1.0.10 | 代理端（主端口：8602，消息端口：18602） |
+| noearorg/folkmq-server:1.0.11 | 服务端（主端口：8602，消息端口：18602） |
+| noearorg/folkmq-broker:1.0.11 | 代理端（主端口：8602，消息端口：18602） |
 
 当使用 broker 集群时，可以把 folkmq-server 端口改成别的
 
@@ -28,10 +28,10 @@
 docker-compose -f docker-compose-standalone.yml up
 ```
 
-### 2、docker 部署方式（一般用于临时试用）
+### 2、docker 部署方式
 
 ```
-docker run -p 18602:18602 -p 8602:8602 noearorg/folkmq-server:1.0.10 
+docker run -p 18602:18602 -p 8602:8602 noearorg/folkmq-server:1.0.11 
 ```
 
 

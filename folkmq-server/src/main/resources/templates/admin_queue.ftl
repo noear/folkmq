@@ -21,7 +21,7 @@
         <thead>
         <tr>
             <td class="left" rowspan="2">队列</td>
-            <td colspan="9">消息</td>
+            <td colspan="9">消息数量</td>
             <td width="50px" rowspan="2" class="center">会话</td>
             <td width="130px" rowspan="2" class="center">状态</td>
         </tr>

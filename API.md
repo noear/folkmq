@@ -99,24 +99,24 @@ public interface MqClient {
 ### MqConsumeHandler 接口
 
 ```java
-
 /**
  * 消费处理器
  */
 public interface MqConsumeHandler {
     /**
      * 消费
+     * 
+     * @param message 派发的消息
      */
     void consume(MqMessage message) throws IOException;
 }
-
 ```
 
 ### MqMessage 接口
 
 ```java
 /**
- * 消息结构体定义
+ * 派发的消息
  */
 public interface MqMessage {
     /**

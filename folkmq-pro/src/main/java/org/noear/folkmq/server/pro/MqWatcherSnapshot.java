@@ -96,7 +96,7 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
         try {
             String subscribeMapJsonStr = readSnapshotFile(subscribeMapFile);
 
-            ONode subscribeMapJson = ONode.loadStr(subscribeMapJsonStr);
+            ONode subscribeMapJson = ONode.loadStr(subscribeMapJsonStr, Feature.DisThreadLocal);
             for (String topic : subscribeMapJson.obj().keySet()) {
                 ONode topicConsumerList = subscribeMapJson.get(topic);
                 for (ONode topicConsumer : topicConsumerList.ary()) {
@@ -148,16 +148,16 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
             return false;
         }
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(topicConsumerQueueFile))){
-            while (true){
+        try (BufferedReader reader = new BufferedReader(new FileReader(topicConsumerQueueFile))) {
+            while (true) {
                 //一行行读取（避免大 json 坏掉后，全坏了）//也比较省内存
                 String messageJsonStr = reader.readLine();
-                if(messageJsonStr == null){
+                if (messageJsonStr == null) {
                     break;
                 }
 
-                if(messageJsonStr.length() > 0) {
-                    ONode messageJson = ONode.loadStr(messageJsonStr);
+                if (messageJsonStr.length() > 0) {
+                    ONode messageJson = ONode.loadStr(messageJsonStr, Feature.DisThreadLocal);
 
                     String metaString = messageJson.get("meta").getString();
                     String data = messageJson.get("data").getString();
@@ -225,7 +225,7 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
             return;
         }
 
-        ONode subscribeMapJson = new ONode(Options.def().add(Feature.PrettyFormat)).asObject();
+        ONode subscribeMapJson = new ONode(Options.def().add(Feature.PrettyFormat, Feature.DisThreadLocal)).asObject();
         List<String> topicList = new ArrayList<>(subscribeMap.keySet());
         for (String topic : topicList) {
             List<String> topicConsumerList = new ArrayList<>(subscribeMap.get(topic));
@@ -307,7 +307,7 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
 
                     try {
                         Entity entity = messageHolder.getContent();
-                        ONode entityJson = new ONode();
+                        ONode entityJson = new ONode(Options.def().add(Feature.DisThreadLocal));
                         entityJson.set("meta", entity.metaString());
                         entityJson.set("data", entity.dataAsString());
 

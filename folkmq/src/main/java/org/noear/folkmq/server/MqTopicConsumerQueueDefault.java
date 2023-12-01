@@ -176,8 +176,8 @@ public class MqTopicConsumerQueueDefault extends MqTopicConsumerQueueBase implem
             internalAdd(messageHolder.delayed());
 
             //记日志
-            if (log.isWarnEnabled()) {
-                log.warn("MqConsumerQueue distribute: @{} no sessions, times={}, tid={}",
+            if (log.isDebugEnabled()) {
+                log.debug("MqConsumerQueue distribute: @{} no sessions, times={}, tid={}",
                         consumer,
                         messageHolder.getDistributeCount(),
                         messageHolder.getTid());

@@ -3,18 +3,26 @@
 
 ## 一、服务端容器镜像
 
-| 镜像                            | 说明                       |
-|-------------------------------|--------------------------|
-| noearorg/folkmq-server:1.0.11 | 服务端（主端口：8602，消息端口：18602） |
-| noearorg/folkmq-broker:1.0.11 | 代理端（主端口：8602，消息端口：18602） |
+容器镜像：（使用 broker 集群模式时，folkmq-server 实例的消息端口会自动关掉）
 
-当使用 broker 集群时，可以把 folkmq-server 端口改成别的
+| 镜像                            | 说明                             |
+|-------------------------------|--------------------------------|
+| noearorg/folkmq-server:1.0.11 | 服务端（主端口：8602，消息端口：18602），可独立使用 |
+| noearorg/folkmq-broker:1.0.11 | 代理端（主端口：8602，消息端口：18602）       |
 
 
-| 端口    | 说明       |
-|-------|----------|
-| 8602  | 主端口（即管理端口） |
-| 18602 | 消息服务端口   |
+支持在主端口上提供 prometheus 监控支持，配置提示：
+
+```yml
+scrape_configs:
+  - job_name: 'folkmq-server'
+    scrape_interval: 5s
+    metrics_path: '/metrics/prometheus'
+    static_configs:
+      - targets: ['127.0.0.1:8602']
+        labels:
+           instance: 'folkmq-server1'
+```
 
 
 ## 二、单机部署说明

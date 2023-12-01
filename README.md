@@ -78,8 +78,8 @@
 
 | Docker                       | Remarks                                             |
 |------------------------------|-----------------------------------------------------|
-| noearorg/folkmq-server:1.0.10 | Server (main port: 8602, message port: 18602) |
-| noearorg/folkmq-broker:1.0.10 | Server (main port: 8602, message port: 18602)       |
+| noearorg/folkmq-server:1.0.11 | Server (main port: 8602, message port: 18602) |
+| noearorg/folkmq-broker:1.0.11 | Server (main port: 8602, message port: 18602)       |
 
 When using broker cluster, change folkmq-server port to 8601
 
@@ -100,7 +100,7 @@ Adding attributes or environment variables, for example： `folkmq.access.ak1=sk
 ### 1、Start the server (more deployment references: [deployment Notes](deploy))
 
 ```
-docker run -p 18602:18602 -p 8602:8602 noearorg/folkmq-server:1.0.10 
+docker run -p 18602:18602 -p 8602:8602 noearorg/folkmq-server:1.0.11 
 ```
 
 ### 2、Write client-side code
@@ -113,7 +113,7 @@ docker run -p 18602:18602 -p 8602:8602 noearorg/folkmq-server:1.0.10
     <dependency>
         <groupId>org.noear</groupId>
         <artifactId>folkmq-transport-java-tcp</artifactId>
-        <version>1.0.10</version>
+        <version>1.0.11</version>
     </dependency>
 </dependencies>
 ```

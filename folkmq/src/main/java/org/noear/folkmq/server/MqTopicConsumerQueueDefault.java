@@ -9,8 +9,6 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.DelayQueue;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * 主题消费者队列默认实现（服务端给 [一个主题+一个消费者] 安排一个队列，一个消费者可多个会话，只随机给一个会话派发）
@@ -18,17 +16,13 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author noear
  * @since 1.0
  */
-public class MqTopicConsumerQueueDefault implements MqTopicConsumerQueue {
+public class MqTopicConsumerQueueDefault extends MqTopicConsumerQueueBase implements MqTopicConsumerQueue {
     private static final Logger log = LoggerFactory.getLogger(MqTopicConsumerQueueDefault.class);
-
-    private Object SESSION_LOCK = new Object();
 
     //主题
     private final String topic;
     //用户
     private final String consumer;
-    //用户会话（多个）
-    private final List<Session> consumerSessions;
     //观察者
     private final MqWatcher watcher;
 
@@ -41,10 +35,10 @@ public class MqTopicConsumerQueueDefault implements MqTopicConsumerQueue {
     private final Thread messageQueueThread;
 
     public MqTopicConsumerQueueDefault(MqWatcher watcher, String topic, String consumer) {
+        super();
         this.watcher = watcher;
         this.topic = topic;
         this.consumer = consumer;
-        this.consumerSessions = new ArrayList<>();
 
         this.messageMap = new ConcurrentHashMap<>();
 
@@ -53,7 +47,8 @@ public class MqTopicConsumerQueueDefault implements MqTopicConsumerQueue {
         this.messageQueueThread.start();
     }
 
-    AtomicLong queueTakeRef = new AtomicLong();
+    //单线程计数
+    private long queueTakeRef = 0;
 
     private void queueTake() {
         while (!messageQueueThread.isInterrupted()) {
@@ -61,12 +56,13 @@ public class MqTopicConsumerQueueDefault implements MqTopicConsumerQueue {
                 MqMessageHolder messageHolder = messageQueue.poll();
 
                 if (messageHolder != null) {
-                    queueTakeRef.set(0);
+                    queueTakeRef = 0;
+                    messageCounterSub(messageHolder);
                     distribute(messageHolder);
                 } else {
-                    if (queueTakeRef.incrementAndGet() > 100) {
-                        log.info("MqConsumerQueue queueTake as null *100, queue={}#{}", topic, consumer);
-                        queueTakeRef.set(0);
+                    if ((queueTakeRef++) > 1000) {
+                        log.info("MqConsumerQueue queueTake as null *1000, queue={}#{}", topic, consumer);
+                        queueTakeRef = 0;
                     }
 
                     Thread.sleep(100);
@@ -103,48 +99,17 @@ public class MqTopicConsumerQueueDefault implements MqTopicConsumerQueue {
         return messageQueueThread.isAlive();
     }
 
-    public Thread.State state(){
+    public Thread.State state() {
         return messageQueueThread.getState();
     }
 
     /**
      * 获取消息表
      */
-    @Override
     public Map<String, MqMessageHolder> getMessageMap() {
         return Collections.unmodifiableMap(messageMap);
     }
 
-    /**
-     * 添加消费者会话
-     */
-    @Override
-    public void addSession(Session session) {
-        consumerSessions.add(session);
-    }
-
-    /**
-     * 移除消费者会话
-     */
-    @Override
-    public void removeSession(Session session) {
-        //removeSession 可能会对 get(idx) 带来安全，所以锁一下
-        synchronized (SESSION_LOCK) {
-            consumerSessions.remove(session);
-        }
-    }
-
-    public Session getSession() {
-        //removeSession 可能会对 get(idx) 带来安全，所以锁一下
-        synchronized (SESSION_LOCK) {
-            int idx = 0;
-            if (consumerSessions.size() > 1) {
-                idx = ThreadLocalRandom.current().nextInt(0, consumerSessions.size());
-            }
-
-            return consumerSessions.get(idx);
-        }
-    }
 
     /**
      * 添加消息
@@ -153,21 +118,33 @@ public class MqTopicConsumerQueueDefault implements MqTopicConsumerQueue {
     public void add(MqMessageHolder messageHolder) {
         messageMap.put(messageHolder.getTid(), messageHolder);
         messageQueue.add(messageHolder);
+
+        messageCounterAdd(messageHolder);
+    }
+
+    private void internalAdd(MqMessageHolder mh) {
+        messageQueue.add(mh);
+        messageCounterAdd(mh);
+    }
+
+    private void internalRemove(MqMessageHolder mh) {
+        if(messageQueue.remove(mh)){
+            messageCounterSub(mh);
+        }
     }
 
     /**
-     * 消息数量
+     * 消息总量
      */
-    public int messageCount() {
+    public int messageTotal() {
         return messageQueue.size();
     }
 
     /**
-     * 会话数量
+     * 消息总量2（用于做校验）
      */
-    @Override
-    public int sessionCount() {
-        return consumerSessions.size();
+    public int messageTotal2() {
+        return messageMap.size();
     }
 
     /**
@@ -180,13 +157,13 @@ public class MqTopicConsumerQueueDefault implements MqTopicConsumerQueue {
         }
 
         //找到此身份的其中一个会话（如果是 ip 就一个；如果是集群名则任选一个）
-        if (consumerSessions.size() > 0) {
+        if (sessionCount() > 0) {
             try {
                 distributeDo(messageHolder);
             } catch (Throwable e) {
                 //进入延后队列
-                messageQueue.remove(messageHolder);
-                messageQueue.add(messageHolder.delayed());
+                internalRemove(messageHolder);
+                internalAdd(messageHolder.delayed());
 
                 //记日志
                 if (log.isWarnEnabled()) {
@@ -196,12 +173,13 @@ public class MqTopicConsumerQueueDefault implements MqTopicConsumerQueue {
             }
         } else {
             //进入延后队列
-            messageQueue.add(messageHolder.delayed());
+            internalAdd(messageHolder.delayed());
 
             //记日志
             if (log.isWarnEnabled()) {
-                log.warn("MqConsumerQueue distribute: @{} no sessions, tid={}",
+                log.warn("MqConsumerQueue distribute: @{} no sessions, times={}, tid={}",
                         consumer,
+                        messageHolder.getDistributeCount(),
                         messageHolder.getTid());
             }
         }
@@ -223,7 +201,7 @@ public class MqTopicConsumerQueueDefault implements MqTopicConsumerQueue {
 
             //添加延时任务：2小时后，如果没有回执就重发（即消息最长不能超过2小时）
             messageHolder.setDistributeTime(System.currentTimeMillis() + MqNextTime.getMaxDelayMillis());
-            messageQueue.add(messageHolder);
+            internalAdd(messageHolder);
 
             //给会话发送消息 //用 sendAndSubscribe 不安全，时间太久可能断连过（流就不能用了）
             s1.sendAndSubscribe(MqConstants.MQ_EVENT_DISTRIBUTE, messageHolder.getContent(), m -> {
@@ -250,14 +228,14 @@ public class MqTopicConsumerQueueDefault implements MqTopicConsumerQueue {
         if (ack > 0) {
             //ok
             messageMap.remove(messageHolder.getTid());
-            messageQueue.remove(messageHolder);
+            internalRemove(messageHolder);
 
             //移除前，不要改移性
             messageHolder.setDone(true);
         } else {
             //no （如果在队列改时间即可；如果不在队列说明有补发过）
-            messageQueue.remove(messageHolder);
-            messageQueue.add(messageHolder.delayed());
+            internalRemove(messageHolder);
+            internalAdd(messageHolder.delayed());
         }
     }
 
@@ -272,7 +250,6 @@ public class MqTopicConsumerQueueDefault implements MqTopicConsumerQueue {
 
         messageQueue.clear();
         messageMap.clear();
-
-        consumerSessions.clear();
+        super.close();
     }
 }

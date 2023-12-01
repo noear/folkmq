@@ -247,7 +247,7 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
             MqTopicConsumerQueue topicConsumerQueue = topicConsumerMap.get(topicConsumer);
 
             try {
-                saveTopicConsumerQueue1(topicConsumer, topicConsumerQueue);
+                saveTopicConsumerQueue1(topicConsumer, (MqTopicConsumerQueueDefault)topicConsumerQueue);
 
                 log.info("Server persistent messageQueue completed, topicConsumer={}", topicConsumer);
             } catch (Exception e) {
@@ -258,7 +258,7 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
         log.info("Server persistent saveTopicConsumerQueue completed");
     }
 
-    private void saveTopicConsumerQueue1(String topicConsumer, MqTopicConsumerQueue topicConsumerQueue) throws IOException {
+    private void saveTopicConsumerQueue1(String topicConsumer, MqTopicConsumerQueueDefault topicConsumerQueue) throws IOException {
         ONode topicConsumerQueueJson = new ONode(Options.def().add(Feature.PrettyFormat)).asArray();
 
         if (topicConsumerQueue != null) {

@@ -23,11 +23,6 @@ public interface MqTopicConsumerQueue {
     String getConsumer();
 
     /**
-     * 获取消息表
-     */
-    Map<String, MqMessageHolder> getMessageMap();
-
-    /**
      * 添加消费者会话
      */
     void addSession(Session session);
@@ -38,19 +33,24 @@ public interface MqTopicConsumerQueue {
     void removeSession(Session session);
 
     /**
+     * 会话数量
+     * */
+    int sessionCount();
+
+    /**
      * 添加消息
      */
     void add(MqMessageHolder messageHolder);
 
     /**
-     * 消息数量
-     */
-    int messageCount();
+     * 消息总量
+     * */
+    int messageTotal();
 
     /**
-     * 会话数量
-     */
-    int sessionCount();
+     * 消息总量2（用作校验）
+     * */
+    int messageTotal2();
 
     /**
      * 关闭

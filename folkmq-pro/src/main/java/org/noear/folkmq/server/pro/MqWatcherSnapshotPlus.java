@@ -7,7 +7,7 @@ import org.noear.socketd.transport.core.Session;
 import org.noear.socketd.utils.RunUtils;
 
 import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.LongAdder;
 
 /**
  * 消息观察者 - 快照持久化（增加实现策略）
@@ -18,9 +18,9 @@ import java.util.concurrent.atomic.AtomicLong;
  * @since 1.0
  */
 public class MqWatcherSnapshotPlus extends MqWatcherSnapshot{
-    private final AtomicLong save900Count;
-    private final AtomicLong save300Count;
-    private final AtomicLong save60Count;
+    private final LongAdder save900Count;
+    private final LongAdder save300Count;
+    private final LongAdder save60Count;
 
     private final ScheduledFuture<?> save900Future;
     private final ScheduledFuture<?> save300Future;
@@ -37,9 +37,9 @@ public class MqWatcherSnapshotPlus extends MqWatcherSnapshot{
     public MqWatcherSnapshotPlus(String dataPath) {
         super(dataPath);
 
-        this.save900Count = new AtomicLong();
-        this.save300Count = new AtomicLong();
-        this.save60Count = new AtomicLong();
+        this.save900Count = new LongAdder();
+        this.save300Count = new LongAdder();
+        this.save60Count = new LongAdder();
 
         int fixedDelay900 = 1000 * 900; //900秒
         this.save900Future = RunUtils.scheduleWithFixedDelay(this::onSave900, fixedDelay900, fixedDelay900);
@@ -75,20 +75,19 @@ public class MqWatcherSnapshotPlus extends MqWatcherSnapshot{
     }
 
     public long getSave900Count() {
-        return save900Count.get();
+        return save900Count.longValue();
     }
 
     public long getSave300Count() {
-        return save300Count.get();
+        return save300Count.longValue();
     }
 
     public long getSave60Count() {
-        return save60Count.get();
+        return save60Count.longValue();
     }
 
     private void onSave900() {
-        long count = save900Count.get();
-        save900Count.set(0);
+        long count = save900Count.sumThenReset();
 
         if (count >= save900Condition) {
             onSave();
@@ -100,8 +99,7 @@ public class MqWatcherSnapshotPlus extends MqWatcherSnapshot{
     }
 
     private void onSave300() {
-        long count = save300Count.get();
-        save300Count.set(0);
+        long count = save300Count.sumThenReset();
 
         if (count >= save300Condition) {
             onSave();
@@ -113,8 +111,7 @@ public class MqWatcherSnapshotPlus extends MqWatcherSnapshot{
     }
 
     private void onSave60() {
-        long count = save60Count.get();
-        save60Count.set(0);
+        long count = save60Count.sumThenReset();
 
         if (count >= save60Condition) {
             onSave();
@@ -166,8 +163,8 @@ public class MqWatcherSnapshotPlus extends MqWatcherSnapshot{
 
     private void onChange() {
         //记数
-        save900Count.incrementAndGet();
-        save300Count.incrementAndGet();
-        save60Count.incrementAndGet();
+        save900Count.increment();
+        save300Count.increment();
+        save60Count.increment();
     }
 }

@@ -11,9 +11,9 @@ import java.util.concurrent.CountDownLatch;
 public class BenchmarkTest {
     public static void main(String[] args) throws Exception {
         //服务端
-//        MqServer server = new MqServerDefault()
-//                .addAccess("folkmq", "YapLHTx19RlsEE16")
-//                .start(18602);
+        MqServer server = new MqServerDefault()
+                .addAccess("folkmq", "YapLHTx19RlsEE16")
+                .start(18602);
 
         Thread.sleep(1000);
         int count = 1000_000;

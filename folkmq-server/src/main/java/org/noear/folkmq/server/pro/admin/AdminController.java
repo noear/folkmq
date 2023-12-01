@@ -1,6 +1,6 @@
 package org.noear.folkmq.server.pro.admin;
 
-import org.noear.folkmq.server.MqMessageHolder;
+import org.noear.folkmq.common.MqConstants;
 import org.noear.folkmq.server.MqServiceInternal;
 import org.noear.folkmq.server.MqTopicConsumerQueue;
 import org.noear.folkmq.server.MqTopicConsumerQueueDefault;
@@ -12,7 +12,6 @@ import org.noear.solon.annotation.Controller;
 import org.noear.solon.annotation.Inject;
 import org.noear.solon.annotation.Mapping;
 import org.noear.solon.core.handle.ModelAndView;
-import org.noear.solon.core.handle.Result;
 import org.noear.solon.validation.annotation.Logined;
 import org.noear.solon.validation.annotation.Valid;
 
@@ -74,32 +73,30 @@ public class AdminController extends BaseController {
 
     @Mapping("/admin/queue")
     public ModelAndView queue() {
-        Map<String, MqTopicConsumerQueue> topicConsumerMap = server.getTopicConsumerMap();
+        List<MqTopicConsumerQueue> mqTopicConsumerQueues = new ArrayList<>(server.getTopicConsumerMap().values());
 
         List<QueueVo> list = new ArrayList<>();
 
-        for (String queue : new ArrayList<String>(topicConsumerMap.keySet())) {
-            MqTopicConsumerQueueDefault consumerQueue = (MqTopicConsumerQueueDefault)topicConsumerMap.get(queue);
+        for (MqTopicConsumerQueue tmp : mqTopicConsumerQueues) {
+            MqTopicConsumerQueueDefault queue = (MqTopicConsumerQueueDefault) tmp;
 
             QueueVo queueVo = new QueueVo();
-            queueVo.queue = (queue);
+            queueVo.queue = queue.getTopic() + MqConstants.SEPARATOR_TOPIC_CONSUMER + queue.getConsumer();
 
-            if (consumerQueue != null) {
-                queueVo.isAlive = (consumerQueue.isAlive());
-                queueVo.state = (consumerQueue.state().name());
-                queueVo.messageCount = (consumerQueue.messageCount());
-                queueVo.sessionCount = (consumerQueue.sessionCount());
+            //queueVo.isAlive = (queue.isAlive());
+            queueVo.state = (queue.state().name());
+            queueVo.sessionCount = (queue.sessionCount());
+            queueVo.messageCount = (queue.messageTotal());
 
-                List<MqMessageHolder> messageList = new ArrayList<>(consumerQueue.getMessageMap().values());
-                queueVo.messageDelayedCount1 = messageList.stream().filter(m -> m.getDistributeCount() == 1).count();
-                queueVo.messageDelayedCount2 = messageList.stream().filter(m -> m.getDistributeCount() == 2).count();
-                queueVo.messageDelayedCount3 = messageList.stream().filter(m -> m.getDistributeCount() == 3).count();
-                queueVo.messageDelayedCount4 = messageList.stream().filter(m -> m.getDistributeCount() == 4).count();
-                queueVo.messageDelayedCount5 = messageList.stream().filter(m -> m.getDistributeCount() == 5).count();
-                queueVo.messageDelayedCount6 = messageList.stream().filter(m -> m.getDistributeCount() == 6).count();
-                queueVo.messageDelayedCount7 = messageList.stream().filter(m -> m.getDistributeCount() == 7).count();
-                queueVo.messageDelayedCount8 = messageList.stream().filter(m -> m.getDistributeCount() > 7).count();
-            }
+            queueVo.messageDelayedCount1 = queue.messageCounter(1);
+            queueVo.messageDelayedCount2 = queue.messageCounter(2);
+            queueVo.messageDelayedCount3 = queue.messageCounter(3);
+            queueVo.messageDelayedCount4 = queue.messageCounter(4);
+            queueVo.messageDelayedCount5 = queue.messageCounter(5);
+            queueVo.messageDelayedCount6 = queue.messageCounter(6);
+            queueVo.messageDelayedCount7 = queue.messageCounter(7);
+            queueVo.messageDelayedCount8 = queue.messageCounter(8);
+
 
             list.add(queueVo);
         }

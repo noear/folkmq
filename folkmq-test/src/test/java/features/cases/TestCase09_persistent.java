@@ -90,8 +90,8 @@ public class TestCase09_persistent extends BaseTestCase {
         assert serverInternal.getTopicConsumerMap().size() == 1;
 
         MqTopicConsumerQueue topicConsumerQueue = serverInternal.getTopicConsumerMap().values().toArray(new MqTopicConsumerQueue[1])[0];
-        System.out.println("server topicConsumerQueue.size=" + topicConsumerQueue.messageCount());
-        assert topicConsumerQueue.getMessageMap().size() == 0;
-        assert topicConsumerQueue.messageCount() == 0;
+        System.out.println("server topicConsumerQueue.size=" + topicConsumerQueue.messageTotal());
+        assert topicConsumerQueue.messageTotal() == 0;
+        assert topicConsumerQueue.messageTotal2() == 0;
     }
 }

@@ -55,8 +55,6 @@ public abstract class MqTopicConsumerQueueBase implements MqTopicConsumerQueue {
     public long messageCounter(int n) {
         if (n > 7) {
             return messageCounters[8].longValue();
-        } else if (n < 1) {
-            return messageCounters[0].longValue();
         } else {
             return messageCounters[n].longValue();
         }

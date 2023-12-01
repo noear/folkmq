@@ -27,14 +27,14 @@
         </tr>
         <tr>
             <td width="100px" class="center">总数</td>
-            <td width="100px" class="center">延时1</td>
-            <td width="100px" class="center">延时2</td>
-            <td width="100px" class="center">延时3</td>
-            <td width="80px" class="center">延时4</td>
-            <td width="80px" class="center">延时5</td>
-            <td width="80px" class="center">延时6</td>
-            <td width="60px" class="center">延时7</td>
-            <td width="60px" class="center">延时8</td>
+            <td width="100px" class="center">延时1<br/>(5s)</td>
+            <td width="100px" class="center">延时2<br/>(30s)</td>
+            <td width="100px" class="center">延时3<br/>(3m)</td>
+            <td width="80px" class="center">延时4<br/>(9m)</td>
+            <td width="80px" class="center">延时5<br/>(15m)</td>
+            <td width="80px" class="center">延时6<br/>(30m)</td>
+            <td width="60px" class="center">延时7<br/>(1h)</td>
+            <td width="60px" class="center">延时8<br/>(2h)</td>
         </tr>
         </thead>
         <tbody id="tbody">

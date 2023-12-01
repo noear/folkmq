@@ -58,7 +58,7 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
         }
     }
 
-    public boolean inSaveProcess(){
+    public boolean inSaveProcess() {
         return inSaveProcess.get();
     }
 
@@ -75,8 +75,13 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
 
     @Override
     public void onStartAfter() {
-        RunUtils.asyncAndTry(this::loadTopicConsumerQueue);
-        inLoadProcess.set(false);
+        RunUtils.asyncAndTry(() -> {
+            try {
+                loadTopicConsumerQueue();
+            } finally {
+                inLoadProcess.set(false);
+            }
+        });
     }
 
     /**
@@ -143,30 +148,40 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
             return false;
         }
 
-        String topicConsumerQueueJsonStr = readSnapshotFile(topicConsumerQueueFile);
-        ONode topicConsumerQueueJson = ONode.loadStr(topicConsumerQueueJsonStr);
+        try (BufferedReader reader = new BufferedReader(new FileReader(topicConsumerQueueFile))){
+            while (true){
+                //一行行读取（避免大 json 坏掉后，全坏了）//也比较省内存
+                String messageJsonStr = reader.readLine();
+                if(messageJsonStr == null){
+                    break;
+                }
 
-        for (ONode messageJson : topicConsumerQueueJson.ary()) {
-            String metaString = messageJson.get("meta").getString();
-            String data = messageJson.get("data").getString();
+                if(messageJsonStr.length() > 0) {
+                    ONode messageJson = ONode.loadStr(messageJsonStr);
 
-            Entity entity = new StringEntity(data).metaString(metaString);
-            Message message = new MessageDefault()
-                    .sid(Utils.guid())
-                    .flag(Flags.Message)
-                    .entity(entity);
+                    String metaString = messageJson.get("meta").getString();
+                    String data = messageJson.get("data").getString();
+
+                    Entity entity = new StringEntity(data).metaString(metaString);
+                    Message message = new MessageDefault()
+                            .sid(Utils.guid())
+                            .flag(Flags.Message)
+                            .entity(entity);
 
 
-            String tid = message.meta(MqConstants.MQ_META_TID);
-            int qos = "0".equals(message.meta(MqConstants.MQ_META_QOS)) ? 0 : 1;
-            int times = Integer.parseInt(message.metaOrDefault(MqConstants.MQ_META_TIMES, "0"));
-            long scheduled = 0;
-            String scheduledStr = message.meta(MqConstants.MQ_META_SCHEDULED);
-            if (Utils.isNotEmpty(scheduledStr)) {
-                scheduled = Long.parseLong(scheduledStr);
+                    String tid = message.meta(MqConstants.MQ_META_TID);
+                    int qos = "0".equals(message.meta(MqConstants.MQ_META_QOS)) ? 0 : 1;
+                    int times = Integer.parseInt(message.metaOrDefault(MqConstants.MQ_META_TIMES, "0"));
+                    long scheduled = 0;
+                    String scheduledStr = message.meta(MqConstants.MQ_META_SCHEDULED);
+                    if (Utils.isNotEmpty(scheduledStr)) {
+                        scheduled = Long.parseLong(scheduledStr);
+                    }
+
+                    serverRef.exchangeDo(topicConsumer, message, tid, qos, times, scheduled);
+                }
             }
 
-            serverRef.exchangeDo(topicConsumer, message, tid, qos, times, scheduled);
         }
 
         return true;
@@ -182,7 +197,7 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
 
     @Override
     public void onSave() {
-        if(inLoadProcess.get()){
+        if (inLoadProcess.get()) {
             //正在加载中（不可保存，否则会盖掉加载中的数据）
             return;
         }
@@ -193,10 +208,12 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
             inSaveProcess.set(true);
         }
 
-        saveSubscribeMap();
-        saveTopicConsumerQueue();
-
-        inSaveProcess.set(false);
+        try {
+            saveSubscribeMap();
+            saveTopicConsumerQueue();
+        } finally {
+            inSaveProcess.set(false);
+        }
     }
 
     /**
@@ -254,7 +271,7 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
             MqTopicConsumerQueue topicConsumerQueue = topicConsumerMap.get(topicConsumer);
 
             try {
-                saveTopicConsumerQueue1(topicConsumer, (MqTopicConsumerQueueDefault)topicConsumerQueue);
+                saveTopicConsumerQueue1(topicConsumer, (MqTopicConsumerQueueDefault) topicConsumerQueue);
 
                 log.info("Server persistent messageQueue completed, topicConsumer={}", topicConsumer);
             } catch (Exception e) {
@@ -266,26 +283,6 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
     }
 
     private void saveTopicConsumerQueue1(String topicConsumer, MqTopicConsumerQueueDefault topicConsumerQueue) throws IOException {
-        ONode topicConsumerQueueJson = new ONode(Options.def().add(Feature.PrettyFormat)).asArray();
-
-        if (topicConsumerQueue != null) {
-            List<MqMessageHolder> messageList = new ArrayList<>(topicConsumerQueue.getMessageMap().values());
-            for (MqMessageHolder messageHolder : messageList) {
-                if (messageHolder.isDone()) {
-                    continue;
-                }
-
-                try {
-                    Entity entity = messageHolder.getContent();
-                    ONode entityJson = topicConsumerQueueJson.addNew();
-                    entityJson.set("meta", entity.metaString());
-                    entityJson.set("data", entity.dataAsString());
-                } catch (Exception e) {
-                    log.warn("Server persistent message failed, tid={}", messageHolder.getTid(), e);
-                }
-            }
-        }
-
         String[] topicConsumerAry = topicConsumer.split(MqConstants.SEPARATOR_TOPIC_CONSUMER);
         File topicConsumerQueueDir = new File(directory, topicConsumerAry[0]);
         if (topicConsumerQueueDir.exists() == false) {
@@ -298,7 +295,33 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
             topicConsumerQueueFile.createNewFile();
         }
 
-        saveSnapshotFile(topicConsumerQueueFile, topicConsumerQueueJson.toJson());
+
+        if (topicConsumerQueue != null) {
+            List<MqMessageHolder> messageList = new ArrayList<>(topicConsumerQueue.getMessageMap().values());
+
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(topicConsumerQueueFile))) {
+                for (MqMessageHolder messageHolder : messageList) {
+                    if (messageHolder.isDone()) {
+                        continue;
+                    }
+
+                    try {
+                        Entity entity = messageHolder.getContent();
+                        ONode entityJson = new ONode();
+                        entityJson.set("meta", entity.metaString());
+                        entityJson.set("data", entity.dataAsString());
+
+                        //一条写一行（大 json 容易坏掉）//也比较省内存
+                        writer.write(entityJson.toJson());
+                        writer.newLine();
+                    } catch (Exception e) {
+                        log.warn("Server persistent message failed, tid={}", messageHolder.getTid(), e);
+                    }
+                }
+            }
+        } else {
+            saveSnapshotFile(topicConsumerQueueFile, "");
+        }
     }
 
     /**

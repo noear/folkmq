@@ -3,7 +3,7 @@ package org.noear.folkmq.client;
 import java.io.IOException;
 
 /**
- * 消息结构体定义
+ * 派发的消息
  *
  * @author noear
  * @since 1.0

@@ -12,7 +12,7 @@ public interface MqConsumeHandler {
     /**
      * 消费
      *
-     * @param message 消息
+     * @param message 派发的消息
      */
     void consume(MqMessage message) throws IOException;
 }

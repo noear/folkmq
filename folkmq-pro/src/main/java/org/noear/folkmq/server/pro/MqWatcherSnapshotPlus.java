@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.LongAdder;
  * @author noear
  * @since 1.0
  */
-public class MqWatcherSnapshotPlus extends MqWatcherSnapshot{
+public class MqWatcherSnapshotPlus extends MqWatcherSnapshot {
     private final LongAdder save900Count;
     private final LongAdder save300Count;
     private final LongAdder save100Count;
@@ -156,8 +156,8 @@ public class MqWatcherSnapshotPlus extends MqWatcherSnapshot{
     }
 
     @Override
-    public void onAcknowledge(String consumer, MqMessageHolder messageHolder, boolean isOk) {
-        super.onAcknowledge(consumer, messageHolder, isOk);
+    public void onAcknowledge(String topic, String consumer, MqMessageHolder messageHolder, boolean isOk) {
+        super.onAcknowledge(topic, consumer, messageHolder, isOk);
         onChange();
     }
 

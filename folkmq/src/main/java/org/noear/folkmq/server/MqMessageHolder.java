@@ -31,7 +31,7 @@ public class MqMessageHolder implements Delayed {
     private AtomicBoolean isDone;
 
     public MqMessageHolder(String consumer, Message from, String tid, int qos, int distributeCount, long distributeTime) {
-        this.content = new EntityDefault().data(from.dataAsBytes()).metaMap(from.metaMap());
+        this.content = new EntityDefault().data(from.data()).metaMap(from.metaMap());
         this.content.meta(MqConstants.MQ_META_CONSUMER, consumer).at(consumer);
 
         this.isDone = new AtomicBoolean();

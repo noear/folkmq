@@ -1,4 +1,4 @@
-### 1.0.11
+### 1.0.12
 * 添加 folkmq-server 管理后台会话保持（重启服务不会被退出）
 * 添加 folkmq-server 对 prometheus 支持
 * 添加 folkmq-server 延时消息的统计看板

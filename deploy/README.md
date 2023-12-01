@@ -7,8 +7,8 @@
 
 | 镜像                            | 说明                             |
 |-------------------------------|--------------------------------|
-| noearorg/folkmq-server:1.0.11 | 服务端（主端口：8602，消息端口：18602），可独立使用 |
-| noearorg/folkmq-broker:1.0.11 | 代理端（主端口：8602，消息端口：18602）       |
+| noearorg/folkmq-server:1.0.12 | 服务端（主端口：8602，消息端口：18602），可独立使用 |
+| noearorg/folkmq-broker:1.0.12 | 代理端（主端口：8602，消息端口：18602）       |
 
 
 支持在主端口上提供 prometheus 监控支持，配置提示：
@@ -39,7 +39,7 @@ docker-compose -f docker-compose-standalone.yml up
 ### 2、docker 部署方式
 
 ```
-docker run -p 18602:18602 -p 8602:8602 noearorg/folkmq-server:1.0.11 
+docker run -p 18602:18602 -p 8602:8602 noearorg/folkmq-server:1.0.12 
 ```
 
 

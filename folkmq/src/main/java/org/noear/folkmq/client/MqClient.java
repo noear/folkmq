@@ -30,8 +30,17 @@ public interface MqClient {
 
     /**
      * 自动回执
+     *
+     * @param auto 自动（默认为 true）
      */
     MqClient autoAcknowledge(boolean auto);
+
+    /**
+     * 发布重试
+     *
+     * @param times 次数（默认为 2）
+     * */
+    MqClient publishRetryTimes(int times);
 
     /**
      * 订阅主题

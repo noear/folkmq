@@ -1,3 +1,7 @@
+
+### 1.0.13
+* 添加 客户端发布重试 MqClient::publishRetryTimes
+
 ### 1.0.12
 * 添加 folkmq-server 管理后台会话保持（重启服务不会被退出）
 * 添加 folkmq-server 对 prometheus 支持

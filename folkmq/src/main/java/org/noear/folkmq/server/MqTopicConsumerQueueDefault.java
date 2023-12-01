@@ -206,7 +206,7 @@ public class MqTopicConsumerQueueDefault extends MqTopicConsumerQueueBase implem
             internalAdd(messageHolder);
 
             //给会话发送消息 //用 sendAndSubscribe 不安全，时间太久可能断连过（流就不能用了）
-            s1.sendAndSubscribe(MqConstants.MQ_EVENT_DISTRIBUTE, messageHolder.getContent(), m -> {
+            s1.sendAndRequest(MqConstants.MQ_EVENT_DISTRIBUTE, messageHolder.getContent(), m -> {
                 int ack = Integer.parseInt(m.metaOrDefault(MqConstants.MQ_META_ACK, "0"));
                 acknowledgeDo(messageHolder, ack);
             });

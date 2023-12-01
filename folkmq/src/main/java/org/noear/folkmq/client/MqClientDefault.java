@@ -1,6 +1,7 @@
 package org.noear.folkmq.client;
 
 import org.noear.folkmq.common.MqConstants;
+import org.noear.folkmq.exception.FolkmqException;
 import org.noear.socketd.SocketD;
 import org.noear.socketd.exception.SocketdAlarmException;
 import org.noear.socketd.exception.SocketdConnectionException;
@@ -179,8 +180,15 @@ public class MqClientDefault extends EventListener implements MqClientInternal {
 
         if (qos > 0) {
             //::Qos1
-            clientSession.sendAndSubscribe(MqConstants.MQ_EVENT_PUBLISH, entity, r -> {
-                future.complete(null);
+            clientSession.sendAndRequest(MqConstants.MQ_EVENT_PUBLISH, entity, r -> {
+                int ack = Integer.parseInt(r.metaOrDefault(MqConstants.MQ_META_ACK, "0"));
+
+                if (ack == 1) {
+                    future.complete(null);
+                } else {
+                    String messsage = "Client message publish confirmation failed: " + r.dataAsString();
+                    future.completeExceptionally(new FolkmqException(messsage));
+                }
             });
         } else {
             //::Qos0

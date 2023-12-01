@@ -139,7 +139,7 @@ public class ClientDemo1 {
 }
 ```
 
-## Automatic retry and delay policies
+## Consume automatic retry and delay policies
 
 | Number of distribution | Automatic delay |            |
 |------|------|------------|
@@ -154,37 +154,13 @@ public class ClientDemo1 {
 | n..  | 2h   | It's 2 hours after the 8th time |
 
 
-## Dictionary of client interfaces
+## Dictionary of main client interfaces
 
-```java
-//Message client interface
-public interface MqClient {
-    MqClient connect() throws IOException;
+See：[《API.md》](API.md)
 
-    void disconnect() throws IOException;
+## Architecture diagram
 
-    MqClient config(ClientConfigHandler configHandler);
+<img src="folkmq_schema.png" width="500" />
 
-    MqClient autoAcknowledge(boolean auto);
-
-    void subscribe(String topic, String consumer, MqConsumeHandler consumerHandler) throws IOException;
-
-    void unsubscribe(String topic, String consumer) throws IOException;
-    
-    default CompletableFuture<?> publish(String topic, String content) throws IOException {
-        return publish(topic, content, null, 1);
-    }
-    
-    default CompletableFuture<?> publish(String topic, String content, int qos) throws IOException {
-        return publish(topic, content, null, qos);
-    }
-    
-    default CompletableFuture<?> publish(String topic, String content, Date scheduled) throws IOException {
-        return publish(topic, content, scheduled, 1);
-    }
-    
-    CompletableFuture<?> publish(String topic, String content, Date scheduled, int qos) throws IOException;
-}
-```
 
 

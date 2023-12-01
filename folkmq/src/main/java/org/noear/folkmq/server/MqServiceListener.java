@@ -91,7 +91,7 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
             //观察后，再答复（以支持同步的原子性需求。同步或异步，由用户按需控制）
             if (m.isRequest() || m.isSubscribe()) { //此判断兼容 Qos0, Qos1
                 //发送“确认”，表示服务端收到了
-                s.replyEnd(m, new StringEntity(""));
+                s.replyEnd(m, new StringEntity("").meta(MqConstants.MQ_META_ACK,"1"));
             }
 
             //执行交换
@@ -100,6 +100,11 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
 
         //接收保存指令
         on(MqConstants.MQ_EVENT_SAVE, (s, m) -> {
+            if (m.isRequest() || m.isSubscribe()) { //此判断兼容 Qos0, Qos1
+                //发送“确认”，表示服务端收到了
+                s.replyEnd(m, new StringEntity("").meta(MqConstants.MQ_META_ACK,"1"));
+            }
+
             save();
         });
     }

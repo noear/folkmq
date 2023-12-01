@@ -74,27 +74,6 @@
 * Presentation of results：[《[FolkMQ] 一个新的内存型消息队列（快，特别的快）》](https://www.bilibili.com/video/BV1mc411D7pY/)
 * Quick start：[《FolkMQ - Helloworld 入门》](https://www.bilibili.com/video/BV1Yj411L7fB/)
 
-## Server-side container image
-
-| Docker                       | Remarks                                             |
-|------------------------------|-----------------------------------------------------|
-| noearorg/folkmq-server:1.0.12 | Server (main port: 8602, message port: 18602) |
-| noearorg/folkmq-broker:1.0.12 | Server (main port: 8602, message port: 18602)       |
-
-When using broker cluster, change folkmq-server port to 8601
-
-* Optional configuration
-
-| Properties or environment variables  | Default values | Remarks                                           |
-|--------------------------------------|-----|---------------------------------------------------|
-| `server.port`                        |  8602   | main port (http)                                  |
-|                                      |  18602   | message port (tcp), equal to the main port +10000 |
-| `folkmq.admin`                       |  admin   | management password                               |
-
-* Add a message access account：
-
-Adding attributes or environment variables, for example： `folkmq.access.ak1=sk1`，`folkmq.access.ak2=sk2`
-
 ## Helloworld
 
 ### 1、Start the server (more deployment references: [deployment Notes](deploy))

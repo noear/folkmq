@@ -74,28 +74,7 @@
 * 成果展示：[《[FolkMQ] 一个新的内存型消息队列（快，特别的快）》](https://www.bilibili.com/video/BV1mc411D7pY/)
 * 快速入门：[《FolkMQ - Helloworld 入门》](https://www.bilibili.com/video/BV1Yj411L7fB/)
 
-## 服务端容器镜像
-
-| 镜像                            | 说明                       |
-|-------------------------------|--------------------------|
-| noearorg/folkmq-server:1.0.12 | 服务端（主端口：8602，消息端口：18602） |
-| noearorg/folkmq-broker:1.0.12 | 服务端（主端口：8602，消息端口：18602） |
-
-当使用 broker 集群时，把 folkmq-server 端口改成：8601
-
-* 可选配置
-
-| 属性或环境变量                       | 默认值 |                       |
-|-------------------------------|-----|-----------------------|
-| `server.port`                 |  8602   | 主端口(http，管理用)         |
-|                               |  18602   | 消息端口(tcp)，等于主端口+10000 |
-| `folkmq.admin`                |  admin   | 管理密码                  |
-
-* 添加消息访问账号：
-
-添属性或环境变量，例： `folkmq.access.ak1=sk1`，`folkmq.access.ak2=sk2`
-
-## Helloworld
+## 你好世界！
 
 ### 1、启动服务 (更多部署参考：[部署说明](deploy))
 

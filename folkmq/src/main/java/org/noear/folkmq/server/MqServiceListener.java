@@ -26,7 +26,7 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
     private Object SUBSCRIBE_LOCK = new Object();
 
     //服务端访问账号
-    private Map<String, String> serverAccessMap = new HashMap<>();
+    private Map<String, String> serverAccessMap = new ConcurrentHashMap<>();
     //观察者
     private MqWatcher watcher;
 

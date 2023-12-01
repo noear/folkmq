@@ -44,9 +44,19 @@
 
 ## Introduction
 
-* Adopt a Redis-like strategy (run in memory + snapshot persistence)
-* Functions Subscribe, unsubscribe, publish message, publish timed message, ACK, automatic retry, delay policy, Qos0, Qos1
-* No clustering yet (you can build your own)
+* Run in Memory + snapshot persistence + Broker cluster mode (optional)
+* Can add ws, UDP-based communication (and, perhaps, iot)
+
+| role     | function                                                                          | remark         |
+|----------|-----------------------------------------------------------------------------------|------------|
+| Producer | Publish messages (Qos0, Qos1), publish timed messages (Qos0, Qos1), publish retry |            |
+|          |                                                                                   |            |
+| Consumer | Subscribe, unsubscribe                                                            |            |
+| Consumer | Consume - ACK                                                                     |            |
+|          |                                                                                   |            |
+| Server   | Distribute - Retry, Distribute - Delayed                                                 | Dispatch retry and delay policies |
+| Server   | In-memory running, snapshot persistence (automatic, offline, manual)        |            |
+
 
 ## Features
 

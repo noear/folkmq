@@ -160,6 +160,4 @@ public class ClientDemo1 {
 
 ## 架构图
 
-只有一个时序队列！！！没有“就绪”、“处理中”、“待重试”、“已提交”、“列信” 等多队列的切换。
-
 <img src="folkmq_schema.png" width="500" />

@@ -19,18 +19,6 @@
         <micrometer.version>1.11.1</micrometer.version>
     </properties>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.noear</groupId>
-                <artifactId>solon-parent</artifactId>
-                <version>${solon.version}</version>
-                <scope>import</scope>
-                <type>pom</type>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
     <dependencies>
         <dependency>
             <groupId>org.noear</groupId>
@@ -39,12 +27,13 @@
 
         <dependency>
             <groupId>org.noear</groupId>
-            <artifactId>folkmq-transport-smartsocket</artifactId>
+            <artifactId>folkmq-transport-netty</artifactId>
         </dependency>
 
         <dependency>
             <groupId>org.noear</groupId>
             <artifactId>solon-web</artifactId>
+            <version>${solon.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.noear</groupId>
@@ -56,16 +45,19 @@
         <dependency>
             <groupId>org.noear</groupId>
             <artifactId>solon.sessionstate.jwt</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.noear</groupId>
-            <artifactId>solon.cloud.metrics</artifactId>
+            <version>${solon.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.noear</groupId>
             <artifactId>solon.logging.logback</artifactId>
+            <version>${solon.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.noear</groupId>
+            <artifactId>solon.cloud.metrics</artifactId>
+            <version>${solon.version}</version>
         </dependency>
 
         <dependency>

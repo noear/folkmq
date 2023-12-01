@@ -16,12 +16,13 @@
 
     <properties>
         <solon.version>2.6.1</solon.version>
+        <micrometer.version>1.11.1</micrometer.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.noear</groupId>
-            <artifactId>folkmq-transport-smartsocket</artifactId>
+            <artifactId>folkmq-transport-netty</artifactId>
         </dependency>
 
         <dependency>
@@ -32,8 +33,26 @@
 
         <dependency>
             <groupId>org.noear</groupId>
+            <artifactId>solon.boot.smarthttp</artifactId>
+            <version>${solon.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.noear</groupId>
             <artifactId>solon.logging.logback</artifactId>
             <version>${solon.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.noear</groupId>
+            <artifactId>solon.cloud.metrics</artifactId>
+            <version>${solon.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
+            <version>${micrometer.version}</version>
         </dependency>
     </dependencies>
 

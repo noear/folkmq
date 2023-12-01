@@ -160,6 +160,8 @@ See：[《API.md》](API.md)
 
 ## Architecture diagram
 
+Only one time queue!! There is no "Ready", "in progress", "to be retried", "committed", "column" and other multi-queue switching.
+
 <img src="folkmq_schema.png" width="500" />
 
 

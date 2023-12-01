@@ -35,6 +35,10 @@ public interface MqConstants {
      * 元信息：消费回执
      */
     String MQ_META_ACK = "mq.ack";
+    /**
+     * 元信息：执行确认
+     */
+    String MQ_META_CONFIRM = "mq.confirm";
 
     /**
      * 事件：订阅

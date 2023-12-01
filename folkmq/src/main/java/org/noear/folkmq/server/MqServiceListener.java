@@ -55,14 +55,14 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
             //观察者::订阅时（适配时，可选择同步或异步。同步可靠性高，异步性能好）
             watcher.onSubscribe(topic, consumer, s);
 
-            //观察后，再答复（以支持同步的原子性需求。同步或异步，由用户按需控制）
-            if (m.isRequest() || m.isSubscribe()) {
-                //发送“确认”，表示服务端收到了
-                s.replyEnd(m, new StringEntity("").meta(MqConstants.MQ_META_ACK,"1"));
-            }
-
             //执行订阅
             subscribeDo(topic, consumer, s);
+
+            //答复（以支持同步的原子性需求。同步或异步，由用户按需控制）
+            if (m.isRequest() || m.isSubscribe()) {
+                //发送“确认”，表示服务端收到了
+                s.replyEnd(m, new StringEntity("").meta(MqConstants.MQ_META_CONFIRM,"1"));
+            }
         });
 
         //接收取消订阅指令
@@ -73,14 +73,14 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
             //观察者::取消订阅时（适配时，可选择同步或异步。同步可靠性高，异步性能好）
             watcher.onUnSubscribe(topic, consumer, s);
 
-            //观察后，再答复（以支持同步的原子性需求。同步或异步，由用户按需控制）
-            if (m.isRequest() || m.isSubscribe()) {
-                //发送“确认”，表示服务端收到了
-                s.replyEnd(m, new StringEntity("").meta(MqConstants.MQ_META_ACK,"1"));
-            }
-
             //执行取消订阅
             unsubscribeDo(topic, consumer, s);
+
+            //答复（以支持同步的原子性需求。同步或异步，由用户按需控制）
+            if (m.isRequest() || m.isSubscribe()) {
+                //发送“确认”，表示服务端收到了
+                s.replyEnd(m, new StringEntity("").meta(MqConstants.MQ_META_CONFIRM,"1"));
+            }
         });
 
         //接收发布指令
@@ -88,24 +88,24 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
             //观察者::发布时（适配时，可选择同步或异步。同步可靠性高，异步性能好）
             watcher.onPublish(m);
 
-            //观察后，再答复（以支持同步的原子性需求。同步或异步，由用户按需控制）
-            if (m.isRequest() || m.isSubscribe()) { //此判断兼容 Qos0, Qos1
-                //发送“确认”，表示服务端收到了
-                s.replyEnd(m, new StringEntity("").meta(MqConstants.MQ_META_ACK,"1"));
-            }
-
             //执行交换
             exchangeDo(m);
+
+            //再答复（以支持同步的原子性需求。同步或异步，由用户按需控制）
+            if (m.isRequest() || m.isSubscribe()) { //此判断兼容 Qos0, Qos1
+                //发送“确认”，表示服务端收到了
+                s.replyEnd(m, new StringEntity("").meta(MqConstants.MQ_META_CONFIRM,"1"));
+            }
         });
 
         //接收保存指令
         on(MqConstants.MQ_EVENT_SAVE, (s, m) -> {
+            save();
+
             if (m.isRequest() || m.isSubscribe()) { //此判断兼容 Qos0, Qos1
                 //发送“确认”，表示服务端收到了
-                s.replyEnd(m, new StringEntity("").meta(MqConstants.MQ_META_ACK,"1"));
+                s.replyEnd(m, new StringEntity("").meta(MqConstants.MQ_META_CONFIRM,"1"));
             }
-
-            save();
         });
     }
 

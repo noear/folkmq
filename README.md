@@ -89,7 +89,7 @@
 ### 1、Start the server (more deployment references: [deployment Notes](deploy))
 
 ```
-docker run -p 18602:18602 -p 8602:8602 noearorg/folkmq-server:1.0.12 
+docker run -p 18602:18602 -p 8602:8602 noearorg/folkmq-server:1.0.13 
 ```
 
 ### 2、Write client-side code
@@ -102,7 +102,7 @@ docker run -p 18602:18602 -p 8602:8602 noearorg/folkmq-server:1.0.12
     <dependency>
         <groupId>org.noear</groupId>
         <artifactId>folkmq-transport-java-tcp</artifactId>
-        <version>1.0.12</version>
+        <version>1.0.13</version>
     </dependency>
 </dependencies>
 ```
@@ -123,7 +123,7 @@ public class ClientDemo1 {
         });
 
         //Publish
-        client.publish("demo", "helloworld!").get();
+        client.publish("demo", new MqMessage("helloworld!")).get();
     }
 }
 ```

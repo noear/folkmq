@@ -4,6 +4,9 @@
 ```java
 /**
  * 消息客户端
+ *
+ * @author noear
+ * @since 1.0
  */
 public interface MqClient {
     /**
@@ -55,46 +58,42 @@ public interface MqClient {
     /**
      * 发布消息
      *
-     * @param topic   主题
-     * @param content 消息内容
-     */
-    default CompletableFuture<?> publish(String topic, String content) throws IOException {
-        return publish(topic, content, null, 1);
-    }
-
-    /**
-     * 发布消息
-     *
-     * @param topic   主题
-     * @param content 消息内容
-     * @param qos     质量等级（0 或 1）
-     */
-    default CompletableFuture<?> publish(String topic, String content, int qos) throws IOException {
-        return publish(topic, content, null, qos);
-    }
-
-    /**
-     * 发布消息
-     *
      * @param topic     主题
-     * @param content   消息内容
-     * @param scheduled 预定派发时间
+     * @param message   消息
      */
-    default CompletableFuture<?> publish(String topic, String content, Date scheduled) throws IOException {
-        return publish(topic, content, scheduled, 1);
-    }
-
-    /**
-     * 发布消息
-     *
-     * @param topic     主题
-     * @param content   消息内容
-     * @param scheduled 预定派发时间
-     * @param qos       质量等级（0 或 1）
-     */
-    CompletableFuture<?> publish(String topic, String content, Date scheduled, int qos) throws IOException;
+    CompletableFuture<?> publish(String topic, IMqMessage message) throws IOException;
 }
 ```
+
+### IMqMessage 接口
+
+```java
+/**
+ * 消息接口
+ */
+public interface IMqMessage {
+    /**
+     * 事务ID
+     */
+    String getTid();
+
+    /**
+     * 内容
+     */
+    String getContent();
+
+    /**
+     * 定时时间
+     */
+    Date getScheduled();
+
+    /**
+     * 质量等级（0 或 1）
+     */
+    int getQos();
+}
+```
+
 
 ### MqConsumeHandler 接口
 
@@ -106,7 +105,7 @@ public interface MqConsumeHandler {
     /**
      * 消费
      * 
-     * @param message 派发的消息
+     * @param message 收到的消息
      */
     void consume(MqMessage message) throws IOException;
 }
@@ -116,28 +115,13 @@ public interface MqConsumeHandler {
 
 ```java
 /**
- * 派发的消息
+ * 收到的消息接口
  */
-public interface MqMessage {
-    /**
-     * 事务ID
-     */
-    String getTid();
-
+public interface IMqMessageReceived extends IMqMessage {
     /**
      * 主题
      */
     String getTopic();
-
-    /**
-     * 内容
-     */
-    String getContent();
-
-    /**
-     * 质量等级（0 或 1）
-     */
-    int getQos();
 
     /**
      * 已派发次数

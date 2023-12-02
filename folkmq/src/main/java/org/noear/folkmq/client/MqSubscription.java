@@ -47,7 +47,7 @@ public class MqSubscription implements MqConsumeHandler {
     }
 
     @Override
-    public void consume(MqMessage message) throws IOException {
+    public void consume(MqMessageReceived message) throws IOException {
         consumerHandler.consume(message);
     }
 }

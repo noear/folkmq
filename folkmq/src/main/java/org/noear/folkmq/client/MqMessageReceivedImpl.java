@@ -5,24 +5,26 @@ import org.noear.folkmq.common.MqConstants;
 import org.noear.socketd.transport.core.Message;
 
 import java.io.IOException;
+import java.util.Date;
 
 /**
- * 消息结构体默认实现
+ * 收到的消息实现
  *
  * @author noear
  * @since 1.0
  */
-public class MqMessageDefault implements MqMessage {
+public class MqMessageReceivedImpl implements MqMessageReceived {
     protected final transient MqClientInternal clientInternal;
     protected final transient Message from;
 
     private final String tid;
     private final String topic;
     private final String content;
+    private final Date scheduled;
     private final int qos;
     private final int times;
 
-    public MqMessageDefault(MqClientInternal clientInternal, Message from) {
+    public MqMessageReceivedImpl(MqClientInternal clientInternal, Message from) {
         this.clientInternal = clientInternal;
         this.from = from;
 
@@ -32,6 +34,7 @@ public class MqMessageDefault implements MqMessage {
 
         this.qos = Integer.parseInt(from.metaOrDefault(MqConstants.MQ_META_QOS, "1"));
         this.times = Integer.parseInt(from.metaOrDefault(MqConstants.MQ_META_TIMES, "0"));
+        this.scheduled = null;
     }
 
     public String getConsumer(){
@@ -60,6 +63,11 @@ public class MqMessageDefault implements MqMessage {
     @Override
     public String getContent() {
         return content;
+    }
+
+    @Override
+    public Date getScheduled() {
+        return null;
     }
 
     @Override

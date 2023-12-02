@@ -16,7 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -51,10 +50,10 @@ public class MqClientDefault extends EventListener implements MqClientInternal {
 
         //接收派发指令
         on(MqConstants.MQ_EVENT_DISTRIBUTE, (s, m) -> {
-            MqMessageDefault message = null;
+            MqMessageReceivedImpl message = null;
 
             try {
-                message = new MqMessageDefault(this, m);
+                message = new MqMessageReceivedImpl(this, m);
                 MqSubscription subscription = subscriptionMap.get(message.getTopic());
 
                 if (subscription != null) {
@@ -163,30 +162,28 @@ public class MqClientDefault extends EventListener implements MqClientInternal {
      * 发布消息
      *
      * @param topic     主题
-     * @param content   消息内容
-     * @param scheduled 预定派发时间
-     * @param qos       质量等级（0 或 1）
+     * @param message   消息实体
      */
     @Override
-    public CompletableFuture<?> publish(String topic, String content, Date scheduled, int qos) throws IOException {
+    public CompletableFuture<?> publish(String topic, MqMessage message) throws IOException {
         if (clientSession == null) {
             throw new SocketdConnectionException("Not connected!");
         }
 
         //构建消息实体
-        StringEntity entity = new StringEntity(content);
-        entity.meta(MqConstants.MQ_META_TID, Utils.guid());
+        StringEntity entity = new StringEntity(message.getContent());
+        entity.meta(MqConstants.MQ_META_TID, message.getTid());
         entity.meta(MqConstants.MQ_META_TOPIC, topic);
-        entity.meta(MqConstants.MQ_META_QOS, (qos == 0 ? "0" : "1"));
-        if (scheduled == null) {
+        entity.meta(MqConstants.MQ_META_QOS, (message.getQos() == 0 ? "0" : "1"));
+        if (message.getScheduled() == null) {
             entity.meta(MqConstants.MQ_META_SCHEDULED, "0");
         } else {
-            entity.meta(MqConstants.MQ_META_SCHEDULED, String.valueOf(scheduled.getTime()));
+            entity.meta(MqConstants.MQ_META_SCHEDULED, String.valueOf(message.getScheduled().getTime()));
         }
         entity.at(MqConstants.BROKER_AT_SERVER);
 
         //执行
-        return publishDo(entity, qos);
+        return publishDo(entity, message.getQos());
     }
 
     /**
@@ -246,7 +243,7 @@ public class MqClientDefault extends EventListener implements MqClientInternal {
      * 消费回执
      */
     @Override
-    public void acknowledge(MqMessageDefault message, boolean isOk) throws IOException {
+    public void acknowledge(MqMessageReceivedImpl message, boolean isOk) throws IOException {
         //发送“回执”，向服务端反馈消费情况
         if (message.getQos() > 0) {
             //此处用 replyEnd 不安全，时间长久可能会话断连过（流就无效了）

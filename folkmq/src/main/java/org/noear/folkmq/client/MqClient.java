@@ -3,7 +3,6 @@ package org.noear.folkmq.client;
 import org.noear.socketd.transport.client.ClientConfigHandler;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -62,42 +61,8 @@ public interface MqClient {
     /**
      * 发布消息
      *
-     * @param topic   主题
-     * @param content 消息内容
-     */
-    default CompletableFuture<?> publish(String topic, String content) throws IOException {
-        return publish(topic, content, null, 1);
-    }
-
-    /**
-     * 发布消息
-     *
-     * @param topic   主题
-     * @param content 消息内容
-     * @param qos     质量等级（0 或 1）
-     */
-    default CompletableFuture<?> publish(String topic, String content, int qos) throws IOException {
-        return publish(topic, content, null, qos);
-    }
-
-    /**
-     * 发布消息
-     *
      * @param topic     主题
-     * @param content   消息内容
-     * @param scheduled 预定派发时间
+     * @param message   消息实体
      */
-    default CompletableFuture<?> publish(String topic, String content, Date scheduled) throws IOException {
-        return publish(topic, content, scheduled, 1);
-    }
-
-    /**
-     * 发布消息
-     *
-     * @param topic     主题
-     * @param content   消息内容
-     * @param scheduled 预定派发时间
-     * @param qos       质量等级（0 或 1）
-     */
-    CompletableFuture<?> publish(String topic, String content, Date scheduled, int qos) throws IOException;
+    CompletableFuture<?> publish(String topic, MqMessage message) throws IOException;
 }

@@ -47,8 +47,8 @@ public class BrokerListenerFolkmq extends BrokerListener {
     public void onOpen(Session session) throws IOException {
         super.onOpen(session);
 
-        String atName = session.at();
-        if (MqConstants.BROKER_AT_SERVER.equals(atName)) {
+        String brokerPlayerName = session.name();
+        if (MqConstants.BROKER_AT_SERVER.equals(brokerPlayerName)) {
             return;
         }
 
@@ -78,8 +78,8 @@ public class BrokerListenerFolkmq extends BrokerListener {
         Collection<String> atList = session.attrMap().keySet();
         if (atList.size() > 0) {
             for (String at : atList) {
-                //注销服务
-                removeService(at, session);
+                //注销玩家
+                removePlayer(at, session);
             }
         }
     }
@@ -87,14 +87,14 @@ public class BrokerListenerFolkmq extends BrokerListener {
     @Override
     public void onMessage(Session requester, Message message) throws IOException {
         if (MqConstants.MQ_EVENT_SUBSCRIBE.equals(message.event())) {
-            //订阅，注册服务
+            //订阅，注册玩家
             String consumer = message.meta(MqConstants.MQ_META_CONSUMER);
             requester.attr(consumer, "1");
-            addService(consumer, requester);
+            addPlayer(consumer, requester);
         } else if (MqConstants.MQ_EVENT_UNSUBSCRIBE.equals(message.event())) {
-            //取消订阅，注销服务
+            //取消订阅，注销玩家
             String consumer = message.meta(MqConstants.MQ_META_CONSUMER);
-            removeService(consumer, requester);
+            removePlayer(consumer, requester);
         }
 
         super.onMessage(requester, message);

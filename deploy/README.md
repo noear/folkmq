@@ -64,7 +64,7 @@ docker run -p 18602:18602 -p 8602:8602 noearorg/folkmq-server:1.0.13
 java -jar folkmq-server.jar
 ```
 
-## 三、集群部署说明
+## 三、Broker 集群部署说明
 
 
 ### 1、docker-compose 部署方式
@@ -75,6 +75,12 @@ java -jar folkmq-server.jar
 docker-compose -f docker-compose-cluster.yml up
 ```
 
-集群部署时角色的关系如下：
+### 2、broker 集群架构图：
 
-<img src="DEV-BROKER.png" width="400">
+* 结构图
+
+<img src="../broker-structure.png" width="400">
+
+* 时序图
+
+<img src="../broker-sequence.png" width="400">

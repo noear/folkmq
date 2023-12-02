@@ -46,8 +46,13 @@ public class MqSubscription implements MqConsumeHandler {
         this.consumerHandler = consumerHandler;
     }
 
+    /**
+     * 消费
+     *
+     * @param message 收到的消息
+     */
     @Override
-    public void consume(MqMessageReceived message) throws IOException {
+    public void consume(IMqMessageReceived message) throws IOException {
         consumerHandler.consume(message);
     }
 }

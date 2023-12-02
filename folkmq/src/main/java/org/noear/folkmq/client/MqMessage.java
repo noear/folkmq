@@ -1,5 +1,7 @@
 package org.noear.folkmq.client;
 
+import org.noear.socketd.utils.Utils;
+
 import java.util.Date;
 
 /**
@@ -8,24 +10,43 @@ import java.util.Date;
  * @author noear
  * @since 1.0
  */
-public interface MqMessage {
-    /**
-     * 事务ID
-     */
-    String getTid();
+public class MqMessage implements IMqMessage {
+    private String tid;
+    private String content;
+    private Date scheduled;
+    private int qos = 1;
 
-    /**
-     * 内容
-     */
-    String getContent();
+    public MqMessage(String content){
+        this.tid = Utils.guid();
+        this.content = content;
+    }
 
-    /**
-     * 定时时间
-     */
-    Date getScheduled();
+    @Override
+    public String getTid() {
+        return tid;
+    }
 
-    /**
-     * 质量等级（0 或 1）
-     */
-    int getQos();
+    public String getContent() {
+        return content;
+    }
+
+    public Date getScheduled() {
+        return scheduled;
+    }
+
+    public int getQos() {
+        return qos;
+    }
+
+
+
+    public MqMessage scheduled(Date scheduled) {
+        this.scheduled = scheduled;
+        return this;
+    }
+
+    public MqMessage qos(int qos) {
+        this.qos = qos;
+        return this;
+    }
 }

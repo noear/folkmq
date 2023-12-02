@@ -2,6 +2,7 @@ package benchmark;
 
 import org.noear.folkmq.client.MqClient;
 import org.noear.folkmq.client.MqClientDefault;
+import org.noear.folkmq.client.MqMessage;
 import org.noear.folkmq.server.MqServer;
 import org.noear.folkmq.server.MqServerDefault;
 
@@ -35,13 +36,13 @@ public class BenchmarkScheduledTest {
 
         //发布预热
         for (int i = 0; i < 100; i++) {
-            client.publish("hot", "hot-" + i).get();
+            client.publish("hot", new MqMessage("hot-" + i)).get();
         }
 
         //发布测试
         long start_time = System.currentTimeMillis();
         for (int i = 0; i < count; i++) {
-            client.publish("test", "test-" + i, new Date(System.currentTimeMillis() + 5000));
+            client.publish("test", new MqMessage("test-" + i).scheduled(new Date(System.currentTimeMillis() + 5000)));
         }
         long sendTime = System.currentTimeMillis() - start_time;
 

@@ -11,7 +11,6 @@ import org.noear.socketd.transport.core.Entity;
 import org.noear.socketd.transport.core.Session;
 import org.noear.socketd.transport.core.entity.StringEntity;
 import org.noear.socketd.transport.core.listener.EventListener;
-import org.noear.socketd.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,10 +49,10 @@ public class MqClientDefault extends EventListener implements MqClientInternal {
 
         //接收派发指令
         on(MqConstants.MQ_EVENT_DISTRIBUTE, (s, m) -> {
-            MqMessageReceivedImpl message = null;
+            MqMessageReceived message = null;
 
             try {
-                message = new MqMessageReceivedImpl(this, m);
+                message = new MqMessageReceived(this, m);
                 MqSubscription subscription = subscriptionMap.get(message.getTopic());
 
                 if (subscription != null) {
@@ -162,10 +161,10 @@ public class MqClientDefault extends EventListener implements MqClientInternal {
      * 发布消息
      *
      * @param topic     主题
-     * @param message   消息实体
+     * @param message   消息
      */
     @Override
-    public CompletableFuture<?> publish(String topic, MqMessage message) throws IOException {
+    public CompletableFuture<?> publish(String topic, IMqMessage message) throws IOException {
         if (clientSession == null) {
             throw new SocketdConnectionException("Not connected!");
         }
@@ -187,7 +186,7 @@ public class MqClientDefault extends EventListener implements MqClientInternal {
     }
 
     /**
-     * 执行发布消息
+     * 执行消息发布
      *
      * @param qos    qos
      * @param entity 消息实体
@@ -241,9 +240,12 @@ public class MqClientDefault extends EventListener implements MqClientInternal {
 
     /**
      * 消费回执
+     *
+     * @param message 收到的消息
+     * @param isOk    回执
      */
     @Override
-    public void acknowledge(MqMessageReceivedImpl message, boolean isOk) throws IOException {
+    public void acknowledge(MqMessageReceived message, boolean isOk) throws IOException {
         //发送“回执”，向服务端反馈消费情况
         if (message.getQos() > 0) {
             //此处用 replyEnd 不安全，时间长久可能会话断连过（流就无效了）

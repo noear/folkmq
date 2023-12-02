@@ -2,6 +2,7 @@ package labs;
 
 import org.noear.folkmq.FolkMQ;
 import org.noear.folkmq.client.MqClient;
+import org.noear.folkmq.client.MqMessage;
 
 public class ProducerTest {
     public static void main(String[] args) throws Exception {
@@ -13,11 +14,11 @@ public class ProducerTest {
 
         //发布预热
         for (int i = 0; i < 100; i++) {
-            client.publish("hot", "hot-" + i).get();
+            client.publish("hot", new MqMessage("hot-" + i)).get();
         }
 
         for (int i = 0; i < count; i++) {
-            client.publish("test", "test-" + i);
+            client.publish("test", new MqMessage("test-" + i));
         }
     }
 }

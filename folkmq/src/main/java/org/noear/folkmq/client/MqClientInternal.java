@@ -12,8 +12,8 @@ public interface MqClientInternal extends MqClient {
     /**
      * 消费回执
      *
-     * @param message 消息
+     * @param message 收到的消息
      * @param isOk    回执
      */
-    void acknowledge(MqMessageReceivedImpl message, boolean isOk) throws IOException;
+    void acknowledge(MqMessageReceived message, boolean isOk) throws IOException;
 }

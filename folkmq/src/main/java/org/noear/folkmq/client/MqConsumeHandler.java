@@ -14,5 +14,5 @@ public interface MqConsumeHandler {
      *
      * @param message 收到的消息
      */
-    void consume(MqMessageReceived message) throws IOException;
+    void consume(IMqMessageReceived message) throws IOException;
 }

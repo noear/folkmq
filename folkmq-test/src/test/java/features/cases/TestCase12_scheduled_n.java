@@ -1,6 +1,7 @@
 package features.cases;
 
 import org.noear.folkmq.client.MqClientDefault;
+import org.noear.folkmq.client.MqMessage;
 import org.noear.folkmq.server.MqServerDefault;
 import org.noear.folkmq.server.MqServiceInternal;
 import org.noear.folkmq.server.MqTopicConsumerQueue;
@@ -37,11 +38,11 @@ public class TestCase12_scheduled_n extends BaseTestCase {
             countDownLatch.countDown();
         }));
 
-        client.publish("demo", "demo1", new Date(System.currentTimeMillis() + 5000));
-        client.publish("demo", "demo2", new Date(System.currentTimeMillis() + 5000));
-        client.publish("demo", "demo3", new Date(System.currentTimeMillis() + 5000));
-        client.publish("demo", "demo4", new Date(System.currentTimeMillis() + 5000));
-        client.publish("demo", "demo5", new Date(System.currentTimeMillis() + 5000));
+        client.publish("demo", new MqMessage("demo1").scheduled(new Date(System.currentTimeMillis() + 5000)));
+        client.publish("demo", new MqMessage("demo2").scheduled(new Date(System.currentTimeMillis() + 5000)));
+        client.publish("demo", new MqMessage("demo3").scheduled(new Date(System.currentTimeMillis() + 5000)));
+        client.publish("demo", new MqMessage("demo4").scheduled(new Date(System.currentTimeMillis() + 5000)));
+        client.publish("demo", new MqMessage("demo5").scheduled(new Date(System.currentTimeMillis() + 5000)));
 
         countDownLatch.await(6, TimeUnit.SECONDS);
 

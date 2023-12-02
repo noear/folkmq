@@ -62,7 +62,7 @@ public interface MqClient {
      * 发布消息
      *
      * @param topic     主题
-     * @param message   消息实体
+     * @param message   消息
      */
-    CompletableFuture<?> publish(String topic, MqMessage message) throws IOException;
+    CompletableFuture<?> publish(String topic, IMqMessage message) throws IOException;
 }

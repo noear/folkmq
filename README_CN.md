@@ -89,7 +89,7 @@
 ### 1、启动服务 (更多部署参考：[部署说明](deploy))
 
 ```
-docker run -p 18602:18602 -p 8602:8602 noearorg/folkmq-server:1.0.12 
+docker run -p 18602:18602 -p 8602:8602 noearorg/folkmq-server:1.0.13 
 ```
 
 ### 2、编写客户端代码
@@ -102,7 +102,7 @@ docker run -p 18602:18602 -p 8602:8602 noearorg/folkmq-server:1.0.12
     <dependency>
         <groupId>org.noear</groupId>
         <artifactId>folkmq-transport-java-tcp</artifactId>
-        <version>1.0.12</version>
+        <version>1.0.13</version>
     </dependency>
 </dependencies>
 ```

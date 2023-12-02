@@ -1,9 +1,10 @@
 version: '3.5'
 services:
   folkmq-broker:
-    image: noearorg/folkmq-broker:1.0.12
+    image: noearorg/folkmq-broker:1.0.13
     container_name: folkmq-broker
     ports:
+      - 8602:8602
       - 18602:18602
     volumes:
       - ./data/broker:/data
@@ -13,9 +14,10 @@ services:
         aliases:
           - folkmq-broker
   folkmq-server1:
-    image: noearorg/folkmq-server:1.0.12
+    image: noearorg/folkmq-server:1.0.13
     container_name: folkmq-server1
     ports:
+      - 8611:8602
       - 18611:18602
     volumes:
       - ./logs/server1:/logs
@@ -30,9 +32,10 @@ services:
         aliases:
           - folkmq-server1
   folkmq-server2:
-    image: noearorg/folkmq-server:1.0.12
+    image: noearorg/folkmq-server:1.0.13
     container_name: folkmq-server2
     ports:
+      - 8612:8602
       - 18612:18602
     volumes:
       - ./data/server2:/data

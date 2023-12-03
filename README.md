@@ -47,15 +47,15 @@
 * Run in Memory + snapshot persistence + Broker cluster mode (optional)
 * Can add ws, UDP-based communication (and, perhaps, iot)
 
-| role     | function                                                                          | 
-|----------|-----------------------------------------------------------------------------------|
-| Producer | Publish messages (Qos0, Qos1), publish timed messages (Qos0, Qos1), publish retry |     
-|          |                                                                                   |       
-| Consumer | Subscribe, unsubscribe                                                            |        
-| Consumer | Consume - ACK                                                                     |      
-|          |                                                                                   |     
-| Server   | Distribute - Retry, Distribute - Delayed                                          | 
-| Server   | In-memory running, snapshot persistence (automatic, offline, manual)              |           
+| role     | function                                                                                    | 
+|----------|---------------------------------------------------------------------------------------------|
+| Producer | Publish messages (Qos0, Qos1), publish timed messages (Qos0, Qos1), publish retry           |     
+|          |                                                                                             |       
+| Consumer | Subscribe, unsubscribe                                                                      |        
+| Consumer | Consume-ACK                                                                                 |      
+|          |                                                                                             |     
+| Server   | Publish-Confirm, Subscribe-Confirm, Unsubscribe-Confirm, Distribute-Retry, Distribute-Delay | 
+| Server   | In-memory running, snapshot persistence (automatic, offline, manual)                        |           
 
 
 ## Features

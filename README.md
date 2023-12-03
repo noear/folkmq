@@ -52,7 +52,7 @@
 | Producer | Publish messages (Qos0, Qos1), publish timed messages (Qos0, Qos1), publish retry           |     
 |          |                                                                                             |       
 | Consumer | Subscribe, unsubscribe                                                                      |        
-| Consumer | Consume-ACK                                                                                 |      
+| Consumer | Consume-ACK (automatic, manual)                                                             |      
 |          |                                                                                             |     
 | Server   | Publish-Confirm, Subscribe-Confirm, Unsubscribe-Confirm, Distribute-Retry, Distribute-Delay | 
 | Server   | In-memory running, snapshot persistence (automatic, offline, manual)                        |           

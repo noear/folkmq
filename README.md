@@ -149,7 +149,7 @@ See：[《API.md》](API.md)
 
 ## Architecture diagram
 
-<img src="folkmq_schema.png" width="500" />
+<img src="folkmq_schema.png" width="600" />
 
 
 

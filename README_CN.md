@@ -149,4 +149,4 @@ public class ClientDemo1 {
 
 ## 架构图
 
-<img src="folkmq_schema.png" width="500" />
+<img src="folkmq_schema.png" width="600" />

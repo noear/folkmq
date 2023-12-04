@@ -6,6 +6,10 @@
 </p>
 
 <p align="center">
+	<a href="https://folkmq.noear.org/">https://folkmq.noear.org</a>
+</p>
+
+<p align="center">
     <a target="_blank" href="https://search.maven.org/artifact/org.noear/folkmq">
         <img src="https://img.shields.io/maven-central/v/org.noear/folkmq.svg?label=Maven%20Central" alt="Maven" />
     </a>
@@ -67,9 +71,6 @@
 
 //使用 MacBook pro 2020 + JDK8 本机测试，单客户端发与收（跑分难免有波动，我是选了好看点的）
 
-* 简单的管理后台
-
-<img src="DEV-PREVIEW.png" width="600" />
 
 ### 加入到社区交流群
 
@@ -85,69 +86,13 @@
 * 成果展示：[《[FolkMQ] 一个新的内存型消息队列（快，特别的快）》](https://www.bilibili.com/video/BV1mc411D7pY/)
 * 快速入门：[《FolkMQ - Helloworld 入门》](https://www.bilibili.com/video/BV1Yj411L7fB/)
 
-## 你好世界！
+### 官网
 
-### 1、启动服务 (更多部署参考：[部署说明](deploy))
+https://folkmq.noear.org
 
-```
-docker run -p 18602:18602 -p 8602:8602 noearorg/folkmq-server:1.0.14 
-```
+### 特别感谢JetBrains对开源项目支持
 
-### 2、编写客户端代码
+<a href="https://jb.gg/OpenSourceSupport">
+  <img src="https://user-images.githubusercontent.com/8643542/160519107-199319dc-e1cf-4079-94b7-01b6b8d23aa6.png" align="left" height="100" width="100"  alt="JetBrains">
+</a>
 
-* maven import
-
-```xml
-<dependencies>
-    <!-- 可选包：java-tcp（90kb左右）, smartsocket（260Kb左右）, netty（2.5Mb左右） -->
-    <dependency>
-        <groupId>org.noear</groupId>
-        <artifactId>folkmq-transport-java-tcp</artifactId>
-        <version>1.0.14</version>
-    </dependency>
-</dependencies>
-```
-
-
-* client(consumer + producer) use
-
-```java
-public class ClientDemo1 {
-    public static void main(String[] args) throws Exception {
-        //客户端（鉴权为可选。服务端，不添加则不鉴权）
-        MqClient client = FolkMQ.createClient("folkmq://127.0.0.1:18602?ak=folkmq&sk=YapLHTx19RlsEE16")
-                .connect();
-
-        //订阅（consumer = ip or cluster name）
-        client.subscribe("demo", "demoapp", message -> {
-            System.out.println(message);
-        });
-
-        //发布
-        client.publish("demo", new MqMessage("helloworld!"));
-    }
-}
-```
-
-## 消费自动重试与延时策略
-
-| 派发次数 | 自动延时 |            |
-|------|------|------------|
-| 0    | 0s   | 相当于马上发     |
-| 1    | 5s   |            |
-| 2    | 30s  |            |
-| 3    | 3m   |            |
-| 4    | 9m   |            |
-| 5    | 15m  |            |
-| 6    | 30m  |            |
-| 7    | 1h   |            |
-| n..  | 2h   | 第8次之后都是2小时 |
-
-
-## 客户端主要接口字典
-
-详见：[《API.md》](API.md)
-
-## 架构图
-
-<img src="folkmq_schema.png" width="600" />

@@ -6,6 +6,10 @@
 </p>
 
 <p align="center">
+	<a href="https://folkmq.noear.org/">https://folkmq.noear.org</a>
+</p>
+
+<p align="center">
     <a target="_blank" href="https://search.maven.org/artifact/org.noear/folkmq">
         <img src="https://img.shields.io/maven-central/v/org.noear/folkmq.svg?label=Maven%20Central" alt="Maven" />
     </a>
@@ -66,9 +70,7 @@
 
 //Using MacBook pro 2020 + JDK8 native test, single client sending and receiving (running points inevitably have fluctuations, I chose the better one)
 
-* Simple management
 
-<img src="DEV-PREVIEW.png" width="600" />
 
 ### Join a community exchange group
 
@@ -84,72 +86,18 @@
 * Presentation of results：[《[FolkMQ] 一个新的内存型消息队列（快，特别的快）》](https://www.bilibili.com/video/BV1mc411D7pY/)
 * Quick start：[《FolkMQ - Helloworld 入门》](https://www.bilibili.com/video/BV1Yj411L7fB/)
 
-## Helloworld
+### Official website
 
-### 1、Start the server (more deployment references: [deployment Notes](deploy))
+https://folkmq.noear.org
 
-```
-docker run -p 18602:18602 -p 8602:8602 noearorg/folkmq-server:1.0.14 
-```
+### Special thanks to JetBrains for supporting the open source project
 
-### 2、Write client-side code
-
-* maven import
-
-```xml
-<dependencies>
-    <!-- Optional packages: java-tcp (~ 90kb), smartsocket (~ 260Kb), netty (~ 2.5Mb) -->
-    <dependency>
-        <groupId>org.noear</groupId>
-        <artifactId>folkmq-transport-java-tcp</artifactId>
-        <version>1.0.14</version>
-    </dependency>
-</dependencies>
-```
+<a href="https://jb.gg/OpenSourceSupport">
+  <img src="https://user-images.githubusercontent.com/8643542/160519107-199319dc-e1cf-4079-94b7-01b6b8d23aa6.png" align="left" height="100" width="100"  alt="JetBrains">
+</a>
 
 
-* client(consumer + producer) use
 
-```java
-public class ClientDemo1 {
-    public static void main(String[] args) throws Exception {
-        //Client (Authentication is optional. Server-side, do not add, do not authenticate)
-        MqClient client = FolkMQ.createClient("folkmq://127.0.0.1:18602?ak=folkmq&sk=YapLHTx19RlsEE16")
-                .connect();
-
-        //Subscribe
-        client.subscribe("demo", "demoapp", message -> {
-            System.out.println(message);
-        });
-
-        //Publish
-        client.publish("demo", new MqMessage("helloworld!"));
-    }
-}
-```
-
-## Consume automatic retry and delay policies
-
-| Number of distribution | Automatic delay |            |
-|------|------|------------|
-| 0    | 0s   | It is equivalent to sending out immediately.     |
-| 1    | 5s   |            |
-| 2    | 30s  |            |
-| 3    | 3m   |            |
-| 4    | 9m   |            |
-| 5    | 15m  |            |
-| 6    | 30m  |            |
-| 7    | 1h   |            |
-| n..  | 2h   | It's 2 hours after the 8th time |
-
-
-## Dictionary of main client interfaces
-
-See：[《API.md》](API.md)
-
-## Architecture diagram
-
-<img src="folkmq_schema.png" width="600" />
 
 
 

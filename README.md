@@ -45,7 +45,7 @@
 ## Introduction
 
 * Run in Memory + snapshot persistence + Broker cluster mode (optional)
-* Can add ws, UDP-based communication (and, perhaps, iot)
+* based on [Socket. D development] (https://socketd.noear.org/), it features full support), especially the single connection "multiplex"! Protocols such as udp can also be added
 
 | role     | function                                                                                    | 
 |----------|---------------------------------------------------------------------------------------------|

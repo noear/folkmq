@@ -124,7 +124,7 @@ public class ClientDemo1 {
         });
 
         //发布
-        client.publish("demo", new MqMessage("helloworld!")).get();
+        client.publish("demo", new MqMessage("helloworld!"));
     }
 }
 ```

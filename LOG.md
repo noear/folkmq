@@ -1,4 +1,7 @@
 
+### 1.0.14
+* 拆分 client::publish 为 publish + publishAsync
+
 ### 1.0.13
 * 添加 客户端发布重试 MqClient::publishRetryTimes
 * 调整 客户端发布接口为1个（原来4个），原多参数改为1个实体参数（未来可能还会扩充属性）

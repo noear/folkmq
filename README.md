@@ -123,7 +123,7 @@ public class ClientDemo1 {
         });
 
         //Publish
-        client.publish("demo", new MqMessage("helloworld!")).get();
+        client.publish("demo", new MqMessage("helloworld!"));
     }
 }
 ```

@@ -38,7 +38,7 @@ public class TestCase02_scheduled extends BaseTestCase {
             countDownLatch.countDown();
         }));
 
-        client.publish("demo", new MqMessage("demo1").scheduled(new Date(System.currentTimeMillis() + 5000)));
+        client.publishAsync("demo", new MqMessage("demo1").scheduled(new Date(System.currentTimeMillis() + 5000)));
 
         countDownLatch.await(6, TimeUnit.SECONDS);
 

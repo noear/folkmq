@@ -14,11 +14,11 @@ public class ProducerTest {
 
         //发布预热
         for (int i = 0; i < 100; i++) {
-            client.publish("hot", new MqMessage("hot-" + i)).get();
+            client.publish("hot", new MqMessage("hot-" + i));
         }
 
         for (int i = 0; i < count; i++) {
-            client.publish("test", new MqMessage("test-" + i));
+            client.publishAsync("test", new MqMessage("test-" + i));
         }
     }
 }

@@ -37,7 +37,7 @@ public class TestCase01_send extends BaseTestCase {
             countDownLatch.countDown();
         }));
 
-        client.publish("demo",  new MqMessage("demo1"));
+        client.publishAsync("demo",  new MqMessage("demo1"));
 
         countDownLatch.await(1, TimeUnit.SECONDS);
 

@@ -44,11 +44,11 @@ public class TestCase13_ack_retry_n extends BaseTestCase {
             }
         }));
 
-        client.publish("demo", new MqMessage("demo1"));
-        client.publish("demo",  new MqMessage("demo2"));
-        client.publish("demo",  new MqMessage("demo3"));
-        client.publish("demo",  new MqMessage("demo4"));
-        client.publish("demo",  new MqMessage("demo5"));
+        client.publishAsync("demo", new MqMessage("demo1"));
+        client.publishAsync("demo",  new MqMessage("demo2"));
+        client.publishAsync("demo",  new MqMessage("demo3"));
+        client.publishAsync("demo",  new MqMessage("demo4"));
+        client.publishAsync("demo",  new MqMessage("demo5"));
 
         countDownLatch.await(40, TimeUnit.SECONDS);
 

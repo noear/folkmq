@@ -24,11 +24,11 @@ public class ClientDemo1 {
         //发布
         for (int i = 0; i < 10; i++) {
             Thread.sleep(100);
-            client.publish("demo", new MqMessage("hi-" + i));
-            client.publish("demo2", new MqMessage("hi-" + i));
+            client.publishAsync("demo", new MqMessage("hi-" + i));
+            client.publishAsync("demo2", new MqMessage("hi-" + i));
         }
 
         //延迟五秒
-        client.publish("demo3", new MqMessage("hi-d").scheduled(new Date(System.currentTimeMillis() + 5000)));
+        client.publishAsync("demo3", new MqMessage("hi-d").scheduled(new Date(System.currentTimeMillis() + 5000)));
     }
 }

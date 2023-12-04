@@ -49,10 +49,10 @@ public class MqClientDefault extends EventListener implements MqClientInternal {
 
         //接收派发指令
         on(MqConstants.MQ_EVENT_DISTRIBUTE, (s, m) -> {
-            MqMessageReceived message = null;
+            MqMessageReceivedImpl message = null;
 
             try {
-                message = new MqMessageReceived(this, m);
+                message = new MqMessageReceivedImpl(this, m);
                 MqSubscription subscription = subscriptionMap.get(message.getTopic());
 
                 if (subscription != null) {
@@ -157,44 +157,15 @@ public class MqClientDefault extends EventListener implements MqClientInternal {
         }
     }
 
-    /**
-     * 发布消息
-     *
-     * @param topic     主题
-     * @param message   消息
-     */
     @Override
-    public CompletableFuture<?> publish(String topic, IMqMessage message) throws IOException {
+    public void publish(String topic, IMqMessage message) throws IOException {
         if (clientSession == null) {
             throw new SocketdConnectionException("Not connected!");
         }
 
-        //构建消息实体
-        StringEntity entity = new StringEntity(message.getContent());
-        entity.meta(MqConstants.MQ_META_TID, message.getTid());
-        entity.meta(MqConstants.MQ_META_TOPIC, topic);
-        entity.meta(MqConstants.MQ_META_QOS, (message.getQos() == 0 ? "0" : "1"));
-        if (message.getScheduled() == null) {
-            entity.meta(MqConstants.MQ_META_SCHEDULED, "0");
-        } else {
-            entity.meta(MqConstants.MQ_META_SCHEDULED, String.valueOf(message.getScheduled().getTime()));
-        }
-        entity.at(MqConstants.BROKER_AT_SERVER);
+        Entity entity = publishEntityBuild(topic, message);
 
-        //执行
-        return publishDo(entity, message.getQos());
-    }
-
-    /**
-     * 执行消息发布
-     *
-     * @param qos    qos
-     * @param entity 消息实体
-     */
-    private CompletableFuture<?> publishDo(StringEntity entity, int qos) throws IOException {
-        CompletableFuture<?> future = new CompletableFuture<>();
-
-        if (qos > 0) {
+        if (message.getQos() > 0) {
             //::Qos1
             if (publishRetryTimes > 0) {
                 //采用同步 + 重试支持
@@ -204,7 +175,6 @@ public class MqClientDefault extends EventListener implements MqClientInternal {
                         Entity resp = clientSession.sendAndRequest(MqConstants.MQ_EVENT_PUBLISH, entity);
                         int confirm = Integer.parseInt(resp.metaOrDefault(MqConstants.MQ_META_CONFIRM, "0"));
                         if (confirm == 1) {
-                            future.complete(null);
                             break;
                         } else {
                             String messsage = "Client message publish confirm failed: " + resp.dataAsString();
@@ -218,24 +188,63 @@ public class MqClientDefault extends EventListener implements MqClientInternal {
                     }
                 }
             } else {
-                //采用异常 + 可选等待
-                clientSession.sendAndRequest(MqConstants.MQ_EVENT_PUBLISH, entity, r -> {
-                    int confirm = Integer.parseInt(r.metaOrDefault(MqConstants.MQ_META_CONFIRM, "0"));
-                    if (confirm == 1) {
-                        future.complete(null);
-                    } else {
-                        String messsage = "Client message publish confirm failed: " + r.dataAsString();
-                        future.completeExceptionally(new FolkmqException(messsage));
-                    }
-                });
+
             }
         } else {
             //::Qos0
             clientSession.send(MqConstants.MQ_EVENT_PUBLISH, entity);
-            future.complete(null);
+        }
+    }
+
+    /**
+     * 发布消息
+     *
+     * @param topic   主题
+     * @param message 消息
+     */
+    @Override
+    public CompletableFuture<Boolean> publishAsync(String topic, IMqMessage message) throws IOException {
+        if (clientSession == null) {
+            throw new SocketdConnectionException("Not connected!");
+        }
+
+        CompletableFuture<Boolean> future = new CompletableFuture<>();
+        Entity entity = publishEntityBuild(topic, message);
+
+        if (message.getQos() > 0) {
+            //采用异常 + 可选等待
+            clientSession.sendAndRequest(MqConstants.MQ_EVENT_PUBLISH, entity, r -> {
+                int confirm = Integer.parseInt(r.metaOrDefault(MqConstants.MQ_META_CONFIRM, "0"));
+                if (confirm == 1) {
+                    future.complete(true);
+                } else {
+                    String messsage = "Client message publish confirm failed: " + r.dataAsString();
+                    future.completeExceptionally(new FolkmqException(messsage));
+                }
+            });
+        } else {
+            //::Qos0
+            clientSession.send(MqConstants.MQ_EVENT_PUBLISH, entity);
+            future.complete(true);
         }
 
         return future;
+    }
+
+    private Entity publishEntityBuild(String topic, IMqMessage message) {
+        //构建消息实体
+        StringEntity entity = new StringEntity(message.getContent());
+        entity.meta(MqConstants.MQ_META_TID, message.getTid());
+        entity.meta(MqConstants.MQ_META_TOPIC, topic);
+        entity.meta(MqConstants.MQ_META_QOS, (message.getQos() == 0 ? "0" : "1"));
+        if (message.getScheduled() == null) {
+            entity.meta(MqConstants.MQ_META_SCHEDULED, "0");
+        } else {
+            entity.meta(MqConstants.MQ_META_SCHEDULED, String.valueOf(message.getScheduled().getTime()));
+        }
+        entity.at(MqConstants.BROKER_AT_SERVER);
+
+        return entity;
     }
 
     /**
@@ -245,7 +254,7 @@ public class MqClientDefault extends EventListener implements MqClientInternal {
      * @param isOk    回执
      */
     @Override
-    public void acknowledge(MqMessageReceived message, boolean isOk) throws IOException {
+    public void acknowledge(MqMessageReceivedImpl message, boolean isOk) throws IOException {
         //发送“回执”，向服务端反馈消费情况
         if (message.getQos() > 0) {
             //此处用 replyEnd 不安全，时间长久可能会话断连过（流就无效了）

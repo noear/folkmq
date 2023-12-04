@@ -44,7 +44,7 @@ public class TestCase03_ack_retry extends BaseTestCase {
             }
         }));
 
-        client.publish("demo", new MqMessage("demo1"));
+        client.publishAsync("demo", new MqMessage("demo1"));
 
         countDownLatch.await(40, TimeUnit.SECONDS);
 

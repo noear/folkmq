@@ -52,7 +52,7 @@ public class MqSubscription implements MqConsumeHandler {
      * @param message 收到的消息
      */
     @Override
-    public void consume(IMqMessageReceived message) throws IOException {
+    public void consume(MqMessageReceived message) throws IOException {
         consumerHandler.consume(message);
     }
 }

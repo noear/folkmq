@@ -39,7 +39,7 @@ public class TestCase09_persistent extends BaseTestCase {
             countDownLatch.countDown();
         }));
 
-        client.publish("demo", new MqMessage("demo0")).get(); //停连前，确保发完了
+        client.publish("demo", new MqMessage("demo0")); //停连前，确保发完了
         Thread.sleep(100);//确保上面的消费完成
         client.disconnect();
         Thread.sleep(100);//确保断连
@@ -53,8 +53,8 @@ public class TestCase09_persistent extends BaseTestCase {
         client.connect(); //新的会话
         client.unsubscribe("demo", "127.0.0.1"); //取消订阅； 为了不马上被派发掉
         Thread.sleep(100); //确保完成取消订阅了
-        client.publish("demo", new MqMessage("demo1")).get();
-        client.publish("demo", new MqMessage("demo2")).get();
+        client.publish("demo", new MqMessage("demo1"));
+        client.publish("demo", new MqMessage("demo2"));
 
         Thread.sleep(100);//确保断连
 
@@ -72,7 +72,7 @@ public class TestCase09_persistent extends BaseTestCase {
             countDownLatch.countDown();
         }));
 
-        client.publish("demo", new MqMessage("demo3")).get();
+        client.publish("demo", new MqMessage("demo3"));
 
         Thread.sleep(100);
 

@@ -1,6 +1,7 @@
 package org.noear.folkmq.client;
 
 import org.noear.socketd.transport.client.ClientConfigHandler;
+import org.noear.socketd.utils.IoConsumer;
 
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
@@ -38,7 +39,7 @@ public interface MqClient {
      * 发布重试
      *
      * @param times 次数（默认为 0）
-     * */
+     */
     MqClient publishRetryTimes(int times);
 
     /**
@@ -59,10 +60,18 @@ public interface MqClient {
     void unsubscribe(String topic, String consumer) throws IOException;
 
     /**
-     * 发布消息
+     * 同步发布消息
      *
-     * @param topic     主题
-     * @param message   消息
+     * @param topic   主题
+     * @param message 消息
      */
-    CompletableFuture<?> publish(String topic, IMqMessage message) throws IOException;
+    void publish(String topic, IMqMessage message) throws IOException;
+
+    /**
+     * 异步发布消息
+     *
+     * @param topic   主题
+     * @param message 消息
+     */
+    CompletableFuture<Boolean> publishAsync(String topic, IMqMessage message) throws IOException;
 }

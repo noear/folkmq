@@ -46,11 +46,11 @@ public class TestCase14_qos0_n extends BaseTestCase {
             }
         }));
 
-        client.publish("demo", new MqMessage("demo1").qos(0));
-        client.publish("demo", new MqMessage("demo2").qos(0));
-        client.publish("demo", new MqMessage("demo3").qos(0));
-        client.publish("demo", new MqMessage("demo4").qos(0));
-        client.publish("demo", new MqMessage("demo5").qos(0));
+        client.publishAsync("demo", new MqMessage("demo1").qos(0));
+        client.publishAsync("demo", new MqMessage("demo2").qos(0));
+        client.publishAsync("demo", new MqMessage("demo3").qos(0));
+        client.publishAsync("demo", new MqMessage("demo4").qos(0));
+        client.publishAsync("demo", new MqMessage("demo5").qos(0));
 
         countDownLatch.await(40, TimeUnit.SECONDS);
 

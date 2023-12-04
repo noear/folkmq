@@ -38,11 +38,11 @@ public class TestCase12_scheduled_n extends BaseTestCase {
             countDownLatch.countDown();
         }));
 
-        client.publish("demo", new MqMessage("demo1").scheduled(new Date(System.currentTimeMillis() + 5000)));
-        client.publish("demo", new MqMessage("demo2").scheduled(new Date(System.currentTimeMillis() + 5000)));
-        client.publish("demo", new MqMessage("demo3").scheduled(new Date(System.currentTimeMillis() + 5000)));
-        client.publish("demo", new MqMessage("demo4").scheduled(new Date(System.currentTimeMillis() + 5000)));
-        client.publish("demo", new MqMessage("demo5").scheduled(new Date(System.currentTimeMillis() + 5000)));
+        client.publishAsync("demo", new MqMessage("demo1").scheduled(new Date(System.currentTimeMillis() + 5000)));
+        client.publishAsync("demo", new MqMessage("demo2").scheduled(new Date(System.currentTimeMillis() + 5000)));
+        client.publishAsync("demo", new MqMessage("demo3").scheduled(new Date(System.currentTimeMillis() + 5000)));
+        client.publishAsync("demo", new MqMessage("demo4").scheduled(new Date(System.currentTimeMillis() + 5000)));
+        client.publishAsync("demo", new MqMessage("demo5").scheduled(new Date(System.currentTimeMillis() + 5000)));
 
         countDownLatch.await(6, TimeUnit.SECONDS);
 

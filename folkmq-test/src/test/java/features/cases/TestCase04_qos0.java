@@ -46,7 +46,7 @@ public class TestCase04_qos0 extends BaseTestCase {
             }
         }));
 
-        client.publish("demo", new MqMessage("demo1").qos(0));
+        client.publishAsync("demo", new MqMessage("demo1").qos(0));
 
         countDownLatch.await(40, TimeUnit.SECONDS);
 

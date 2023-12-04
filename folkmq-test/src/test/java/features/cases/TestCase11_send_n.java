@@ -37,11 +37,11 @@ public class TestCase11_send_n extends BaseTestCase {
             countDownLatch.countDown();
         }));
 
-        client.publish("demo", new MqMessage("demo1"));
-        client.publish("demo", new MqMessage("demo2"));
-        client.publish("demo", new MqMessage("demo3"));
-        client.publish("demo", new MqMessage("demo4"));
-        client.publish("demo", new MqMessage("demo5"));
+        client.publishAsync("demo", new MqMessage("demo1"));
+        client.publishAsync("demo", new MqMessage("demo2"));
+        client.publishAsync("demo", new MqMessage("demo3"));
+        client.publishAsync("demo", new MqMessage("demo4"));
+        client.publishAsync("demo", new MqMessage("demo5"));
 
         countDownLatch.await(1, TimeUnit.SECONDS);
 

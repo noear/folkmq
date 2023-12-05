@@ -40,7 +40,7 @@
         </menu>
     </left>
     <right class="frm">
-        <iframe src="/admin/topic" frameborder="0" name="dock"></iframe>
+        <iframe src="/admin/session" frameborder="0" name="dock"></iframe>
     </right>
 </main>
 </body>

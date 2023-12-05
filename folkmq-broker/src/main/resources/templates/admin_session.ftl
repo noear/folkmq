@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html class="frm10">
 <head>
-    <title>${app} - 查看主题</title>
+    <title>${app} - 查看会话</title>
     <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico"/>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8 "/>
     <link rel="stylesheet" href="${css}/main.css"/>
@@ -13,22 +13,22 @@
 </head>
 <body>
 <toolbar class="blockquote">
-    <left>主题</left>
+    <left>会话</left>
     <right></right>
 </toolbar>
 <datagrid class="list">
     <table>
         <thead>
         <tr>
-            <td width="200px" class="left">主题</td>
-            <td class="left">订阅队列</td>
+            <td width="300px" class="left">名字</td>
+            <td class="left">会话数量</td>
         </tr>
         </thead>
         <tbody id="tbody">
         <#list list as item>
             <tr>
-                <td class="left">${item.topic}</td>
-                <td class="left break">${item.queueList}</td>
+                <td class="left">${item.name}</td>
+                <td class="left break">${item.sessionCount}</td>
             </tr>
         </#list>
         </tbody>

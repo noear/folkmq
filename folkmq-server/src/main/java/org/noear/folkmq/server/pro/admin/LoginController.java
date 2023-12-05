@@ -67,14 +67,11 @@ public class LoginController extends BaseController {
 
         String captchaOfSessoin = ctx.sessionOrDefault("Validation_String", "");
         if (captcha.equalsIgnoreCase(captchaOfSessoin) == false) {
-            log.info("userName={}, captcha={}, captchaOfSessoin={}", userName, captcha, captchaOfSessoin);
             return Result.failure("提示：验证码错误！");
         }
 
         //用户登录
         if (adminUser.equals(userName) && adminPassword.equals(passWord)) {
-            log.info("userName={}, ip={}, 登录成功...", userName, ctx.realIp());
-
             //1.用户登录::成功
             ctx.sessionSet("Logined", "1");
 

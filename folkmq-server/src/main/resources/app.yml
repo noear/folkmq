@@ -24,12 +24,13 @@ solon.logging.logger:
     level: WARN
 
 
-folkmq.admin: admin
-folkmq.snapshot:
-  enable: true
-  save900: 1
-  save300: 10
-  save100: 10000
+folkmq:
+  admin: admin
+  snapshot:
+    enable: true
+    save900: 1
+    save300: 10
+    save100: 10000
 
 
 #folkmq.broker: "sd:tcp://127.0.0.1:18602?@=folkmq-server"

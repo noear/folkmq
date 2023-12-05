@@ -1,14 +1,12 @@
 package org.noear.folkmq.server.pro.admin;
 
 import org.noear.folkmq.FolkMQ;
-import org.noear.solon.annotation.Singleton;
 import org.noear.solon.core.handle.ModelAndView;
 
 /**
  * @author noear
  * @since 1.0
  */
-@Singleton(false)
 public abstract class BaseController {
 
     /*

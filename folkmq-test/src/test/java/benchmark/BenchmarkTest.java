@@ -8,6 +8,7 @@ import org.noear.folkmq.server.MqServerDefault;
 
 import java.util.concurrent.CountDownLatch;
 
+//单连接单线程发
 public class BenchmarkTest {
     public static void main(String[] args) throws Exception {
         //服务端
@@ -16,7 +17,7 @@ public class BenchmarkTest {
                 .start(18602);
 
         Thread.sleep(1000);
-        int count = 1000_000;
+        int count = 100_000;
         CountDownLatch countDownLatch = new CountDownLatch(count);
 
         //客户端

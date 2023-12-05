@@ -20,6 +20,9 @@ solon.logging.logger:
   "io.netty":
     level: WARN
 
+folkmq:
+  admin: admin
+
 #folkmq.access:
 #  user1 : "YapLHTx19RlsEE16"
 #  user2 : "YapLHTx19RlsEE16"

@@ -16,6 +16,9 @@ import org.noear.solon.core.bean.LifecycleBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author noear
  * @since 1.0
@@ -28,7 +31,9 @@ public class FolkmqLifecycleBean implements LifecycleBean {
     private AppContext appContext;
 
     private MqServer localServer;
-    private Session brokerSession;
+
+    private MqServiceListener brokerServiceListener;
+    private List<Session> brokerSessions;
 
     @Override
     public void start() throws Throwable {
@@ -49,36 +54,56 @@ public class FolkmqLifecycleBean implements LifecycleBean {
         appContext.wrapAndPut(MqWatcherSnapshotPlus.class, snapshotPlus);
 
         if (Utils.isEmpty(brokerServer)) {
-            //服务端（鉴权为可选。不添加则不鉴权）
-            localServer = FolkMQ.createServer()
-                    .addAccessAll(Solon.cfg().getMap("folkmq.access."));
-
-            if (saveEnable) {
-                localServer.watcher(snapshotPlus);
-            }
-
-            localServer.start(Solon.cfg().serverPort() + 10000);
-
-            //加入容器
-            appContext.wrapAndPut(MqServiceInternal.class, localServer.getServerInternal());
-
-            log.info("FlokMQ local server started!");
+            startLocalServerMode(saveEnable, snapshotPlus);
         } else {
-            MqServiceListener serviceListener = new MqServiceListener(true);
-
-            if (saveEnable) {
-                serviceListener.watcher(snapshotPlus);
-            }
-
-            brokerSession = SocketD.createClient(brokerServer)
-                    .listen(serviceListener)
-                    .open();
-
-            //加入容器
-            appContext.wrapAndPut(MqServiceInternal.class, serviceListener);
-
-            log.info("FlokMQ broker service started!");
+            startBrokerSession(brokerServer, saveEnable, snapshotPlus);
         }
+    }
+
+    private void startLocalServerMode(boolean saveEnable, MqWatcherSnapshotPlus snapshotPlus) throws Exception {
+        //服务端（鉴权为可选。不添加则不鉴权）
+        localServer = FolkMQ.createServer()
+                .addAccessAll(Solon.cfg().getMap("folkmq.access."));
+
+        if (saveEnable) {
+            localServer.watcher(snapshotPlus);
+        }
+
+        localServer.start(Solon.cfg().serverPort() + 10000);
+
+        //加入容器
+        appContext.wrapAndPut(MqServiceInternal.class, localServer.getServerInternal());
+
+        log.info("FlokMQ local server started!");
+    }
+
+    private void startBrokerSession(String brokerServers, boolean saveEnable, MqWatcherSnapshotPlus snapshotPlus) throws Exception {
+        brokerSessions = new ArrayList<>();
+        brokerServiceListener = new MqServiceListener(true);
+
+
+        if (saveEnable) {
+            brokerServiceListener.watcher(snapshotPlus);
+        }
+
+        //同时支持：Broker 和 Multi-Broker
+        for (String server : brokerServers.split(",")) {
+            server = server.trim();
+
+            if (Utils.isNotEmpty(server)) {
+                Session session = SocketD.createClient(server)
+                        .listen(brokerServiceListener)
+                        .open();
+
+                brokerSessions.add(session);
+            }
+        }
+
+
+        //加入容器
+        appContext.wrapAndPut(MqServiceInternal.class, brokerServiceListener);
+
+        log.info("FlokMQ broker service started!");
     }
 
     @Override
@@ -88,8 +113,13 @@ public class FolkmqLifecycleBean implements LifecycleBean {
             localServer.stop();
         }
 
-        if (brokerSession != null) {
-            brokerSession.close();
+        if (brokerSessions != null) {
+            for (Session session : brokerSessions) {
+                session.close();
+            }
+
+            //停止时会触发快照
+            brokerServiceListener.save();
         }
     }
 }

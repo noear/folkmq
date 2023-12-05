@@ -1,7 +1,7 @@
 version: '3.5'
 services:
   folkmq-broker:
-    image: noearorg/folkmq-broker:1.0.14
+    image: noearorg/folkmq-broker:1.0.15
     container_name: folkmq-broker
     ports:
       - 8602:8602
@@ -19,7 +19,7 @@ services:
         aliases:
           - folkmq-broker
   folkmq-server1:
-    image: noearorg/folkmq-server:1.0.14
+    image: noearorg/folkmq-server:1.0.15
     container_name: folkmq-server1
     ports:
       - 8611:8602
@@ -29,7 +29,7 @@ services:
       - ./data/server1:/data
     environment:
       # @=folkmq-server 请勿修改
-      - folkmq.broker=sd:tcp://folkmq-broker:18602?@=folkmq-server
+      - folkmq.broker=folkmq://folkmq-broker:18602?@=folkmq-server
       - TZ=Asia/Shanghai
     depends_on:
       - folkmq-broker
@@ -38,7 +38,7 @@ services:
         aliases:
           - folkmq-server1
   folkmq-server2:
-    image: noearorg/folkmq-server:1.0.14
+    image: noearorg/folkmq-server:1.0.15
     container_name: folkmq-server2
     ports:
       - 8612:8602
@@ -48,7 +48,7 @@ services:
       - ./logs/server2:/logs
     environment:
       # @=folkmq-server 请勿修改
-      - folkmq.broker=sd:tcp://folkmq-broker:18602?@=folkmq-server
+      - folkmq.broker=folkmq://folkmq-broker:18602?@=folkmq-server
       - TZ=Asia/Shanghai
     depends_on:
       - folkmq-broker

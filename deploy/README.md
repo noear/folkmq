@@ -7,8 +7,8 @@
 
 | 镜像                            | 说明                             |
 |-------------------------------|--------------------------------|
-| noearorg/folkmq-server:1.0.14 | 服务端（主端口：8602，消息端口：18602），可独立使用 |
-| noearorg/folkmq-broker:1.0.14 | 代理端（主端口：8602，消息端口：18602）       |
+| noearorg/folkmq-server:1.0.15 | 服务端（主端口：8602，消息端口：18602），可独立使用 |
+| noearorg/folkmq-broker:1.0.15 | 代理端（主端口：8602，消息端口：18602）       |
 
 
 * 可选配置：
@@ -55,7 +55,7 @@ docker-compose -f docker-compose-standalone.yml up
 ### 2、docker 部署方式
 
 ```
-docker run -p 18602:18602 -p 8602:8602 noearorg/folkmq-server:1.0.14 
+docker run -p 18602:18602 -p 8602:8602 noearorg/folkmq-server:1.0.15 
 ```
 
 
@@ -82,3 +82,31 @@ docker-compose -f docker-compose-cluster.yml up
 ### 2、集群架构
 
 FolkMQ 是使用 Socket.D 开发的，集群即为 Socket.D Broker 模式集群。详见：[《Socket.D 集群模式》](https://socketd.noear.org/article/737)
+
+
+## 五、Multi-Broker 模式集群部署说明
+
+这个比较复杂，所以用 jar 形式来表达部署关系。顺带把访问账号也带上
+
+* 启动两个 broker 服务
+
+```
+java -Dserver.port=8601 -Dfolkmq.access.ak1=sk1 -jar folkmq-broker.jar
+java -Dserver.port=8602 -Dfolkmq.access.ak1=sk1 -jar folkmq-broker.jar
+```
+
+* 启动三个 server 服务（连接时多个地址用","隔开）
+
+```
+java -Dserver.port=8101 -Dfolkmq.broker='folkmq://127.0.0.1:18601?@=folkmq-server&ak=ak1&sk=sk1,folkmq://127.0.0.1:18602?@=folkmq-server&ak=ak1&sk=sk1' -jar folkmq-server.jar
+java -Dserver.port=8102 -Dfolkmq.broker='folkmq://127.0.0.1:18601?@=folkmq-server&ak=ak1&sk=sk1,folkmq://127.0.0.1:18602?@=folkmq-server&ak=ak1&sk=sk1' -jar folkmq-server.jar
+java -Dserver.port=8103 -Dfolkmq.broker='folkmq://127.0.0.1:18601?@=folkmq-server&ak=ak1&sk=sk1,folkmq://127.0.0.1:18602?@=folkmq-server&ak=ak1&sk=sk1' -jar folkmq-server.jar
+```
+
+* client 示例（连接时多个地址用","隔开）
+
+```java
+//客户端
+MqClient client = FolkMQ.createClient("folkmq://127.0.0.1:18601?ak=ak1&sk=sk1,folkmq://127.0.0.1:18602?ak=ak1&sk=sk1")
+        .connect();
+```

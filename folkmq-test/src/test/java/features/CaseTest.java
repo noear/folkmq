@@ -73,5 +73,17 @@ public class CaseTest {
         testCase.stop();
     }
 
+    @Test
+    public void TestCase15_send_multi_server() throws Exception {
+        BaseTestCase testCase = new TestCase15_send_multi_server(2015);
+        testCase.start();
+        testCase.stop();
+    }
 
+    @Test
+    public void TestCase16_ack_retry_multi_server() throws Exception {
+        BaseTestCase testCase = new TestCase16_ack_retry_multi_server(2016);
+        testCase.start();
+        testCase.stop();
+    }
 }

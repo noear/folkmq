@@ -35,7 +35,7 @@ public class TestCase09_persistent extends BaseTestCase {
                 .connect();
 
         client.subscribe("demo", "127.0.0.1", ((message) -> {
-            System.out.println(message);
+            System.out.println("::" + message);
             countDownLatch.countDown();
         }));
 
@@ -68,7 +68,7 @@ public class TestCase09_persistent extends BaseTestCase {
         client.connect(); //新的会话
 
         client.subscribe("demo", "127.0.0.1", ((message) -> {
-            System.out.println(message);
+            System.out.println("::" + message);
             countDownLatch.countDown();
         }));
 

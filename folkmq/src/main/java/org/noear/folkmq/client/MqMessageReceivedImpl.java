@@ -2,6 +2,7 @@ package org.noear.folkmq.client;
 
 import org.noear.folkmq.common.MqConstants;
 import org.noear.socketd.transport.core.Message;
+import org.noear.socketd.transport.core.Session;
 
 import java.io.IOException;
 import java.util.Date;
@@ -13,8 +14,9 @@ import java.util.Date;
  * @since 1.0
  */
 public class MqMessageReceivedImpl implements MqMessageReceived {
-    protected final transient MqClientInternal clientInternal;
-    protected final transient Message from;
+    private final transient MqClientInternal clientInternal;
+    private final transient Message from;
+    private final transient Session session;
 
     private final String tid;
     private final String topic;
@@ -23,8 +25,9 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
     private final int qos;
     private final int times;
 
-    public MqMessageReceivedImpl(MqClientInternal clientInternal, Message from) {
+    public MqMessageReceivedImpl(MqClientInternal clientInternal, Session session, Message from) {
         this.clientInternal = clientInternal;
+        this.session = session;
         this.from = from;
 
         this.tid = from.metaOrDefault(MqConstants.MQ_META_TID, "");
@@ -36,7 +39,7 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
         this.scheduled = null;
     }
 
-    public String getConsumer(){
+    public String getConsumer() {
         return from.meta(MqConstants.MQ_META_CONSUMER);
     }
 
@@ -66,7 +69,7 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
 
     @Override
     public Date getScheduled() {
-        return null;
+        return scheduled;
     }
 
     @Override
@@ -88,7 +91,7 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
     @Override
     public void acknowledge(boolean isOk) throws IOException {
         //发送“回执”，向服务端反馈消费情况
-        clientInternal.acknowledge(this, isOk);
+        clientInternal.acknowledge(session, from, this, isOk);
     }
 
     @Override

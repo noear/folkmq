@@ -45,8 +45,6 @@ public class BrokerListenerFolkmq extends BrokerListener {
 
     @Override
     public void onOpen(Session session) throws IOException {
-        super.onOpen(session);
-
         if (serverAccessMap.size() > 0) {
             //如果有 ak/sk 配置，则进行鉴权
             String accessKey = session.param(MqConstants.PARAM_ACCESS_KEY);
@@ -62,6 +60,8 @@ public class BrokerListenerFolkmq extends BrokerListener {
                 return;
             }
         }
+
+        super.onOpen(session);
 
         log.info("Server channel opened, sessionId={}", session.sessionId());
     }

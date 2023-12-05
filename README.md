@@ -62,6 +62,15 @@
 | Server   | In-memory running, snapshot persistence (automatic, offline, manual)                        |           
 
 
+
+## License to Use Software
+
+FolkMQ is a commercial open source software that:
+
+* Standalone deployment, Community Edition features (free for licensed use)
+* Cluster deployment edition, for Enterprise Edition features (paid and licensed)。See：[《Enterprise Edition》](https://folkmq.noear.org/article/edition)
+
+
 ## Features
 
 * Fast, really fast (~ 100_000 TPS). A bit like Redis is to MySql.

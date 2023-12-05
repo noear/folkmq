@@ -73,7 +73,7 @@ FolkMQ is a commercial open source software that:
 
 ## Features
 
-* Fast, really fast (Stand-alone version, ～ 150K TPS). A bit like Redis is to MySql.
+* Fast, really fast (Stand-alone version, ～ 180K TPS). A bit like Redis is to MySql.
 
 <img src="DEV-TEST.png" width="600" />
 

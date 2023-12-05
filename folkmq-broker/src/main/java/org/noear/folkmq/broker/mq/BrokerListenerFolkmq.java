@@ -47,11 +47,6 @@ public class BrokerListenerFolkmq extends BrokerListener {
     public void onOpen(Session session) throws IOException {
         super.onOpen(session);
 
-        String brokerPlayerName = session.name();
-        if (MqConstants.BROKER_AT_SERVER.equals(brokerPlayerName)) {
-            return;
-        }
-
         if (serverAccessMap.size() > 0) {
             //如果有 ak/sk 配置，则进行鉴权
             String accessKey = session.param(MqConstants.PARAM_ACCESS_KEY);

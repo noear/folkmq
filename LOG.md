@@ -1,4 +1,10 @@
 
+### 1.0.15
+* 调整 folkmq-broker 启用鉴权后，对所有连接做鉴权（之前 folkmq-server 是跳过的，不安全）
+* 修复 folkmq-server 在集群模式下没有触发停止快照的问题
+* 添加 folkmq-server 对 multi-broker 集群模式支持
+* 添加 folkmq-client 对 multi-server 地址支持（也对 multi-broker 支持）
+
 ### 1.0.14
 * 拆分 client::publish 为 publish + publishAsync
 

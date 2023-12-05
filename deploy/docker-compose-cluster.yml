@@ -9,6 +9,11 @@ services:
     volumes:
       - ./data/broker:/data
       - ./logs/broker:/logs
+    environment:
+      - folkmq.admin=admin  #管理后台密码（暂时没有管理后台）
+#      - folkmq.access.ak1=sk1 #消息访问账号，可以配置多个
+#      - folkmq.access.ak2=sk2
+      - TZ=Asia/Shanghai
     networks:
       folkmq:
         aliases:
@@ -24,7 +29,8 @@ services:
       - ./data/server1:/data
     environment:
       # @=folkmq-server 请勿修改
-      folkmq.broker: "sd:tcp://folkmq-broker:18602?@=folkmq-server"
+      - folkmq.broker=sd:tcp://folkmq-broker:18602?@=folkmq-server
+      - TZ=Asia/Shanghai
     depends_on:
       - folkmq-broker
     networks:
@@ -42,7 +48,8 @@ services:
       - ./logs/server2:/logs
     environment:
       # @=folkmq-server 请勿修改
-      folkmq.broker: "sd:tcp://folkmq-broker:18602?@=folkmq-server"
+      - folkmq.broker=sd:tcp://folkmq-broker:18602?@=folkmq-server
+      - TZ=Asia/Shanghai
     depends_on:
       - folkmq-broker
     networks:

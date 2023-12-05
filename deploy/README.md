@@ -19,9 +19,6 @@
 |                               |  18602   | 消息端口(tcp)，等于主端口+10000 |
 | `folkmq.admin`                |  admin   | 管理密码                  |
 
-* 添加消息访问账号：
-
-添属性或环境变量，例： `folkmq.access.ak1=sk1`，`folkmq.access.ak2=sk2`
 
 * 支持在主端口上提供 prometheus 监控支持，配置提示：
 
@@ -36,8 +33,15 @@ scrape_configs:
            instance: 'folkmq-server1'
 ```
 
+## 二、添加消息访问账号：
 
-## 二、单机部署说明
+添属性或环境变量，例： `folkmq.access.ak1=sk1`，`folkmq.access.ak2=sk2`
+
+* 单机部署，在 server 上配置
+* 集群部署，在 Broker 上配置
+
+
+## 三、单机部署说明
 
 
 ### 1、docker-compose 部署方式
@@ -64,7 +68,7 @@ docker run -p 18602:18602 -p 8602:8602 noearorg/folkmq-server:1.0.14
 java -jar folkmq-server.jar
 ```
 
-## 三、Broker 模式集群部署说明
+## 四、Broker 模式集群部署说明
 
 
 ### 1、docker-compose 部署方式

@@ -88,7 +88,7 @@ public class FolkmqLifecycleBean implements LifecycleBean {
 
         //同时支持：Broker 和 Multi-Broker
         for (String server : brokerServers.split(",")) {
-            server = server.trim();
+            server = server.trim().replace("folkmq://","sd:tcp://");
 
             if (Utils.isNotEmpty(server)) {
                 Session session = SocketD.createClient(server)

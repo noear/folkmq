@@ -55,7 +55,10 @@ public class MqClientDefault implements MqClientInternal {
     }
 
     private Session getSessionOne() {
-        if (clientSessions.size() == 1) {
+        if (clientSessions.size() == 0) {
+            //没有会话
+            return null;
+        } else if (clientSessions.size() == 1) {
             return clientSessions.get(0);
         } else {
             List<Session> sessions = clientSessions.stream()
@@ -63,8 +66,12 @@ public class MqClientDefault implements MqClientInternal {
                     .collect(Collectors.toList());
 
             if (sessions.size() == 0) {
-                //没有可用的连接
+                //没有会话可用
                 return null;
+            }
+
+            if (sessions.size() == 1) {
+                return sessions.get(0);
             }
 
             //论询处理

@@ -64,7 +64,7 @@ public class AdminController extends BaseController {
             vm.put("licence", "没有或无效许可证");
             vm.put("checkBtnShow", false);
         } else {
-            vm.put("licence", LicenceUtils.getLicence());
+            vm.put("licence", LicenceUtils.getLicence2());
 
             if (LicenceUtils.isAuthorized() == 0) {
                 vm.put("checkBtnShow", true);

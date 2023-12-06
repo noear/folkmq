@@ -25,6 +25,23 @@ public class LicenceUtils {
         return licence;
     }
 
+    public static String getLicence2() {
+        StringBuilder buf = new StringBuilder();
+        String[] ary = getLicence().split("-");
+        for (String s : ary) {
+            if (s.length() > 8) {
+                buf.append(s.substring(0, s.length() - 6) + "******");
+            } else if (s.length() > 6) {
+                buf.append(s.substring(0, s.length() - 4) + "****");
+            } else {
+                buf.append(s.substring(0, s.length() - 2) + "**");
+            }
+            buf.append("-");
+        }
+        buf.setLength(buf.length() - 1);
+        return buf.toString();
+    }
+
     public static boolean isValid() {
         if (Utils.isEmpty(getLicence()) || getLicence().length() != 36) {
             return false;

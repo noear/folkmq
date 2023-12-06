@@ -1,4 +1,7 @@
 ### 1.0.16
+* 添加 folkmq-broker 许可证界面
+* 添加 folkmq-broker 主题看板
+* 优化 folkmq-server 对时序的处理（仅对不同 ms 有序）
 * socket.d 升为 2.1.6
 
 ### 1.0.15

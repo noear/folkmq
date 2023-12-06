@@ -21,7 +21,7 @@
         <thead>
         <tr>
             <td class="left" rowspan="2">队列</td>
-            <td colspan="9">集群消息数量汇总</td>
+            <td colspan="9">集群消息汇总</td>
         </tr>
         <tr>
             <td width="100px" class="center">总数</td>

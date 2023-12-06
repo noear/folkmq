@@ -2,8 +2,8 @@
 <html class="frm10">
 <head>
     <title>${app} - 许可证</title>
-    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico"/>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8 "/>
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico"/>
     <link rel="stylesheet" href="${css}/main.css"/>
     <script src="${js}/lib.js"></script>
     <script src="${js}/layer/layer.js"></script>

@@ -4,11 +4,11 @@ import org.noear.folkmq.broker.admin.dso.LicenceUtils;
 import org.noear.folkmq.broker.admin.model.SessionVo;
 import org.noear.socketd.broker.BrokerListener;
 import org.noear.socketd.transport.core.Session;
-import org.noear.solon.Utils;
 import org.noear.solon.annotation.Controller;
 import org.noear.solon.annotation.Inject;
 import org.noear.solon.annotation.Mapping;
 import org.noear.solon.core.handle.ModelAndView;
+import org.noear.solon.core.handle.Result;
 import org.noear.solon.validation.annotation.Logined;
 import org.noear.solon.validation.annotation.Valid;
 
@@ -32,14 +32,66 @@ public class AdminController extends BaseController {
     public ModelAndView admin() {
         ModelAndView vm = view("admin");
 
-        if (Utils.isEmpty(LicenceUtils.getLicence())) {
-            vm.put("licenceBtn", "无效授权");
+        vm.put("isValid", LicenceUtils.isValid());
+
+        if (LicenceUtils.isValid()) {
+            switch (LicenceUtils.isAuthorized()) {
+                case -1:
+                    vm.put("licenceBtn", "非法授权");
+                    break;
+                case 1:
+                    vm.put("licenceBtn", "正版授权");
+                    break;
+                default:
+                    vm.put("licenceBtn", "授权检测");
+                    break;
+
+            }
         } else {
-            vm.put("licenceBtn", "授权检测");
+            vm.put("licenceBtn", "无效授权");
         }
 
         return vm;
     }
+
+    @Mapping("/admin/licence")
+    public ModelAndView licence() {
+        ModelAndView vm = view("admin_licence");
+
+        vm.put("isAuthorized", false);
+
+        if (LicenceUtils.isValid() == false) {
+            vm.put("licence", "没有或无效许可证");
+            vm.put("checkBtnShow", false);
+        } else {
+            vm.put("licence", LicenceUtils.getLicence());
+
+            if (LicenceUtils.isAuthorized() == 0) {
+                vm.put("checkBtnShow", true);
+            } else {
+                vm.put("checkBtnShow", false);
+            }
+
+            if (LicenceUtils.isAuthorized() == 1) {
+                vm.put("isAuthorized", true);
+                vm.put("subscribeDate", LicenceUtils.getSubscribeDate());
+                vm.put("subscribeMonths", LicenceUtils.getSubscribeMonths());
+                vm.put("consumer", LicenceUtils.getConsumer());
+            }
+        }
+
+        return vm;
+    }
+
+    @Mapping("/admin/licence/ajax/check")
+    public Result licence_check() {
+        if (LicenceUtils.isValid() == false) {
+            return Result.failure(400, "没有或无效许可证");
+        }
+
+        return LicenceUtils.auth();
+    }
+
 
     @Mapping("/admin/session")
     public ModelAndView session() {
@@ -65,18 +117,5 @@ public class AdminController extends BaseController {
         }
 
         return view("admin_session").put("list", list);
-    }
-
-    @Mapping("/admin/licence")
-    public ModelAndView licence() {
-        ModelAndView vm = view("admin_licence");
-
-        if(Utils.isEmpty(LicenceUtils.getLicence())) {
-            vm.put("licence", "没有授权许可证");
-        }else{
-            vm.put("licence", LicenceUtils.getLicence());
-        }
-
-        return vm;
     }
 }

@@ -20,7 +20,7 @@ public class BrokerLifecycleBean implements LifecycleBean {
     private AppContext appContext;
 
     private Server brokerServer;
-    private BrokerListener brokerListener;
+    private BrokerListenerFolkmq brokerListener;
 
     @Override
     public void start() throws Throwable {
@@ -34,7 +34,7 @@ public class BrokerLifecycleBean implements LifecycleBean {
                 .listen(brokerListener)
                 .start();
 
-        appContext.wrapAndPut(BrokerListener.class, brokerListener);
+        appContext.wrapAndPut(BrokerListenerFolkmq.class, brokerListener);
     }
 
     @Override

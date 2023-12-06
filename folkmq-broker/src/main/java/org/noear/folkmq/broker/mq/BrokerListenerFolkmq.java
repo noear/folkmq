@@ -1,14 +1,15 @@
 package org.noear.folkmq.broker.mq;
 
 import org.noear.folkmq.common.MqConstants;
+import org.noear.folkmq.server.MqTopicConsumerQueue;
+import org.noear.folkmq.server.MqTopicConsumerQueueDefault;
 import org.noear.socketd.broker.BrokerListener;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * FolkMq 经纪人监听
@@ -19,6 +20,14 @@ import java.util.Map;
 public class BrokerListenerFolkmq extends BrokerListener {
     //访问账号
     private Map<String, String> accessMap = new HashMap<>();
+
+    //订阅关系表(topicConsumer=>MqTopicConsumerQueue)
+    private Map<String, Set<String>> subscribeMap = new ConcurrentHashMap<>();
+    private Object SUBSCRIBE_LOCK = new Object();
+
+    public Map<String, Set<String>> getSubscribeMap() {
+        return subscribeMap;
+    }
 
     /**
      * 配置访问账号
@@ -83,9 +92,12 @@ public class BrokerListenerFolkmq extends BrokerListener {
     public void onMessage(Session requester, Message message) throws IOException {
         if (MqConstants.MQ_EVENT_SUBSCRIBE.equals(message.event())) {
             //订阅，注册玩家
+            String topic = message.meta(MqConstants.MQ_META_TOPIC);
             String consumer = message.meta(MqConstants.MQ_META_CONSUMER);
             requester.attr(consumer, "1");
             addPlayer(consumer, requester);
+
+            subscribeDo(topic, consumer);
         } else if (MqConstants.MQ_EVENT_UNSUBSCRIBE.equals(message.event())) {
             //取消订阅，注销玩家
             String consumer = message.meta(MqConstants.MQ_META_CONSUMER);
@@ -93,5 +105,15 @@ public class BrokerListenerFolkmq extends BrokerListener {
         }
 
         super.onMessage(requester, message);
+    }
+
+    public void subscribeDo(String topic, String consumer) {
+        String topicConsumer = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER + consumer;
+
+        synchronized (SUBSCRIBE_LOCK) {
+            //以身份进行订阅(topic=>[topicConsumer])
+            Set<String> topicConsumerSet = subscribeMap.computeIfAbsent(topic, n -> Collections.newSetFromMap(new ConcurrentHashMap<>()));
+            topicConsumerSet.add(topicConsumer);
+        }
     }
 }

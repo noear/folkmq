@@ -22,7 +22,7 @@ solon.logging.logger:
 
 folkmq:
   admin: admin
-  licence: "4ADB6163-4026-4AA4-92FA-CAEBA115F30F"
+  licence: ""
 
 #folkmq.access:
 #  user1 : "YapLHTx19RlsEE16"

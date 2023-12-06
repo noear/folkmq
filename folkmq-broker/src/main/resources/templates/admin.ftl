@@ -36,6 +36,7 @@
             <div onclick="$('main').toggleClass('smlmenu');if(window.onMenuHide){window.onMenuHide();}"><i class='fa fa-bars'></i></div>
             <items>
                 <a class='sel' href='/admin/session' target="dock">会话看板</a>
+                <a href='/admin/licence' target="dock">${licenceBtn!}</a>
             </items>
         </menu>
     </left>

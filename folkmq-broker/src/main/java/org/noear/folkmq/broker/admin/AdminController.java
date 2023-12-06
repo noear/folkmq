@@ -1,8 +1,10 @@
 package org.noear.folkmq.broker.admin;
 
+import org.noear.folkmq.broker.admin.dso.LicenceUtils;
 import org.noear.folkmq.broker.admin.model.SessionVo;
 import org.noear.socketd.broker.BrokerListener;
 import org.noear.socketd.transport.core.Session;
+import org.noear.solon.Utils;
 import org.noear.solon.annotation.Controller;
 import org.noear.solon.annotation.Inject;
 import org.noear.solon.annotation.Mapping;
@@ -25,9 +27,18 @@ public class AdminController extends BaseController {
     @Inject
     BrokerListener brokerListener;
 
+
     @Mapping("/admin")
     public ModelAndView admin() {
-        return view("admin");
+        ModelAndView vm = view("admin");
+
+        if (Utils.isEmpty(LicenceUtils.getLicence())) {
+            vm.put("licenceBtn", "无效授权");
+        } else {
+            vm.put("licenceBtn", "授权检测");
+        }
+
+        return vm;
     }
 
     @Mapping("/admin/session")
@@ -56,4 +67,16 @@ public class AdminController extends BaseController {
         return view("admin_session").put("list", list);
     }
 
+    @Mapping("/admin/licence")
+    public ModelAndView licence() {
+        ModelAndView vm = view("admin_licence");
+
+        if(Utils.isEmpty(LicenceUtils.getLicence())) {
+            vm.put("licence", "没有授权许可证");
+        }else{
+            vm.put("licence", LicenceUtils.getLicence());
+        }
+
+        return vm;
+    }
 }

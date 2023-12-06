@@ -61,7 +61,7 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
             //答复（以支持同步的原子性需求。同步或异步，由用户按需控制）
             if (m.isRequest() || m.isSubscribe()) {
                 //发送“确认”，表示服务端收到了
-                s.replyEnd(m, new StringEntity("").meta(MqConstants.MQ_META_CONFIRM,"1"));
+                s.replyEnd(m, new StringEntity("").meta(MqConstants.MQ_META_CONFIRM, "1"));
             }
         });
 
@@ -79,7 +79,7 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
             //答复（以支持同步的原子性需求。同步或异步，由用户按需控制）
             if (m.isRequest() || m.isSubscribe()) {
                 //发送“确认”，表示服务端收到了
-                s.replyEnd(m, new StringEntity("").meta(MqConstants.MQ_META_CONFIRM,"1"));
+                s.replyEnd(m, new StringEntity("").meta(MqConstants.MQ_META_CONFIRM, "1"));
             }
         });
 
@@ -94,7 +94,7 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
             //再答复（以支持同步的原子性需求。同步或异步，由用户按需控制）
             if (m.isRequest() || m.isSubscribe()) { //此判断兼容 Qos0, Qos1
                 //发送“确认”，表示服务端收到了
-                s.replyEnd(m, new StringEntity("").meta(MqConstants.MQ_META_CONFIRM,"1"));
+                s.replyEnd(m, new StringEntity("").meta(MqConstants.MQ_META_CONFIRM, "1"));
             }
         });
 
@@ -104,7 +104,7 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
 
             if (m.isRequest() || m.isSubscribe()) { //此判断兼容 Qos0, Qos1
                 //发送“确认”，表示服务端收到了
-                s.replyEnd(m, new StringEntity("").meta(MqConstants.MQ_META_CONFIRM,"1"));
+                s.replyEnd(m, new StringEntity("").meta(MqConstants.MQ_META_CONFIRM, "1"));
             }
         });
     }
@@ -279,7 +279,7 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
             //::1.构建订阅关系
 
             //以身份进行订阅(topic=>[topicConsumer])
-            Set<String> topicConsumerSet = subscribeMap.computeIfAbsent(topic, n-> Collections.newSetFromMap(new ConcurrentHashMap<>()));
+            Set<String> topicConsumerSet = subscribeMap.computeIfAbsent(topic, n -> Collections.newSetFromMap(new ConcurrentHashMap<>()));
             topicConsumerSet.add(topicConsumer);
 
             //为身份建立队列(topicConsumer=>MqTopicConsumerQueue)
@@ -348,6 +348,9 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
         String scheduledStr = message.meta(MqConstants.MQ_META_SCHEDULED);
         if (Utils.isNotEmpty(scheduledStr)) {
             scheduled = Long.parseLong(scheduledStr);
+        } else {
+            //默认为当前ms（相对于后面者，有个排序作用）
+            scheduled = System.currentTimeMillis();
         }
 
 

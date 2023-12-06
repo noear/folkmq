@@ -61,7 +61,7 @@ public class AdminController extends BaseController {
         vm.put("isAuthorized", false);
 
         if (LicenceUtils.isValid() == false) {
-            vm.put("licence", "没有或无效许可证");
+            vm.put("licence", "没有或无效许可证（请购买正版授权：<a href='https://folkmq.noear.org' target='_blank'>https://folkmq.noear.org</a>）");
             vm.put("checkBtnShow", false);
         } else {
             vm.put("licence", LicenceUtils.getLicence2());
@@ -70,13 +70,15 @@ public class AdminController extends BaseController {
                 vm.put("checkBtnShow", true);
             } else {
                 vm.put("checkBtnShow", false);
-            }
 
-            if (LicenceUtils.isAuthorized() == 1) {
-                vm.put("isAuthorized", true);
-                vm.put("subscribeDate", LicenceUtils.getSubscribeDate());
-                vm.put("subscribeMonths", LicenceUtils.getSubscribeMonths());
-                vm.put("consumer", LicenceUtils.getConsumer());
+                if (LicenceUtils.isAuthorized() == 1) {
+                    vm.put("isAuthorized", true);
+                    vm.put("subscribeDate", LicenceUtils.getSubscribeDate());
+                    vm.put("subscribeMonths", LicenceUtils.getSubscribeMonths());
+                    vm.put("consumer", LicenceUtils.getConsumer());
+                } else {
+                    vm.put("licence", "非法授权（请购买正版授权：<a href='https://folkmq.noear.org' target='_blank'>https://folkmq.noear.org</a>）");
+                }
             }
         }
 

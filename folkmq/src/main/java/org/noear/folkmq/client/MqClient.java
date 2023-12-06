@@ -1,8 +1,8 @@
 package org.noear.folkmq.client;
 
 import org.noear.socketd.transport.client.ClientConfigHandler;
-import org.noear.socketd.utils.IoConsumer;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 
@@ -12,7 +12,7 @@ import java.util.concurrent.CompletableFuture;
  * @author noear
  * @since 1.0
  */
-public interface MqClient {
+public interface MqClient extends Closeable {
     /**
      * 连接
      */

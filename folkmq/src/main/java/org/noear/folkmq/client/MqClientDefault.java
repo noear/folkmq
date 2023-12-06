@@ -10,6 +10,7 @@ import org.noear.socketd.transport.core.Entity;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
 import org.noear.socketd.transport.core.entity.StringEntity;
+import org.noear.socketd.utils.RunUtils;
 import org.noear.socketd.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,11 +34,11 @@ public class MqClientDefault implements MqClientInternal {
     private static final Logger log = LoggerFactory.getLogger(MqClientDefault.class);
 
     //服务端地址
-    private String serverUrl;
+    private final String serverUrl;
     //客户端会话
-    private List<Session> clientSessions;
-    private AtomicInteger clientRoundCounter = new AtomicInteger(0);
-    private MqClientListener clientListener;
+    private final List<Session> clientSessions;
+    private final AtomicInteger clientRoundCounter = new AtomicInteger(0);
+    private final MqClientListener clientListener;
     //客户端配置
     private ClientConfigHandler clientConfigHandler;
     //订阅字典
@@ -293,6 +294,14 @@ public class MqClientDefault implements MqClientInternal {
             //此处用 replyEnd 不安全，时间长久可能会话断连过（流就无效了）
             session.replyEnd(from, new StringEntity("")
                     .meta(MqConstants.MQ_META_ACK, isOk ? "1" : "0"));
+        }
+    }
+
+    @Override
+    public void close() throws IOException {
+        for (Session session : clientSessions) {
+            //某个关闭出错，不影响别的关闭
+            RunUtils.runAndTry(session::close);
         }
     }
 }

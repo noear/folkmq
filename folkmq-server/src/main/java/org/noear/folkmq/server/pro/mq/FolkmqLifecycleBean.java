@@ -5,8 +5,11 @@ import org.noear.folkmq.server.MqServer;
 import org.noear.folkmq.server.MqServiceInternal;
 import org.noear.folkmq.server.MqServiceListener;
 import org.noear.folkmq.server.pro.MqWatcherSnapshotPlus;
+import org.noear.folkmq.server.pro.admin.dso.ViewUtils;
+import org.noear.snack.ONode;
 import org.noear.socketd.SocketD;
 import org.noear.socketd.transport.client.ClientSession;
+import org.noear.socketd.transport.core.entity.StringEntity;
 import org.noear.solon.Solon;
 import org.noear.solon.Utils;
 import org.noear.solon.annotation.Component;
@@ -80,7 +83,15 @@ public class FolkmqLifecycleBean implements LifecycleBean {
     private void startBrokerSession(String brokerServers, boolean saveEnable, MqWatcherSnapshotPlus snapshotPlus) throws Exception {
         brokerServiceListener = new MqServiceListener(true);
 
+        //允许控制台获取队列看板
+        brokerServiceListener.on("admin.view.queue", (s,m)->{
+            if(m.isRequest() || m.isSubscribe()){
+                String json = ONode.stringify(ViewUtils.queueView(brokerServiceListener));
+                s.replyEnd(m, new StringEntity(json));
+            }
+        });
 
+        //快照
         if (saveEnable) {
             brokerServiceListener.watcher(snapshotPlus);
         }

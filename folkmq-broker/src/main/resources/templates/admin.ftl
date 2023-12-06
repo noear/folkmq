@@ -37,6 +37,7 @@
             <items>
                 <a class='sel' href='/admin/session' target="dock">会话看板</a>
                 <a href='/admin/topic' target="dock">主题看板</a>
+                <a href='/admin/queue' target="dock">队列看板</a>
                 <br/><br/>
                 <a href='/admin/licence' target="dock">${licenceBtn!}</a>
             </items>

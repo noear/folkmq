@@ -5,6 +5,7 @@ import org.noear.folkmq.server.MqServiceInternal;
 import org.noear.folkmq.server.MqTopicConsumerQueue;
 import org.noear.folkmq.server.MqTopicConsumerQueueDefault;
 import org.noear.folkmq.server.pro.MqWatcherSnapshotPlus;
+import org.noear.folkmq.server.pro.admin.dso.ViewUtils;
 import org.noear.folkmq.server.pro.admin.model.QueueVo;
 import org.noear.folkmq.server.pro.admin.model.TopicVo;
 import org.noear.socketd.utils.RunUtils;
@@ -73,35 +74,7 @@ public class AdminController extends BaseController {
 
     @Mapping("/admin/queue")
     public ModelAndView queue() {
-        List<MqTopicConsumerQueue> mqTopicConsumerQueues = new ArrayList<>(server.getTopicConsumerMap().values());
-
-        List<QueueVo> list = new ArrayList<>();
-
-        for (MqTopicConsumerQueue tmp : mqTopicConsumerQueues) {
-            MqTopicConsumerQueueDefault queue = (MqTopicConsumerQueueDefault) tmp;
-
-            QueueVo queueVo = new QueueVo();
-            queueVo.queue = queue.getTopic() + MqConstants.SEPARATOR_TOPIC_CONSUMER + queue.getConsumer();
-
-            //queueVo.isAlive = (queue.isAlive());
-            queueVo.state = (queue.state().name());
-            queueVo.sessionCount = (queue.sessionCount());
-            queueVo.messageCount = (queue.messageTotal());
-
-            queueVo.messageDelayedCount1 = queue.messageCounter(1);
-            queueVo.messageDelayedCount2 = queue.messageCounter(2);
-            queueVo.messageDelayedCount3 = queue.messageCounter(3);
-            queueVo.messageDelayedCount4 = queue.messageCounter(4);
-            queueVo.messageDelayedCount5 = queue.messageCounter(5);
-            queueVo.messageDelayedCount6 = queue.messageCounter(6);
-            queueVo.messageDelayedCount7 = queue.messageCounter(7);
-            queueVo.messageDelayedCount8 = queue.messageCounter(8);
-
-
-            list.add(queueVo);
-        }
-
-        list.sort(Comparator.comparing(QueueVo::getQueue));
+        List<QueueVo> list = ViewUtils.queueView(server);
 
         return view("admin_queue").put("list", list);
     }

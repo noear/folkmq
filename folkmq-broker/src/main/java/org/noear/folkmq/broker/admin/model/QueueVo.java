@@ -1,4 +1,4 @@
-package org.noear.folkmq.server.pro.admin.model;
+package org.noear.folkmq.broker.admin.model;
 
 import java.io.Serializable;
 

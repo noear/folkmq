@@ -1,10 +1,11 @@
 package org.noear.folkmq.broker.admin;
 
 import org.noear.folkmq.broker.admin.dso.LicenceUtils;
+import org.noear.folkmq.broker.admin.dso.QueueViewService;
+import org.noear.folkmq.broker.admin.model.QueueVo;
 import org.noear.folkmq.broker.admin.model.SessionVo;
 import org.noear.folkmq.broker.admin.model.TopicVo;
 import org.noear.folkmq.broker.mq.BrokerListenerFolkmq;
-import org.noear.socketd.broker.BrokerListener;
 import org.noear.socketd.transport.core.Session;
 import org.noear.solon.annotation.Controller;
 import org.noear.solon.annotation.Inject;
@@ -28,6 +29,9 @@ import java.util.*;
 public class AdminController extends BaseController {
     @Inject
     BrokerListenerFolkmq brokerListener;
+
+    @Inject
+    QueueViewService queueViewService;
 
 
     @Mapping("/admin")
@@ -129,6 +133,13 @@ public class AdminController extends BaseController {
         return view("admin_topic").put("list", list);
     }
 
+    @Mapping("/admin/queue")
+    public ModelAndView queue() {
+        List<QueueVo> list = new ArrayList<>(queueViewService.getQueueVoMap().values());
+        list.sort(Comparator.comparing(v -> v.queue));
+
+        return view("admin_queue").put("list", list);
+    }
 
     @Mapping("/admin/session")
     public ModelAndView session() {

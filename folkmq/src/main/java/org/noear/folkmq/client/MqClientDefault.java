@@ -3,15 +3,15 @@ package org.noear.folkmq.client;
 import org.noear.folkmq.common.MqConstants;
 import org.noear.folkmq.exception.FolkmqException;
 import org.noear.socketd.SocketD;
+import org.noear.socketd.cluster.ClusterClientSession;
 import org.noear.socketd.exception.SocketdConnectionException;
-import org.noear.socketd.transport.client.Client;
+import org.noear.socketd.exception.SocketdException;
 import org.noear.socketd.transport.client.ClientConfigHandler;
+import org.noear.socketd.transport.client.ClientSession;
 import org.noear.socketd.transport.core.Entity;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
 import org.noear.socketd.transport.core.entity.StringEntity;
-import org.noear.socketd.utils.RunUtils;
-import org.noear.socketd.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 /**
  * 消息客户端默认实现
@@ -34,9 +33,9 @@ public class MqClientDefault implements MqClientInternal {
     private static final Logger log = LoggerFactory.getLogger(MqClientDefault.class);
 
     //服务端地址
-    private final String serverUrl;
+    private final List<String> serverUrls;
     //客户端会话
-    private final List<Session> clientSessions;
+    private ClusterClientSession clientSession;
     private final AtomicInteger clientRoundCounter = new AtomicInteger(0);
     private final MqClientListener clientListener;
     //客户端配置
@@ -49,69 +48,29 @@ public class MqClientDefault implements MqClientInternal {
     //发布重试
     protected int publishRetryTimes = 2;
 
-    public MqClientDefault(String serverUrl) {
-        this.serverUrl = serverUrl.replaceAll("folkmq://", "sd:tcp://");
-        this.clientSessions = new ArrayList<>();
+    public MqClientDefault(String... urls) {
+        this.serverUrls = new ArrayList<>();
         this.clientListener = new MqClientListener(this);
-    }
 
-    private Session getSessionOne() {
-        if (clientSessions.size() == 0) {
-            //没有会话
-            return null;
-        } else if (clientSessions.size() == 1) {
-            return clientSessions.get(0);
-        } else {
-            List<Session> sessions = clientSessions.stream()
-                    .filter(s -> s.isValid())
-                    .collect(Collectors.toList());
-
-            if (sessions.size() == 0) {
-                //没有会话可用
-                return null;
-            }
-
-            if (sessions.size() == 1) {
-                return sessions.get(0);
-            }
-
-            //论询处理
-            int counter = clientRoundCounter.incrementAndGet();
-            int idx = counter % sessions.size();
-            if (counter > 999_999_999) {
-                clientRoundCounter.set(0);
-            }
-            return sessions.get(idx);
+        for (String url : urls) {
+            url = url.replaceAll("folkmq://", "sd:tcp://");
+            serverUrls.add(url);
         }
     }
 
     @Override
     public MqClient connect() throws IOException {
-        for (String server : serverUrl.split(",")) {
-            server = server.trim();
-
-            if (Utils.isNotEmpty(server)) {
-                Client client = SocketD.createClient(server);
-
-                if (clientConfigHandler != null) {
-                    client.config(clientConfigHandler);
-                }
-
-                Session session = client.listen(clientListener).open();
-                clientSessions.add(session);
-            }
-        }
+        clientSession = (ClusterClientSession) SocketD.createClusterClient(serverUrls)
+                .config(clientConfigHandler)
+                .listen(clientListener)
+                .open();
 
         return this;
     }
 
     @Override
     public void disconnect() throws IOException {
-        for (Session session : clientSessions) {
-            session.close();
-        }
-
-        clientSessions.clear();
+        clientSession.close();
     }
 
     @Override
@@ -149,16 +108,18 @@ public class MqClientDefault implements MqClientInternal {
         //支持Qos1
         subscriptionMap.put(topic, subscription);
 
-        for (Session session : clientSessions) {
-            //如果有连接会话
-            Entity entity = new StringEntity("")
-                    .meta(MqConstants.MQ_META_TOPIC, subscription.getTopic())
-                    .meta(MqConstants.MQ_META_CONSUMER, subscription.getConsumer())
-                    .at(MqConstants.BROKER_AT_SERVER_ALL);
+        if (clientSession != null) {
+            for (ClientSession session : clientSession.getSessionAll()) {
+                //如果有连接会话
+                Entity entity = new StringEntity("")
+                        .meta(MqConstants.MQ_META_TOPIC, subscription.getTopic())
+                        .meta(MqConstants.MQ_META_CONSUMER, subscription.getConsumer())
+                        .at(MqConstants.BROKER_AT_SERVER_ALL);
 
-            session.sendAndRequest(MqConstants.MQ_EVENT_SUBSCRIBE, entity);
+                session.sendAndRequest(MqConstants.MQ_EVENT_SUBSCRIBE, entity);
 
-            log.info("Client subscribe successfully: {}#{}, sessionId={}", topic, consumer, session.sessionId());
+                log.info("Client subscribe successfully: {}#{}, sessionId={}", topic, consumer, session.sessionId());
+            }
         }
     }
 
@@ -166,28 +127,30 @@ public class MqClientDefault implements MqClientInternal {
     public void unsubscribe(String topic, String consumer) throws IOException {
         subscriptionMap.remove(topic);
 
-        for (Session session : clientSessions) {
-            //如果有连接会话
-            Entity entity = new StringEntity("")
-                    .meta(MqConstants.MQ_META_TOPIC, topic)
-                    .meta(MqConstants.MQ_META_CONSUMER, consumer)
-                    .at(MqConstants.BROKER_AT_SERVER_ALL);
+        if (clientSession != null) {
+            for (ClientSession session : clientSession.getSessionAll()) {
+                //如果有连接会话
+                Entity entity = new StringEntity("")
+                        .meta(MqConstants.MQ_META_TOPIC, topic)
+                        .meta(MqConstants.MQ_META_CONSUMER, consumer)
+                        .at(MqConstants.BROKER_AT_SERVER_ALL);
 
-            session.sendAndRequest(MqConstants.MQ_EVENT_UNSUBSCRIBE, entity);
+                session.sendAndRequest(MqConstants.MQ_EVENT_UNSUBSCRIBE, entity);
 
-            log.info("Client unsubscribe successfully: {}#{}， sessionId={}", topic, consumer, session.sessionId());
+                log.info("Client unsubscribe successfully: {}#{}， sessionId={}", topic, consumer, session.sessionId());
+            }
         }
     }
 
     @Override
     public void publish(String topic, IMqMessage message) throws IOException {
-        if (clientSessions.size() == 0) {
+        if (clientSession == null) {
             throw new SocketdConnectionException("Not connected!");
         }
 
-        Session session = getSessionOne();
+        ClientSession session = clientSession.getSessionOne();
         if (session == null || session.isValid() == false) {
-            throw new SocketdConnectionException("No connection is available!");
+            throw new SocketdException("No session is available!");
         }
 
         Entity entity = publishEntityBuild(topic, message);
@@ -233,13 +196,13 @@ public class MqClientDefault implements MqClientInternal {
      */
     @Override
     public CompletableFuture<Boolean> publishAsync(String topic, IMqMessage message) throws IOException {
-        if (clientSessions.size() == 0) {
+        if (clientSession == null) {
             throw new SocketdConnectionException("Not connected!");
         }
 
-        Session session = getSessionOne();
+        ClientSession session = clientSession.getSessionOne();
         if (session == null || session.isValid() == false) {
-            throw new SocketdConnectionException("No connection is available!");
+            throw new SocketdException("No session is available!");
         }
 
         CompletableFuture<Boolean> future = new CompletableFuture<>();
@@ -299,9 +262,6 @@ public class MqClientDefault implements MqClientInternal {
 
     @Override
     public void close() throws IOException {
-        for (Session session : clientSessions) {
-            //某个关闭出错，不影响别的关闭
-            RunUtils.runAndTry(session::close);
-        }
+        clientSession.close();
     }
 }

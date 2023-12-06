@@ -6,7 +6,7 @@ import org.noear.folkmq.server.MqServiceInternal;
 import org.noear.folkmq.server.MqServiceListener;
 import org.noear.folkmq.server.pro.MqWatcherSnapshotPlus;
 import org.noear.socketd.SocketD;
-import org.noear.socketd.transport.core.Session;
+import org.noear.socketd.transport.client.ClientSession;
 import org.noear.solon.Solon;
 import org.noear.solon.Utils;
 import org.noear.solon.annotation.Component;
@@ -33,7 +33,7 @@ public class FolkmqLifecycleBean implements LifecycleBean {
     private MqServer localServer;
 
     private MqServiceListener brokerServiceListener;
-    private List<Session> brokerSessions;
+    private ClientSession brokerSession;
 
     @Override
     public void start() throws Throwable {
@@ -78,7 +78,6 @@ public class FolkmqLifecycleBean implements LifecycleBean {
     }
 
     private void startBrokerSession(String brokerServers, boolean saveEnable, MqWatcherSnapshotPlus snapshotPlus) throws Exception {
-        brokerSessions = new ArrayList<>();
         brokerServiceListener = new MqServiceListener(true);
 
 
@@ -86,18 +85,20 @@ public class FolkmqLifecycleBean implements LifecycleBean {
             brokerServiceListener.watcher(snapshotPlus);
         }
 
+        List<String> serverUrls = new ArrayList<>();
+
         //同时支持：Broker 和 Multi-Broker
-        for (String server : brokerServers.split(",")) {
-            server = server.trim().replace("folkmq://","sd:tcp://");
+        for (String url : brokerServers.split(",")) {
+            url = url.trim().replace("folkmq://", "sd:tcp://");
 
-            if (Utils.isNotEmpty(server)) {
-                Session session = SocketD.createClient(server)
-                        .listen(brokerServiceListener)
-                        .open();
-
-                brokerSessions.add(session);
+            if (Utils.isNotEmpty(url)) {
+                serverUrls.add(url);
             }
         }
+
+        brokerSession = SocketD.createClusterClient(serverUrls)
+                .listen(brokerServiceListener)
+                .open();
 
 
         //加入容器
@@ -113,10 +114,8 @@ public class FolkmqLifecycleBean implements LifecycleBean {
             localServer.stop();
         }
 
-        if (brokerSessions != null) {
-            for (Session session : brokerSessions) {
-                session.close();
-            }
+        if (brokerSession != null) {
+            brokerSession.close();
 
             //停止时会触发快照
             brokerServiceListener.save();

@@ -17,8 +17,8 @@ import java.util.Map;
  * @since 1.0
  */
 public class BrokerListenerFolkmq extends BrokerListener {
-    //服务端访问账号
-    private Map<String, String> serverAccessMap = new HashMap<>();
+    //访问账号
+    private Map<String, String> accessMap = new HashMap<>();
 
     /**
      * 配置访问账号
@@ -27,7 +27,7 @@ public class BrokerListenerFolkmq extends BrokerListener {
      * @param accessSecretKey 访问者密钥
      */
     public BrokerListenerFolkmq addAccess(String accessKey, String accessSecretKey) {
-        serverAccessMap.put(accessKey, accessSecretKey);
+        accessMap.put(accessKey, accessSecretKey);
         return this;
     }
 
@@ -38,14 +38,14 @@ public class BrokerListenerFolkmq extends BrokerListener {
      */
     public BrokerListenerFolkmq addAccessAll(Map<String, String> accessMap) {
         if (accessMap != null) {
-            serverAccessMap.putAll(accessMap);
+            this.accessMap.putAll(accessMap);
         }
         return this;
     }
 
     @Override
     public void onOpen(Session session) throws IOException {
-        if (serverAccessMap.size() > 0) {
+        if (accessMap.size() > 0) {
             //如果有 ak/sk 配置，则进行鉴权
             String accessKey = session.param(MqConstants.PARAM_ACCESS_KEY);
             String accessSecretKey = session.param(MqConstants.PARAM_ACCESS_SECRET_KEY);
@@ -55,7 +55,7 @@ public class BrokerListenerFolkmq extends BrokerListener {
                 return;
             }
 
-            if (accessSecretKey.equals(serverAccessMap.get(accessKey)) == false) {
+            if (accessSecretKey.equals(accessMap.get(accessKey)) == false) {
                 session.close();
                 return;
             }

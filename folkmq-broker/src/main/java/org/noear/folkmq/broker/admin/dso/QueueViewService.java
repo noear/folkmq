@@ -14,10 +14,7 @@ import org.noear.solon.core.bean.LifecycleBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 
@@ -32,13 +29,27 @@ public class QueueViewService implements LifecycleBean , Runnable {
     @Inject
     private BrokerListenerFolkmq brokerListener;
 
-    private final Map<String, QueueVo> queueVoMap = new ConcurrentHashMap<>();
-    private final Object QUEUE_LOCK = new Object();
+    private Set<String> queueSet = Collections.newSetFromMap(new ConcurrentHashMap<>());
+    private Map<String, QueueVo> queueVoMap = new ConcurrentHashMap<>();
+    private Map<String, QueueVo> queueVoMap2 = new ConcurrentHashMap<>();
+    private Object QUEUE_LOCK = new Object();
 
     private ScheduledFuture<?> scheduledFuture;
 
-    public Map<String, QueueVo> getQueueVoMap() {
-        return queueVoMap;
+    public List<QueueVo> getQueueListVo() {
+        List<QueueVo> list = new ArrayList<>();
+
+        for (String queue : new ArrayList<>(queueSet)) {
+            QueueVo queueVo = queueVoMap.get(queue);
+            if (queueVo == null) {
+                queueVo = new QueueVo();
+                queueVo.queue = queue;
+            }
+
+            list.add(queueVo);
+        }
+
+        return list;
     }
 
     @Override
@@ -54,13 +65,17 @@ public class QueueViewService implements LifecycleBean , Runnable {
             return;
         }
 
+        queueVoMap.clear();
+        queueVoMap.putAll(queueVoMap2);
+        queueVoMap2.clear();
+
         List<Session> sessions = new ArrayList<>(tmp);
         for (Session session : sessions) {
             try {
                 session.sendAndRequest("admin.view.queue", new StringEntity(""), r -> {
                     String json = r.dataAsString();
                     List<QueueVo> list = ONode.loadStr(json).toObjectList(QueueVo.class);
-                    addQueueVo(list);
+                    addQueueVo(list, queueVoMap2);
                 });
             } catch (Throwable e) {
                 log.warn("Cmd 'admin.view.queue' call error", e);
@@ -68,14 +83,16 @@ public class QueueViewService implements LifecycleBean , Runnable {
         }
     }
 
-    private void addQueueVo(List<QueueVo> list) {
+    private void addQueueVo(List<QueueVo> list, Map<String, QueueVo> coll) {
         synchronized (QUEUE_LOCK) {
             for (QueueVo queueVo : list) {
                 if(Utils.isEmpty(queueVo.queue)){
                     continue;
                 }
 
-                QueueVo stat = queueVoMap.computeIfAbsent(queueVo.queue, n -> new QueueVo());
+                queueSet.add(queueVo.queue);
+
+                QueueVo stat = coll.computeIfAbsent(queueVo.queue, n -> new QueueVo());
 
                 stat.queue = queueVo.queue;
                 stat.messageCount += queueVo.messageCount;

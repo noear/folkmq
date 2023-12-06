@@ -135,7 +135,7 @@ public class AdminController extends BaseController {
 
     @Mapping("/admin/queue")
     public ModelAndView queue() {
-        List<QueueVo> list = new ArrayList<>(queueViewService.getQueueVoMap().values());
+        List<QueueVo> list = queueViewService.getQueueListVo();
         list.sort(Comparator.comparing(v -> v.queue));
 
         return view("admin_queue").put("list", list);

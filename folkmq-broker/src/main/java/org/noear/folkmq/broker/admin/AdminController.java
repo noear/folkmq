@@ -9,13 +9,14 @@ import org.noear.folkmq.broker.admin.model.TopicVo;
 import org.noear.folkmq.broker.mq.BrokerListenerFolkmq;
 import org.noear.folkmq.common.MqConstants;
 import org.noear.socketd.transport.core.Session;
-import org.noear.solon.Utils;
+import org.noear.socketd.transport.core.entity.StringEntity;
 import org.noear.solon.annotation.Controller;
 import org.noear.solon.annotation.Inject;
 import org.noear.solon.annotation.Mapping;
 import org.noear.solon.core.handle.ModelAndView;
 import org.noear.solon.core.handle.Result;
 import org.noear.solon.validation.annotation.Logined;
+import org.noear.solon.validation.annotation.NotEmpty;
 import org.noear.solon.validation.annotation.Valid;
 
 import java.io.IOException;
@@ -191,6 +192,7 @@ public class AdminController extends BaseController {
                 }
 
                 ServerVo serverVo = new ServerVo();
+                serverVo.sid = session.sessionId();
                 serverVo.addree = adminAddr + ":" + socketAddress.getPort();
                 serverVo.adminUrl = "http://" + adminAddr + ":" + adminPort + "/admin";
 
@@ -204,5 +206,22 @@ public class AdminController extends BaseController {
         }
 
         return view("admin_server").put("list", list);
+    }
+
+    @Mapping("/admin/server/ajax/save")
+    public Result server_save(@NotEmpty String sid) throws IOException {
+        Collection<Session> tmp = brokerListener.getPlayerAll(MqConstants.BROKER_AT_SERVER);
+
+        if (tmp != null) {
+            List<Session> serverList = new ArrayList<>(tmp);
+            for (Session s1 : serverList) {
+                if (s1.sessionId().equals(sid)) {
+                    s1.send(MqConstants.MQ_EVENT_SAVE, new StringEntity(""));
+                    return Result.succeed();
+                }
+            }
+        }
+
+        return Result.failure("操作失败");
     }
 }

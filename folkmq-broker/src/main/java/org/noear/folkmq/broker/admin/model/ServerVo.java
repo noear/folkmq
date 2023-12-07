@@ -5,8 +5,13 @@ package org.noear.folkmq.broker.admin.model;
  * @since 1.0
  */
 public class ServerVo {
+    public String sid;
     public String addree;
     public String adminUrl;
+
+    public String getSid() {
+        return sid;
+    }
 
     public String getAddree() {
         return addree;

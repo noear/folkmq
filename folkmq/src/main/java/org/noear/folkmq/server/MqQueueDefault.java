@@ -175,7 +175,6 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
                 distributeDo(messageHolder);
             } catch (Throwable e) {
                 //进入延后队列
-                internalRemove(messageHolder);
                 internalAdd(messageHolder.delayed());
 
                 //记日志
@@ -212,15 +211,15 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
         if (messageHolder.getQos() > 0) {
             //::Qos1
 
-            //添加延时任务：2小时后，如果没有回执就重发（即消息最长不能超过2小时）
-            messageHolder.setDistributeTime(System.currentTimeMillis() + MqNextTime.getMaxDelayMillis());
-            internalAdd(messageHolder);
-
-            //给会话发送消息
+            //1.给会话发送消息 //如果有异步，上面会加入队列
             s1.sendAndRequest(MqConstants.MQ_EVENT_DISTRIBUTE, messageHolder.getContent(), m -> {
                 int ack = Integer.parseInt(m.metaOrDefault(MqConstants.MQ_META_ACK, "0"));
                 acknowledgeDo(messageHolder, ack);
             });
+
+            //2.添加延时任务：2小时后，如果没有回执就重发（即消息最长不能超过2小时）
+            messageHolder.setDistributeTime(System.currentTimeMillis() + MqNextTime.getMaxDelayMillis());
+            internalAdd(messageHolder);
         } else {
             //::Qos0
             s1.send(MqConstants.MQ_EVENT_DISTRIBUTE, messageHolder.getContent());

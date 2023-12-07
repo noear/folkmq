@@ -77,7 +77,7 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
     public void onStartAfter() {
         RunUtils.asyncAndTry(() -> {
             try {
-                loadTopicConsumerQueue();
+                loadQueue();
             } finally {
                 inLoadProcess.set(false);
             }
@@ -98,10 +98,10 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
 
             ONode subscribeMapJson = ONode.loadStr(subscribeMapJsonStr, Feature.DisThreadLocal);
             for (String topic : subscribeMapJson.obj().keySet()) {
-                ONode topicConsumerList = subscribeMapJson.get(topic);
-                for (ONode topicConsumer : topicConsumerList.ary()) {
-                    String consumer = topicConsumer.getString().split(MqConstants.SEPARATOR_TOPIC_CONSUMER)[1];
-                    serverRef.subscribeDo(topic, consumer, null);
+                ONode oQueueNameList = subscribeMapJson.get(topic);
+                for (ONode oQueueName : oQueueNameList.ary()) {
+                    String consumerGroup = oQueueName.getString().split(MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP)[1];
+                    serverRef.subscribeDo(topic, consumerGroup, null);
                 }
             }
 
@@ -114,7 +114,7 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
     /**
      * 加载主题消费队列记录（确保线程安全）
      */
-    private void loadTopicConsumerQueue() {
+    private void loadQueue() {
         Map<String, Set<String>> subscribeMap = serverRef.getSubscribeMap();
         if (subscribeMap.size() == 0) {
             return;
@@ -122,33 +122,33 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
 
         List<String> topicList = new ArrayList<>(subscribeMap.keySet());
 
-        Set<String> topicConsumerSet = new HashSet<>();
+        Set<String> queueNameSet = new HashSet<>();
         for (String topic : topicList) {
-            Set<String> topicConsumerSetTmp = subscribeMap.get(topic);
-            if (topicConsumerSetTmp != null) {
-                topicConsumerSet.addAll(topicConsumerSetTmp);
+            Set<String> tmp = subscribeMap.get(topic);
+            if (tmp != null) {
+                queueNameSet.addAll(tmp);
             }
         }
 
-        for (String topicConsumer : topicConsumerSet) {
+        for (String queueName : queueNameSet) {
             try {
-                loadTopicConsumerQueue1(topicConsumer);
+                loadQueue1(queueName);
 
-                log.info("Server persistent load messageQueue completed, topicConsumer={}", topicConsumer);
+                log.info("Server persistent load messageQueue completed, queueName={}", queueName);
             } catch (Exception e) {
-                log.warn("Server persistent load messageQueue failed, topicConsumer={}", topicConsumer, e);
+                log.warn("Server persistent load messageQueue failed, queueName={}", queueName, e);
             }
         }
     }
 
-    private boolean loadTopicConsumerQueue1(String topicConsumer) throws IOException {
-        String topicConsumerQueueFileName = topicConsumer.replace(MqConstants.SEPARATOR_TOPIC_CONSUMER, "/") + file_suffix;
-        File topicConsumerQueueFile = new File(directory, topicConsumerQueueFileName);
-        if (topicConsumerQueueFile.exists() == false) {
+    private boolean loadQueue1(String queueName) throws IOException {
+        String queueFileName = queueName.replace(MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP, "/") + file_suffix;
+        File queueFile = new File(directory, queueFileName);
+        if (queueFile.exists() == false) {
             return false;
         }
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(topicConsumerQueueFile))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(queueFile))) {
             while (true) {
                 //一行行读取（避免大 json 坏掉后，全坏了）//也比较省内存
                 String messageJsonStr = reader.readLine();
@@ -178,7 +178,7 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
                         scheduled = Long.parseLong(scheduledStr);
                     }
 
-                    serverRef.exchangeDo(topicConsumer, message, tid, qos, times, scheduled);
+                    serverRef.exchangeDo(queueName, message, tid, qos, times, scheduled);
                 }
             }
 
@@ -210,7 +210,7 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
 
         try {
             saveSubscribeMap();
-            saveTopicConsumerQueue();
+            saveQueue();
         } finally {
             inSaveProcess.set(false);
         }
@@ -249,7 +249,7 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
     /**
      * 保存主题消费队列记录（确保线程安全）
      */
-    private void saveTopicConsumerQueue() {
+    private void saveQueue() {
         Map<String, Set<String>> subscribeMap = serverRef.getSubscribeMap();
         if (subscribeMap.size() == 0) {
             return;
@@ -257,49 +257,49 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
 
         List<String> topicList = new ArrayList<>(subscribeMap.keySet());
 
-        Set<String> topicConsumerSet = new HashSet<>();
+        Set<String> queueNameSet = new HashSet<>();
         for (String topic : topicList) {
-            Set<String> topicConsumerSetTmp = subscribeMap.get(topic);
-            if (topicConsumerSetTmp != null) {
-                topicConsumerSet.addAll(topicConsumerSetTmp);
+            Set<String> tmp = subscribeMap.get(topic);
+            if (tmp != null) {
+                queueNameSet.addAll(tmp);
             }
         }
 
-        Map<String, MqTopicConsumerQueue> topicConsumerMap = serverRef.getTopicConsumerMap();
+        Map<String, MqQueue> queueMap = serverRef.getQueueMap();
 
-        for (String topicConsumer : topicConsumerSet) {
-            MqTopicConsumerQueue topicConsumerQueue = topicConsumerMap.get(topicConsumer);
+        for (String queueName : queueNameSet) {
+            MqQueue queue = queueMap.get(queueName);
 
             try {
-                saveTopicConsumerQueue1(topicConsumer, (MqTopicConsumerQueueDefault) topicConsumerQueue);
+                saveQueue1(queueName, (MqQueueDefault) queue);
 
-                log.info("Server persistent messageQueue completed, topicConsumer={}", topicConsumer);
+                log.info("Server persistent messageQueue completed, queueName={}", queueName);
             } catch (Exception e) {
-                log.warn("Server persistent messageQueue failed, topicConsumer={}", topicConsumer, e);
+                log.warn("Server persistent messageQueue failed, queueName={}", queueName, e);
             }
         }
 
-        log.info("Server persistent saveTopicConsumerQueue completed");
+        log.info("Server persistent saveQueue completed");
     }
 
-    private void saveTopicConsumerQueue1(String topicConsumer, MqTopicConsumerQueueDefault topicConsumerQueue) throws IOException {
-        String[] topicConsumerAry = topicConsumer.split(MqConstants.SEPARATOR_TOPIC_CONSUMER);
-        File topicConsumerQueueDir = new File(directory, topicConsumerAry[0]);
-        if (topicConsumerQueueDir.exists() == false) {
-            topicConsumerQueueDir.mkdirs();
+    private void saveQueue1(String queueName, MqQueueDefault queue) throws IOException {
+        String[] topicConsumerGroupAry = queueName.split(MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP);
+        File topicDir = new File(directory, topicConsumerGroupAry[0]);
+        if (topicDir.exists() == false) {
+            topicDir.mkdirs();
         }
 
-        String topicConsumerQueueFileName = topicConsumerAry[0] + "/" + topicConsumerAry[1] + file_suffix;
-        File topicConsumerQueueFile = new File(directory, topicConsumerQueueFileName);
-        if (topicConsumerQueueFile.exists() == false) {
-            topicConsumerQueueFile.createNewFile();
+        String queueFileName = topicConsumerGroupAry[0] + "/" + topicConsumerGroupAry[1] + file_suffix;
+        File queueFile = new File(directory, queueFileName);
+        if (queueFile.exists() == false) {
+            queueFile.createNewFile();
         }
 
 
-        if (topicConsumerQueue != null) {
-            List<MqMessageHolder> messageList = new ArrayList<>(topicConsumerQueue.getMessageMap().values());
+        if (queue != null) {
+            List<MqMessageHolder> messageList = new ArrayList<>(queue.getMessageMap().values());
 
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter(topicConsumerQueueFile))) {
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(queueFile))) {
                 for (MqMessageHolder messageHolder : messageList) {
                     if (messageHolder.isDone()) {
                         continue;
@@ -320,7 +320,7 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
                 }
             }
         } else {
-            saveSnapshotFile(topicConsumerQueueFile, "");
+            saveSnapshotFile(queueFile, "");
         }
     }
 

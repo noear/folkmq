@@ -7,18 +7,21 @@ import java.util.Vector;
 import java.util.concurrent.atomic.LongAdder;
 
 /**
+ * 队列基类
+ *
  * @author noear
  * @since 1.0
  */
-public abstract class MqTopicConsumerQueueBase implements MqTopicConsumerQueue {
+public abstract class MqQueueBase implements MqQueue {
+    //会话操作锁
     private final Object SESSION_LOCK = new Object();
 
-    //用户会话（多个）
+    //消费者会话列表
     private final List<Session> consumerSessions = new Vector<>();
     //消息计数器
     private final LongAdder[] messageCounters = new LongAdder[9];
 
-    public MqTopicConsumerQueueBase() {
+    public MqQueueBase() {
         //初始化计数器
         for (int i = 0; i < messageCounters.length; i++) {
             messageCounters[i] = new LongAdder();
@@ -28,8 +31,9 @@ public abstract class MqTopicConsumerQueueBase implements MqTopicConsumerQueue {
     /**
      * 消息计数加数
      */
-    public void messageCounterAdd(MqMessageHolder mh) {
+    public void messageCountAdd(MqMessageHolder mh) {
         int n = mh.getDistributeCount();
+
         if (n > 7) {
             messageCounters[8].increment();
         } else {
@@ -40,8 +44,9 @@ public abstract class MqTopicConsumerQueueBase implements MqTopicConsumerQueue {
     /**
      * 消息计数减数
      */
-    public void messageCounterSub(MqMessageHolder mh) {
+    public void messageCountSub(MqMessageHolder mh) {
         int n = mh.getDistributeCount();
+
         if (n > 7) {
             messageCounters[8].decrement();
         } else {
@@ -50,9 +55,9 @@ public abstract class MqTopicConsumerQueueBase implements MqTopicConsumerQueue {
     }
 
     /**
-     * 消息计数器
+     * 获取消息计数
      */
-    public long messageCounter(int n) {
+    public long messageCount(int n) {
         if (n > 7) {
             return messageCounters[8].longValue();
         } else {
@@ -62,7 +67,7 @@ public abstract class MqTopicConsumerQueueBase implements MqTopicConsumerQueue {
 
 
     /**
-     * 会话数量
+     * 消费者会话数量
      */
     public int sessionCount() {
         return consumerSessions.size();
@@ -87,9 +92,12 @@ public abstract class MqTopicConsumerQueueBase implements MqTopicConsumerQueue {
         }
     }
 
-    //单线程的
+    //在锁内执行（是线程安全的）
     private int sessionRoundIdx;
 
+    /**
+     * 获取一个会话（轮询负载均衡）
+     * */
     public Session getSession() {
         //removeSession 可能会对 get(idx) 带来安全，所以锁一下
 

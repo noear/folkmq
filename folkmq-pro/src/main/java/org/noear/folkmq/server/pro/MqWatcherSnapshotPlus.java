@@ -138,14 +138,14 @@ public class MqWatcherSnapshotPlus extends MqWatcherSnapshot {
     }
 
     @Override
-    public void onSubscribe(String topic, String consumer, Session session) {
-        super.onSubscribe(topic, consumer, session);
+    public void onSubscribe(String topic, String consumerGroup, Session session) {
+        super.onSubscribe(topic, consumerGroup, session);
         onChange();
     }
 
     @Override
-    public void onUnSubscribe(String topic, String consumer, Session session) {
-        super.onUnSubscribe(topic, consumer, session);
+    public void onUnSubscribe(String topic, String consumerGroup, Session session) {
+        super.onUnSubscribe(topic, consumerGroup, session);
         onChange();
     }
 
@@ -156,8 +156,8 @@ public class MqWatcherSnapshotPlus extends MqWatcherSnapshot {
     }
 
     @Override
-    public void onAcknowledge(String topic, String consumer, MqMessageHolder messageHolder, boolean isOk) {
-        super.onAcknowledge(topic, consumer, messageHolder, isOk);
+    public void onAcknowledge(String topic, String consumerGroup, MqMessageHolder messageHolder, boolean isOk) {
+        super.onAcknowledge(topic, consumerGroup, messageHolder, isOk);
         onChange();
     }
 

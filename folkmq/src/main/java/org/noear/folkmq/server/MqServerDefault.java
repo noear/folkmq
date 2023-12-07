@@ -34,6 +34,9 @@ public class MqServerDefault implements MqServer {
         return this;
     }
 
+    /**
+     * 配置观察者
+     */
     @Override
     public MqServer watcher(MqWatcher watcher) {
         serverListener.watcher(watcher);
@@ -73,12 +76,14 @@ public class MqServerDefault implements MqServer {
         //创建 SocketD 服务并配置（使用 tpc 通讯）
         server = SocketD.createServer("sd:tcp");
 
+        //配置
         if (serverConfigHandler != null) {
             server.config(serverConfigHandler);
         }
 
         server.config(c -> c.port(port)).listen(serverListener);
 
+        //开始
         serverListener.start(() -> {
             //启动
             server.start();

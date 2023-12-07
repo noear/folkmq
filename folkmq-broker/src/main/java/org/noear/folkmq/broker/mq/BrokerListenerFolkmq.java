@@ -1,8 +1,6 @@
 package org.noear.folkmq.broker.mq;
 
 import org.noear.folkmq.common.MqConstants;
-import org.noear.folkmq.server.MqTopicConsumerQueue;
-import org.noear.folkmq.server.MqTopicConsumerQueueDefault;
 import org.noear.socketd.broker.BrokerListener;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
@@ -93,14 +91,14 @@ public class BrokerListenerFolkmq extends BrokerListener {
         if (MqConstants.MQ_EVENT_SUBSCRIBE.equals(message.event())) {
             //订阅，注册玩家
             String topic = message.meta(MqConstants.MQ_META_TOPIC);
-            String consumer = message.meta(MqConstants.MQ_META_CONSUMER);
+            String consumer = message.meta(MqConstants.MQ_META_CONSUMER_GROUP);
             requester.attr(consumer, "1");
             addPlayer(consumer, requester);
 
             subscribeDo(topic, consumer);
         } else if (MqConstants.MQ_EVENT_UNSUBSCRIBE.equals(message.event())) {
             //取消订阅，注销玩家
-            String consumer = message.meta(MqConstants.MQ_META_CONSUMER);
+            String consumer = message.meta(MqConstants.MQ_META_CONSUMER_GROUP);
             removePlayer(consumer, requester);
         }
 
@@ -108,7 +106,7 @@ public class BrokerListenerFolkmq extends BrokerListener {
     }
 
     public void subscribeDo(String topic, String consumer) {
-        String topicConsumer = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER + consumer;
+        String topicConsumer = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP + consumer;
 
         synchronized (SUBSCRIBE_LOCK) {
             //以身份进行订阅(topic=>[topicConsumer])

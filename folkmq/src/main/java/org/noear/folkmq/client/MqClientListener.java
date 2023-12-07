@@ -43,9 +43,9 @@ public class MqClientListener extends EventListener {
             } catch (Throwable e) {
                 if (message != null) {
                     client.acknowledge(s, m, message, false);
-                    log.warn("Client consumer handle error, tid={}", message.getTid(), e);
+                    log.warn("Client consume handle error, tid={}", message.getTid(), e);
                 } else {
-                    log.warn("Client consumer handle error", e);
+                    log.warn("Client consume handle error", e);
                 }
             }
         });
@@ -64,7 +64,7 @@ public class MqClientListener extends EventListener {
         for (MqSubscription subscription : client.subscriptionMap.values()) {
             Entity entity = new StringEntity("")
                     .meta(MqConstants.MQ_META_TOPIC, subscription.getTopic())
-                    .meta(MqConstants.MQ_META_CONSUMER, subscription.getConsumerGroup())
+                    .meta(MqConstants.MQ_META_CONSUMER_GROUP, subscription.getConsumerGroup())
                     .at(MqConstants.BROKER_AT_SERVER);
 
             session.send(MqConstants.MQ_EVENT_SUBSCRIBE, entity);

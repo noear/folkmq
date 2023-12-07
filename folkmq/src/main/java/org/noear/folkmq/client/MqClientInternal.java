@@ -16,6 +16,7 @@ public interface MqClientInternal extends MqClient {
      * 消费回执
      *
      * @param session 会话
+     * @param from    来源消息
      * @param message 收到的消息
      * @param isOk    回执
      */

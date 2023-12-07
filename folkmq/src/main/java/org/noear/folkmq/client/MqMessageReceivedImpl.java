@@ -64,7 +64,7 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
     }
 
     /**
-     * 定时时间
+     * 计划时间
      */
     @Override
     public Date getScheduled() {
@@ -98,7 +98,7 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
 
     @Override
     public String toString() {
-        return "MqMessage{" +
+        return "MqMessageReceived{" +
                 "tid='" + tid + '\'' +
                 ", topic='" + topic + '\'' +
                 ", content='" + content + '\'' +

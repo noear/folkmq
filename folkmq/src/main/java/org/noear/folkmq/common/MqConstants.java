@@ -24,9 +24,9 @@ public interface MqConstants {
      */
     String MQ_META_QOS = "mq.qos";
     /**
-     * 元信息：消息者
+     * 元信息：消费者组
      */
-    String MQ_META_CONSUMER = "mq.consumer";
+    String MQ_META_CONSUMER_GROUP = "mq.consumer"; //此处不改动，算历史痕迹。保持向下兼容
     /**
      * 元信息：派发次数
      */
@@ -78,7 +78,7 @@ public interface MqConstants {
     /**
      * 主题与消息者间隔符
      */
-    String SEPARATOR_TOPIC_CONSUMER = "#";
+    String SEPARATOR_TOPIC_CONSUMER_GROUP = "#";
 
     /**
      * 经理人服务

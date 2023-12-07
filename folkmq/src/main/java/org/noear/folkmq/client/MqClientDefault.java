@@ -21,7 +21,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 消息客户端默认实现
@@ -36,6 +35,7 @@ public class MqClientDefault implements MqClientInternal {
     private final List<String> serverUrls;
     //客户端会话
     private ClusterClientSession clientSession;
+    //客户端监听
     private final MqClientListener clientListener;
     //客户端配置
     private ClientConfigHandler clientConfigHandler;
@@ -109,10 +109,10 @@ public class MqClientDefault implements MqClientInternal {
 
         if (clientSession != null) {
             for (ClientSession session : clientSession.getSessionAll()) {
-                //如果有连接会话
+                //如果有连接会话，则执行订阅
                 Entity entity = new StringEntity("")
                         .meta(MqConstants.MQ_META_TOPIC, subscription.getTopic())
-                        .meta(MqConstants.MQ_META_CONSUMER, subscription.getConsumerGroup())
+                        .meta(MqConstants.MQ_META_CONSUMER_GROUP, subscription.getConsumerGroup())
                         .at(MqConstants.BROKER_AT_SERVER_ALL);
 
                 session.sendAndRequest(MqConstants.MQ_EVENT_SUBSCRIBE, entity);
@@ -131,7 +131,7 @@ public class MqClientDefault implements MqClientInternal {
                 //如果有连接会话
                 Entity entity = new StringEntity("")
                         .meta(MqConstants.MQ_META_TOPIC, topic)
-                        .meta(MqConstants.MQ_META_CONSUMER, consumerGroup)
+                        .meta(MqConstants.MQ_META_CONSUMER_GROUP, consumerGroup)
                         .at(MqConstants.BROKER_AT_SERVER_ALL);
 
                 session.sendAndRequest(MqConstants.MQ_EVENT_UNSUBSCRIBE, entity);
@@ -208,7 +208,7 @@ public class MqClientDefault implements MqClientInternal {
         Entity entity = publishEntityBuild(topic, message);
 
         if (message.getQos() > 0) {
-            //采用异常 + 可选等待
+            //::Qos1 采用异常 + 可选等待
             session.sendAndRequest(MqConstants.MQ_EVENT_PUBLISH, entity, r -> {
                 int confirm = Integer.parseInt(r.metaOrDefault(MqConstants.MQ_META_CONFIRM, "0"));
                 if (confirm == 1) {
@@ -253,7 +253,6 @@ public class MqClientDefault implements MqClientInternal {
     public void acknowledge(Session session, Message from, MqMessageReceivedImpl message, boolean isOk) throws IOException {
         //发送“回执”，向服务端反馈消费情况
         if (message.getQos() > 0) {
-            //此处用 replyEnd 不安全，时间长久可能会话断连过（流就无效了）
             session.replyEnd(from, new StringEntity("")
                     .meta(MqConstants.MQ_META_ACK, isOk ? "1" : "0"));
         }

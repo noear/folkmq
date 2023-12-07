@@ -4,7 +4,6 @@ import org.noear.folkmq.common.MqConstants;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.entity.EntityDefault;
 
-import java.io.IOException;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -30,9 +29,9 @@ public class MqMessageHolder implements Delayed {
     //是否完成
     private AtomicBoolean isDone;
 
-    public MqMessageHolder(String consumer, Message from, String tid, int qos, int distributeCount, long distributeTime) {
+    public MqMessageHolder(String consumerGroup, Message from, String tid, int qos, int distributeCount, long distributeTime) {
         this.content = new EntityDefault().data(from.data()).metaMap(from.metaMap());
-        this.content.meta(MqConstants.MQ_META_CONSUMER, consumer).at(consumer);
+        this.content.meta(MqConstants.MQ_META_CONSUMER_GROUP, consumerGroup).at(consumerGroup);
 
         this.isDone = new AtomicBoolean();
 
@@ -52,7 +51,7 @@ public class MqMessageHolder implements Delayed {
     /**
      * 获取消息内容
      */
-    public EntityDefault getContent() throws IOException {
+    public EntityDefault getContent() {
         return content;
     }
 
@@ -99,7 +98,6 @@ public class MqMessageHolder implements Delayed {
         //设置新的派发次数和下次时间
         content.meta(MqConstants.MQ_META_TIMES, String.valueOf(distributeCount));
         content.meta(MqConstants.MQ_META_SCHEDULED, String.valueOf(distributeTime));
-
 
         return this;
     }

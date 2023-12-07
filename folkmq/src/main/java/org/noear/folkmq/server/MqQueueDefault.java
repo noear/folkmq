@@ -11,22 +11,22 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.DelayQueue;
 
 /**
- * 主题消费者队列默认实现（服务端给 [一个主题+一个消费者] 安排一个队列，一个消费者可多个会话，只随机给一个会话派发）
+ * 队列默认实现
  *
  * @author noear
  * @since 1.0
  */
-public class MqTopicConsumerQueueDefault extends MqTopicConsumerQueueBase implements MqTopicConsumerQueue {
-    private static final Logger log = LoggerFactory.getLogger(MqTopicConsumerQueueDefault.class);
+public class MqQueueDefault extends MqQueueBase implements MqQueue {
+    private static final Logger log = LoggerFactory.getLogger(MqQueueDefault.class);
 
     //主题
     private final String topic;
-    //用户
-    private final String consumer;
-    //队列名字
-    private final String topicConsumer;
+    //消费者组
+    private final String consumerGroup;
+    //队列名字 //queueName='topic#consumer'
+    private final String queueName;
 
-    //观察者
+    //观察者（由上层传入）
     private final MqWatcher watcher;
 
     //消息字典
@@ -36,11 +36,11 @@ public class MqTopicConsumerQueueDefault extends MqTopicConsumerQueueBase implem
     private final DelayQueue<MqMessageHolder> messageQueue;
     private final Thread messageQueueThread;
 
-    public MqTopicConsumerQueueDefault(MqWatcher watcher, String topic, String consumer, String topicConsumer) {
+    public MqQueueDefault(MqWatcher watcher, String topic, String consumerGroup, String queueName) {
         super();
         this.topic = topic;
-        this.consumer = consumer;
-        this.topicConsumer = topicConsumer;
+        this.consumerGroup = consumerGroup;
+        this.queueName = queueName;
 
         this.watcher = watcher;
 
@@ -52,7 +52,7 @@ public class MqTopicConsumerQueueDefault extends MqTopicConsumerQueueBase implem
     }
 
     //单线程计数
-    private long queueTakeRef = 0;
+    private long messageQueueTakeRef = 0;
 
     private void queueTake() {
         while (!messageQueueThread.isInterrupted()) {
@@ -60,28 +60,28 @@ public class MqTopicConsumerQueueDefault extends MqTopicConsumerQueueBase implem
                 MqMessageHolder messageHolder = messageQueue.poll();
 
                 if (messageHolder != null) {
-                    queueTakeRef = 0;
-                    messageCounterSub(messageHolder);
+                    messageQueueTakeRef = 0;
+                    messageCountSub(messageHolder);
                     distribute(messageHolder);
                 } else {
-                    if ((queueTakeRef++) > 1000) {
+                    if ((messageQueueTakeRef++) > 1000) {
                         if (log.isDebugEnabled()) {
-                            log.debug("MqConsumerQueue queueTake as null *1000, queue={}#{}", topic, consumer);
+                            log.debug("MqQueue take as null *1000, queue={}#{}", topic, consumerGroup);
                         }
-                        queueTakeRef = 0;
+                        messageQueueTakeRef = 0;
                     }
 
                     Thread.sleep(100);
                 }
             } catch (Throwable e) {
                 if (log.isWarnEnabled()) {
-                    log.warn("MqConsumerQueue queueTake error, queue={}#{}", topic, consumer, e);
+                    log.warn("MqQueue take error, queue={}#{}", topic, consumerGroup, e);
                 }
             }
         }
 
         if (log.isWarnEnabled()) {
-            log.warn("MqConsumerQueue queueTake stoped!");
+            log.warn("MqQueue take stoped!");
         }
     }
 
@@ -94,24 +94,23 @@ public class MqTopicConsumerQueueDefault extends MqTopicConsumerQueueBase implem
     }
 
     /**
-     * 获取消费者
+     * 获取消费者组
      */
     @Override
-    public String getConsumer() {
-        return consumer;
+    public String getConsumerGroup() {
+        return consumerGroup;
     }
 
     /**
      * 获取主题消费者
      * */
-    public String getTopicConsumer() {
-        return topicConsumer;
+    public String getQueueName() {
+        return queueName;
     }
 
-    public boolean isAlive() {
-        return messageQueueThread.isAlive();
-    }
-
+    /**
+     * 状态
+     * */
     public Thread.State state() {
         return messageQueueThread.getState();
     }
@@ -132,17 +131,17 @@ public class MqTopicConsumerQueueDefault extends MqTopicConsumerQueueBase implem
         messageMap.put(messageHolder.getTid(), messageHolder);
         messageQueue.add(messageHolder);
 
-        messageCounterAdd(messageHolder);
+        messageCountAdd(messageHolder);
     }
 
     private void internalAdd(MqMessageHolder mh) {
         messageQueue.add(mh);
-        messageCounterAdd(mh);
+        messageCountAdd(mh);
     }
 
     private void internalRemove(MqMessageHolder mh) {
         if (messageQueue.remove(mh)) {
-            messageCounterSub(mh);
+            messageCountSub(mh);
         }
     }
 
@@ -169,8 +168,9 @@ public class MqTopicConsumerQueueDefault extends MqTopicConsumerQueueBase implem
             return;
         }
 
-        //找到此身份的其中一个会话（如果是 ip 就一个；如果是集群名则任选一个）
+        //如果有会话
         if (sessionCount() > 0) {
+            //::派发
             try {
                 distributeDo(messageHolder);
             } catch (Throwable e) {
@@ -180,18 +180,18 @@ public class MqTopicConsumerQueueDefault extends MqTopicConsumerQueueBase implem
 
                 //记日志
                 if (log.isWarnEnabled()) {
-                    log.warn("MqConsumerQueue distribute error, tid={}",
+                    log.warn("MqQueue distribute error, tid={}",
                             messageHolder.getTid(), e);
                 }
             }
         } else {
-            //进入延后队列
+            //::进入延后队列
             internalAdd(messageHolder.delayed());
 
             //记日志
             if (log.isDebugEnabled()) {
-                log.debug("MqConsumerQueue distribute: @{} no sessions, times={}, tid={}",
-                        consumer,
+                log.debug("MqQueue distribute: @{} no sessions, times={}, tid={}",
+                        consumerGroup,
                         messageHolder.getDistributeCount(),
                         messageHolder.getTid());
             }
@@ -202,12 +202,12 @@ public class MqTopicConsumerQueueDefault extends MqTopicConsumerQueueBase implem
      * 派发执行
      */
     private void distributeDo(MqMessageHolder messageHolder) throws IOException {
-        //随机取一个会话（集群会有多个会话，实例有时也会有多个会话）
+        //获取一个会话（轮询负载均衡）
 
         Session s1 = getSession();
 
         //观察者::派发时（在元信息调整之后，再观察）
-        watcher.onDistribute(topic, consumer, messageHolder);
+        watcher.onDistribute(topic, consumerGroup, messageHolder);
 
         if (messageHolder.getQos() > 0) {
             //::Qos1
@@ -216,7 +216,7 @@ public class MqTopicConsumerQueueDefault extends MqTopicConsumerQueueBase implem
             messageHolder.setDistributeTime(System.currentTimeMillis() + MqNextTime.getMaxDelayMillis());
             internalAdd(messageHolder);
 
-            //给会话发送消息 //用 sendAndSubscribe 不安全，时间太久可能断连过（流就不能用了）
+            //给会话发送消息
             s1.sendAndRequest(MqConstants.MQ_EVENT_DISTRIBUTE, messageHolder.getContent(), m -> {
                 int ack = Integer.parseInt(m.metaOrDefault(MqConstants.MQ_META_ACK, "0"));
                 acknowledgeDo(messageHolder, ack);
@@ -225,18 +225,18 @@ public class MqTopicConsumerQueueDefault extends MqTopicConsumerQueueBase implem
             //::Qos0
             s1.send(MqConstants.MQ_EVENT_DISTRIBUTE, messageHolder.getContent());
             //观察者::回执时
-            watcher.onAcknowledge(topic, consumer, messageHolder, true);
+            watcher.onAcknowledge(topic, consumerGroup, messageHolder, true);
 
             messageMap.remove(messageHolder.getTid());
 
-            //移除前，不要改移性
+            //移除前，不要改属性
             messageHolder.setDone(true);
         }
     }
 
     private void acknowledgeDo(MqMessageHolder messageHolder, int ack) {
         //观察者::回执时
-        watcher.onAcknowledge(topic, consumer, messageHolder, ack > 0);
+        watcher.onAcknowledge(topic, consumerGroup, messageHolder, ack > 0);
 
         if (ack > 0) {
             //ok
@@ -246,7 +246,7 @@ public class MqTopicConsumerQueueDefault extends MqTopicConsumerQueueBase implem
             //移除前，不要改移性
             messageHolder.setDone(true);
         } else {
-            //no （如果在队列改时间即可；如果不在队列说明有补发过）
+            //no （尝试移除，再添加）//否则排序可能不会触发
             internalRemove(messageHolder);
             internalAdd(messageHolder.delayed());
         }

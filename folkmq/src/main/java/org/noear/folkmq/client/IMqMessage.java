@@ -20,7 +20,7 @@ public interface IMqMessage {
     String getContent();
 
     /**
-     * 定时时间
+     * 计划时间
      */
     Date getScheduled();
 

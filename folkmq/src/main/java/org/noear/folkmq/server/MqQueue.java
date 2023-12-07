@@ -3,26 +3,26 @@ package org.noear.folkmq.server;
 import org.noear.socketd.transport.core.Session;
 
 /**
- * 主题消费者队列（服务端给 [一个主题+一个消费者] 安排一个队列，一个消费者可多个会话，只随机给一个会话派发）
+ * 队列（服务端给每对 [主题#消费者组] 安排一个队列，队列内通过轮询负载平衡派发）
  *
  * @author noear
  * @since 1.0
  */
-public interface MqTopicConsumerQueue {
+public interface MqQueue {
     /**
      * 获取主题
      */
     String getTopic();
 
     /**
-     * 获取消费者
+     * 获取消费组
      */
-    String getConsumer();
+    String getConsumerGroup();
 
     /**
-     * 获取主题消息者（队列名）
+     * 获取队列名
      * */
-    String getTopicConsumer();
+    String getQueueName();
 
     /**
      * 添加消费者会话
@@ -35,7 +35,7 @@ public interface MqTopicConsumerQueue {
     void removeSession(Session session);
 
     /**
-     * 会话数量
+     * 消费者会话数量
      * */
     int sessionCount();
 

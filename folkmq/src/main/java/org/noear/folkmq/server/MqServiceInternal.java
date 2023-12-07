@@ -14,34 +14,51 @@ import java.util.Set;
  */
 public interface MqServiceInternal {
     /**
-     * 获取订阅关系表(topic=>[topicConsumer])
+     * 获取订阅关系(topic=>[queueName]) //queueName='topic#consumer'
      */
     Map<String, Set<String>> getSubscribeMap();
 
     /**
-     * 获取主题消息者队列表(topicConsumer=>MqTopicConsumerQueue)
+     * 获取队列字典(queueName=>Queue)
      */
-    Map<String, MqTopicConsumerQueue> getTopicConsumerMap();
+    Map<String, MqQueue> getQueueMap();
 
     /**
      * 执行订阅
+     *
+     * @param topic         主题
+     * @param consumerGroup 消费者组
+     * @param session       会话（即消费者）
      */
-    void subscribeDo(String topic, String consumer, Session session);
+    void subscribeDo(String topic, String consumerGroup, Session session);
 
     /**
      * 执行取消订阅
+     *
+     * @param topic         主题
+     * @param consumerGroup 消费者组
+     * @param session       会话（即消费者）
      */
-    void unsubscribeDo(String topic, String consumer, Session session);
+    void unsubscribeDo(String topic, String consumerGroup, Session session);
 
     /**
      * 执行交换
+     *
+     * @param message 消息
      */
     void exchangeDo(Message message);
 
     /**
      * 执行交换
+     *
+     * @param queueName 队列名
+     * @param message   消息
+     * @param tid       事务Id
+     * @param qos       质量等级
+     * @param times     派发次数
+     * @param scheduled 计划时间
      */
-    void exchangeDo(String topicConsumer, Message message, String tid, int qos, int times, long scheduled);
+    void exchangeDo(String queueName, Message message, String tid, int qos, int times, long scheduled);
 
     /**
      * 保存

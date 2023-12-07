@@ -77,16 +77,16 @@ public class MqWatcherComposite implements MqWatcher {
     }
 
     @Override
-    public void onSubscribe(String topic, String consumer, Session session) {
+    public void onSubscribe(String topic, String consumerGroup, Session session) {
         for (MqWatcher persistent : persistentList) {
-            persistent.onSubscribe(topic, consumer, session);
+            persistent.onSubscribe(topic, consumerGroup, session);
         }
     }
 
     @Override
-    public void onUnSubscribe(String topic, String consumer, Session session) {
+    public void onUnSubscribe(String topic, String consumerGroup, Session session) {
         for (MqWatcher persistent : persistentList) {
-            persistent.onUnSubscribe(topic, consumer, session);
+            persistent.onUnSubscribe(topic, consumerGroup, session);
         }
     }
 
@@ -98,16 +98,16 @@ public class MqWatcherComposite implements MqWatcher {
     }
 
     @Override
-    public void onDistribute(String topic, String consumer, MqMessageHolder messageHolder) {
+    public void onDistribute(String topic, String consumerGroup, MqMessageHolder messageHolder) {
         for (MqWatcher persistent : persistentList) {
-            persistent.onDistribute(topic, consumer, messageHolder);
+            persistent.onDistribute(topic, consumerGroup, messageHolder);
         }
     }
 
     @Override
-    public void onAcknowledge(String topic, String consumer, MqMessageHolder messageHolder, boolean isOk) {
+    public void onAcknowledge(String topic, String consumerGroup, MqMessageHolder messageHolder, boolean isOk) {
         for (MqWatcher persistent : persistentList) {
-            persistent.onAcknowledge(topic, consumer, messageHolder, isOk);
+            persistent.onAcknowledge(topic, consumerGroup, messageHolder, isOk);
         }
     }
 }

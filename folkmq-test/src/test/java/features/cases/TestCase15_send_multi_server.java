@@ -5,13 +5,8 @@ import org.noear.folkmq.client.MqMessage;
 import org.noear.folkmq.server.MqServer;
 import org.noear.folkmq.server.MqServerDefault;
 import org.noear.folkmq.server.MqServiceInternal;
-import org.noear.folkmq.server.MqTopicConsumerQueue;
-import org.noear.socketd.transport.core.Listener;
-import org.noear.socketd.transport.core.Message;
-import org.noear.socketd.transport.core.Session;
-import org.noear.socketd.transport.server.Server;
+import org.noear.folkmq.server.MqQueue;
 
-import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -60,10 +55,10 @@ public class TestCase15_send_multi_server extends BaseTestCase {
 
         //检验服务端
         MqServiceInternal serverInternal = server.getServerInternal();
-        System.out.println("server topicConsumerMap.size=" + serverInternal.getTopicConsumerMap().size());
-        assert serverInternal.getTopicConsumerMap().size() == 1;
+        System.out.println("server topicConsumerMap.size=" + serverInternal.getQueueMap().size());
+        assert serverInternal.getQueueMap().size() == 1;
 
-        MqTopicConsumerQueue topicConsumerQueue = serverInternal.getTopicConsumerMap().values().toArray(new MqTopicConsumerQueue[1])[0];
+        MqQueue topicConsumerQueue = serverInternal.getQueueMap().values().toArray(new MqQueue[1])[0];
         System.out.println("server topicConsumerQueue.size=" + topicConsumerQueue.messageTotal());
         assert topicConsumerQueue.messageTotal() == 0;
         assert topicConsumerQueue.messageTotal2() == 0;
@@ -72,10 +67,10 @@ public class TestCase15_send_multi_server extends BaseTestCase {
 
         //检验服务端
         MqServiceInternal serverInternal2 = server2.getServerInternal();
-        System.out.println("server topicConsumerMap.size=" + serverInternal2.getTopicConsumerMap().size());
-        assert serverInternal2.getTopicConsumerMap().size() == 1;
+        System.out.println("server topicConsumerMap.size=" + serverInternal2.getQueueMap().size());
+        assert serverInternal2.getQueueMap().size() == 1;
 
-        MqTopicConsumerQueue topicConsumerQueue2 = serverInternal2.getTopicConsumerMap().values().toArray(new MqTopicConsumerQueue[1])[0];
+        MqQueue topicConsumerQueue2 = serverInternal2.getQueueMap().values().toArray(new MqQueue[1])[0];
         System.out.println("server topicConsumerQueue.size=" + topicConsumerQueue2.messageTotal());
         assert topicConsumerQueue2.messageTotal() == 0;
         assert topicConsumerQueue2.messageTotal2() == 0;

@@ -43,12 +43,12 @@ public class MqWatcherDefault implements MqWatcher {
     }
 
     @Override
-    public void onSubscribe(String topic, String consumer, Session session) {
+    public void onSubscribe(String topic, String consumerGroup, Session session) {
 
     }
 
     @Override
-    public void onUnSubscribe(String topic, String consumer, Session session) {
+    public void onUnSubscribe(String topic, String consumerGroup, Session session) {
 
     }
 
@@ -58,12 +58,12 @@ public class MqWatcherDefault implements MqWatcher {
     }
 
     @Override
-    public void onDistribute(String topic, String consumer, MqMessageHolder messageHolder) {
+    public void onDistribute(String topic, String consumerGroup, MqMessageHolder messageHolder) {
 
     }
 
     @Override
-    public void onAcknowledge(String topic, String consumer, MqMessageHolder messageHolder, boolean isOk) {
+    public void onAcknowledge(String topic, String consumerGroup, MqMessageHolder messageHolder, boolean isOk) {
 
     }
 }

@@ -42,26 +42,45 @@ public interface MqWatcher {
 
     /**
      * 订阅时
+     *
+     * @param topic         主题
+     * @param consumerGroup 消费者组
+     * @param session       会话（即消费者）
      */
-    void onSubscribe(String topic, String consumer, Session session);
+    void onSubscribe(String topic, String consumerGroup, Session session);
 
     /**
      * 取消订阅时
+     *
+     * @param topic         主题
+     * @param consumerGroup 消费者组
+     * @param session       会话（即消费者）
      */
-    void onUnSubscribe(String topic, String consumer, Session session);
+    void onUnSubscribe(String topic, String consumerGroup, Session session);
 
     /**
      * 发布时
+     *
+     * @param message 消息
      */
     void onPublish(Message message);
 
     /**
      * 派发时
+     *
+     * @param topic         主题
+     * @param consumerGroup 消费者组
+     * @param messageHolder 消息持有人
      */
-    void onDistribute(String topic, String consumer, MqMessageHolder messageHolder);
+    void onDistribute(String topic, String consumerGroup, MqMessageHolder messageHolder);
 
     /**
      * 回执时
+     *
+     * @param topic         主题
+     * @param consumerGroup 消费者组
+     * @param messageHolder 消息持有人
+     * @param isOk          回执
      */
-    void onAcknowledge(String topic, String consumer, MqMessageHolder messageHolder, boolean isOk);
+    void onAcknowledge(String topic, String consumerGroup, MqMessageHolder messageHolder, boolean isOk);
 }

@@ -27,7 +27,7 @@ public class FolkMQ {
     /**
      * 创建客户端
      */
-    public static MqClient createClient(String serverUrl) {
-        return new MqClientDefault(serverUrl);
+    public static MqClient createClient(String... serverUrls) {
+        return new MqClientDefault(serverUrls);
     }
 }

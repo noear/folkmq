@@ -1,9 +1,6 @@
 package org.noear.folkmq.server;
 
-import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
-
-import java.util.Map;
 
 /**
  * 主题消费者队列（服务端给 [一个主题+一个消费者] 安排一个队列，一个消费者可多个会话，只随机给一个会话派发）
@@ -21,6 +18,11 @@ public interface MqTopicConsumerQueue {
      * 获取消费者
      */
     String getConsumer();
+
+    /**
+     * 获取主题消息者（队列名）
+     * */
+    String getTopicConsumer();
 
     /**
      * 添加消费者会话

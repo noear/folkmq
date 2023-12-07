@@ -23,9 +23,11 @@ public class MqTopicConsumerQueueDefault extends MqTopicConsumerQueueBase implem
     private final String topic;
     //用户
     private final String consumer;
+    //队列名字
+    private final String topicConsumer;
+
     //观察者
     private final MqWatcher watcher;
-
 
     //消息字典
     private final Map<String, MqMessageHolder> messageMap;
@@ -34,11 +36,13 @@ public class MqTopicConsumerQueueDefault extends MqTopicConsumerQueueBase implem
     private final DelayQueue<MqMessageHolder> messageQueue;
     private final Thread messageQueueThread;
 
-    public MqTopicConsumerQueueDefault(MqWatcher watcher, String topic, String consumer) {
+    public MqTopicConsumerQueueDefault(MqWatcher watcher, String topic, String consumer, String topicConsumer) {
         super();
-        this.watcher = watcher;
         this.topic = topic;
         this.consumer = consumer;
+        this.topicConsumer = topicConsumer;
+
+        this.watcher = watcher;
 
         this.messageMap = new ConcurrentHashMap<>();
 
@@ -95,6 +99,13 @@ public class MqTopicConsumerQueueDefault extends MqTopicConsumerQueueBase implem
     @Override
     public String getConsumer() {
         return consumer;
+    }
+
+    /**
+     * 获取主题消费者
+     * */
+    public String getTopicConsumer() {
+        return topicConsumer;
     }
 
     public boolean isAlive() {

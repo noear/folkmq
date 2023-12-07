@@ -285,7 +285,7 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
             //为身份建立队列(topicConsumer=>MqTopicConsumerQueue)
             MqTopicConsumerQueue topicConsumerQueue = topicConsumerMap.get(topicConsumer);
             if (topicConsumerQueue == null) {
-                topicConsumerQueue = new MqTopicConsumerQueueDefault(watcher, topic, consumer);
+                topicConsumerQueue = new MqTopicConsumerQueueDefault(watcher, topic, consumer, topicConsumer);
                 topicConsumerMap.put(topicConsumer, topicConsumerQueue);
             }
 

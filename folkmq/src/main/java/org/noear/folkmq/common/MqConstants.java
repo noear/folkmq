@@ -62,6 +62,11 @@ public interface MqConstants {
     String MQ_EVENT_SAVE = "mq.event.save";
 
     /**
+     * 管理视图-队列
+     * */
+    String ADMIN_VIEW_QUEUE ="admin.view.queue";
+
+    /**
      * 连接参数：ak
      */
     String PARAM_ACCESS_KEY = "ak";

@@ -1,16 +1,18 @@
 package org.noear.folkmq.broker.admin.dso;
 
 import org.noear.folkmq.broker.admin.model.QueueVo;
+import org.noear.folkmq.broker.common.ConfigNames;
 import org.noear.folkmq.broker.mq.BrokerListenerFolkmq;
+import org.noear.folkmq.common.MqConstants;
 import org.noear.snack.ONode;
 import org.noear.socketd.transport.core.Session;
 import org.noear.socketd.transport.core.entity.StringEntity;
-import org.noear.socketd.utils.RunUtils;
+import org.noear.solon.Solon;
 import org.noear.solon.Utils;
 import org.noear.solon.annotation.Component;
 import org.noear.solon.annotation.Inject;
-import org.noear.solon.core.AppContext;
 import org.noear.solon.core.bean.LifecycleBean;
+import org.noear.solon.core.util.RunUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +25,7 @@ import java.util.concurrent.ScheduledFuture;
  * @since 1.0
  */
 @Component
-public class QueueViewService implements LifecycleBean , Runnable {
+public class QueueViewService implements LifecycleBean {
     private static final Logger log = LoggerFactory.getLogger(QueueViewService.class);
 
     @Inject
@@ -54,32 +56,43 @@ public class QueueViewService implements LifecycleBean , Runnable {
 
     @Override
     public void start() throws Throwable {
-        scheduledFuture = RunUtils.delayAndRepeat(this, 5000);
+        delay();
+    }
+
+    private void delay() {
+        long sync_time_millis = Integer.parseInt(Solon.cfg().get(ConfigNames.folkmq_sync_queue, "5000"));
+        if (sync_time_millis > 0) {
+            scheduledFuture = RunUtil.delay(this::delayDo, sync_time_millis);
+        }
     }
 
 
-    @Override
-    public void run() {
-        Collection<Session> tmp = brokerListener.getPlayerAll("folkmq-server");
-        if (tmp == null) {
-            return;
-        }
-
-        queueVoMap.clear();
-        queueVoMap.putAll(queueVoMap2);
-        queueVoMap2.clear();
-
-        List<Session> sessions = new ArrayList<>(tmp);
-        for (Session session : sessions) {
-            try {
-                session.sendAndRequest("admin.view.queue", new StringEntity(""), r -> {
-                    String json = r.dataAsString();
-                    List<QueueVo> list = ONode.loadStr(json).toObjectList(QueueVo.class);
-                    addQueueVo(list, queueVoMap2);
-                });
-            } catch (Throwable e) {
-                log.warn("Cmd 'admin.view.queue' call error", e);
+    private void delayDo() {
+        try {
+            Collection<Session> tmp = brokerListener.getPlayerAll("folkmq-server");
+            if (tmp == null) {
+                return;
             }
+
+            //一种切换效果。把上次收集的效果切换给当前的。然后重新开始收集
+            queueVoMap.clear();
+            queueVoMap.putAll(queueVoMap2);
+            queueVoMap2.clear();
+
+            List<Session> sessions = new ArrayList<>(tmp);
+            for (Session session : sessions) {
+                try {
+                    session.sendAndRequest(MqConstants.ADMIN_VIEW_QUEUE, new StringEntity(""), r -> {
+                        String json = r.dataAsString();
+                        List<QueueVo> list = ONode.loadStr(json).toObjectList(QueueVo.class);
+                        addQueueVo(list, queueVoMap2);
+                    });
+                } catch (Throwable e) {
+                    log.warn("Cmd 'admin.view.queue' call error", e);
+                }
+            }
+        }finally {
+            delay();
         }
     }
 

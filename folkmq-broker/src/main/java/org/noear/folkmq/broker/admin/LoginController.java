@@ -1,10 +1,11 @@
 package org.noear.folkmq.broker.admin;
 
+import org.noear.folkmq.broker.common.ConfigNames;
 import org.noear.folkmq.broker.admin.utils.ImageUtils;
 import org.noear.folkmq.broker.admin.utils.RandomUtils;
+import org.noear.solon.Solon;
 import org.noear.solon.Utils;
 import org.noear.solon.annotation.Controller;
-import org.noear.solon.annotation.Inject;
 import org.noear.solon.annotation.Mapping;
 import org.noear.solon.annotation.Post;
 import org.noear.solon.core.handle.Context;
@@ -29,10 +30,12 @@ import java.io.IOException;
 public class LoginController extends BaseController {
     static final Logger log = LoggerFactory.getLogger(LoginController.class);
 
-    @Inject("${folkmq.admin:}")
-    private String adminPassword;
+    private final String adminPassword;
+    private final String adminUser = "admin";
 
-    private String adminUser = "admin";
+    public LoginController(){
+        adminPassword = Solon.cfg().get(ConfigNames.folkmq_admin, "");
+    }
 
     @Mapping("/")
     public void home(Context ctx) throws Exception {

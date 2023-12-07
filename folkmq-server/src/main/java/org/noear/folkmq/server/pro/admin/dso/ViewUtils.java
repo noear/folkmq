@@ -1,6 +1,5 @@
 package org.noear.folkmq.server.pro.admin.dso;
 
-import org.noear.folkmq.common.MqConstants;
 import org.noear.folkmq.server.MqServiceInternal;
 import org.noear.folkmq.server.MqTopicConsumerQueue;
 import org.noear.folkmq.server.MqTopicConsumerQueueDefault;
@@ -20,13 +19,16 @@ public class ViewUtils {
     public static List<QueueVo> queueView(MqServiceInternal server) {
         List<MqTopicConsumerQueue> mqTopicConsumerQueues = new ArrayList<>(server.getTopicConsumerMap().values());
 
+        //先排序，可以直接取前99 （旧方案是，全构建完成，再取99）
+        mqTopicConsumerQueues.sort(Comparator.comparing(MqTopicConsumerQueue::getTopicConsumer));
+
         List<QueueVo> list = new ArrayList<>();
 
         for (MqTopicConsumerQueue tmp : mqTopicConsumerQueues) {
             MqTopicConsumerQueueDefault queue = (MqTopicConsumerQueueDefault) tmp;
 
             QueueVo queueVo = new QueueVo();
-            queueVo.queue = queue.getTopic() + MqConstants.SEPARATOR_TOPIC_CONSUMER + queue.getConsumer();
+            queueVo.queue = queue.getTopicConsumer();
 
             //queueVo.isAlive = (queue.isAlive());
             queueVo.state = (queue.state().name());
@@ -44,9 +46,12 @@ public class ViewUtils {
 
 
             list.add(queueVo);
-        }
 
-        list.sort(Comparator.comparing(QueueVo::getQueue));
+            //不超过99
+            if (list.size() == 99) {
+                break;
+            }
+        }
 
         return list;
     }

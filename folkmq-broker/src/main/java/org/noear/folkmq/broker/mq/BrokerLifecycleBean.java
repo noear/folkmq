@@ -1,8 +1,8 @@
 package org.noear.folkmq.broker.mq;
 
+import org.noear.folkmq.broker.common.ConfigNames;
 import org.noear.socketd.SocketD;
 import org.noear.socketd.broker.BrokerFragmentHandler;
-import org.noear.socketd.broker.BrokerListener;
 import org.noear.socketd.transport.server.Server;
 import org.noear.solon.Solon;
 import org.noear.solon.annotation.Component;
@@ -25,7 +25,7 @@ public class BrokerLifecycleBean implements LifecycleBean {
     @Override
     public void start() throws Throwable {
         brokerListener = new BrokerListenerFolkmq()
-                .addAccessAll(Solon.cfg().getMap("folkmq.access."));
+                .addAccessAll(Solon.cfg().getMap(ConfigNames.folkmq_access_x));
 
         brokerServer = SocketD.createServer("sd:tcp")
                 .config(c -> c.port(Solon.cfg().serverPort() + 10000)

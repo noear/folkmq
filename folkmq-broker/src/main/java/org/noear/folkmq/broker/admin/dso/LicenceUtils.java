@@ -1,5 +1,6 @@
 package org.noear.folkmq.broker.admin.dso;
 
+import org.noear.folkmq.broker.common.ConfigNames;
 import org.noear.snack.ONode;
 import org.noear.solon.Solon;
 import org.noear.solon.Utils;
@@ -19,7 +20,7 @@ public class LicenceUtils {
 
     public static String getLicence() {
         if (licence == null) {
-            licence = Solon.cfg().get("folkmq.licence", "");
+            licence = Solon.cfg().get(ConfigNames.folkmq_licence, "");
         }
 
         return licence;

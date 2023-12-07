@@ -1,6 +1,8 @@
-### 1.0.16
-* 添加 folkmq-broker 许可证界面
+### 1.0.17
+* 添加 folkmq-broker 授权检测
 * 添加 folkmq-broker 主题看板
+* 添加 folkmq-broker 队列看板（从 folkmq-server 定时汇总统计数据）
+* 添加 folkmq-broker 节点看板
 * 优化 folkmq-server 对时序的处理（仅对不同 ms 有序）
 * socket.d 升为 2.1.6
 

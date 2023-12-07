@@ -26,11 +26,11 @@ public class BenchmarkTest3 {
                 .connect();
 
         //订阅
-        client.subscribe("hot", "a", message -> {
+        client.subscribe("hot", "demo", message -> {
             //System.out.println("::" + topic + " - " + message);
         });
 
-        client.subscribe("test", "a", message -> {
+        client.subscribe("test", "test", message -> {
             //System.out.println("::" + topic + " - " + message);
             consumeDownLatch.countDown();
         });

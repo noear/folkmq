@@ -104,9 +104,23 @@ public class FolkmqLifecycleBean implements LifecycleBean {
         for (String url : brokerServers.split(",")) {
             url = url.trim().replace("folkmq://", "sd:tcp://");
 
-            if (Utils.isNotEmpty(url)) {
-                serverUrls.add(url);
+            if (Utils.isEmpty(url)) {
+                continue;
             }
+
+            //确保有 @参数（外部可不加）
+            if (url.contains("@=") == false) {
+                if (url.contains("?")) {
+                    url = url + "&@=" + MqConstants.BROKER_AT_SERVER;
+                } else {
+                    url = url + "?@=" + MqConstants.BROKER_AT_SERVER;
+                }
+            }
+
+            //添加自己的主端口
+            url = url + "&port=" + Solon.cfg().serverPort();
+
+            serverUrls.add(url);
         }
 
         brokerSession = SocketD.createClusterClient(serverUrls)

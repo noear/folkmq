@@ -39,19 +39,21 @@ public class FolkmqLifecycleBean implements LifecycleBean {
 
     private MqServiceListener brokerServiceListener;
     private ClientSession brokerSession;
+    private MqWatcherSnapshotPlus snapshotPlus;
+    private boolean saveEnable;
 
     @Override
     public void start() throws Throwable {
         String brokerServer = Solon.cfg().get(ConfigNames.folkmq_broker);
 
-        boolean saveEnable = Solon.cfg().getBool(ConfigNames.folkmq_snapshot_enable, true);
+        saveEnable = Solon.cfg().getBool(ConfigNames.folkmq_snapshot_enable, true);
 
         long save900 = Solon.cfg().getLong(ConfigNames.folkmq_snapshot_save900, 0);
         long save300 = Solon.cfg().getLong(ConfigNames.folkmq_snapshot_save300, 0);
         long save100 = Solon.cfg().getLong(ConfigNames.folkmq_snapshot_save100, 0);
 
         //初始化快照持久化
-        MqWatcherSnapshotPlus snapshotPlus = new MqWatcherSnapshotPlus();
+        snapshotPlus = new MqWatcherSnapshotPlus();
         snapshotPlus.save900Condition(save900);
         snapshotPlus.save300Condition(save300);
         snapshotPlus.save100Condition(save100);
@@ -59,13 +61,13 @@ public class FolkmqLifecycleBean implements LifecycleBean {
         appContext.wrapAndPut(MqWatcherSnapshotPlus.class, snapshotPlus);
 
         if (Utils.isEmpty(brokerServer)) {
-            startLocalServerMode(saveEnable, snapshotPlus);
+            startLocalServerMode(snapshotPlus);
         } else {
-            startBrokerSession(brokerServer, saveEnable, snapshotPlus);
+            startBrokerSession(brokerServer, snapshotPlus);
         }
     }
 
-    private void startLocalServerMode(boolean saveEnable, MqWatcherSnapshotPlus snapshotPlus) throws Exception {
+    private void startLocalServerMode(MqWatcherSnapshotPlus snapshotPlus) throws Exception {
         //服务端（鉴权为可选。不添加则不鉴权）
         localServer = FolkMQ.createServer()
                 .addAccessAll(Solon.cfg().getMap(ConfigNames.folkmq_access_x));
@@ -82,7 +84,7 @@ public class FolkmqLifecycleBean implements LifecycleBean {
         log.info("FlokMQ local server started!");
     }
 
-    private void startBrokerSession(String brokerServers, boolean saveEnable, MqWatcherSnapshotPlus snapshotPlus) throws Exception {
+    private void startBrokerSession(String brokerServers, MqWatcherSnapshotPlus snapshotPlus) throws Exception {
         brokerServiceListener = new MqServiceListener(true);
 
         //允许控制台获取队列看板
@@ -127,6 +129,11 @@ public class FolkmqLifecycleBean implements LifecycleBean {
                 .listen(brokerServiceListener)
                 .open();
 
+        //启动时恢复快照
+        if (saveEnable) {
+            snapshotPlus.onStartBefore();
+            snapshotPlus.onStartAfter();
+        }
 
         //加入容器
         appContext.wrapAndPut(MqServiceInternal.class, brokerServiceListener);
@@ -142,10 +149,13 @@ public class FolkmqLifecycleBean implements LifecycleBean {
         }
 
         if (brokerSession != null) {
-            brokerSession.close();
-
             //停止时会触发快照
-            brokerServiceListener.save();
+            if (saveEnable) {
+                snapshotPlus.onStopBefore();
+                snapshotPlus.onStopAfter();
+            }
+
+            brokerSession.close();
         }
     }
 }

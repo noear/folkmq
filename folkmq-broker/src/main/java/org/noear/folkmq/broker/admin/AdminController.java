@@ -3,10 +3,13 @@ package org.noear.folkmq.broker.admin;
 import org.noear.folkmq.broker.admin.dso.LicenceUtils;
 import org.noear.folkmq.broker.admin.dso.ViewQueueService;
 import org.noear.folkmq.broker.admin.model.QueueVo;
+import org.noear.folkmq.broker.admin.model.ServerVo;
 import org.noear.folkmq.broker.admin.model.SessionVo;
 import org.noear.folkmq.broker.admin.model.TopicVo;
 import org.noear.folkmq.broker.mq.BrokerListenerFolkmq;
+import org.noear.folkmq.common.MqConstants;
 import org.noear.socketd.transport.core.Session;
+import org.noear.solon.Utils;
 import org.noear.solon.annotation.Controller;
 import org.noear.solon.annotation.Inject;
 import org.noear.solon.annotation.Mapping;
@@ -15,6 +18,8 @@ import org.noear.solon.core.handle.Result;
 import org.noear.solon.validation.annotation.Logined;
 import org.noear.solon.validation.annotation.Valid;
 
+import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.util.*;
 
 /**
@@ -165,5 +170,39 @@ public class AdminController extends BaseController {
         }
 
         return view("admin_session").put("list", list);
+    }
+
+    @Mapping("/admin/server")
+    public ModelAndView server() throws IOException {
+        List<ServerVo> list = new ArrayList<>();
+        Collection<Session> tmp = brokerListener.getPlayerAll(MqConstants.BROKER_AT_SERVER);
+
+        if (tmp != null) {
+            List<Session> serverList = new ArrayList<>(tmp);
+
+            //用 list 转一下，免避线程安全
+            for (Session session : serverList) {
+                InetSocketAddress socketAddress = session.remoteAddress();
+                String admimPort = session.param("port");
+
+                ServerVo serverVo = new ServerVo();
+                serverVo.addree = socketAddress.toString();
+
+                if (Utils.isEmpty(admimPort)) {
+                    serverVo.adminUrl = "http://" + socketAddress.getHostName() + ":" + admimPort + "/admin";
+                } else {
+                    serverVo.adminUrl = "http://" + socketAddress.getHostName() + ":" + admimPort + "/admin";
+                }
+
+                list.add(serverVo);
+
+                //不超过99
+                if (list.size() == 99) {
+                    break;
+                }
+            }
+        }
+
+        return view("admin_server").put("list", list);
     }
 }

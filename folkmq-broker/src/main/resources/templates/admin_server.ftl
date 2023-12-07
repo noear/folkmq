@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html class="frm10">
 <head>
-    <title>${app} - 主题</title>
+    <title>${app} - 集群节点</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8 "/>
     <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico"/>
     <link rel="stylesheet" href="${css}/main.css"/>
@@ -13,22 +13,24 @@
 </head>
 <body>
 <toolbar class="blockquote">
-    <left>主题</left>
+    <left>集群节点</left>
     <right></right>
 </toolbar>
 <datagrid class="list">
     <table>
         <thead>
         <tr>
-            <td width="200px" class="left">主题</td>
-            <td class="left">订阅队列</td>
+            <td width="300px" class="left">地址</td>
+            <td class="left">后台</td>
         </tr>
         </thead>
         <tbody id="tbody">
         <#list list as item>
             <tr>
-                <td class="left">${item.topic}</td>
-                <td class="left break">${item.queueList}</td>
+                <td class="left">${item.addree}</td>
+                <td class="left break">
+                    <a href="${item.adminUrl}" target="_blank">${item.adminUrl}</a>
+                </td>
             </tr>
         </#list>
         </tbody>

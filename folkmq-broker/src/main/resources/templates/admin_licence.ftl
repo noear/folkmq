@@ -35,7 +35,7 @@
 </head>
 <body>
 <toolbar class="blockquote">
-    <left>授权</left>
+    <left>许可证</left>
     <right></right>
 </toolbar>
 <detail>

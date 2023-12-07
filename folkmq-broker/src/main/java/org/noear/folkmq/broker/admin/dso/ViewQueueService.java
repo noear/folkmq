@@ -72,7 +72,7 @@ public class ViewQueueService implements LifecycleBean {
 
     private void delayDo() {
         try {
-            Collection<Session> tmp = brokerListener.getPlayerAll("folkmq-server");
+            Collection<Session> tmp = brokerListener.getPlayerAll(MqConstants.BROKER_AT_SERVER);
             if (tmp == null) {
                 return;
             }

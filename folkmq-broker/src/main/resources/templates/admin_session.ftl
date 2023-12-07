@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html class="frm10">
 <head>
-    <title>${app} - 查看会话</title>
+    <title>${app} - 连接会话</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8 "/>
     <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico"/>
     <link rel="stylesheet" href="${css}/main.css"/>
@@ -13,7 +13,7 @@
 </head>
 <body>
 <toolbar class="blockquote">
-    <left>会话</left>
+    <left>连接会话</left>
     <right></right>
 </toolbar>
 <datagrid class="list">

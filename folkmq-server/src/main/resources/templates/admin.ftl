@@ -27,6 +27,7 @@
     <nav>
     </nav>
     <aside>
+        <a href="https://folkmq.noear.org" target="_blank"><i class='fa fa-code-fork'></i></a>
         <a class='split' href='/login'><i class='fa fa-fw fa-circle-o-notch'></i>退出</a>
     </aside>
 </header>

@@ -183,16 +183,16 @@ public class AdminController extends BaseController {
             //用 list 转一下，免避线程安全
             for (Session session : serverList) {
                 InetSocketAddress socketAddress = session.remoteAddress();
-                String admimPort = session.param("port");
+                String adminPort = session.param("port");
+                String adminAddr = socketAddress.getAddress().toString();
+
+                if (adminAddr.startsWith("/")) {
+                    adminAddr = adminAddr.substring(1);
+                }
 
                 ServerVo serverVo = new ServerVo();
-                serverVo.addree = socketAddress.getAddress() + ":" + socketAddress.getPort();
-
-                if (Utils.isEmpty(admimPort)) {
-                    serverVo.adminUrl = "http://" + socketAddress.getAddress() + ":" + admimPort + "/admin";
-                } else {
-                    serverVo.adminUrl = "http://" + socketAddress.getAddress() + ":" + admimPort + "/admin";
-                }
+                serverVo.addree = adminAddr + ":" + socketAddress.getPort();
+                serverVo.adminUrl = "http://" + adminAddr + ":" + adminPort + "/admin";
 
                 list.add(serverVo);
 

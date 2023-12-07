@@ -253,8 +253,10 @@ public class MqClientDefault implements MqClientInternal {
     public void acknowledge(Session session, Message from, MqMessageReceivedImpl message, boolean isOk) throws IOException {
         //发送“回执”，向服务端反馈消费情况
         if (message.getQos() > 0) {
-            session.replyEnd(from, new StringEntity("")
-                    .meta(MqConstants.MQ_META_ACK, isOk ? "1" : "0"));
+            if (session.isValid()) {
+                session.replyEnd(from, new StringEntity("")
+                        .meta(MqConstants.MQ_META_ACK, isOk ? "1" : "0"));
+            }
         }
     }
 

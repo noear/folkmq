@@ -1,7 +1,7 @@
 package org.noear.folkmq.broker.admin;
 
 import org.noear.folkmq.broker.admin.dso.LicenceUtils;
-import org.noear.folkmq.broker.admin.dso.QueueViewService;
+import org.noear.folkmq.broker.admin.dso.ViewQueueService;
 import org.noear.folkmq.broker.admin.model.QueueVo;
 import org.noear.folkmq.broker.admin.model.SessionVo;
 import org.noear.folkmq.broker.admin.model.TopicVo;
@@ -31,7 +31,7 @@ public class AdminController extends BaseController {
     BrokerListenerFolkmq brokerListener;
 
     @Inject
-    QueueViewService queueViewService;
+    ViewQueueService viewQueueService;
 
 
     @Mapping("/admin")
@@ -135,7 +135,7 @@ public class AdminController extends BaseController {
 
     @Mapping("/admin/queue")
     public ModelAndView queue() {
-        List<QueueVo> list = queueViewService.getQueueListVo();
+        List<QueueVo> list = viewQueueService.getQueueListVo();
         list.sort(Comparator.comparing(v -> v.queue));
 
         return view("admin_queue").put("list", list);

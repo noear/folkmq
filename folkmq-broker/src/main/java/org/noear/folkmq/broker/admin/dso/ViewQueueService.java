@@ -25,8 +25,8 @@ import java.util.concurrent.ScheduledFuture;
  * @since 1.0
  */
 @Component
-public class QueueViewService implements LifecycleBean {
-    private static final Logger log = LoggerFactory.getLogger(QueueViewService.class);
+public class ViewQueueService implements LifecycleBean {
+    private static final Logger log = LoggerFactory.getLogger(ViewQueueService.class);
 
     @Inject
     private BrokerListenerFolkmq brokerListener;

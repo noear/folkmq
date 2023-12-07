@@ -1,5 +1,6 @@
 package org.noear.folkmq.broker.admin.dso;
 
+import org.noear.folkmq.FolkMQ;
 import org.noear.folkmq.broker.common.ConfigNames;
 import org.noear.snack.ONode;
 import org.noear.solon.Solon;
@@ -71,6 +72,7 @@ public class LicenceUtils {
         try {
             String json = HttpUtils.http("https://folkmq.noear.org/licence/auth")
                     .data("licence", LicenceUtils.getLicence())
+                    .data("version", FolkMQ.version())
                     .post();
 
             ONode oNode = ONode.loadStr(json);

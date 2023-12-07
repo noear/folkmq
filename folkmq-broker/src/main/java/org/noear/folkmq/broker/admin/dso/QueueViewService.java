@@ -60,7 +60,10 @@ public class QueueViewService implements LifecycleBean {
     }
 
     private void delay() {
-        long sync_time_millis = Integer.parseInt(Solon.cfg().get(ConfigNames.folkmq_sync_queue, "5000"));
+        long sync_time_millis = Integer.parseInt(Solon.cfg().get(
+                ConfigNames.folkmq_view_queue_syncInterval,
+                ConfigNames.folkmq_view_queue_syncInterval_def));
+
         if (sync_time_millis > 0) {
             scheduledFuture = RunUtil.delay(this::delayDo, sync_time_millis);
         }

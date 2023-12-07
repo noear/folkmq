@@ -9,8 +9,9 @@ public interface ConfigNames {
     String folkmq_admin = "folkmq.admin";
     //许可证
     String folkmq_licence = "folkmq.licence";
-    //同步队列间隔（ms）
-    String folkmq_sync_queue = "folkmq.sync.queue";
+    //视图队列同步间隔（ms）
+    String folkmq_view_queue_syncInterval = "folkmq.view.queue.syncInterval";
+    String folkmq_view_queue_syncInterval_def = "5000";
 
     //访问账号(ak:sk)
     String folkmq_access_x = "folkmq.access.";

@@ -23,6 +23,9 @@ solon.logging.logger:
 folkmq:
   admin: admin
   licence: ""
+  view:
+    queue:
+      syncInterval: 5000
 
 #folkmq.access:
 #  user1 : "YapLHTx19RlsEE16"

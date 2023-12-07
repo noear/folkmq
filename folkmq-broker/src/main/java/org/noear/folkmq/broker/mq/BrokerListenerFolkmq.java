@@ -4,6 +4,7 @@ import org.noear.folkmq.common.MqConstants;
 import org.noear.socketd.broker.BrokerListener;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
+import org.noear.socketd.transport.core.entity.StringEntity;
 
 import java.io.IOException;
 import java.util.*;
@@ -100,6 +101,22 @@ public class BrokerListenerFolkmq extends BrokerListener {
             //取消订阅，注销玩家
             String consumer = message.meta(MqConstants.MQ_META_CONSUMER_GROUP);
             removePlayer(consumer, requester);
+        } else if (MqConstants.MQ_EVENT_DISTRIBUTE.equals(message.event())) {
+            String atName = message.at();
+
+            //单发模式（给同名的某个玩家，轮询负截均衡）
+            Session responder = getPlayerOne(atName);
+            if (responder != null) {
+                //转发消息
+                forwardToSession(requester, message, responder);
+            } else {
+                //如果没有会话，自动转为ACK失败
+                if(message.isSubscribe() || message.isRequest()){
+                    requester.replyEnd(message, new StringEntity("")
+                            .meta(MqConstants.MQ_META_ACK, "0"));
+                }
+            }
+            return;
         }
 
         super.onMessage(requester, message);

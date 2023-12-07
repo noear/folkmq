@@ -28,7 +28,6 @@ services:
       - ./logs/server1:/logs
       - ./data/server1:/data
     environment:
-      # @=folkmq-server 请勿修改
       - folkmq.broker=folkmq://folkmq-broker:18602
       - solon.start.ping=folkmq-broker:8602
       - TZ=Asia/Shanghai
@@ -48,7 +47,6 @@ services:
       - ./data/server2:/data
       - ./logs/server2:/logs
     environment:
-      # @=folkmq-server 请勿修改
       - folkmq.broker=folkmq://folkmq-broker:18602
       - solon.start.ping=folkmq-broker:8602
       - TZ=Asia/Shanghai

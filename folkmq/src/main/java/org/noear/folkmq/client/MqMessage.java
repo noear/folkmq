@@ -38,8 +38,6 @@ public class MqMessage implements IMqMessage {
         return qos;
     }
 
-
-
     public MqMessage scheduled(Date scheduled) {
         this.scheduled = scheduled;
         return this;

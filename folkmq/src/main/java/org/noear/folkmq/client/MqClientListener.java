@@ -64,7 +64,7 @@ public class MqClientListener extends EventListener {
         for (MqSubscription subscription : client.subscriptionMap.values()) {
             Entity entity = new StringEntity("")
                     .meta(MqConstants.MQ_META_TOPIC, subscription.getTopic())
-                    .meta(MqConstants.MQ_META_CONSUMER, subscription.getConsumer())
+                    .meta(MqConstants.MQ_META_CONSUMER, subscription.getConsumerGroup())
                     .at(MqConstants.BROKER_AT_SERVER);
 
             session.send(MqConstants.MQ_EVENT_SUBSCRIBE, entity);

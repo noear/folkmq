@@ -36,7 +36,6 @@ public class MqClientDefault implements MqClientInternal {
     private final List<String> serverUrls;
     //客户端会话
     private ClusterClientSession clientSession;
-    private final AtomicInteger clientRoundCounter = new AtomicInteger(0);
     private final MqClientListener clientListener;
     //客户端配置
     private ClientConfigHandler clientConfigHandler;
@@ -98,12 +97,12 @@ public class MqClientDefault implements MqClientInternal {
      * 订阅主题
      *
      * @param topic           主题
-     * @param consumer        消费者（实例 ip 或 集群 name）
+     * @param consumerGroup   消费者组
      * @param consumerHandler 消费处理
      */
     @Override
-    public void subscribe(String topic, String consumer, MqConsumeHandler consumerHandler) throws IOException {
-        MqSubscription subscription = new MqSubscription(topic, consumer, consumerHandler);
+    public void subscribe(String topic, String consumerGroup, MqConsumeHandler consumerHandler) throws IOException {
+        MqSubscription subscription = new MqSubscription(topic, consumerGroup, consumerHandler);
 
         //支持Qos1
         subscriptionMap.put(topic, subscription);
@@ -113,18 +112,18 @@ public class MqClientDefault implements MqClientInternal {
                 //如果有连接会话
                 Entity entity = new StringEntity("")
                         .meta(MqConstants.MQ_META_TOPIC, subscription.getTopic())
-                        .meta(MqConstants.MQ_META_CONSUMER, subscription.getConsumer())
+                        .meta(MqConstants.MQ_META_CONSUMER, subscription.getConsumerGroup())
                         .at(MqConstants.BROKER_AT_SERVER_ALL);
 
                 session.sendAndRequest(MqConstants.MQ_EVENT_SUBSCRIBE, entity);
 
-                log.info("Client subscribe successfully: {}#{}, sessionId={}", topic, consumer, session.sessionId());
+                log.info("Client subscribe successfully: {}#{}, sessionId={}", topic, consumerGroup, session.sessionId());
             }
         }
     }
 
     @Override
-    public void unsubscribe(String topic, String consumer) throws IOException {
+    public void unsubscribe(String topic, String consumerGroup) throws IOException {
         subscriptionMap.remove(topic);
 
         if (clientSession != null) {
@@ -132,12 +131,12 @@ public class MqClientDefault implements MqClientInternal {
                 //如果有连接会话
                 Entity entity = new StringEntity("")
                         .meta(MqConstants.MQ_META_TOPIC, topic)
-                        .meta(MqConstants.MQ_META_CONSUMER, consumer)
+                        .meta(MqConstants.MQ_META_CONSUMER, consumerGroup)
                         .at(MqConstants.BROKER_AT_SERVER_ALL);
 
                 session.sendAndRequest(MqConstants.MQ_EVENT_UNSUBSCRIBE, entity);
 
-                log.info("Client unsubscribe successfully: {}#{}， sessionId={}", topic, consumer, session.sessionId());
+                log.info("Client unsubscribe successfully: {}#{}， sessionId={}", topic, consumerGroup, session.sessionId());
             }
         }
     }

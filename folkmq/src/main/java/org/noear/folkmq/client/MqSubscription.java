@@ -10,7 +10,7 @@ import java.io.IOException;
  */
 public class MqSubscription implements MqConsumeHandler {
     private final String topic;
-    private final String consumer;
+    private final String consumerGroup;
     private final MqConsumeHandler consumerHandler;
 
 
@@ -22,10 +22,10 @@ public class MqSubscription implements MqConsumeHandler {
     }
 
     /**
-     * 消费者（实例 IP，或集群 Name）
+     * 消费者组
      */
-    public String getConsumer() {
-        return consumer;
+    public String getConsumerGroup() {
+        return consumerGroup;
     }
 
     /**
@@ -37,12 +37,12 @@ public class MqSubscription implements MqConsumeHandler {
 
     /**
      * @param topic           主题
-     * @param consumer        消费者（实例 ip 或 集群 name）
+     * @param consumerGroup   消费者组
      * @param consumerHandler 消费处理器
      */
-    public MqSubscription(String topic, String consumer, MqConsumeHandler consumerHandler) {
+    public MqSubscription(String topic, String consumerGroup, MqConsumeHandler consumerHandler) {
         this.topic = topic;
-        this.consumer = consumer;
+        this.consumerGroup = consumerGroup;
         this.consumerHandler = consumerHandler;
     }
 

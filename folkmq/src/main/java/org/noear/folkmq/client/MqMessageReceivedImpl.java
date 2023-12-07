@@ -39,10 +39,6 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
         this.scheduled = null;
     }
 
-    public String getConsumer() {
-        return from.meta(MqConstants.MQ_META_CONSUMER);
-    }
-
     /**
      * 事务ID
      */
@@ -67,11 +63,17 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
         return content;
     }
 
+    /**
+     * 定时时间
+     */
     @Override
     public Date getScheduled() {
         return scheduled;
     }
 
+    /**
+     * 质量等级（0 或 1）
+     */
     @Override
     public int getQos() {
         return qos;

@@ -30,7 +30,7 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
     //观察者
     private MqWatcher watcher;
 
-    //订阅关系表(topicConsumer=>MqTopicConsumerQueue)
+    //订阅关系表(topic=>topicConsumer[])
     private Map<String, Set<String>> subscribeMap = new ConcurrentHashMap<>();
     //主题消费队列表(topicConsumer=>MqTopicConsumerQueue)
     private Map<String, MqTopicConsumerQueue> topicConsumerMap = new ConcurrentHashMap<>();

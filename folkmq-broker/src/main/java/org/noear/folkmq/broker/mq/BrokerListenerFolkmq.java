@@ -21,7 +21,7 @@ public class BrokerListenerFolkmq extends BrokerListener {
     //访问账号
     private Map<String, String> accessMap = new HashMap<>();
 
-    //订阅关系表(topicConsumer=>MqTopicConsumerQueue)
+    //订阅关系表(topic=>topicConsumer[])
     private Map<String, Set<String>> subscribeMap = new ConcurrentHashMap<>();
     private Object SUBSCRIBE_LOCK = new Object();
 

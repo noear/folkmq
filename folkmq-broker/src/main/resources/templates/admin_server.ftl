@@ -21,7 +21,7 @@
         <thead>
         <tr>
             <td width="300px" class="left">地址</td>
-            <td class="left">后台</td>
+            <td class="left">控制台</td>
         </tr>
         </thead>
         <tbody id="tbody">

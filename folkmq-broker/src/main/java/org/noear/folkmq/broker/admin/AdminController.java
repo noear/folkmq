@@ -186,12 +186,12 @@ public class AdminController extends BaseController {
                 String admimPort = session.param("port");
 
                 ServerVo serverVo = new ServerVo();
-                serverVo.addree = socketAddress.toString();
+                serverVo.addree = socketAddress.getAddress() + ":" + socketAddress.getPort();
 
                 if (Utils.isEmpty(admimPort)) {
-                    serverVo.adminUrl = "http://" + socketAddress.getHostName() + ":" + admimPort + "/admin";
+                    serverVo.adminUrl = "http://" + socketAddress.getAddress() + ":" + admimPort + "/admin";
                 } else {
-                    serverVo.adminUrl = "http://" + socketAddress.getHostName() + ":" + admimPort + "/admin";
+                    serverVo.adminUrl = "http://" + socketAddress.getAddress() + ":" + admimPort + "/admin";
                 }
 
                 list.add(serverVo);

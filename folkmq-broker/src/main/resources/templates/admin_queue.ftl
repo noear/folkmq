@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html class="frm10">
 <head>
-    <title>${app} - 队列消息</title>
+    <title>${app} - 队列消息汇总</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8 "/>
     <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico"/>
     <link rel="stylesheet" href="${css}/main.css"/>
@@ -13,7 +13,7 @@
 </head>
 <body>
 <toolbar class="blockquote">
-    <left>队列消息</left>
+    <left>队列消息汇总</left>
     <right></right>
 </toolbar>
 <datagrid class="list">

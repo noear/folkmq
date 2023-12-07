@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html class="frm10">
 <head>
-    <title>${app} - 查看主题</title>
+    <title>${app} - 主题</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8 "/>
     <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico"/>
     <link rel="stylesheet" href="${css}/main.css"/>

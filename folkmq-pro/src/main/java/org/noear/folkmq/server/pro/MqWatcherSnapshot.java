@@ -299,8 +299,8 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
             for (String topic : topicList) {
                 List<String> topicConsumerList = new ArrayList<>(subscribeMap.get(topic));
                 ONode topicJson = new ONode(Options.def().add(Feature.DisThreadLocal));
-                topicJson.set("topic", topicJson);
-                topicJson.get("queues").addAll(topicConsumerList);
+                topicJson.set("topic", topic);
+                topicJson.getOrNew("queues").addAll(topicConsumerList);
 
                 //一条写一行（大 json 容易坏掉）//也比较省内存
                 writer.write(topicJson.toJson());

@@ -94,21 +94,67 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
         }
 
         try {
-            String subscribeMapJsonStr = readSnapshotFile(subscribeMapFile);
-
-            ONode subscribeMapJson = ONode.loadStr(subscribeMapJsonStr, Feature.DisThreadLocal);
-            for (String topic : subscribeMapJson.obj().keySet()) {
-                ONode oQueueNameList = subscribeMapJson.get(topic);
-                for (ONode oQueueName : oQueueNameList.ary()) {
-                    String consumerGroup = oQueueName.getString().split(MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP)[1];
-                    serverRef.subscribeDo(topic, consumerGroup, null);
-                }
+            if (loadSubscribeMapNewDo(subscribeMapFile) == false) {
+                loadSubscribeMapOldDo(subscribeMapFile);
             }
 
             log.info("Server persistent load subscribeMap completed");
         } catch (Exception e) {
             log.warn("Server persistent load subscribeMap failed", e);
         }
+    }
+
+    /**
+     * @deprecated 1.0.18
+     * */
+    private void loadSubscribeMapOldDo(File subscribeMapFile) throws Exception {
+        String subscribeMapJsonStr = readSnapshotFile(subscribeMapFile);
+
+        ONode subscribeMapJson = ONode.loadStr(subscribeMapJsonStr, Feature.DisThreadLocal);
+        for (String topic : subscribeMapJson.obj().keySet()) {
+            ONode oQueueNameList = subscribeMapJson.get(topic);
+            for (ONode oQueueName : oQueueNameList.ary()) {
+                String consumerGroup = oQueueName.getString().split(MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP)[1];
+                serverRef.subscribeDo(topic, consumerGroup, null);
+            }
+        }
+    }
+
+    private boolean loadSubscribeMapNewDo(File subscribeMapFile) throws Exception {
+        boolean isNewStyle = false;
+        try (BufferedReader reader = new BufferedReader(new FileReader(subscribeMapFile))) {
+            while (true) {
+                //一行行读取（避免大 json 坏掉后，全坏了）//也比较省内存
+                String topicJsonStr = reader.readLine();
+                if (topicJsonStr == null) {
+                    break;
+                }
+
+                if (topicJsonStr.equals("{")) { //说明是旧格式
+                    if (isNewStyle) {
+                        continue;
+                    } else {
+                        return false;
+                    }
+                } else {
+                    isNewStyle = true;
+                }
+
+                if (topicJsonStr.endsWith("}")) {
+                    ONode oNode = ONode.loadStr(topicJsonStr, Feature.DisThreadLocal);
+
+                    String topic = oNode.get("topic").getString();
+                    ONode oQueueNameList = oNode.get("queues");
+
+                    for (ONode oQueueName : oQueueNameList.ary()) {
+                        String consumerGroup = oQueueName.getString().split(MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP)[1];
+                        serverRef.subscribeDo(topic, consumerGroup, null);
+                    }
+                }
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -156,13 +202,13 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
                     break;
                 }
 
-                if (messageJsonStr.length() > 0 && messageJsonStr.endsWith("}")) {
+                if (messageJsonStr.endsWith("}")) {
                     ONode messageJson = ONode.loadStr(messageJsonStr, Feature.DisThreadLocal);
 
                     String metaString = messageJson.get("meta").getString();
                     String data = messageJson.get("data").getString();
 
-                    if(data == null){
+                    if (data == null) {
                         //可能会有异常，造成数据不完整
                         continue;
                     }
@@ -226,29 +272,40 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
      * 保存订阅关系（确保线程安全）
      */
     private void saveSubscribeMap() {
+        try {
+            saveSubscribeMapDo();
+
+            log.info("Server persistent saveSubscribeMap completed");
+        } catch (Exception e) {
+            log.warn("Server persistent saveSubscribeMap failed");
+        }
+    }
+
+    private void saveSubscribeMapDo() throws Exception {
         Map<String, Set<String>> subscribeMap = serverRef.getSubscribeMap();
         if (subscribeMap.size() == 0) {
             return;
         }
 
-        ONode subscribeMapJson = new ONode(Options.def().add(Feature.PrettyFormat, Feature.DisThreadLocal)).asObject();
-        List<String> topicList = new ArrayList<>(subscribeMap.keySet());
-        for (String topic : topicList) {
-            List<String> topicConsumerList = new ArrayList<>(subscribeMap.get(topic));
-            subscribeMapJson.set(topic, topicConsumerList);
-        }
         File subscribeMapFile = new File(directory, "subscribe-map.fdb");
 
-        try {
-            if (subscribeMapFile.exists() == false) {
-                subscribeMapFile.createNewFile();
+        if (subscribeMapFile.exists() == false) {
+            subscribeMapFile.createNewFile();
+        }
+
+        List<String> topicList = new ArrayList<>(subscribeMap.keySet());
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(subscribeMapFile))) {
+            for (String topic : topicList) {
+                List<String> topicConsumerList = new ArrayList<>(subscribeMap.get(topic));
+                ONode topicJson = new ONode(Options.def().add(Feature.DisThreadLocal));
+                topicJson.set("topic", topicJson);
+                topicJson.get("queues").addAll(topicConsumerList);
+
+                //一条写一行（大 json 容易坏掉）//也比较省内存
+                writer.write(topicJson.toJson());
+                writer.newLine();
             }
-
-            saveSnapshotFile(subscribeMapFile, subscribeMapJson.toJson());
-
-            log.info("Server persistent saveSubscribeMap completed");
-        } catch (Exception e) {
-            log.warn("Server persistent saveSubscribeMap failed");
         }
     }
 

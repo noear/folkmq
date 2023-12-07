@@ -7,8 +7,8 @@
 
 | 镜像                            | 说明                             |
 |-------------------------------|--------------------------------|
-| noearorg/folkmq-server:1.0.16 | 服务端（主端口：8602，消息端口：18602），可独立使用 |
-| noearorg/folkmq-broker:1.0.16 | 代理端（主端口：8602，消息端口：18602）       |
+| noearorg/folkmq-server:1.0.17 | 服务端（主端口：8602，消息端口：18602），可独立使用 |
+| noearorg/folkmq-broker:1.0.17 | 代理端（主端口：8602，消息端口：18602）       |
 
 
 * 可选配置：
@@ -55,7 +55,7 @@ docker-compose -f docker-compose-standalone.yml up
 ### 2、docker 部署方式
 
 ```
-docker run -p 18602:18602 -p 8602:8602 noearorg/folkmq-server:1.0.16 
+docker run -p 18602:18602 -p 8602:8602 noearorg/folkmq-server:1.0.17 
 ```
 
 
@@ -98,9 +98,9 @@ java -Dserver.port=8602 -Dfolkmq.access.ak1=sk1 -jar folkmq-broker.jar
 * 启动三个 server 服务（连接时多个地址用","隔开）
 
 ```
-java -Dserver.port=8101 -Dfolkmq.broker='folkmq://127.0.0.1:18601?@=folkmq-server&ak=ak1&sk=sk1,folkmq://127.0.0.1:18602?@=folkmq-server&ak=ak1&sk=sk1' -jar folkmq-server.jar
-java -Dserver.port=8102 -Dfolkmq.broker='folkmq://127.0.0.1:18601?@=folkmq-server&ak=ak1&sk=sk1,folkmq://127.0.0.1:18602?@=folkmq-server&ak=ak1&sk=sk1' -jar folkmq-server.jar
-java -Dserver.port=8103 -Dfolkmq.broker='folkmq://127.0.0.1:18601?@=folkmq-server&ak=ak1&sk=sk1,folkmq://127.0.0.1:18602?@=folkmq-server&ak=ak1&sk=sk1' -jar folkmq-server.jar
+java -Dserver.port=8101 -Dfolkmq.broker='folkmq://127.0.0.1:18601?ak=ak1&sk=sk1,folkmq://127.0.0.1:18602?ak=ak1&sk=sk1' -jar folkmq-server.jar
+java -Dserver.port=8102 -Dfolkmq.broker='folkmq://127.0.0.1:18601?ak=ak1&sk=sk1,folkmq://127.0.0.1:18602?ak=ak1&sk=sk1' -jar folkmq-server.jar
+java -Dserver.port=8103 -Dfolkmq.broker='folkmq://127.0.0.1:18601?ak=ak1&sk=sk1,folkmq://127.0.0.1:18602?ak=ak1&sk=sk1' -jar folkmq-server.jar
 ```
 
 * client 示例（连接时多个地址用","隔开）

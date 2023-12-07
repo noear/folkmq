@@ -39,8 +39,8 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
 
     //正在保持中
     private final AtomicBoolean inSaveProcess = new AtomicBoolean(false);
-    //正在保存中
-    private final AtomicBoolean inLoadProcess = new AtomicBoolean(false);
+    //是否已启动
+    private final AtomicBoolean isStarted = new AtomicBoolean(false);
 
     public MqWatcherSnapshot() {
         this(null);
@@ -69,7 +69,7 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
 
     @Override
     public void onStartBefore() {
-        inLoadProcess.set(true);
+        isStarted.set(false);
         loadSubscribeMap();
     }
 
@@ -79,7 +79,7 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
             try {
                 loadQueue();
             } finally {
-                inLoadProcess.set(false);
+                isStarted.set(true);
             }
         });
     }
@@ -156,11 +156,16 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
                     break;
                 }
 
-                if (messageJsonStr.length() > 0) {
+                if (messageJsonStr.length() > 0 && messageJsonStr.endsWith("}")) {
                     ONode messageJson = ONode.loadStr(messageJsonStr, Feature.DisThreadLocal);
 
                     String metaString = messageJson.get("meta").getString();
                     String data = messageJson.get("data").getString();
+
+                    if(data == null){
+                        //可能会有异常，造成数据不完整
+                        continue;
+                    }
 
                     Entity entity = new StringEntity(data).metaString(metaString);
                     Message message = new MessageDefault()
@@ -193,12 +198,13 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
     @Override
     public void onStopAfter() {
         onSave();
+        isStarted.set(false);
     }
 
     @Override
     public void onSave() {
-        if (inLoadProcess.get()) {
-            //正在加载中（不可保存，否则会盖掉加载中的数据）
+        if (isStarted.get() == false) {
+            //未加载完成（不可保存，否则会盖掉加载中的数据）
             return;
         }
 

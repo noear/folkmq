@@ -33,7 +33,7 @@ folkmq:
     save100: 10000
 
 
-#folkmq.broker: "sd:tcp://127.0.0.1:18602?@=folkmq-server"
+#folkmq.broker: "folkmq://127.0.0.1:18602"
 
 #folkmq.access:
 #  user1 : "YapLHTx19RlsEE16"

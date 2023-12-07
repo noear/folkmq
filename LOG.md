@@ -4,6 +4,7 @@
 * 添加 folkmq-broker 队列看板（从 folkmq-server 定时汇总统计数据）
 * 添加 folkmq-broker 节点看板
 * 优化 folkmq-server 对时序的处理（仅对不同 ms 有序）
+* 简化 folkmq-server 连接 folkmq-broker 的地址，不需要加 @=folkmq-server （自动处理了）
 * socket.d 升为 2.1.6
 
 ### 1.0.15

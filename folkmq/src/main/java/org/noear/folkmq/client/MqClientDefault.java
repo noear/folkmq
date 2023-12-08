@@ -152,39 +152,9 @@ public class MqClientDefault implements MqClientInternal {
             throw new SocketdException("No session is available!");
         }
 
-        Entity entity = publishEntityBuild(topic, message);
+        Entity entity = publishEntityBuildDo(topic, message);
 
-        if (message.getQos() > 0) {
-            //::Qos1
-            Entity resp = null;
-            if (publishRetryTimes > 0) {
-                //多次重试
-                int times = publishRetryTimes;
-                while (times > 0) {
-                    try {
-                        resp = session.sendAndRequest(MqConstants.MQ_EVENT_PUBLISH, entity);
-                        break;
-                    } catch (Throwable e) {
-                        times--;
-                        if (times == 0) {
-                            throw e;
-                        }
-                    }
-                }
-            } else {
-                //单次
-                resp = session.sendAndRequest(MqConstants.MQ_EVENT_PUBLISH, entity);
-            }
-
-            int confirm = Integer.parseInt(resp.metaOrDefault(MqConstants.MQ_META_CONFIRM, "0"));
-            if (confirm != 1) {
-                String messsage = "Client message publish confirm failed: " + resp.dataAsString();
-                throw new FolkmqException(messsage);
-            }
-        } else {
-            //::Qos0
-            session.send(MqConstants.MQ_EVENT_PUBLISH, entity);
-        }
+        publishRetryDo(session, message, entity, null);
     }
 
     /**
@@ -205,29 +175,76 @@ public class MqClientDefault implements MqClientInternal {
         }
 
         CompletableFuture<Boolean> future = new CompletableFuture<>();
-        Entity entity = publishEntityBuild(topic, message);
+        Entity entity = publishEntityBuildDo(topic, message);
 
-        if (message.getQos() > 0) {
-            //::Qos1 采用异常 + 可选等待
-            session.sendAndRequest(MqConstants.MQ_EVENT_PUBLISH, entity, r -> {
-                int confirm = Integer.parseInt(r.metaOrDefault(MqConstants.MQ_META_CONFIRM, "0"));
-                if (confirm == 1) {
-                    future.complete(true);
-                } else {
-                    String messsage = "Client message publish confirm failed: " + r.dataAsString();
-                    future.completeExceptionally(new FolkmqException(messsage));
-                }
-            });
-        } else {
-            //::Qos0
-            session.send(MqConstants.MQ_EVENT_PUBLISH, entity);
-            future.complete(true);
-        }
+        publishRetryDo(session, message, entity, future);
 
         return future;
     }
 
-    private Entity publishEntityBuild(String topic, IMqMessage message) {
+    /**
+     * 发布重试执行
+     */
+    private void publishRetryDo(ClientSession session, IMqMessage message, Entity entity, CompletableFuture<Boolean> future) throws IOException {
+        if (publishRetryTimes > 1) {
+            //多次重试
+            for (int i = publishRetryTimes; i > 0; i--) {
+                try {
+                    publishDo(session, message, entity, future);
+                    break;
+                } catch (Throwable e) {
+                    if (i == 1) {
+                        throw e;
+                    }
+                }
+            }
+        } else {
+            //单次
+            publishDo(session, message, entity, future);
+        }
+    }
+
+    /**
+     * 发布执行
+     */
+    private void publishDo(ClientSession session, IMqMessage message, Entity entity, CompletableFuture<Boolean> future) throws IOException {
+        if (message.getQos() > 0) {
+            //::Qos1
+            if (future != null) {
+                //异步
+                session.sendAndRequest(MqConstants.MQ_EVENT_PUBLISH, entity, r -> {
+                    int confirm = Integer.parseInt(r.metaOrDefault(MqConstants.MQ_META_CONFIRM, "0"));
+                    if (confirm == 1) {
+                        future.complete(true);
+                    } else {
+                        String messsage = "Client message publish confirm failed: " + r.dataAsString();
+                        future.completeExceptionally(new FolkmqException(messsage));
+                    }
+                });
+            } else {
+                //同步
+                Entity resp = session.sendAndRequest(MqConstants.MQ_EVENT_PUBLISH, entity);
+
+                int confirm = Integer.parseInt(resp.metaOrDefault(MqConstants.MQ_META_CONFIRM, "0"));
+                if (confirm != 1) {
+                    String messsage = "Client message publish confirm failed: " + resp.dataAsString();
+                    throw new FolkmqException(messsage);
+                }
+            }
+        } else {
+            //::Qos0
+            session.send(MqConstants.MQ_EVENT_PUBLISH, entity);
+
+            if (future != null) {
+                future.complete(true);
+            }
+        }
+    }
+
+    /**
+     * 发布实体构建
+     */
+    private Entity publishEntityBuildDo(String topic, IMqMessage message) {
         //构建消息实体
         StringEntity entity = new StringEntity(message.getContent());
         entity.meta(MqConstants.MQ_META_TID, message.getTid());
@@ -260,6 +277,9 @@ public class MqClientDefault implements MqClientInternal {
         }
     }
 
+    /**
+     * 关闭
+     */
     @Override
     public void close() throws IOException {
         clientSession.close();

@@ -53,7 +53,7 @@
 
 | role     | function                                                                                    | 
 |----------|---------------------------------------------------------------------------------------------|
-| Producer | Publish messages (Qos0, Qos1), publish timed messages (Qos0, Qos1), publish retry           |     
+| Producer | Publish messages (Qos0, Qos1), publish timed messages (Qos0, Qos1)                          |     
 |          |                                                                                             |       
 | Consumer | Subscribe, unsubscribe                                                                      |        
 | Consumer | Consume-ACK (automatic, manual)                                                             |      

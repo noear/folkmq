@@ -36,13 +36,6 @@ public interface MqClient extends Closeable {
     MqClient autoAcknowledge(boolean auto);
 
     /**
-     * 发布重试
-     *
-     * @param times 次数（默认为 0）
-     */
-    MqClient publishRetryTimes(int times);
-
-    /**
      * 订阅主题
      *
      * @param topic           主题

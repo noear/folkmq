@@ -22,6 +22,7 @@
         <tr>
             <td class="left" rowspan="2">队列</td>
             <td colspan="9">集群消息汇总</td>
+            <td width="60px" rowspan="2" class="center">会话数</td>
         </tr>
         <tr>
             <td width="100px" class="center">总数</td>
@@ -48,6 +49,7 @@
                 <td class="center">${item.messageDelayedCount6}</td>
                 <td class="center">${item.messageDelayedCount7}</td>
                 <td class="center">${item.messageDelayedCount8}</td>
+                <td class="center">${item.sessionCount}</td>
             </tr>
         </#list>
         </tbody>

@@ -147,35 +147,6 @@ public class AdminController extends BaseController {
         return view("admin_queue").put("list", list);
     }
 
-    @Mapping("/admin/session")
-    public ModelAndView session() {
-        List<String> nameList = new ArrayList<>(brokerListener.getNameAll());
-        nameList.sort(String::compareTo);
-
-        List<SessionVo> list = new ArrayList<>();
-
-        //用 list 转一下，免避线程安全
-        for (String name : nameList) {
-            if(MqConstants.BROKER_AT_SERVER.equals(name)){
-                continue;
-            }
-
-            Collection<Session> sessions = brokerListener.getPlayerAll(name);
-
-            SessionVo sessionVo = new SessionVo();
-            sessionVo.setName(name);
-            sessionVo.setSessionCount(sessions.size());
-
-            list.add(sessionVo);
-
-            //不超过99
-            if (list.size() == 99) {
-                break;
-            }
-        }
-
-        return view("admin_session").put("list", list);
-    }
 
     @Mapping("/admin/server")
     public ModelAndView server() throws IOException {

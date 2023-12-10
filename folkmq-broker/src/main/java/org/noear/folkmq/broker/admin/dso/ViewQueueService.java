@@ -46,6 +46,7 @@ public class ViewQueueService implements LifecycleBean {
             if (queueVo == null) {
                 queueVo = new QueueVo();
                 queueVo.queue = queue;
+                queueVo.sessionCount = brokerListener.getPlayerAll(queue).size();
             }
 
             list.add(queueVo);
@@ -59,6 +60,9 @@ public class ViewQueueService implements LifecycleBean {
         delay();
     }
 
+    /**
+     * 延时处理
+     * */
     private void delay() {
         long sync_time_millis = Integer.parseInt(Solon.cfg().get(
                 ConfigNames.folkmq_view_queue_syncInterval,
@@ -102,7 +106,7 @@ public class ViewQueueService implements LifecycleBean {
     private void addQueueVo(List<QueueVo> list, Map<String, QueueVo> coll) {
         synchronized (QUEUE_LOCK) {
             for (QueueVo queueVo : list) {
-                if(Utils.isEmpty(queueVo.queue)){
+                if (Utils.isEmpty(queueVo.queue)) {
                     continue;
                 }
 
@@ -120,6 +124,9 @@ public class ViewQueueService implements LifecycleBean {
                 stat.messageDelayedCount6 += queueVo.messageDelayedCount6;
                 stat.messageDelayedCount7 += queueVo.messageDelayedCount7;
                 stat.messageDelayedCount8 += queueVo.messageDelayedCount8;
+
+                String topic = queueVo.queue.split(MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP)[0];
+                brokerListener.subscribeDo(topic, queueVo.queue);
             }
         }
     }

@@ -44,12 +44,12 @@ public class ViewQueueService implements LifecycleBean {
         for (String queue : new ArrayList<>(queueSet)) {
             QueueVo queueVo = queueVoMap.get(queue);
             if (queueVo == null) {
-                queueVo = new QueueVo();
+                queueVo = new QueueVo();//初始化
                 queueVo.queue = queue;
-
-                queueVo.sessionCount = brokerListener.getPlayerNum(queue);
             }
 
+            //随时刷新
+            queueVo.sessionCount = brokerListener.getPlayerNum(queue);
             list.add(queueVo);
         }
 

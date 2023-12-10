@@ -58,6 +58,26 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
         }
     }
 
+    private void saveCommit(File fileTmp, String fileName) throws IOException {
+        //
+        // 1. write to .fdb.tmp; （避免写的时候破坏 .fdb）
+        // 2. del .fdb.bak
+        // 3. .fdb -> .fdb.bak
+        // 4. .fdb.tmp -> .fdb （万一失败了，可以从 .fdb.back 还原）
+        //
+        File fileBak = new File(directory, fileName + ".bak");
+        if (fileBak.exists()) {
+            fileBak.delete();
+        }
+
+        File file = new File(directory, fileName);
+        if (file.exists()) {
+            file.renameTo(fileBak);
+        }
+
+        fileTmp.renameTo(file);
+    }
+
     public boolean inSaveProcess() {
         return inSaveProcess.get();
     }
@@ -243,12 +263,16 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
 
     @Override
     public void onStopAfter() {
-        onSave();
+        saveDo();
         isStarted.set(false);
     }
 
     @Override
     public void onSave() {
+        saveDo();
+    }
+
+    private void saveDo(){
         if (isStarted.get() == false) {
             //未加载完成（不可保存，否则会盖掉加载中的数据）
             return;
@@ -287,15 +311,18 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
             return;
         }
 
-        File subscribeMapFile = new File(directory, "subscribe-map.fdb");
+        //先写临时文件；成功写完再替代正试文件
+        String subscribeMapFileName = "subscribe-map.fdb";
+        String subscribeMapFileNameTmp = subscribeMapFileName + ".tmp";
+        File subscribeMapFileTmp = new File(directory, subscribeMapFileNameTmp);
 
-        if (subscribeMapFile.exists() == false) {
-            subscribeMapFile.createNewFile();
+        if (subscribeMapFileTmp.exists() == false) {
+            subscribeMapFileTmp.createNewFile();
         }
 
         List<String> topicList = new ArrayList<>(subscribeMap.keySet());
 
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(subscribeMapFile))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(subscribeMapFileTmp))) {
             for (String topic : topicList) {
                 List<String> topicConsumerList = new ArrayList<>(subscribeMap.get(topic));
                 ONode topicJson = new ONode(Options.def().add(Feature.DisThreadLocal));
@@ -307,6 +334,9 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
                 writer.newLine();
             }
         }
+
+        //备份
+        saveCommit(subscribeMapFileTmp, subscribeMapFileName);
     }
 
     /**
@@ -353,16 +383,18 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
         }
 
         String queueFileName = topicConsumerGroupAry[0] + "/" + topicConsumerGroupAry[1] + file_suffix;
-        File queueFile = new File(directory, queueFileName);
-        if (queueFile.exists() == false) {
-            queueFile.createNewFile();
+        String queueFileNameTmp = queueFileName +".tmp";
+
+        File queueFileTmp = new File(directory, queueFileNameTmp);
+        if (queueFileTmp.exists() == false) {
+            queueFileTmp.createNewFile();
         }
 
 
         if (queue != null) {
             List<MqMessageHolder> messageList = new ArrayList<>(queue.getMessageMap().values());
 
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter(queueFile))) {
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(queueFileTmp))) {
                 for (MqMessageHolder messageHolder : messageList) {
                     if (messageHolder.isDone()) {
                         continue;
@@ -382,8 +414,14 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
                     }
                 }
             }
+
+            //备份
+            saveCommit(queueFileTmp, queueFileName);
         } else {
-            saveSnapshotFile(queueFile, "");
+            saveSnapshotFile(queueFileTmp, "");
+
+            //备份
+            saveCommit(queueFileTmp, queueFileName);
         }
     }
 
@@ -395,7 +433,7 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
             byte[] bytes = IoUtils.transferToBytes(input);
 
             //解压
-            byte[] contentBytes = bytes;//GzipUtils.decompress(bytes);
+            byte[] contentBytes = bytes;
             return new String(contentBytes, StandardCharsets.UTF_8);
         }
     }
@@ -406,7 +444,7 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
     private static void saveSnapshotFile(File file, String content) throws IOException {
         //压缩
         byte[] contentBytes = content.getBytes(StandardCharsets.UTF_8);
-        byte[] bytes = contentBytes;//GzipUtils.compress(contentBytes);
+        byte[] bytes = contentBytes;
 
         try (ByteArrayInputStream input = new ByteArrayInputStream(bytes);
              OutputStream out = new FileOutputStream(file)) {

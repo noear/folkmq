@@ -92,29 +92,34 @@ public class BrokerListenerFolkmq extends BrokerListener {
         if (MqConstants.MQ_EVENT_SUBSCRIBE.equals(message.event())) {
             //订阅，注册玩家
             String topic = message.meta(MqConstants.MQ_META_TOPIC);
-            String consumer = message.meta(MqConstants.MQ_META_CONSUMER_GROUP);
-            requester.attr(consumer, "1");
-            addPlayer(consumer, requester);
+            String consumerGroup = message.meta(MqConstants.MQ_META_CONSUMER_GROUP);
+            String queueName = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP + consumerGroup;
 
-            subscribeDo(topic, consumer);
+            requester.attr(queueName, "1");
+            addPlayer(queueName, requester);
+
+            subscribeDo(topic, queueName);
         } else if (MqConstants.MQ_EVENT_UNSUBSCRIBE.equals(message.event())) {
             //取消订阅，注销玩家
-            String consumer = message.meta(MqConstants.MQ_META_CONSUMER_GROUP);
-            removePlayer(consumer, requester);
+            String topic = message.meta(MqConstants.MQ_META_TOPIC);
+            String consumerGroup = message.meta(MqConstants.MQ_META_CONSUMER_GROUP);
+            String queueName = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP + consumerGroup;
+
+            removePlayer(queueName, requester);
         } else if (MqConstants.MQ_EVENT_DISTRIBUTE.equals(message.event())) {
             String atName = message.at();
 
             //单发模式（给同名的某个玩家，轮询负截均衡）
             Session responder = getPlayerOne(atName);
-            if (responder != null) {
+            if (responder != null && responder.isValid()) {
                 //转发消息
-                forwardToSession(requester, message, responder);
-            } else {
-                //如果没有会话，自动转为ACK失败
-                if(message.isSubscribe() || message.isRequest()){
-                    requester.replyEnd(message, new StringEntity("")
-                            .meta(MqConstants.MQ_META_ACK, "0"));
+                try {
+                    forwardToSession(requester, message, responder);
+                } catch (Throwable e) {
+                    ackNo(requester, message);
                 }
+            } else {
+                ackNo(requester, message);
             }
             return;
         }
@@ -122,13 +127,20 @@ public class BrokerListenerFolkmq extends BrokerListener {
         super.onMessage(requester, message);
     }
 
-    public void subscribeDo(String topic, String consumer) {
-        String topicConsumer = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP + consumer;
+    private void ackNo(Session requester, Message message) throws IOException{
+        //如果没有会话，自动转为ACK失败
+        if (message.isSubscribe() || message.isRequest()) {
+            requester.replyEnd(message, new StringEntity("")
+                    .meta(MqConstants.MQ_META_ACK, "0"));
+        }
+    }
+
+    public void subscribeDo(String topic, String queueName) {
 
         synchronized (SUBSCRIBE_LOCK) {
             //以身份进行订阅(topic=>[topicConsumer])
             Set<String> topicConsumerSet = subscribeMap.computeIfAbsent(topic, n -> Collections.newSetFromMap(new ConcurrentHashMap<>()));
-            topicConsumerSet.add(topicConsumer);
+            topicConsumerSet.add(queueName);
         }
     }
 }

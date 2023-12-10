@@ -396,7 +396,7 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
         MqQueue queue = queueMap.get(queueName);
 
         if (queue != null) {
-            MqMessageHolder messageHolder = new MqMessageHolder(queue.getConsumerGroup(), message, tid, qos, times, scheduled);
+            MqMessageHolder messageHolder = new MqMessageHolder(queueName, queue.getConsumerGroup(), message, tid, qos, times, scheduled);
             queue.add(messageHolder);
         }
     }

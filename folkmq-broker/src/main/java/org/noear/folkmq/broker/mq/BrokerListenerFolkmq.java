@@ -28,6 +28,15 @@ public class BrokerListenerFolkmq extends BrokerListener {
         return subscribeMap;
     }
 
+    public int getPlayerNum(String name) {
+        Collection<Session> tmp = getPlayerAll(name);
+        if (tmp == null) {
+            return 0;
+        } else {
+            return tmp.size();
+        }
+    }
+
     /**
      * 配置访问账号
      *

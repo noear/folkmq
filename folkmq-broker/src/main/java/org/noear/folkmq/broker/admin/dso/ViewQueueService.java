@@ -46,7 +46,8 @@ public class ViewQueueService implements LifecycleBean {
             if (queueVo == null) {
                 queueVo = new QueueVo();
                 queueVo.queue = queue;
-                queueVo.sessionCount = brokerListener.getPlayerAll(queue).size();
+
+                queueVo.sessionCount = brokerListener.getPlayerNum(queue);
             }
 
             list.add(queueVo);

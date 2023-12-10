@@ -12,7 +12,7 @@ public class MqNextTime {
     static {
         String tmp = System.getProperty("folkmq.maxConsumeWaiting");
         if (tmp != null) {
-            maxConsumeMillis = Integer.parseInt(tmp.replace("s","").trim()) * 1000;
+            maxConsumeMillis = Integer.parseInt(tmp.toLowerCase().replace("s","").trim()) * 1000;
         }
     }
 

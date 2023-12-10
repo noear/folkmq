@@ -35,6 +35,7 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
     //队列字典(queueName=>Queue)
     private Map<String, MqQueue> queueMap = new ConcurrentHashMap<>();
 
+    //派发线程
     private Thread distributeThread;
 
     private boolean brokerMode;

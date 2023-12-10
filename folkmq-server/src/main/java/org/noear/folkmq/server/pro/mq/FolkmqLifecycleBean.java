@@ -130,10 +130,7 @@ public class FolkmqLifecycleBean implements LifecycleBean {
                 .open();
 
         //启动时恢复快照
-        if (saveEnable) {
-            snapshotPlus.onStartBefore();
-            snapshotPlus.onStartAfter();
-        }
+        brokerServiceListener.start(null);
 
         //加入容器
         appContext.wrapAndPut(MqServiceInternal.class, brokerServiceListener);
@@ -149,13 +146,9 @@ public class FolkmqLifecycleBean implements LifecycleBean {
         }
 
         if (brokerSession != null) {
-            //停止时会触发快照
-            if (saveEnable) {
-                snapshotPlus.onStopBefore();
-                snapshotPlus.onStopAfter();
-            }
-
             brokerSession.close();
+            //停止时会触发快照
+            brokerServiceListener.stop(null);
         }
     }
 }

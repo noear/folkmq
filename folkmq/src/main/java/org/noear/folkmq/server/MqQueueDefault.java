@@ -111,23 +111,22 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
     }
 
     private void internalRemove(MqMessageHolder mh) {
-        if (messageQueue.remove(mh)) {
-            messageCountSub(mh);
-        }
+        messageQueue.remove(mh);
+        messageCountSub(mh);
     }
 
     /**
      * 消息总量
      */
     public int messageTotal() {
-        return messageQueue.size();
+        return messageMap.size();
     }
 
     /**
      * 消息总量2（用于做校验）
      */
     public int messageTotal2() {
-        return messageMap.size();
+        return messageQueue.size();
     }
 
     /**
@@ -187,34 +186,29 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
             //1.给会话发送消息 //如果有异步，上面会加入队列
             s1.sendAndRequest(MqConstants.MQ_EVENT_DISTRIBUTE, messageHolder.getContent(), m -> {
                 int ack = Integer.parseInt(m.metaOrDefault(MqConstants.MQ_META_ACK, "0"));
-                acknowledgeDo(messageHolder, ack);
+                acknowledgeDo(messageHolder, ack, true);
             });
 
-            //2.添加延时任务：2小时后，如果没有回执就重发（即消息最长不能超过2小时）
-            messageHolder.setDistributeTime(System.currentTimeMillis() + MqNextTime.getMaxDelayMillis());
+            //2.添加延时任务：2h1s 后，如果没有回执就重发（即消息最长不能超过2小时）
+            messageHolder.setDistributeTime(System.currentTimeMillis() + MqNextTime.getMaxDelayMillis() + 1000);
             internalAdd(messageHolder);
         } else {
             //::Qos0
             s1.send(MqConstants.MQ_EVENT_DISTRIBUTE, messageHolder.getContent());
-            //观察者::回执时
-            watcher.onAcknowledge(topic, consumerGroup, messageHolder, true);
-
-            messageMap.remove(messageHolder.getTid());
-
-            //移除前，不要改属性
-            messageHolder.setDone(true);
+            acknowledgeDo(messageHolder, 1, false);
         }
     }
 
-    private void acknowledgeDo(MqMessageHolder messageHolder, int ack) {
+    private void acknowledgeDo(MqMessageHolder messageHolder, int ack, boolean removeQueue) {
         //观察者::回执时
         watcher.onAcknowledge(topic, consumerGroup, messageHolder, ack > 0);
 
         if (ack > 0) {
             //ok
             messageMap.remove(messageHolder.getTid());
-            internalRemove(messageHolder);
-
+            if (removeQueue) {
+                internalRemove(messageHolder);
+            }
             //移除前，不要改移性
             messageHolder.setDone(true);
         } else {

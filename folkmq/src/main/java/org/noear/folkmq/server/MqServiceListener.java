@@ -402,7 +402,8 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
             try {
                 int count = 0;
 
-                for (MqQueue queue : queueMap.values()) {
+                List<MqQueue> queueList = new ArrayList<>(queueMap.values());
+                for (MqQueue queue : queueList) {
                     try {
                         if (queue.distribute()) {
                             count++;

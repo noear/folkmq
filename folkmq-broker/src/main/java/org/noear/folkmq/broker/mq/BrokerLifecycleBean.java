@@ -29,7 +29,7 @@ public class BrokerLifecycleBean implements LifecycleBean {
 
         brokerServer = SocketD.createServer("sd:tcp")
                 .config(c -> c.port(Solon.cfg().serverPort() + 10000)
-                        .maxThreads(c.getCoreThreads() * 2) //默认为8
+                        .maxThreads(c.getCoreThreads() * 4) //默认为8
                         .fragmentHandler(new BrokerFragmentHandler()))
                 .listen(brokerListener)
                 .start();

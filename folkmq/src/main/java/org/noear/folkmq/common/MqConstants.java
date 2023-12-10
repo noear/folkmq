@@ -63,8 +63,8 @@ public interface MqConstants {
 
     /**
      * 管理视图-队列
-     * */
-    String ADMIN_VIEW_QUEUE ="admin.view.queue";
+     */
+    String ADMIN_VIEW_QUEUE = "admin.view.queue";
 
     /**
      * 连接参数：ak
@@ -89,4 +89,9 @@ public interface MqConstants {
      * 经理人所有服务
      */
     String BROKER_AT_SERVER_ALL = "folkmq-server*";
+
+    /**
+     * 最大分片大小（1m）
+     */
+    int MAX_FRAGMENT_SIZE = 1024 * 1024;
 }

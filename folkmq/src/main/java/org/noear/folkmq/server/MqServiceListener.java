@@ -167,7 +167,9 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
         watcher.onStartBefore();
 
         //启动
-        onStart.run();
+        if (onStart != null) {
+            onStart.run();
+        }
         distributeThread.start();
 
         //观察者::服务启动之后
@@ -191,7 +193,9 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
         watcher.onStopBefore();
 
         //停止
-        onStop.run();
+        if (onStop != null) {
+            onStop.run();
+        }
         distributeThread.interrupt();
 
         //观察者::服务停止之后

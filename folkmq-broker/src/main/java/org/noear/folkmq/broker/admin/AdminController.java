@@ -156,6 +156,10 @@ public class AdminController extends BaseController {
 
         //用 list 转一下，免避线程安全
         for (String name : nameList) {
+            if(MqConstants.BROKER_AT_SERVER.equals(name)){
+                continue;
+            }
+
             Collection<Session> sessions = brokerListener.getPlayerAll(name);
 
             SessionVo sessionVo = new SessionVo();

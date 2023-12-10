@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html class="frm10">
 <head>
-    <title>${app} - 连接会话</title>
+    <title>${app} - 消费者会话</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8 "/>
     <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico"/>
     <link rel="stylesheet" href="${css}/main.css"/>
@@ -13,15 +13,15 @@
 </head>
 <body>
 <toolbar class="blockquote">
-    <left>连接会话</left>
+    <left>消费者会话</left>
     <right></right>
 </toolbar>
 <datagrid class="list">
     <table>
         <thead>
         <tr>
-            <td width="300px" class="left">名字</td>
-            <td class="left">会话数量</td>
+            <td width="300px" class="left">队列</td>
+            <td class="left">消费者会话数量</td>
         </tr>
         </thead>
         <tbody id="tbody">

@@ -36,8 +36,8 @@
         <menu>
             <div onclick="$('main').toggleClass('smlmenu');if(window.onMenuHide){window.onMenuHide();}"><i class='fa fa-bars'></i></div>
             <items>
-                <a class='sel' href='/admin/session' target="dock">会话看板</a>
-                <a href='/admin/server' target="dock">节点看板</a>
+                <a class='sel' href='/admin/server' target="dock">集群节点</a>
+                <a href='/admin/session' target="dock">消费会话</a>
                 <a href='/admin/topic' target="dock">主题看板</a>
                 <a href='/admin/queue' target="dock">消息看板</a>
                 <br/><br/>
@@ -46,7 +46,7 @@
         </menu>
     </left>
     <right class="frm">
-        <iframe src="/admin/session" frameborder="0" name="dock"></iframe>
+        <iframe src="/admin/server" frameborder="0" name="dock"></iframe>
     </right>
 </main>
 </body>

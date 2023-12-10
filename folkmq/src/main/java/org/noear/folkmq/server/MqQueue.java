@@ -45,6 +45,11 @@ public interface MqQueue {
     void add(MqMessageHolder messageHolder);
 
     /**
+     * 派发消息
+     * */
+    boolean distribute();
+
+    /**
      * 消息总量
      * */
     int messageTotal();

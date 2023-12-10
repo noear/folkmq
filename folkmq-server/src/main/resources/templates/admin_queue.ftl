@@ -23,7 +23,6 @@
             <td class="left" rowspan="2">队列</td>
             <td colspan="9">消息数</td>
             <td width="50px" rowspan="2" class="center">会话数</td>
-            <td width="130px" rowspan="2" class="center">状态</td>
         </tr>
         <tr>
             <td width="100px" class="center">总数</td>
@@ -51,7 +50,6 @@
                 <td class="center">${item.messageDelayedCount7}</td>
                 <td class="center">${item.messageDelayedCount8}</td>
                 <td class="center">${item.sessionCount}</td>
-                <td class="center">${item.state}</td>
             </tr>
         </#list>
         </tbody>

@@ -249,7 +249,7 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
                         scheduled = Long.parseLong(scheduledStr);
                     }
 
-                    serverRef.exchangeDo(queueName, message, tid, qos, times, scheduled);
+                    serverRef.routingDo(queueName, message, tid, qos, times, scheduled);
                 }
             }
 

@@ -34,7 +34,6 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
 
     //消息队列与处理线程
     private final DelayQueue<MqMessageHolder> messageQueue;
-    private final Thread messageQueueThread;
 
     public MqQueueDefault(MqWatcher watcher, String topic, String consumerGroup, String queueName) {
         super();
@@ -47,41 +46,20 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
         this.messageMap = new ConcurrentHashMap<>();
 
         this.messageQueue = new DelayQueue<>();
-        this.messageQueueThread = new Thread(this::queueTake);
-        this.messageQueueThread.start();
     }
 
-    //单线程计数
-    private long messageQueueTakeRef = 0;
+    /**
+     * 提取
+     */
+    @Override
+    public boolean distribute() {
+        MqMessageHolder messageHolder = messageQueue.poll();
 
-    private void queueTake() {
-        while (!messageQueueThread.isInterrupted()) {
-            try {
-                MqMessageHolder messageHolder = messageQueue.poll();
-
-                if (messageHolder != null) {
-                    messageQueueTakeRef = 0;
-                    messageCountSub(messageHolder);
-                    distribute(messageHolder);
-                } else {
-                    if ((messageQueueTakeRef++) > 1000) {
-                        if (log.isDebugEnabled()) {
-                            log.debug("MqQueue take as null *1000, queue={}#{}", topic, consumerGroup);
-                        }
-                        messageQueueTakeRef = 0;
-                    }
-
-                    Thread.sleep(100);
-                }
-            } catch (Throwable e) {
-                if (log.isWarnEnabled()) {
-                    log.warn("MqQueue take error, queue={}#{}", topic, consumerGroup, e);
-                }
-            }
-        }
-
-        if (log.isWarnEnabled()) {
-            log.warn("MqQueue take stoped!");
+        if (messageHolder != null) {
+            distribute0(messageHolder);
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -103,16 +81,9 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
 
     /**
      * 获取主题消费者
-     * */
+     */
     public String getQueueName() {
         return queueName;
-    }
-
-    /**
-     * 状态
-     * */
-    public Thread.State state() {
-        return messageQueueThread.getState();
     }
 
     /**
@@ -162,7 +133,9 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
     /**
      * 执行派发
      */
-    protected void distribute(MqMessageHolder messageHolder) {
+    protected void distribute0(MqMessageHolder messageHolder) {
+        messageCountSub(messageHolder);
+
         if (messageHolder.isDone()) {
             messageMap.remove(messageHolder.getTid());
             return;
@@ -256,10 +229,6 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
      */
     @Override
     public void close() {
-        if (messageQueueThread != null) {
-            messageQueueThread.interrupt();
-        }
-
         messageQueue.clear();
         messageMap.clear();
         super.close();

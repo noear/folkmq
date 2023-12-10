@@ -35,12 +35,16 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
     //队列字典(queueName=>Queue)
     private Map<String, MqQueue> queueMap = new ConcurrentHashMap<>();
 
+    private Thread distributeThread;
+
     private boolean brokerMode;
 
 
     public MqServiceListener(boolean brokerMode) {
         //::初始化 Watcher 接口
         this.brokerMode = brokerMode;
+
+        this.distributeThread = new Thread(this::distributeDo, "distributeThread");
 
         this.watcher = new MqWatcherDefault();
         this.watcher.init(this);
@@ -95,7 +99,7 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
             watcher.onPublish(m);
 
             //执行交换
-            exchangeDo(m);
+            routingDo(m);
 
             //再答复（以支持同步的原子性需求。同步或异步，由用户按需控制）
             if (m.isRequest() || m.isSubscribe()) { //此判断兼容 Qos0, Qos1
@@ -163,6 +167,7 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
 
         //启动
         onStart.run();
+        distributeThread.start();
 
         //观察者::服务启动之后
         watcher.onStartAfter();
@@ -186,6 +191,7 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
 
         //停止
         onStop.run();
+        distributeThread.interrupt();
 
         //观察者::服务停止之后
         watcher.onStopAfter();
@@ -340,10 +346,10 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
     }
 
     /**
-     * 执行交换
+     * 执行路由
      */
     @Override
-    public void exchangeDo(Message message) {
+    public void routingDo(Message message) {
         String tid = message.meta(MqConstants.MQ_META_TID);
         //可能是非法消息
         if (Utils.isEmpty(tid)) {
@@ -373,17 +379,55 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
             List<String> topicConsumerList = new ArrayList<>(topicConsumerSet);
 
             for (String topicConsumer : topicConsumerList) {
-                exchangeDo(topicConsumer, message, tid, qos, times, scheduled);
+                routingDo(topicConsumer, message, tid, qos, times, scheduled);
             }
         }
     }
 
-    public void exchangeDo(String queueName, Message message, String tid, int qos, int times, long scheduled) {
+    /**
+     * 执行路由
+     */
+    public void routingDo(String queueName, Message message, String tid, int qos, int times, long scheduled) {
         MqQueue queue = queueMap.get(queueName);
 
         if (queue != null) {
             MqMessageHolder messageHolder = new MqMessageHolder(queue.getConsumerGroup(), message, tid, qos, times, scheduled);
             queue.add(messageHolder);
+        }
+    }
+
+    private void distributeDo() {
+        while (!distributeThread.isInterrupted()) {
+            try {
+                int count = 0;
+
+                for (MqQueue queue : queueMap.values()) {
+                    try {
+                        if (queue.distribute()) {
+                            count++;
+                        }
+                    } catch (Throwable e) {
+                        if (log.isWarnEnabled()) {
+                            log.warn("MqQueue take error, queue={}", queue.getQueueName(), e);
+                        }
+                    }
+                }
+
+                if (count == 0) {
+                    //一点消息都没有，就修复下
+                    Thread.sleep(100);
+                }
+            } catch (Throwable e) {
+                if (e instanceof InterruptedException == false) {
+                    if (log.isWarnEnabled()) {
+                        log.warn("MqQueue distribute error", e);
+                    }
+                }
+            }
+        }
+
+        if (log.isWarnEnabled()) {
+            log.warn("MqQueue take stoped!");
         }
     }
 }

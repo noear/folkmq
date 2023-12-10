@@ -30,8 +30,6 @@ public class ViewUtils {
             QueueVo queueVo = new QueueVo();
             queueVo.queue = queue.getQueueName();
 
-            //queueVo.isAlive = (queue.isAlive());
-            queueVo.state = (queue.state().name());
             queueVo.sessionCount = (queue.sessionCount());
             queueVo.messageCount = (queue.messageTotal());
 

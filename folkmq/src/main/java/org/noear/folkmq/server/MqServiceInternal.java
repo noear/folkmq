@@ -42,14 +42,14 @@ public interface MqServiceInternal {
     void unsubscribeDo(String topic, String consumerGroup, Session session);
 
     /**
-     * 执行交换
+     * 执行路由
      *
      * @param message 消息
      */
-    void exchangeDo(Message message);
+    void routingDo(Message message);
 
     /**
-     * 执行交换
+     * 执行路由
      *
      * @param queueName 队列名
      * @param message   消息
@@ -58,7 +58,7 @@ public interface MqServiceInternal {
      * @param times     派发次数
      * @param scheduled 计划时间
      */
-    void exchangeDo(String queueName, Message message, String tid, int qos, int times, long scheduled);
+    void routingDo(String queueName, Message message, String tid, int qos, int times, long scheduled);
 
     /**
      * 保存

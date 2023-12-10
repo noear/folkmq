@@ -189,8 +189,8 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
                 acknowledgeDo(messageHolder, ack, true);
             });
 
-            //2.添加延时任务：2h1s 后，如果没有回执就重发（即消息最长不能超过2小时）
-            messageHolder.setDistributeTime(System.currentTimeMillis() + MqNextTime.getMaxDelayMillis() + 1000);
+            //2.添加保险延时任务：如果没有回执就重发
+            messageHolder.setDistributeTime(System.currentTimeMillis() + MqNextTime.maxConsumeMillis());
             internalAdd(messageHolder);
         } else {
             //::Qos0

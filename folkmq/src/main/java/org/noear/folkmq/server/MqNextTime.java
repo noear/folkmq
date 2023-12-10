@@ -7,13 +7,20 @@ package org.noear.folkmq.server;
  * @since 1.0
  */
 public class MqNextTime {
-    private static long maxDelayMillis = 1000 * 60 * 60 * 2;
+    private static long maxConsumeMillis = 1000 * 60 * 3;
+
+    static {
+        String tmp = System.getProperty("folkmq.maxConsumeWaiting");
+        if (tmp != null) {
+            maxConsumeMillis = Integer.parseInt(tmp.replace("s","").trim()) * 1000;
+        }
+    }
 
     /**
-     * 最大延时毫秒数（2小时）
+     * 最大消费时间（3M）
      * */
-    public static long getMaxDelayMillis() {
-        return maxDelayMillis;
+    public static long maxConsumeMillis() {
+        return maxConsumeMillis;
     }
 
     /**

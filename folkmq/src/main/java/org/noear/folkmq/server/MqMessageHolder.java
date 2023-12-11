@@ -23,9 +23,9 @@ public class MqMessageHolder implements Delayed {
     private final int qos;
 
     //派发时间
-    private long distributeTime;
+    private volatile long distributeTime;
     //派发次数
-    private int distributeCount;
+    private volatile int distributeCount;
     //是否完成
     private AtomicBoolean isDone;
 

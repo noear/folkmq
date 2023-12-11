@@ -68,7 +68,7 @@
 FolkMQ 为商业开源软件，其中：
 
 * 单机部署版，为社区版功能（免费授权使用）
-* 集群部署版，为企业版功能（付费授权使用）。详见：[《企业版》](https://folkmq.noear.org/article/edition)
+* 集群部署版，为专业版、企业版功能（付费授权使用）。详见：[《版本规划》](https://folkmq.noear.org/article/edition)
 
 
 ## 特点

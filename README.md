@@ -68,7 +68,7 @@
 FolkMQ is a commercial open source software that:
 
 * Standalone deployment, Community Edition features (free for licensed use)
-* Cluster deployment edition, for Enterprise Edition features (paid and licensed)。See：[《Enterprise Edition》](https://folkmq.noear.org/article/edition)
+* Cluster deployment edition, for Professional edition, Enterprise edition features (paid license use)。详见：[《Product planning》](https://folkmq.noear.org/article/edition)
 
 
 ## Features

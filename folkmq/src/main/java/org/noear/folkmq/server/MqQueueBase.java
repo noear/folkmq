@@ -78,7 +78,9 @@ public abstract class MqQueueBase implements MqQueue {
      */
     @Override
     public void addSession(Session session) {
-        consumerSessions.add(session);
+        if (consumerSessions.contains(session) == false) {
+            consumerSessions.add(session);
+        }
     }
 
     /**

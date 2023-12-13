@@ -13,8 +13,8 @@ import java.util.concurrent.TimeUnit;
  * @author noear
  * @since 1.0
  */
-public class TestCase01_send extends BaseTestCase {
-    public TestCase01_send(int port) {
+public class TestCase01_publish extends BaseTestCase {
+    public TestCase01_publish(int port) {
         super(port);
     }
 

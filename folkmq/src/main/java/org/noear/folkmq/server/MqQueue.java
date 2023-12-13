@@ -45,6 +45,11 @@ public interface MqQueue {
     void add(MqMessageHolder messageHolder);
 
     /**
+     * 移除消息
+     * */
+    void removeAt(String tid);
+
+    /**
      * 派发消息
      * */
     boolean distribute();

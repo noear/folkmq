@@ -204,6 +204,32 @@ public class MqClientDefault implements MqClientInternal {
         return future;
     }
 
+    @Override
+    public void unpublish(String topic, String tid) throws IOException {
+        if (clientSession == null) {
+            throw new SocketdConnectionException("Not connected!");
+        }
+
+        ClientSession session = clientSession.getSessionOne();
+        if (session == null || session.isValid() == false) {
+            throw new SocketdException("No session is available!");
+        }
+
+        Entity entity = new StringEntity("")
+                .meta(MqConstants.MQ_META_TOPIC, topic)
+                .meta(MqConstants.MQ_META_TID, tid)
+                .at(MqConstants.BROKER_AT_SERVER_ALL);
+
+        //::Qos1
+        Entity resp = session.sendAndRequest(MqConstants.MQ_EVENT_UNPUBLISH, entity);
+
+        int confirm = Integer.parseInt(resp.metaOrDefault(MqConstants.MQ_META_CONFIRM, "0"));
+        if (confirm != 1) {
+            String messsage = "Client message unpublish confirm failed: " + resp.dataAsString();
+            throw new FolkmqException(messsage);
+        }
+    }
+
 
     /**
      * 消费回执

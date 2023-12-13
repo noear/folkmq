@@ -112,6 +112,24 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
             }
         });
 
+        //接收取消发布指令
+        on(MqConstants.MQ_EVENT_UNPUBLISH, (s,m)->{
+            //观察者::取消发布时（适配时，可选择同步或异步。同步可靠性高，异步性能好）
+            watcher.onUnPublish(m);
+
+            //执行交换
+            unRoutingDo(m);
+
+            //再答复（以支持同步的原子性需求。同步或异步，由用户按需控制）
+            if (m.isRequest() || m.isSubscribe()) { //此判断兼容 Qos0, Qos1
+                //发送“确认”，表示服务端收到了
+                if (s.isValid()) {
+                    //如果会话仍有效，则答复（有可能会半路关掉）
+                    s.replyEnd(m, new StringEntity("").meta(MqConstants.MQ_META_CONFIRM, "1"));
+                }
+            }
+        });
+
         //接收保存指令
         on(MqConstants.MQ_EVENT_SAVE, (s, m) -> {
             save();
@@ -376,7 +394,7 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
         }
 
 
-        //取出所有订阅的主题消息者
+        //取出所有订阅的主题消费者
         Set<String> topicConsumerSet = subscribeMap.get(topic);
 
         if (topicConsumerSet != null) {
@@ -398,6 +416,34 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
         if (queue != null) {
             MqMessageHolder messageHolder = new MqMessageHolder(queueName, queue.getConsumerGroup(), message, tid, qos, times, scheduled);
             queue.add(messageHolder);
+        }
+    }
+
+    /**
+     * 执行取消路由
+     */
+    public void unRoutingDo(Message message) {
+        String tid = message.meta(MqConstants.MQ_META_TID);
+        //可能是非法消息
+        if (Utils.isEmpty(tid)) {
+            log.warn("The tid cannot be null, sid={}", message.sid());
+            return;
+        }
+
+        //复用解析
+        String topic = message.meta(MqConstants.MQ_META_TOPIC);
+
+        //取出所有订阅的主题消费者
+        Set<String> topicConsumerSet = subscribeMap.get(topic);
+
+        if (topicConsumerSet != null) {
+            //避免遍历 Set 时，出现 add or remove 而异常
+            List<String> topicConsumerList = new ArrayList<>(topicConsumerSet);
+
+            for (String topicConsumer : topicConsumerList) {
+                MqQueue queue = queueMap.get(topicConsumer);
+                queue.removeAt(tid);
+            }
         }
     }
 

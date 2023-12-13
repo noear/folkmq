@@ -98,6 +98,13 @@ public class MqWatcherComposite implements MqWatcher {
     }
 
     @Override
+    public void onUnPublish(Message message) {
+        for (MqWatcher persistent : persistentList) {
+            persistent.onUnPublish(message);
+        }
+    }
+
+    @Override
     public void onDistribute(String topic, String consumerGroup, MqMessageHolder messageHolder) {
         for (MqWatcher persistent : persistentList) {
             persistent.onDistribute(topic, consumerGroup, messageHolder);

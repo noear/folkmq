@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 public class CaseTest {
     @Test
     public void TestCase01_send() throws Exception {
-        BaseTestCase testCase = new TestCase01_send(2001);
+        BaseTestCase testCase = new TestCase01_publish(2001);
         testCase.start();
         testCase.stop();
     }
@@ -83,6 +83,13 @@ public class CaseTest {
     @Test
     public void TestCase16_ack_retry_multi_server() throws Exception {
         BaseTestCase testCase = new TestCase16_ack_retry_multi_server(2016);
+        testCase.start();
+        testCase.stop();
+    }
+
+    @Test
+    public void TestCase17_unpublish() throws Exception {
+        BaseTestCase testCase = new TestCase17_unpublish(2017);
         testCase.start();
         testCase.stop();
     }

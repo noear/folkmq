@@ -105,6 +105,17 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
         messageCountAdd(messageHolder);
     }
 
+    /**
+     * 移除消息
+     * */
+    @Override
+    public void removeAt(String tid) {
+        MqMessageHolder messageHolder = messageMap.remove(tid);
+        if (messageHolder != null) {
+            internalRemove(messageHolder);
+        }
+    }
+
     private void internalAdd(MqMessageHolder mh) {
         messageQueue.add(mh);
         messageCountAdd(mh);

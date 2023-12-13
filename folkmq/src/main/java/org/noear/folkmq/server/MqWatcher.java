@@ -66,6 +66,13 @@ public interface MqWatcher {
     void onPublish(Message message);
 
     /**
+     * 取消发布时
+     *
+     * @param message 消息
+     */
+    void onUnPublish(Message message);
+
+    /**
      * 派发时
      *
      * @param topic         主题

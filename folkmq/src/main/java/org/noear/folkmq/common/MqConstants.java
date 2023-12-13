@@ -53,6 +53,10 @@ public interface MqConstants {
      */
     String MQ_EVENT_PUBLISH = "mq.event.publish";
     /**
+     * 事件：取消发布
+     */
+    String MQ_EVENT_UNPUBLISH = "mq.event.unpublish";
+    /**
      * 事件：派发
      */
     String MQ_EVENT_DISTRIBUTE = "mq.event.distribute";

@@ -214,11 +214,12 @@ public class AdminController extends BaseController {
             Date scheduledDate = DateUtil.parse(scheduled);
 
             MqMessage message = new MqMessage(content).qos(qos).scheduled(scheduledDate);
-            Message routingMessage = MqUtils.routingMessageBuild(topic, message);
 
-            brokerListener.publishDo(routingMessage);
-
-            return Result.succeed();
+            if (brokerListener.publishDo(topic, message)) {
+                return Result.succeed();
+            } else {
+                return Result.failure("集群没有服务节点");
+            }
         } catch (Exception e) {
             return Result.failure(e.getLocalizedMessage());
         }

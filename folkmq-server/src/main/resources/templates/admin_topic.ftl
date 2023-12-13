@@ -21,7 +21,7 @@
         <thead>
         <tr>
             <td width="200px" class="left">主题</td>
-            <td class="left">队列</td>
+            <td class="left">队列（由订阅时自动产生）</td>
         </tr>
         </thead>
         <tbody id="tbody">

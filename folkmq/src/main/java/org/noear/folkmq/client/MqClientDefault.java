@@ -1,6 +1,7 @@
 package org.noear.folkmq.client;
 
 import org.noear.folkmq.common.MqConstants;
+import org.noear.folkmq.common.MqUtils;
 import org.noear.folkmq.exception.FolkmqException;
 import org.noear.socketd.SocketD;
 import org.noear.socketd.cluster.ClusterClientSession;
@@ -146,7 +147,7 @@ public class MqClientDefault implements MqClientInternal {
             throw new SocketdException("No session is available!");
         }
 
-        Entity entity = publishEntityBuildDo(topic, message);
+        Entity entity = MqUtils.publishEntityBuild(topic, message);
 
         if (message.getQos() > 0) {
             //::Qos1
@@ -181,7 +182,7 @@ public class MqClientDefault implements MqClientInternal {
         }
 
         CompletableFuture<Boolean> future = new CompletableFuture<>();
-        Entity entity = publishEntityBuildDo(topic, message);
+        Entity entity = MqUtils.publishEntityBuild(topic, message);
 
         if (message.getQos() > 0) {
             //::Qos1
@@ -203,24 +204,6 @@ public class MqClientDefault implements MqClientInternal {
         return future;
     }
 
-    /**
-     * 发布实体构建
-     */
-    private Entity publishEntityBuildDo(String topic, IMqMessage message) {
-        //构建消息实体
-        StringEntity entity = new StringEntity(message.getContent());
-        entity.meta(MqConstants.MQ_META_TID, message.getTid());
-        entity.meta(MqConstants.MQ_META_TOPIC, topic);
-        entity.meta(MqConstants.MQ_META_QOS, (message.getQos() == 0 ? "0" : "1"));
-        if (message.getScheduled() == null) {
-            entity.meta(MqConstants.MQ_META_SCHEDULED, "0");
-        } else {
-            entity.meta(MqConstants.MQ_META_SCHEDULED, String.valueOf(message.getScheduled().getTime()));
-        }
-        entity.at(MqConstants.BROKER_AT_SERVER);
-
-        return entity;
-    }
 
     /**
      * 消费回执

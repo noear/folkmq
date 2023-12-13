@@ -4,10 +4,13 @@ import org.noear.folkmq.broker.admin.dso.LicenceUtils;
 import org.noear.folkmq.broker.admin.dso.ViewQueueService;
 import org.noear.folkmq.broker.admin.model.QueueVo;
 import org.noear.folkmq.broker.admin.model.ServerVo;
-import org.noear.folkmq.broker.admin.model.SessionVo;
 import org.noear.folkmq.broker.admin.model.TopicVo;
 import org.noear.folkmq.broker.mq.BrokerListenerFolkmq;
+import org.noear.folkmq.client.MqMessage;
 import org.noear.folkmq.common.MqConstants;
+import org.noear.folkmq.common.MqUtils;
+import org.noear.snack.core.utils.DateUtil;
+import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
 import org.noear.socketd.transport.core.entity.StringEntity;
 import org.noear.solon.annotation.Controller;
@@ -198,5 +201,26 @@ public class AdminController extends BaseController {
         }
 
         return Result.failure("操作失败");
+    }
+
+    @Mapping("/admin/publish")
+    public ModelAndView publish() {
+        return view("admin_publish");
+    }
+
+    @Mapping("/admin/publish/ajax/post")
+    public Result publish_ajax_post(String topic, String scheduled, int qos, String content) {
+        try {
+            Date scheduledDate = DateUtil.parse(scheduled);
+
+            MqMessage message = new MqMessage(content).qos(qos).scheduled(scheduledDate);
+            Message routingMessage = MqUtils.routingMessageBuild(topic, message);
+
+            brokerListener.publishDo(routingMessage);
+
+            return Result.succeed();
+        } catch (Exception e) {
+            return Result.failure(e.getLocalizedMessage());
+        }
     }
 }

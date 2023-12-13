@@ -13,19 +13,19 @@
 
     <#if checkBtnShow>
     <script>
-        function checkDo(){
-            $.post('/admin/licence/ajax/check', {check:1}, data=>{
-                if(data.code == 200){
+        function checkDo() {
+            $.post('/admin/licence/ajax/check', {check: 1}, data => {
+                if (data.code == 200) {
                     top.layer.msg('操作成功')
                     setTimeout(function () {
                         top.location.reload();
                     }, 800);
-                }else if(data.code == 401){
+                } else if (data.code == 401) {
                     top.layer.msg(data.description);
                     setTimeout(function () {
                         top.location.reload();
                     }, 800);
-                }else{
+                } else {
                     top.layer.msg(data.description);
                 }
             });

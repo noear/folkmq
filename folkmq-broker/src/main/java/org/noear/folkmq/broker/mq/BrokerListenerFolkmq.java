@@ -127,7 +127,7 @@ public class BrokerListenerFolkmq extends BrokerListener {
         super.onMessage(requester, message);
     }
 
-    private void ackNo(Session requester, Message message) throws IOException{
+    private void ackNo(Session requester, Message message) throws IOException {
         //如果没有会话，自动转为ACK失败
         if (message.isSubscribe() || message.isRequest()) {
             requester.replyEnd(message, new StringEntity("")
@@ -141,6 +141,13 @@ public class BrokerListenerFolkmq extends BrokerListener {
             //以身份进行订阅(topic=>[topicConsumer])
             Set<String> topicConsumerSet = subscribeMap.computeIfAbsent(topic, n -> Collections.newSetFromMap(new ConcurrentHashMap<>()));
             topicConsumerSet.add(queueName);
+        }
+    }
+
+    public void publishDo(Message message) throws IOException {
+        Session responder = this.getPlayerOne(message.at());
+        if (responder != null) {
+            responder.sendAndRequest(MqConstants.MQ_EVENT_PUBLISH, message);
         }
     }
 }

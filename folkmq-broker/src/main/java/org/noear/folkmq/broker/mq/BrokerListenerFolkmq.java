@@ -73,7 +73,7 @@ public class BrokerListenerFolkmq extends BrokerListener {
 
         super.onOpen(session);
 
-        log.info("Server channel opened, sessionId={}", session.sessionId());
+        log.info("Player channel opened, sessionId={}", session.sessionId());
     }
 
     @Override

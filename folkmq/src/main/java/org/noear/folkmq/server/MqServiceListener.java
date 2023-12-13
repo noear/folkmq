@@ -252,7 +252,7 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
                 }
             }
 
-            log.info("Server channel opened, sessionId={}", session.sessionId());
+            log.info("Client channel opened, sessionId={}", session.sessionId());
         }
     }
 

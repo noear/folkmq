@@ -65,6 +65,11 @@ public class FolkmqLifecycleBean implements LifecycleBean {
         } else {
             startBrokerSession(brokerServer, snapshotPlus);
         }
+
+        log.info("Server:main: folkmq-server: Started (SOCKET.D/{}-{}, folkmq/{})",
+                SocketD.protocolVersion(),
+                SocketD.version(),
+                FolkMQ.version());
     }
 
     private void startLocalServerMode(MqWatcherSnapshotPlus snapshotPlus) throws Exception {

@@ -1,5 +1,6 @@
 package org.noear.folkmq.broker.mq;
 
+import org.noear.folkmq.FolkMQ;
 import org.noear.folkmq.broker.common.ConfigNames;
 import org.noear.socketd.SocketD;
 import org.noear.socketd.broker.BrokerFragmentHandler;
@@ -9,6 +10,8 @@ import org.noear.solon.annotation.Component;
 import org.noear.solon.annotation.Inject;
 import org.noear.solon.core.AppContext;
 import org.noear.solon.core.bean.LifecycleBean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author noear
@@ -16,6 +19,8 @@ import org.noear.solon.core.bean.LifecycleBean;
  */
 @Component
 public class BrokerLifecycleBean implements LifecycleBean {
+    private static final Logger log = LoggerFactory.getLogger(BrokerLifecycleBean.class);
+
     @Inject
     private AppContext appContext;
 
@@ -35,6 +40,11 @@ public class BrokerLifecycleBean implements LifecycleBean {
                 .start();
 
         appContext.wrapAndPut(BrokerListenerFolkmq.class, brokerListener);
+
+        log.info("Server:main: folkmq-broker: Started (SOCKET.D/{}-{}, folkmq/{})",
+                SocketD.protocolVersion(),
+                SocketD.version(),
+                FolkMQ.version());
     }
 
     @Override

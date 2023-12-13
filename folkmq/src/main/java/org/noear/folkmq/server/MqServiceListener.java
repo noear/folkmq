@@ -234,26 +234,26 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
         super.onOpen(session);
 
         if (brokerMode) {
-            return;
-        }
+            log.info("Broker channel opened, sessionId={}", session.sessionId());
+        } else {
+            if (serverAccessMap.size() > 0) {
+                //如果有 ak/sk 配置，则进行鉴权
+                String accessKey = session.param(MqConstants.PARAM_ACCESS_KEY);
+                String accessSecretKey = session.param(MqConstants.PARAM_ACCESS_SECRET_KEY);
 
-        if (serverAccessMap.size() > 0) {
-            //如果有 ak/sk 配置，则进行鉴权
-            String accessKey = session.param(MqConstants.PARAM_ACCESS_KEY);
-            String accessSecretKey = session.param(MqConstants.PARAM_ACCESS_SECRET_KEY);
+                if (accessKey == null || accessSecretKey == null) {
+                    session.close();
+                    return;
+                }
 
-            if (accessKey == null || accessSecretKey == null) {
-                session.close();
-                return;
+                if (accessSecretKey.equals(serverAccessMap.get(accessKey)) == false) {
+                    session.close();
+                    return;
+                }
             }
 
-            if (accessSecretKey.equals(serverAccessMap.get(accessKey)) == false) {
-                session.close();
-                return;
-            }
+            log.info("Server channel opened, sessionId={}", session.sessionId());
         }
-
-        log.info("Server channel opened, sessionId={}", session.sessionId());
     }
 
     /**

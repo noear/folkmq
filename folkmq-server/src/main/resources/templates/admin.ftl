@@ -38,6 +38,7 @@
             <items>
                 <a class='sel' href='/admin/topic' target="dock">主题看板</a>
                 <a href='/admin/queue' target="dock">消息看板</a>
+                <a href='/admin/publish' target="dock">消息发布</a>
                 <br />
                 <br />
                 <a href='/admin/save' target="dock">更新快照</a>

@@ -1,15 +1,25 @@
 package org.noear.folkmq.server.pro.admin;
 
+import org.noear.folkmq.client.MqMessage;
+import org.noear.folkmq.common.MqConstants;
+import org.noear.folkmq.common.MqUtils;
+import org.noear.folkmq.exception.FolkmqException;
 import org.noear.folkmq.server.MqServiceInternal;
 import org.noear.folkmq.server.pro.MqWatcherSnapshotPlus;
 import org.noear.folkmq.server.pro.admin.dso.ViewUtils;
 import org.noear.folkmq.server.pro.admin.model.QueueVo;
 import org.noear.folkmq.server.pro.admin.model.TopicVo;
+import org.noear.snack.core.utils.DateUtil;
+import org.noear.socketd.transport.core.Entity;
+import org.noear.socketd.transport.core.Flags;
+import org.noear.socketd.transport.core.Message;
+import org.noear.socketd.transport.core.internal.MessageDefault;
 import org.noear.socketd.utils.RunUtils;
 import org.noear.solon.annotation.Controller;
 import org.noear.solon.annotation.Inject;
 import org.noear.solon.annotation.Mapping;
 import org.noear.solon.core.handle.ModelAndView;
+import org.noear.solon.core.handle.Result;
 import org.noear.solon.validation.annotation.Logined;
 import org.noear.solon.validation.annotation.Valid;
 
@@ -74,6 +84,27 @@ public class AdminController extends BaseController {
         List<QueueVo> list = ViewUtils.queueView(server);
 
         return view("admin_queue").put("list", list);
+    }
+
+    @Mapping("/admin/publish")
+    public ModelAndView publish(){
+        return view("admin_publish");
+    }
+
+    @Mapping("/admin/publish/ajax/post")
+    public Result publish_ajax_post(String topic, String scheduled, int qos, String content) {
+        try {
+            Date scheduledDate = DateUtil.parse(scheduled);
+
+            MqMessage message = new MqMessage(content).qos(qos).scheduled(scheduledDate);
+            Message routingMessage = MqUtils.routingMessageBuild(topic, message);
+
+            server.routingDo(routingMessage);
+
+            return Result.succeed();
+        } catch (Exception e) {
+            return Result.failure(e.getLocalizedMessage());
+        }
     }
 
     @Mapping("/admin/save")

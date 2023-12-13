@@ -1,5 +1,7 @@
 ### 1.0.20
-* sokcet.d 升为 2.1.11
+* 添加 folkmq-server 控制台消息发布功能
+* 添加 folkmq-broker 控制台消息发布功能
+* sokcet.d 升为 2.1.12
 
 ### 1.0.19
 * 添加 folkmq-server 最大消息等待时间配置（默认 180s，之前为2h）！！！

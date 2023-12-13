@@ -6,6 +6,7 @@ import org.noear.socketd.transport.core.Flags;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.entity.StringEntity;
 import org.noear.socketd.transport.core.internal.MessageDefault;
+import org.noear.socketd.utils.Utils;
 
 /**
  * 消息工具类
@@ -48,6 +49,7 @@ public class MqUtils {
 
         MessageDefault messageDefault = new MessageDefault()
                 .flag(Flags.Message)
+                .sid(Utils.guid())
                 .event(MqConstants.MQ_EVENT_PUBLISH)
                 .entity(entity);
 

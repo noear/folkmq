@@ -51,6 +51,11 @@
 * Run in Memory + snapshot persistence + Broker cluster mode (optional)
 * based on [Socket. D development] (https://socketd.noear.org/), it features full support), especially the single connection "multiplex"! Protocols such as udp can also be added
 
+
+* Use "multiplexing" + "running in memory" + "snapshot persistence" + "Broker cluster mode "(optional)
+* based on [Socket.D Network Application protocol](https://socketd.noear.org/) Development. New design, independent architecture!
+
+
 | role     | function                                                                                    | 
 |----------|---------------------------------------------------------------------------------------------|
 | Producer | Publish messages (Qos0, Qos1), publish timed messages (Qos0, Qos1)                          |     
@@ -59,7 +64,8 @@
 | Consumer | Consume-ACK (automatic, manual)                                                             |      
 |          |                                                                                             |     
 | Server   | Publish-Confirm, Subscribe-Confirm, Unsubscribe-Confirm, Distribute-Retry, Distribute-Delay | 
-| Server   | In-memory running, snapshot persistence (automatic, offline, manual)                        |           
+| Server   | In-memory running, snapshot persistence (automatic, offline, manual)                        |   
+| Server   | Cluster hot scaling                                                       |        
 
 
 
@@ -73,7 +79,23 @@ FolkMQ is a commercial open source software that:
 
 ## Features
 
-* Fast, really fast (Stand-alone version, ～ 180K TPS). A bit like Redis is to MySql.
+
+
+* High throughput, low latency
+
+FolkMQ runs purely in memory and can process hundreds of thousands of messages per second with minimum latency of less than a millisecond.
+
+* Extensibility
+
+FolkMQ Broker cluster <mark> supports FolkMQ-Server node hot extension </mark>. When the flow is high, it can be added at any time, and the flow can be reduced when it is low
+
+* Durability, reliability
+
+Messages are snapshot persisted (similar to redis) to local disk, and data backup is supported to prevent data loss
+
+
+* Fast (standalone, ~ 180K TPS). A bit like Redis is to MySql.
+
 
 <img src="DEV-TEST.png" width="600" />
 

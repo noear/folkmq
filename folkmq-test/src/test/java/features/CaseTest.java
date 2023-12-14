@@ -93,4 +93,11 @@ public class CaseTest {
         testCase.start();
         testCase.stop();
     }
+
+    @Test
+    public void TestCase18_batch_subscribe() throws Exception {
+        BaseTestCase testCase = new TestCase18_batch_subscribe(2017);
+        testCase.start();
+        testCase.stop();
+    }
 }

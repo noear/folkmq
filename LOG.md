@@ -1,3 +1,11 @@
+### 1.0.21
+* 添加 broker 集群热扩展机制
+* 添加 mq.event.join 新指令（用于加入集群时，同步订阅）
+* 添加 client 批量订阅支持（连接前订阅，即为批量） 
+* 添加 client::unpublishAsync 取消发布异步模式
+* 调整 各端打开时的日志打印
+* 调整 ServiceListener 打开时的日志打印
+
 ### 1.0.20
 * 添加 folkmq-server 控制台消息发布功能
 * 添加 folkmq-broker 控制台消息发布功能

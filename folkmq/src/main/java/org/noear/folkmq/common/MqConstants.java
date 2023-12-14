@@ -39,6 +39,10 @@ public interface MqConstants {
      * 元信息：执行确认
      */
     String MQ_META_CONFIRM = "mq.confirm";
+    /**
+     * 元信息：批量处理
+     */
+    String MQ_META_BATCH = "mq.batch";
 
     /**
      * 事件：订阅
@@ -61,9 +65,14 @@ public interface MqConstants {
      */
     String MQ_EVENT_DISTRIBUTE = "mq.event.distribute";
     /**
-     * 事件：保存
+     * 事件：保存快照
      */
     String MQ_EVENT_SAVE = "mq.event.save";
+
+    /**
+     * 事件：加入集群
+     * */
+    String MQ_EVENT_JOIN = "mq.event.join";
 
     /**
      * 管理视图-队列

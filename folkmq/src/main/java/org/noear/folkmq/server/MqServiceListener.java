@@ -1,6 +1,7 @@
 package org.noear.folkmq.server;
 
 import org.noear.folkmq.common.MqConstants;
+import org.noear.snack.ONode;
 import org.noear.socketd.exception.SocketdAlarmException;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
@@ -54,14 +55,34 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
 
         //接收订阅指令
         on(MqConstants.MQ_EVENT_SUBSCRIBE, (s, m) -> {
-            String topic = m.meta(MqConstants.MQ_META_TOPIC);
-            String consumerGroup = m.meta(MqConstants.MQ_META_CONSUMER_GROUP);
+            String is_batch = m.meta(MqConstants.MQ_META_BATCH);
 
-            //观察者::订阅时（适配时，可选择同步或异步。同步可靠性高，异步性能好）
-            watcher.onSubscribe(topic, consumerGroup, s);
+            if("1".equals(is_batch)){
+               ONode oNode = ONode.loadStr(m.dataAsString());
+                Map<String, Collection<String>> subscribeData = oNode.toObject();
+                if(subscribeData != null){
+                    for(Map.Entry<String, Collection<String>> kv : subscribeData.entrySet()){
+                        for(String queueName : kv.getValue()){
+                            String consumerGroup = queueName.split(MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP)[1];
 
-            //执行订阅
-            subscribeDo(topic, consumerGroup, s);
+                            //观察者::订阅时（适配时，可选择同步或异步。同步可靠性高，异步性能好）
+                            watcher.onSubscribe(kv.getKey(), consumerGroup, s);
+
+                            //执行订阅
+                            subscribeDo(kv.getKey(), consumerGroup, s);
+                        }
+                    }
+                }
+            }else {
+                String topic = m.meta(MqConstants.MQ_META_TOPIC);
+                String consumerGroup = m.meta(MqConstants.MQ_META_CONSUMER_GROUP);
+
+                //观察者::订阅时（适配时，可选择同步或异步。同步可靠性高，异步性能好）
+                watcher.onSubscribe(topic, consumerGroup, s);
+
+                //执行订阅
+                subscribeDo(topic, consumerGroup, s);
+            }
 
             //答复（以支持同步的原子性需求。同步或异步，由用户按需控制）
             if (m.isRequest() || m.isSubscribe()) {
@@ -234,6 +255,9 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
         super.onOpen(session);
 
         if (brokerMode) {
+            //申请加入
+            session.send(MqConstants.MQ_EVENT_JOIN, new StringEntity(""));
+
             log.info("Broker channel opened, sessionId={}", session.sessionId());
         } else {
             if (serverAccessMap.size() > 0) {

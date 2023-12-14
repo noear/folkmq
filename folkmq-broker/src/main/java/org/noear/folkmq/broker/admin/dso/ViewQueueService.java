@@ -127,7 +127,7 @@ public class ViewQueueService implements LifecycleBean {
                 stat.messageDelayedCount8 += queueVo.messageDelayedCount8;
 
                 String topic = queueVo.queue.split(MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP)[0];
-                brokerListener.subscribeDo(topic, queueVo.queue);
+                brokerListener.subscribeDo(null, topic, queueVo.queue);
             }
         }
     }

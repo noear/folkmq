@@ -75,4 +75,12 @@ public interface MqClient extends Closeable {
      * @param tid   事务id
      */
     void unpublish(String topic, String tid) throws IOException;
+
+    /**
+     * 取消发布
+     *
+     * @param topic 主题
+     * @param tid   事务id
+     */
+    CompletableFuture<Boolean> unpublishAsync(String topic, String tid) throws IOException;
 }

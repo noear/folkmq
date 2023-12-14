@@ -1,5 +1,7 @@
 package org.noear.folkmq.client;
 
+import org.noear.folkmq.common.MqConstants;
+
 import java.io.IOException;
 
 /**
@@ -11,7 +13,8 @@ import java.io.IOException;
 public class MqSubscription implements MqConsumeHandler {
     private final String topic;
     private final String consumerGroup;
-    private final MqConsumeHandler consumerHandler;
+    private final String queueName;
+    private final MqConsumeHandler consumeHandler;
 
 
     /**
@@ -29,21 +32,29 @@ public class MqSubscription implements MqConsumeHandler {
     }
 
     /**
-     * 消费处理器
+     * 相关队列名
      */
-    public MqConsumeHandler getConsumerHandler() {
-        return consumerHandler;
+    public String getQueueName() {
+        return queueName;
     }
 
     /**
-     * @param topic           主题
-     * @param consumerGroup   消费者组
-     * @param consumerHandler 消费处理器
+     * 消费处理器
      */
-    public MqSubscription(String topic, String consumerGroup, MqConsumeHandler consumerHandler) {
+    public MqConsumeHandler getConsumeHandler() {
+        return consumeHandler;
+    }
+
+    /**
+     * @param topic          主题
+     * @param consumerGroup  消费者组
+     * @param consumeHandler 消费处理器
+     */
+    public MqSubscription(String topic, String consumerGroup, MqConsumeHandler consumeHandler) {
         this.topic = topic;
         this.consumerGroup = consumerGroup;
-        this.consumerHandler = consumerHandler;
+        this.queueName = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP + consumerGroup;
+        this.consumeHandler = consumeHandler;
     }
 
     /**
@@ -53,6 +64,6 @@ public class MqSubscription implements MqConsumeHandler {
      */
     @Override
     public void consume(MqMessageReceived message) throws IOException {
-        consumerHandler.consume(message);
+        consumeHandler.consume(message);
     }
 }

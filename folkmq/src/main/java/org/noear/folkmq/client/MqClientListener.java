@@ -1,6 +1,7 @@
 package org.noear.folkmq.client;
 
 import org.noear.folkmq.common.MqConstants;
+import org.noear.snack.ONode;
 import org.noear.socketd.exception.SocketdAlarmException;
 import org.noear.socketd.transport.core.Entity;
 import org.noear.socketd.transport.core.Session;
@@ -10,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.*;
 
 /**
  * 客户端监听器
@@ -60,15 +62,25 @@ public class MqClientListener extends EventListener {
 
         log.info("Client session opened, sessionId={}", session.sessionId());
 
-        //用于重连时重新订阅
-        for (MqSubscription subscription : client.subscriptionMap.values()) {
-            Entity entity = new StringEntity("")
-                    .meta(MqConstants.MQ_META_TOPIC, subscription.getTopic())
-                    .meta(MqConstants.MQ_META_CONSUMER_GROUP, subscription.getConsumerGroup())
-                    .at(MqConstants.BROKER_AT_SERVER);
-
-            session.send(MqConstants.MQ_EVENT_SUBSCRIBE, entity);
+        if(client.subscriptionMap.size() == 0){
+            return;
         }
+
+        //用于重连时重新订阅
+        Map<String, Set<String>> subscribeData = new HashMap<>();
+        for (MqSubscription subscription : client.subscriptionMap.values()) {
+            Set<String> queueNameSet = subscribeData.computeIfAbsent(subscription.getTopic(), n -> new HashSet<>());
+            queueNameSet.add(subscription.getQueueName());
+        }
+
+        String json = ONode.stringify(subscribeData);
+        Entity entity = new StringEntity(json)
+                .meta(MqConstants.MQ_META_BATCH, "1")
+                .at(MqConstants.BROKER_AT_SERVER);
+
+        session.sendAndRequest(MqConstants.MQ_EVENT_SUBSCRIBE, entity);
+
+        log.info("Client onOpen batch subscribe successfully, sessionId={}", session.sessionId());
     }
 
     /**

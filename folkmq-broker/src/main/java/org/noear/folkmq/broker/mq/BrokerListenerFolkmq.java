@@ -79,12 +79,16 @@ public class BrokerListenerFolkmq extends BrokerListener {
             super.onOpen(session);
         }
 
-        log.info("Player channel opened, sessionId={}", session.sessionId());
+        log.info("Player channel opened, sessionId={}, ip={}",
+                session.sessionId(),
+                session.remoteAddress());
     }
 
     @Override
     public void onClose(Session session) {
         super.onClose(session);
+
+        log.info("Player channel closed, sessionId={}", session.sessionId());
 
         Collection<String> atList = session.attrMap().keySet();
         if (atList.size() > 0) {

@@ -287,10 +287,6 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
     public void onClose(Session session) {
         super.onClose(session);
 
-        if (brokerMode) {
-            return;
-        }
-
         log.info("Server channel closed, sessionId={}", session.sessionId());
 
         //遍历会话绑定的队列 //线程安全处理

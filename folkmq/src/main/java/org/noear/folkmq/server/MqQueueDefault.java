@@ -107,7 +107,7 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
 
     /**
      * 移除消息
-     * */
+     */
     @Override
     public void removeAt(String tid) {
         MqMessageHolder messageHolder = messageMap.remove(tid);
@@ -153,10 +153,18 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
 
         //如果有会话
         if (sessionCount() > 0) {
+            //获取一个会话（轮询负载均衡）
+            Session s1 = getSession();
+
             //::派发
             try {
-                distributeDo(messageHolder);
+                distributeDo(s1, messageHolder);
             } catch (Throwable e) {
+                //如果无效，则移掉
+                if(s1.isValid() == false){
+                    removeSession(s1);
+                }
+
                 //进入延后队列
                 internalAdd(messageHolder.delayed());
 
@@ -183,11 +191,7 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
     /**
      * 派发执行
      */
-    private void distributeDo(MqMessageHolder messageHolder) throws IOException {
-        //获取一个会话（轮询负载均衡）
-
-        Session s1 = getSession();
-
+    private void distributeDo(Session s1, MqMessageHolder messageHolder) throws IOException {
         //观察者::派发时（在元信息调整之后，再观察）
         watcher.onDistribute(topic, consumerGroup, messageHolder);
 

@@ -153,20 +153,6 @@ public class BrokerListenerFolkmq extends BrokerListener {
         super.onMessage(requester, message);
     }
 
-    @Override
-    public Session getPlayerOne(String name) {
-        Session session = super.getPlayerOne(name);
-        if (session != null) {
-            if (session.isValid() == false) {
-                //如果节点无效了，做并闭处理；并重试一次
-                onClose(session);
-                session = super.getPlayerOne(name);
-            }
-        }
-
-        return session;
-    }
-
     private void onSubscribe(Session requester, Message message) {
         String is_batch = message.meta(MqConstants.MQ_META_BATCH);
         if ("1".equals(is_batch)) {

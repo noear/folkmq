@@ -63,7 +63,7 @@ public class AdminController extends BaseController {
 
             }
         } else {
-            vm.put("licenceBtn", "无效授权");
+            vm.put("licenceBtn", "非法授权");
         }
 
         return vm;
@@ -76,7 +76,7 @@ public class AdminController extends BaseController {
         vm.put("isAuthorized", false);
 
         if (LicenceUtils.isValid() == false) {
-            vm.put("licence", "没有或无效许可证（请购买正版授权：<a href='https://folkmq.noear.org' target='_blank'>https://folkmq.noear.org</a>）");
+            vm.put("licence", "无效许可证（请购买正版授权：<a href='https://folkmq.noear.org' target='_blank'>https://folkmq.noear.org</a>）");
             vm.put("checkBtnShow", false);
         } else {
             vm.put("licence", LicenceUtils.getLicence2());
@@ -103,7 +103,7 @@ public class AdminController extends BaseController {
     @Mapping("/admin/licence/ajax/check")
     public Result licence_check() {
         if (LicenceUtils.isValid() == false) {
-            return Result.failure(400, "没有或无效许可证");
+            return Result.failure(400, "无效许可证");
         }
 
         return LicenceUtils.auth();

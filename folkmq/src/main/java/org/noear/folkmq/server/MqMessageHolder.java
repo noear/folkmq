@@ -109,8 +109,21 @@ public class MqMessageHolder implements Delayed {
 
     @Override
     public int compareTo(Delayed o) {
-        long f = this.distributeTime - ((MqMessageHolder) o).distributeTime;
-        return (int) f;
+        if (this == o) {
+            return 0;
+        }
+
+        long diff = this.distributeTime - ((MqMessageHolder) o).distributeTime;
+
+        if (diff == 0) {
+            return 0;
+        }
+
+        if (diff < 0) {
+            return -1;
+        }
+
+        return 1;
     }
 
     //不要加 hashCode, equals 重写！

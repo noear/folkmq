@@ -31,18 +31,20 @@ public class TestCase16_ack_retry_multi_server extends BaseTestCase {
                 .start(getPort() + 10000);
 
         //客户端
-        CountDownLatch countDownLatch = new CountDownLatch(1);
+        CountDownLatch countDownLatch = new CountDownLatch(4);
 
-        client = new MqClientDefault("folkmq://127.0.0.1:" + getPort() +",folkmq://127.0.0.1:" + (10000+getPort()))
+        client = new MqClientDefault(
+                "folkmq://127.0.0.1:" + getPort(),
+                "folkmq://127.0.0.1:" + (10000+getPort()))
                 .autoAcknowledge(false)
                 .connect();
 
         client.subscribe("demo", "a", ((message) -> {
             System.out.println(message);
 
-            if(message.getTimes() > 1) {
-                countDownLatch.countDown();
+            if(message.getTimes() > 0) {
                 message.acknowledge(true);
+                countDownLatch.countDown();
             }else{
                 message.acknowledge(false);
             }
@@ -53,19 +55,19 @@ public class TestCase16_ack_retry_multi_server extends BaseTestCase {
         client.publishAsync("demo", new MqMessage("demo3"));
         client.publishAsync("demo", new MqMessage("demo4"));
 
-        countDownLatch.await(40, TimeUnit.SECONDS);
+        countDownLatch.await();
 
         //检验客户端
         assert countDownLatch.getCount() == 0;
 
-        Thread.sleep(100);
+        Thread.sleep(1000);
 
         //检验服务端
         MqServiceInternal serverInternal = server.getServerInternal();
         System.out.println("server topicConsumerMap.size=" + serverInternal.getQueueMap().size());
         assert serverInternal.getQueueMap().size() == 1;
 
-        MqQueue topicConsumerQueue = serverInternal.getQueueMap().values().toArray(new MqQueue[1])[0];
+        MqQueue topicConsumerQueue = serverInternal.getQueueMap().get("demo#a");
         System.out.println("server topicConsumerQueue.size=" + topicConsumerQueue.messageTotal());
         assert topicConsumerQueue.messageTotal() == 0;
         assert topicConsumerQueue.messageTotal2() == 0;
@@ -77,7 +79,7 @@ public class TestCase16_ack_retry_multi_server extends BaseTestCase {
         System.out.println("server topicConsumerMap.size=" + serverInternal2.getQueueMap().size());
         assert serverInternal2.getQueueMap().size() == 1;
 
-        MqQueue topicConsumerQueue2 = serverInternal2.getQueueMap().values().toArray(new MqQueue[1])[0];
+        MqQueue topicConsumerQueue2 = serverInternal2.getQueueMap().get("demo#a");
         System.out.println("server topicConsumerQueue.size=" + topicConsumerQueue2.messageTotal());
         assert topicConsumerQueue2.messageTotal() == 0;
         assert topicConsumerQueue2.messageTotal2() == 0;

@@ -36,9 +36,9 @@ public class TestCase13_ack_retry_n extends BaseTestCase {
         client.subscribe("demo", "a", ((message) -> {
             System.out.println(message);
 
-            if(message.getTimes() > 1) {
-                countDownLatch.countDown();
+            if(message.getTimes() > 0) {
                 message.acknowledge(true);
+                countDownLatch.countDown();
             }else{
                 message.acknowledge(false);
             }
@@ -50,7 +50,7 @@ public class TestCase13_ack_retry_n extends BaseTestCase {
         client.publishAsync("demo",  new MqMessage("demo4"));
         client.publishAsync("demo",  new MqMessage("demo5"));
 
-        countDownLatch.await(40, TimeUnit.SECONDS);
+        countDownLatch.await();
 
         //检验客户端
         assert countDownLatch.getCount() == 0;

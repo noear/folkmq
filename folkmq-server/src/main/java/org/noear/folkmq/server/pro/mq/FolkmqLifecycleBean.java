@@ -75,6 +75,7 @@ public class FolkmqLifecycleBean implements LifecycleBean {
     private void startLocalServerMode(MqWatcherSnapshotPlus snapshotPlus) throws Exception {
         //服务端（鉴权为可选。不添加则不鉴权）
         localServer = FolkMQ.createServer()
+                .config(c -> c.coreThreads(2).maxThreads(4))
                 .addAccessAll(Solon.cfg().getMap(ConfigNames.folkmq_access_x));
 
         if (saveEnable) {
@@ -131,6 +132,7 @@ public class FolkmqLifecycleBean implements LifecycleBean {
         }
 
         brokerSession = SocketD.createClusterClient(serverUrls)
+                .config(c -> c.coreThreads(2).maxThreads(4))
                 .listen(brokerServiceListener)
                 .open();
 

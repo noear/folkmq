@@ -7,6 +7,7 @@ import org.noear.socketd.broker.BrokerFragmentHandler;
 import org.noear.socketd.transport.core.Session;
 import org.noear.socketd.transport.server.Server;
 import org.noear.socketd.utils.RunUtils;
+import org.noear.socketd.utils.StrUtils;
 import org.noear.solon.Solon;
 import org.noear.solon.annotation.Component;
 import org.noear.solon.annotation.Inject;
@@ -16,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
+import java.util.Map;
 
 /**
  * @author noear
@@ -31,10 +33,25 @@ public class BrokerLifecycleBean implements LifecycleBean {
     private Server brokerServer;
     private BrokerListenerFolkmq brokerListener;
 
+    private Map<String, String> getAccessMap() {
+        Map<String, String> accessMap = Solon.cfg().getMap(ConfigNames.folkmq_access_x);
+        accessMap.remove("ak");
+        accessMap.remove("sk");
+
+        String ak = Solon.cfg().get(ConfigNames.folkmq_access_ak);
+        String sk = Solon.cfg().get(ConfigNames.folkmq_access_sk);
+
+        if (StrUtils.isNotEmpty(ak)) {
+            accessMap.put(ak, sk);
+        }
+
+        return accessMap;
+    }
+
     @Override
     public void start() throws Throwable {
         brokerListener = new BrokerListenerFolkmq()
-                .addAccessAll(Solon.cfg().getMap(ConfigNames.folkmq_access_x));
+                .addAccessAll(getAccessMap());
 
         brokerServer = SocketD.createServer("sd:tcp")
                 .config(c -> c.port(Solon.cfg().serverPort() + 10000)

@@ -12,6 +12,7 @@ import org.noear.snack.ONode;
 import org.noear.socketd.SocketD;
 import org.noear.socketd.transport.client.ClientSession;
 import org.noear.socketd.transport.core.entity.StringEntity;
+import org.noear.socketd.utils.StrUtils;
 import org.noear.solon.Solon;
 import org.noear.solon.Utils;
 import org.noear.solon.annotation.Component;
@@ -23,6 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author noear
@@ -72,11 +74,26 @@ public class FolkmqLifecycleBean implements LifecycleBean {
                 FolkMQ.version());
     }
 
+    private Map<String,String> getAccessMap() {
+        Map<String, String> accessMap = Solon.cfg().getMap(ConfigNames.folkmq_access_x);
+        accessMap.remove("ak");
+        accessMap.remove("sk");
+
+        String ak = Solon.cfg().get(ConfigNames.folkmq_access_ak);
+        String sk = Solon.cfg().get(ConfigNames.folkmq_access_sk);
+
+        if (StrUtils.isNotEmpty(ak)) {
+            accessMap.put(ak, sk);
+        }
+
+        return accessMap;
+    }
+
     private void startLocalServerMode(MqWatcherSnapshotPlus snapshotPlus) throws Exception {
         //服务端（鉴权为可选。不添加则不鉴权）
         localServer = FolkMQ.createServer()
                 .config(c -> c.coreThreads(2).maxThreads(4))
-                .addAccessAll(Solon.cfg().getMap(ConfigNames.folkmq_access_x));
+                .addAccessAll(getAccessMap());
 
         if (saveEnable) {
             localServer.watcher(snapshotPlus);

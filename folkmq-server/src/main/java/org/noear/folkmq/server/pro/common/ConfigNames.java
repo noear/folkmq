@@ -17,6 +17,9 @@ public interface ConfigNames {
     String folkmq_snapshot_save300 = "folkmq.snapshot.save300";
     String folkmq_snapshot_save100 = "folkmq.snapshot.save100";
 
-    //访问账号(ak:sk)
+    //访问账号(ak:sk) //弃用（改为单账号，用户好接受）
     String folkmq_access_x = "folkmq.access.";
+    //访问账号(ak:sk)
+    String folkmq_access_ak = "folkmq.access.ak";
+    String folkmq_access_sk = "folkmq.access.sk";
 }

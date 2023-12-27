@@ -13,6 +13,9 @@ public interface ConfigNames {
     String folkmq_view_queue_syncInterval = "folkmq.view.queue.syncInterval";
     String folkmq_view_queue_syncInterval_def = "5000";
 
-    //访问账号(ak:sk)
+    //访问账号(ak:sk) //弃用（改为单账号，用户好接受）
     String folkmq_access_x = "folkmq.access.";
+    //访问账号(ak:sk)
+    String folkmq_access_ak = "folkmq.access.ak";
+    String folkmq_access_sk = "folkmq.access.sk";
 }

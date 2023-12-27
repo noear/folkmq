@@ -11,8 +11,8 @@ services:
       - ./logs/broker:/logs
     environment:
       - folkmq.admin=admin  #管理后台密码（暂时没有管理后台）
-#      - folkmq.access.ak1=sk1 #消息访问账号，可以配置多个
-#      - folkmq.access.ak2=sk2
+#      - folkmq.access.ak=demo              #消息访问账号
+#      - folkmq.access.sk=YapLHTx19RlsEE16  #消息访问密钥
       - TZ=Asia/Shanghai
     networks:
       folkmq:

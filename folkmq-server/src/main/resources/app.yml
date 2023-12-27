@@ -37,5 +37,5 @@ folkmq:
 #folkmq.broker: "folkmq://127.0.0.1:18602"
 
 #folkmq.access:
-#  user1 : "YapLHTx19RlsEE16"
-#  user2 : "YapLHTx19RlsEE16"
+#  ak : "demo"
+#  sk : "YapLHTx19RlsEE16"

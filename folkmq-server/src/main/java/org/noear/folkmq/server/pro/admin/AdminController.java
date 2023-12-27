@@ -3,17 +3,15 @@ package org.noear.folkmq.server.pro.admin;
 import org.noear.folkmq.client.MqMessage;
 import org.noear.folkmq.common.MqConstants;
 import org.noear.folkmq.common.MqUtils;
-import org.noear.folkmq.exception.FolkmqException;
+import org.noear.folkmq.server.MqQueue;
 import org.noear.folkmq.server.MqServiceInternal;
 import org.noear.folkmq.server.pro.MqWatcherSnapshotPlus;
 import org.noear.folkmq.server.pro.admin.dso.ViewUtils;
 import org.noear.folkmq.server.pro.admin.model.QueueVo;
 import org.noear.folkmq.server.pro.admin.model.TopicVo;
 import org.noear.snack.core.utils.DateUtil;
-import org.noear.socketd.transport.core.Entity;
-import org.noear.socketd.transport.core.Flags;
 import org.noear.socketd.transport.core.Message;
-import org.noear.socketd.transport.core.internal.MessageDefault;
+import org.noear.socketd.transport.core.Session;
 import org.noear.socketd.utils.RunUtils;
 import org.noear.solon.annotation.Controller;
 import org.noear.solon.annotation.Inject;
@@ -21,8 +19,10 @@ import org.noear.solon.annotation.Mapping;
 import org.noear.solon.core.handle.ModelAndView;
 import org.noear.solon.core.handle.Result;
 import org.noear.solon.validation.annotation.Logined;
+import org.noear.solon.validation.annotation.NotEmpty;
 import org.noear.solon.validation.annotation.Valid;
 
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -86,8 +86,29 @@ public class AdminController extends BaseController {
         return view("admin_queue").put("list", list);
     }
 
+    @Mapping("/admin/queue_session")
+    public ModelAndView queue_session(@NotEmpty String topic, @NotEmpty String consumerGroup) throws IOException {
+        String queueName = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP + consumerGroup;
+        List<String> list = new ArrayList<>();
+
+        MqQueue queue = server.getQueueMap().get(queueName);
+        if (queue != null) {
+            List<Session> sessions = new ArrayList<>(queue.getSessions());
+            for (Session s1 : sessions) {
+                list.add(s1.remoteAddress().toString());
+
+                //不超过99
+                if (list.size() == 99) {
+                    break;
+                }
+            }
+        }
+
+        return view("admin_queue_session").put("list", list);
+    }
+
     @Mapping("/admin/publish")
-    public ModelAndView publish(){
+    public ModelAndView publish() {
         return view("admin_publish");
     }
 

@@ -2,6 +2,7 @@ package org.noear.folkmq.server;
 
 import org.noear.socketd.transport.core.Session;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.atomic.LongAdder;
@@ -92,6 +93,11 @@ public abstract class MqQueueBase implements MqQueue {
         synchronized (SESSION_LOCK) {
             consumerSessions.remove(session);
         }
+    }
+
+    @Override
+    public Collection<Session> getSessions(){
+        return consumerSessions;
     }
 
     //在锁内执行（是线程安全的）

@@ -9,6 +9,7 @@ import org.noear.folkmq.broker.mq.BrokerListenerFolkmq;
 import org.noear.folkmq.client.MqMessage;
 import org.noear.folkmq.common.MqConstants;
 import org.noear.folkmq.common.MqUtils;
+import org.noear.folkmq.server.MqQueue;
 import org.noear.snack.core.utils.DateUtil;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
@@ -148,6 +149,27 @@ public class AdminController extends BaseController {
         list.sort(Comparator.comparing(v -> v.queue));
 
         return view("admin_queue").put("list", list);
+    }
+
+    @Mapping("/admin/queue_session")
+    public ModelAndView queue_session(@NotEmpty String topic, @NotEmpty String consumerGroup) throws IOException {
+        String queueName = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP + consumerGroup;
+        List<String> list = new ArrayList<>();
+
+        Collection<Session> sessionList = brokerListener.getPlayerAll(queueName);
+        if (sessionList != null) {
+            List<Session> sessions = new ArrayList<>(sessionList);
+            for (Session s1 : sessions) {
+                list.add(s1.remoteAddress().toString());
+
+                //不超过99
+                if (list.size() == 99) {
+                    break;
+                }
+            }
+        }
+
+        return view("admin_queue_session").put("list", list);
     }
 
 

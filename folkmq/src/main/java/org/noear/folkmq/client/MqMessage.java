@@ -1,6 +1,6 @@
 package org.noear.folkmq.client;
 
-import org.noear.socketd.utils.Utils;
+import org.noear.socketd.utils.StrUtils;
 
 import java.util.Date;
 
@@ -17,7 +17,7 @@ public class MqMessage implements IMqMessage {
     private int qos = 1;
 
     public MqMessage(String content){
-        this.tid = Utils.guid();
+        this.tid = StrUtils.guid();
         this.content = content;
     }
 

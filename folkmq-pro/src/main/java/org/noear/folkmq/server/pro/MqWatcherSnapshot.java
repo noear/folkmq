@@ -12,7 +12,7 @@ import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.entity.StringEntity;
 import org.noear.socketd.transport.core.internal.MessageDefault;
 import org.noear.socketd.utils.RunUtils;
-import org.noear.socketd.utils.Utils;
+import org.noear.socketd.utils.StrUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,7 +47,7 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
     }
 
     public MqWatcherSnapshot(String dataPath) {
-        if (Utils.isEmpty(dataPath)) {
+        if (StrUtils.isEmpty(dataPath)) {
             dataPath = "./data/fdb/";
         }
 
@@ -233,11 +233,11 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
                         continue;
                     }
 
-                    Entity entity = new StringEntity(data).metaString(metaString);
+                    Entity entity = new StringEntity(data).metaStringSet(metaString);
                     Message message = new MessageDefault()
-                            .sid(Utils.guid())
-                            .flag(Flags.Message)
-                            .entity(entity);
+                            .sidSet(StrUtils.guid())
+                            .flagSet(Flags.Message)
+                            .entitySet(entity);
 
 
                     String tid = message.meta(MqConstants.MQ_META_TID);
@@ -246,7 +246,7 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
                     long scheduled = 0;
 
                     String scheduledStr = message.meta(MqConstants.MQ_META_SCHEDULED);
-                    if (Utils.isNotEmpty(scheduledStr)) {
+                    if (StrUtils.isNotEmpty(scheduledStr)) {
                         scheduled = Long.parseLong(scheduledStr);
                     }
 

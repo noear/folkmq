@@ -9,7 +9,7 @@ import org.noear.socketd.transport.core.Entity;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
 import org.noear.socketd.transport.core.entity.StringEntity;
-import org.noear.socketd.utils.Utils;
+import org.noear.socketd.utils.StrUtils;
 
 import java.io.IOException;
 import java.util.*;
@@ -132,13 +132,13 @@ public class BrokerListenerFolkmq extends BrokerListener {
             //同步订阅
             if(subscribeMap.size() > 0) {
                 String json = ONode.stringify(subscribeMap);
-                Entity entity = new StringEntity(json).meta(MqConstants.MQ_META_BATCH, "1");
+                Entity entity = new StringEntity(json).metaPut(MqConstants.MQ_META_BATCH, "1");
                 requester.sendAndRequest(MqConstants.MQ_EVENT_SUBSCRIBE, entity);
             }
 
             //注册服务
             String name = requester.name();
-            if (Utils.isNotEmpty(name)) {
+            if (StrUtils.isNotEmpty(name)) {
                 addPlayer(name, requester);
             }
 
@@ -179,7 +179,7 @@ public class BrokerListenerFolkmq extends BrokerListener {
 
     public void subscribeDo(Session requester, String topic, String queueName) {
         if (requester != null) {
-            requester.attr(queueName, "1");
+            requester.attrPut(queueName, "1");
             addPlayer(queueName, requester);
         }
 
@@ -213,7 +213,7 @@ public class BrokerListenerFolkmq extends BrokerListener {
         //如果没有会话，自动转为ACK失败
         if (message.isSubscribe() || message.isRequest()) {
             requester.replyEnd(message, new StringEntity("")
-                    .meta(MqConstants.MQ_META_ACK, "0"));
+                    .metaPut(MqConstants.MQ_META_ACK, "0"));
         }
     }
 }

@@ -27,7 +27,7 @@ public class MqClientListener extends EventListener {
         this.client = client;
 
         //接收派发指令
-        on(MqConstants.MQ_EVENT_DISTRIBUTE, (s, m) -> {
+        doOn(MqConstants.MQ_EVENT_DISTRIBUTE, (s, m) -> {
             MqMessageReceivedImpl message = null;
 
             try {
@@ -75,7 +75,7 @@ public class MqClientListener extends EventListener {
 
         String json = ONode.stringify(subscribeData);
         Entity entity = new StringEntity(json)
-                .meta(MqConstants.MQ_META_BATCH, "1")
+                .metaPut(MqConstants.MQ_META_BATCH, "1")
                 .at(MqConstants.BROKER_AT_SERVER);
 
         session.sendAndRequest(MqConstants.MQ_EVENT_SUBSCRIBE, entity);

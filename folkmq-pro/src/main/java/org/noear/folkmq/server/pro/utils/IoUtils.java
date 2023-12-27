@@ -1,6 +1,6 @@
 package org.noear.folkmq.server.pro.utils;
 
-import org.noear.socketd.utils.Utils;
+import org.noear.socketd.utils.StrUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -27,7 +27,7 @@ public class IoUtils {
 
         ByteArrayOutputStream outs = transferTo(ins, new ByteArrayOutputStream());
 
-        if (Utils.isEmpty(charset)) {
+        if (StrUtils.isEmpty(charset)) {
             return outs.toString();
         } else {
             return outs.toString(charset);

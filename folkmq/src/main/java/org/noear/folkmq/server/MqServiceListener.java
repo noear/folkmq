@@ -7,7 +7,7 @@ import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
 import org.noear.socketd.transport.core.entity.StringEntity;
 import org.noear.socketd.transport.core.listener.EventListener;
-import org.noear.socketd.utils.Utils;
+import org.noear.socketd.utils.StrUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,7 +54,7 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
         //::初始化 BuilderListener(self) 的路由监听
 
         //接收订阅指令
-        on(MqConstants.MQ_EVENT_SUBSCRIBE, (s, m) -> {
+        doOn(MqConstants.MQ_EVENT_SUBSCRIBE, (s, m) -> {
             String is_batch = m.meta(MqConstants.MQ_META_BATCH);
 
             if("1".equals(is_batch)){
@@ -89,13 +89,13 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
                 //发送“确认”，表示服务端收到了
                 if (s.isValid()) {
                     //如果会话仍有效，则答复（有可能会半路关掉）
-                    s.replyEnd(m, new StringEntity("").meta(MqConstants.MQ_META_CONFIRM, "1"));
+                    s.replyEnd(m, new StringEntity("").metaPut(MqConstants.MQ_META_CONFIRM, "1"));
                 }
             }
         });
 
         //接收取消订阅指令
-        on(MqConstants.MQ_EVENT_UNSUBSCRIBE, (s, m) -> {
+        doOn(MqConstants.MQ_EVENT_UNSUBSCRIBE, (s, m) -> {
             String topic = m.meta(MqConstants.MQ_META_TOPIC);
             String consumerGroup = m.meta(MqConstants.MQ_META_CONSUMER_GROUP);
 
@@ -110,13 +110,13 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
                 //发送“确认”，表示服务端收到了
                 if (s.isValid()) {
                     //如果会话仍有效，则答复（有可能会半路关掉）
-                    s.replyEnd(m, new StringEntity("").meta(MqConstants.MQ_META_CONFIRM, "1"));
+                    s.replyEnd(m, new StringEntity("").metaPut(MqConstants.MQ_META_CONFIRM, "1"));
                 }
             }
         });
 
         //接收发布指令
-        on(MqConstants.MQ_EVENT_PUBLISH, (s, m) -> {
+        doOn(MqConstants.MQ_EVENT_PUBLISH, (s, m) -> {
             //观察者::发布时（适配时，可选择同步或异步。同步可靠性高，异步性能好）
             watcher.onPublish(m);
 
@@ -128,13 +128,13 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
                 //发送“确认”，表示服务端收到了
                 if (s.isValid()) {
                     //如果会话仍有效，则答复（有可能会半路关掉）
-                    s.replyEnd(m, new StringEntity("").meta(MqConstants.MQ_META_CONFIRM, "1"));
+                    s.replyEnd(m, new StringEntity("").metaPut(MqConstants.MQ_META_CONFIRM, "1"));
                 }
             }
         });
 
         //接收取消发布指令
-        on(MqConstants.MQ_EVENT_UNPUBLISH, (s,m)->{
+        doOn(MqConstants.MQ_EVENT_UNPUBLISH, (s,m)->{
             //观察者::取消发布时（适配时，可选择同步或异步。同步可靠性高，异步性能好）
             watcher.onUnPublish(m);
 
@@ -146,20 +146,20 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
                 //发送“确认”，表示服务端收到了
                 if (s.isValid()) {
                     //如果会话仍有效，则答复（有可能会半路关掉）
-                    s.replyEnd(m, new StringEntity("").meta(MqConstants.MQ_META_CONFIRM, "1"));
+                    s.replyEnd(m, new StringEntity("").metaPut(MqConstants.MQ_META_CONFIRM, "1"));
                 }
             }
         });
 
         //接收保存指令
-        on(MqConstants.MQ_EVENT_SAVE, (s, m) -> {
+        doOn(MqConstants.MQ_EVENT_SAVE, (s, m) -> {
             save();
 
             if (m.isRequest() || m.isSubscribe()) { //此判断兼容 Qos0, Qos1
                 //发送“确认”，表示服务端收到了
                 if (s.isValid()) {
                     //如果会话仍有效，则答复（有可能会半路关掉）
-                    s.replyEnd(m, new StringEntity("").meta(MqConstants.MQ_META_CONFIRM, "1"));
+                    s.replyEnd(m, new StringEntity("").metaPut(MqConstants.MQ_META_CONFIRM, "1"));
                 }
             }
         });
@@ -355,7 +355,7 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
                 log.info("Server channel subscribe topic={}, consumerGroup={}, sessionId={}", topic, consumerGroup, session.sessionId());
 
                 //会话绑定队列（可以绑定多个队列）
-                session.attr(queueName, "1");
+                session.attrPut(queueName, "1");
 
                 //加入队列会话
                 queue.addSession(session);
@@ -395,7 +395,7 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
     public void routingDo(Message message) {
         String tid = message.meta(MqConstants.MQ_META_TID);
         //可能是非法消息
-        if (Utils.isEmpty(tid)) {
+        if (StrUtils.isEmpty(tid)) {
             log.warn("The tid cannot be null, sid={}", message.sid());
             return;
         }
@@ -407,7 +407,7 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
         long scheduled = 0;
 
         String scheduledStr = message.meta(MqConstants.MQ_META_SCHEDULED);
-        if (Utils.isNotEmpty(scheduledStr)) {
+        if (StrUtils.isNotEmpty(scheduledStr)) {
             scheduled = Long.parseLong(scheduledStr);
         }
 
@@ -448,7 +448,7 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
     public void unRoutingDo(Message message) {
         String tid = message.meta(MqConstants.MQ_META_TID);
         //可能是非法消息
-        if (Utils.isEmpty(tid)) {
+        if (StrUtils.isEmpty(tid)) {
             log.warn("The tid cannot be null, sid={}", message.sid());
             return;
         }

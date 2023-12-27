@@ -6,7 +6,7 @@ import org.noear.socketd.transport.core.Flags;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.entity.StringEntity;
 import org.noear.socketd.transport.core.internal.MessageDefault;
-import org.noear.socketd.utils.Utils;
+import org.noear.socketd.utils.StrUtils;
 
 /**
  * 消息工具类
@@ -24,13 +24,13 @@ public class MqUtils {
     public static StringEntity publishEntityBuild(String topic, IMqMessage message) {
         //构建消息实体
         StringEntity entity = new StringEntity(message.getContent());
-        entity.meta(MqConstants.MQ_META_TID, message.getTid());
-        entity.meta(MqConstants.MQ_META_TOPIC, topic);
-        entity.meta(MqConstants.MQ_META_QOS, (message.getQos() == 0 ? "0" : "1"));
+        entity.metaPut(MqConstants.MQ_META_TID, message.getTid());
+        entity.metaPut(MqConstants.MQ_META_TOPIC, topic);
+        entity.metaPut(MqConstants.MQ_META_QOS, (message.getQos() == 0 ? "0" : "1"));
         if (message.getScheduled() == null) {
-            entity.meta(MqConstants.MQ_META_SCHEDULED, "0");
+            entity.metaPut(MqConstants.MQ_META_SCHEDULED, "0");
         } else {
-            entity.meta(MqConstants.MQ_META_SCHEDULED, String.valueOf(message.getScheduled().getTime()));
+            entity.metaPut(MqConstants.MQ_META_SCHEDULED, String.valueOf(message.getScheduled().getTime()));
         }
         entity.at(MqConstants.BROKER_AT_SERVER);
 
@@ -48,10 +48,10 @@ public class MqUtils {
                 .at(MqConstants.BROKER_AT_SERVER);
 
         MessageDefault messageDefault = new MessageDefault()
-                .flag(Flags.Message)
-                .sid(Utils.guid())
-                .event(MqConstants.MQ_EVENT_PUBLISH)
-                .entity(entity);
+                .flagSet(Flags.Message)
+                .sidSet(StrUtils.guid())
+                .eventSet(MqConstants.MQ_EVENT_PUBLISH)
+                .entitySet(entity);
 
         return messageDefault;
     }

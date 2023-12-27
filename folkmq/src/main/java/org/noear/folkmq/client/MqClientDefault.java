@@ -104,8 +104,8 @@ public class MqClientDefault implements MqClientInternal {
             for (ClientSession session : clientSession.getSessionAll()) {
                 //如果有连接会话，则执行订阅
                 Entity entity = new StringEntity("")
-                        .meta(MqConstants.MQ_META_TOPIC, subscription.getTopic())
-                        .meta(MqConstants.MQ_META_CONSUMER_GROUP, subscription.getConsumerGroup())
+                        .metaPut(MqConstants.MQ_META_TOPIC, subscription.getTopic())
+                        .metaPut(MqConstants.MQ_META_CONSUMER_GROUP, subscription.getConsumerGroup())
                         .at(MqConstants.BROKER_AT_SERVER_ALL);
 
                 //使用 Qos1
@@ -124,8 +124,8 @@ public class MqClientDefault implements MqClientInternal {
             for (ClientSession session : clientSession.getSessionAll()) {
                 //如果有连接会话
                 Entity entity = new StringEntity("")
-                        .meta(MqConstants.MQ_META_TOPIC, topic)
-                        .meta(MqConstants.MQ_META_CONSUMER_GROUP, consumerGroup)
+                        .metaPut(MqConstants.MQ_META_TOPIC, topic)
+                        .metaPut(MqConstants.MQ_META_CONSUMER_GROUP, consumerGroup)
                         .at(MqConstants.BROKER_AT_SERVER_ALL);
 
                 //使用 Qos1
@@ -216,8 +216,8 @@ public class MqClientDefault implements MqClientInternal {
         }
 
         Entity entity = new StringEntity("")
-                .meta(MqConstants.MQ_META_TOPIC, topic)
-                .meta(MqConstants.MQ_META_TID, tid)
+                .metaPut(MqConstants.MQ_META_TOPIC, topic)
+                .metaPut(MqConstants.MQ_META_TID, tid)
                 .at(MqConstants.BROKER_AT_SERVER_ALL);
 
         //::Qos1
@@ -243,8 +243,8 @@ public class MqClientDefault implements MqClientInternal {
 
         CompletableFuture<Boolean> future = new CompletableFuture<>();
         Entity entity = new StringEntity("")
-                .meta(MqConstants.MQ_META_TOPIC, topic)
-                .meta(MqConstants.MQ_META_TID, tid)
+                .metaPut(MqConstants.MQ_META_TOPIC, topic)
+                .metaPut(MqConstants.MQ_META_TID, tid)
                 .at(MqConstants.BROKER_AT_SERVER_ALL);
 
         //::Qos1
@@ -274,7 +274,7 @@ public class MqClientDefault implements MqClientInternal {
         if (message.getQos() > 0) {
             if (session.isValid()) {
                 session.replyEnd(from, new StringEntity("")
-                        .meta(MqConstants.MQ_META_ACK, isOk ? "1" : "0"));
+                        .metaPut(MqConstants.MQ_META_ACK, isOk ? "1" : "0"));
             }
         }
     }

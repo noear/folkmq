@@ -30,8 +30,8 @@ public class MqMessageHolder implements Delayed {
     private AtomicBoolean isDone;
 
     public MqMessageHolder(String queueName, String consumerGroup, Message from, String tid, int qos, int distributeCount, long distributeTime) {
-        this.content = new EntityDefault().data(from.data()).metaMap(from.metaMap());
-        this.content.meta(MqConstants.MQ_META_CONSUMER_GROUP, consumerGroup).at(queueName);
+        this.content = new EntityDefault().dataSet(from.data()).metaMapPut(from.metaMap());
+        this.content.metaPut(MqConstants.MQ_META_CONSUMER_GROUP, consumerGroup).at(queueName);
 
         this.isDone = new AtomicBoolean();
 
@@ -96,8 +96,8 @@ public class MqMessageHolder implements Delayed {
         distributeTime = MqNextTime.getNextTime(this);
 
         //设置新的派发次数和下次时间
-        content.meta(MqConstants.MQ_META_TIMES, String.valueOf(distributeCount));
-        content.meta(MqConstants.MQ_META_SCHEDULED, String.valueOf(distributeTime));
+        content.metaPut(MqConstants.MQ_META_TIMES, String.valueOf(distributeCount));
+        content.metaPut(MqConstants.MQ_META_SCHEDULED, String.valueOf(distributeTime));
 
         return this;
     }

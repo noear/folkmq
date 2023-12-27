@@ -94,7 +94,7 @@ public class FolkmqLifecycleBean implements LifecycleBean {
         brokerServiceListener = new MqServiceListener(true);
 
         //允许控制台获取队列看板
-        brokerServiceListener.on(MqConstants.ADMIN_VIEW_QUEUE, (s, m) -> {
+        brokerServiceListener.doOn(MqConstants.ADMIN_VIEW_QUEUE, (s, m) -> {
             if (m.isRequest() || m.isSubscribe()) {
                 String json = ONode.stringify(ViewUtils.queueView(brokerServiceListener));
                 s.replyEnd(m, new StringEntity(json));

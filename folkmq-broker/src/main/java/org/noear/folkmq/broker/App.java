@@ -15,6 +15,9 @@ public class App {
             //加载环境变量
             app.cfg().loadEnv("folkmq.");
 
+            //启用 ws 协议
+            app.enableWebSocket(app.cfg().getBool("folkmq.websocket",false));
+
             //登录鉴权跳转
             app.routerInterceptor(0, ((ctx, mainHandler, chain) -> {
                 try {

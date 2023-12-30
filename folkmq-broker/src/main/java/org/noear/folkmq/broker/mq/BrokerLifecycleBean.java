@@ -13,6 +13,8 @@ import org.noear.solon.annotation.Component;
 import org.noear.solon.annotation.Inject;
 import org.noear.solon.core.AppContext;
 import org.noear.solon.core.bean.LifecycleBean;
+import org.noear.solon.net.websocket.WebSocketRouter;
+import org.noear.solon.net.websocket.socketd.ToSocketdWebSocketListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +34,7 @@ public class BrokerLifecycleBean implements LifecycleBean {
 
     private Server brokerServer;
     private BrokerListenerFolkmq brokerListener;
+    private ToSocketdWebSocketListener webSocketListener;
 
     private Map<String, String> getAccessMap() {
         Map<String, String> accessMap = Solon.cfg().getMap(ConfigNames.folkmq_access_x);
@@ -61,12 +64,20 @@ public class BrokerLifecycleBean implements LifecycleBean {
                 .listen(brokerListener)
                 .start();
 
+        appContext.wrapAndPut(Server.class, brokerServer);
         appContext.wrapAndPut(BrokerListenerFolkmq.class, brokerListener);
 
         log.info("Server:main: folkmq-broker: Started (SOCKET.D/{}-{}, folkmq/{})",
                 SocketD.protocolVersion(),
                 SocketD.version(),
                 FolkMQ.version());
+
+
+        if (Solon.app().enableWebSocket()) {
+            //添加 sd:ws 协议监听支持
+            webSocketListener = new ToSocketdWebSocketListener(brokerServer.getConfig(), brokerListener);
+            WebSocketRouter.getInstance().of("/", webSocketListener);
+        }
     }
 
     @Override

@@ -51,6 +51,7 @@ public class MqClientDefault implements MqClientInternal {
         this.clientListener = new MqClientListener(this);
 
         for (String url : urls) {
+            url = url.replaceAll("folkmq:ws://", "sd:ws://");
             url = url.replaceAll("folkmq://", "sd:tcp://");
             serverUrls.add(url);
         }

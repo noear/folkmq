@@ -311,7 +311,7 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
         if (log.isWarnEnabled()) {
             if (error instanceof SocketdAlarmException) {
                 SocketdAlarmException alarmException = (SocketdAlarmException) error;
-                log.warn("Server channel error, sessionId={}, from={}", session.sessionId(), alarmException.getFrom(), error);
+                log.warn("Server channel error, sessionId={}, from={}", session.sessionId(), alarmException.getAlarm(), error);
             } else {
                 log.warn("Server channel error, sessionId={}", session.sessionId(), error);
             }

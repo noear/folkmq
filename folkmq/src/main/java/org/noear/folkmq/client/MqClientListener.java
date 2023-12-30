@@ -103,7 +103,7 @@ public class MqClientListener extends EventListener {
         if (log.isWarnEnabled()) {
             if (error instanceof SocketdAlarmException) {
                 SocketdAlarmException alarmException = (SocketdAlarmException) error;
-                log.warn("Client error, sessionId={}, from={}", session.sessionId(), alarmException.getFrom(), error);
+                log.warn("Client error, sessionId={}, from={}", session.sessionId(), alarmException.getAlarm(), error);
             } else {
                 log.warn("Client error, sessionId={}", session.sessionId(), error);
             }

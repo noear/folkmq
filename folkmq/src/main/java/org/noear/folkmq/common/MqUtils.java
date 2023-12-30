@@ -4,8 +4,9 @@ import org.noear.folkmq.client.IMqMessage;
 import org.noear.socketd.transport.core.Entity;
 import org.noear.socketd.transport.core.Flags;
 import org.noear.socketd.transport.core.Message;
+import org.noear.socketd.transport.core.MessageInternal;
 import org.noear.socketd.transport.core.entity.StringEntity;
-import org.noear.socketd.transport.core.internal.MessageDefault;
+import org.noear.socketd.transport.core.internal.MessageBuilder;
 import org.noear.socketd.utils.StrUtils;
 
 /**
@@ -47,11 +48,12 @@ public class MqUtils {
         Entity entity = MqUtils.publishEntityBuild(topic, message)
                 .at(MqConstants.BROKER_AT_SERVER);
 
-        MessageDefault messageDefault = new MessageDefault()
-                .flagSet(Flags.Message)
-                .sidSet(StrUtils.guid())
-                .eventSet(MqConstants.MQ_EVENT_PUBLISH)
-                .entitySet(entity);
+        MessageInternal messageDefault = new MessageBuilder()
+                .flag(Flags.Message)
+                .sid(StrUtils.guid())
+                .event(MqConstants.MQ_EVENT_PUBLISH)
+                .entity(entity)
+                .build();
 
         return messageDefault;
     }

@@ -13,7 +13,6 @@ import org.noear.solon.annotation.Component;
 import org.noear.solon.annotation.Inject;
 import org.noear.solon.core.AppContext;
 import org.noear.solon.core.bean.LifecycleBean;
-import org.noear.solon.net.websocket.WebSocketRouter;
 import org.noear.solon.net.websocket.socketd.ToSocketdWebSocketListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +31,8 @@ public class BrokerLifecycleBean implements LifecycleBean {
     @Inject
     private AppContext appContext;
 
-    private Server brokerServer;
+    private Server brokerServerTcp;
+    private Server brokerServerWs;
     private BrokerListenerFolkmq brokerListener;
     private ToSocketdWebSocketListener webSocketListener;
 
@@ -53,31 +53,37 @@ public class BrokerLifecycleBean implements LifecycleBean {
 
     @Override
     public void start() throws Throwable {
+        BrokerFragmentHandler brokerFragmentHandler = new BrokerFragmentHandler();
         brokerListener = new BrokerListenerFolkmq()
                 .addAccessAll(getAccessMap());
 
-        brokerServer = SocketD.createServer("sd:tcp")
+        brokerServerTcp = SocketD.createServer("sd:tcp")
                 .config(c -> c.port(Solon.cfg().serverPort() + 10000)
                         .coreThreads(2)
                         .maxThreads(4)
-                        .fragmentHandler(new BrokerFragmentHandler()))
+                        .fragmentHandler(brokerFragmentHandler))
                 .listen(brokerListener)
                 .start();
 
-        appContext.wrapAndPut(Server.class, brokerServer);
+
+        if (Solon.cfg().getBool("folkmq.websocket", false)) {
+            //添加 sd:ws 协议监听支持
+            brokerServerWs = SocketD.createServer("sd:ws")
+                    .config(c -> c.port(Solon.cfg().serverPort() + 10001)
+                            .coreThreads(2)
+                            .maxThreads(4)
+                            .channelExecutor(brokerServerTcp.getConfig().getChannelExecutor()) //复用通用执行器
+                            .fragmentHandler(brokerFragmentHandler))
+                    .listen(brokerListener)
+                    .start();
+        }
+
         appContext.wrapAndPut(BrokerListenerFolkmq.class, brokerListener);
 
         log.info("Server:main: folkmq-broker: Started (SOCKET.D/{}-{}, folkmq/{})",
                 SocketD.protocolVersion(),
                 SocketD.version(),
                 FolkMQ.version());
-
-
-        if (Solon.app().enableWebSocket()) {
-            //添加 sd:ws 协议监听支持
-            webSocketListener = new ToSocketdWebSocketListener(brokerServer.getConfig(), brokerListener);
-            WebSocketRouter.getInstance().of("/", webSocketListener);
-        }
     }
 
     @Override
@@ -92,8 +98,12 @@ public class BrokerLifecycleBean implements LifecycleBean {
             }
         }
 
-        if (brokerServer != null) {
-            brokerServer.stop();
+        if (brokerServerTcp != null) {
+            brokerServerTcp.stop();
+        }
+
+        if (brokerServerWs != null) {
+            brokerServerWs.stop();
         }
     }
 }

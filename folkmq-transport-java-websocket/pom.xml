@@ -11,18 +11,19 @@
         <relativePath>../folkmq-parent/pom.xml</relativePath>
     </parent>
 
-    <artifactId>folkmq</artifactId>
+    <artifactId>folkmq-transport-java-websocket</artifactId>
     <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
             <groupId>org.noear</groupId>
-            <artifactId>socketd</artifactId>
+            <artifactId>folkmq</artifactId>
         </dependency>
 
+        <!-- 可选传输方案（90kb左右） -->
         <dependency>
             <groupId>org.noear</groupId>
-            <artifactId>snack3</artifactId>
+            <artifactId>socketd-transport-java-websocket</artifactId>
         </dependency>
     </dependencies>
 </project>

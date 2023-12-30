@@ -6,7 +6,7 @@
 
     <groupId>org.noear</groupId>
     <artifactId>folkmq-parent</artifactId>
-    <version>1.0.25</version>
+    <version>1.0.26</version>
     <packaging>pom</packaging>
 
     <name>${project.artifactId}</name>
@@ -18,10 +18,10 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
 
-        <folkmq.version>1.0.25</folkmq.version>
+        <folkmq.version>1.0.26</folkmq.version>
         <socketd.version>2.2.1</socketd.version>
         <snack3.version>3.2.84</snack3.version>
-        <solon.version>2.6.3</solon.version>
+        <solon.version>2.6.4</solon.version>
 
         <micrometer.version>1.11.1</micrometer.version>
         <slf4j.version>2.0.9</slf4j.version>
@@ -37,6 +37,7 @@
         <module>../folkmq</module>
         <module>../folkmq-pro</module>
         <module>../folkmq-transport-java-tcp</module>
+        <module>../folkmq-transport-java-websocket</module>
         <module>../folkmq-transport-netty</module>
         <module>../folkmq-transport-smartsocket</module>
     </modules>
@@ -58,6 +59,12 @@
             <dependency>
                 <groupId>org.noear</groupId>
                 <artifactId>folkmq-transport-java-tcp</artifactId>
+                <version>${folkmq.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.noear</groupId>
+                <artifactId>folkmq-transport-java-websocket</artifactId>
                 <version>${folkmq.version}</version>
             </dependency>
 
@@ -89,6 +96,12 @@
             <dependency>
                 <groupId>org.noear</groupId>
                 <artifactId>socketd-transport-java-tcp</artifactId>
+                <version>${socketd.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.noear</groupId>
+                <artifactId>socketd-transport-java-websocket</artifactId>
                 <version>${socketd.version}</version>
             </dependency>
 

@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "outFile": "dist/amd/socketd.js",
+    "module": "amd",
+    "target": "es2017",
+
+    "declaration": true,
+    "esModuleInterop": true,
+
+    "incremental": true,
+    "skipLibCheck": true,
+
+    "strict": true,
+    "noImplicitAny": false,
+    "noImplicitThis": false,
+    "strictPropertyInitialization": false,
+    "noImplicitReturns": true
+  },
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

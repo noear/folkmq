@@ -133,7 +133,7 @@ public class BrokerListenerFolkmq extends BrokerListener {
             if(subscribeMap.size() > 0) {
                 String json = ONode.stringify(subscribeMap);
                 Entity entity = new StringEntity(json).metaPut(MqConstants.MQ_META_BATCH, "1");
-                requester.sendAndRequest(MqConstants.MQ_EVENT_SUBSCRIBE, entity);
+                requester.sendAndRequest(MqConstants.MQ_EVENT_SUBSCRIBE, entity).await();
             }
 
             //注册服务
@@ -196,7 +196,7 @@ public class BrokerListenerFolkmq extends BrokerListener {
         Session responder = this.getPlayerOne(MqConstants.BROKER_AT_SERVER);
         if (responder != null) {
             if (message.getQos() > 0) {
-                responder.sendAndRequest(MqConstants.MQ_EVENT_PUBLISH, routingMessage);
+                responder.sendAndRequest(MqConstants.MQ_EVENT_PUBLISH, routingMessage).await();
             } else {
                 responder.send(MqConstants.MQ_EVENT_PUBLISH, routingMessage);
             }

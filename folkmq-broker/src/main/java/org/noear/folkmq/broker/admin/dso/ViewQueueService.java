@@ -90,7 +90,7 @@ public class ViewQueueService implements LifecycleBean {
             List<Session> sessions = new ArrayList<>(tmp);
             for (Session session : sessions) {
                 try {
-                    session.sendAndRequest(MqConstants.ADMIN_VIEW_QUEUE, new StringEntity(""), r -> {
+                    session.sendAndRequest(MqConstants.ADMIN_VIEW_QUEUE, new StringEntity("")).thenReply(r -> {
                         String json = r.dataAsString();
                         List<QueueVo> list = ONode.loadStr(json).toObjectList(QueueVo.class);
                         addQueueVo(list, queueVoMap2);

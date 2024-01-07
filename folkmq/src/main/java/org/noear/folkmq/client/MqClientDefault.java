@@ -110,7 +110,7 @@ public class MqClientDefault implements MqClientInternal {
                         .at(MqConstants.BROKER_AT_SERVER_ALL);
 
                 //使用 Qos1
-                session.sendAndRequest(MqConstants.MQ_EVENT_SUBSCRIBE, entity);
+                session.sendAndRequest(MqConstants.MQ_EVENT_SUBSCRIBE, entity).await();
 
                 log.info("Client subscribe successfully: {}#{}, sessionId={}", topic, consumerGroup, session.sessionId());
             }
@@ -130,7 +130,7 @@ public class MqClientDefault implements MqClientInternal {
                         .at(MqConstants.BROKER_AT_SERVER_ALL);
 
                 //使用 Qos1
-                session.sendAndRequest(MqConstants.MQ_EVENT_UNSUBSCRIBE, entity);
+                session.sendAndRequest(MqConstants.MQ_EVENT_UNSUBSCRIBE, entity).await();
 
                 log.info("Client unsubscribe successfully: {}#{}， sessionId={}", topic, consumerGroup, session.sessionId());
             }
@@ -152,7 +152,7 @@ public class MqClientDefault implements MqClientInternal {
 
         if (message.getQos() > 0) {
             //::Qos1
-            Entity resp = session.sendAndRequest(MqConstants.MQ_EVENT_PUBLISH, entity);
+            Entity resp = session.sendAndRequest(MqConstants.MQ_EVENT_PUBLISH, entity).await();
 
             int confirm = Integer.parseInt(resp.metaOrDefault(MqConstants.MQ_META_CONFIRM, "0"));
             if (confirm != 1) {
@@ -187,7 +187,7 @@ public class MqClientDefault implements MqClientInternal {
 
         if (message.getQos() > 0) {
             //::Qos1
-            session.sendAndRequest(MqConstants.MQ_EVENT_PUBLISH, entity, r -> {
+            session.sendAndRequest(MqConstants.MQ_EVENT_PUBLISH, entity).thenReply(r -> {
                 int confirm = Integer.parseInt(r.metaOrDefault(MqConstants.MQ_META_CONFIRM, "0"));
                 if (confirm == 1) {
                     future.complete(true);
@@ -222,7 +222,7 @@ public class MqClientDefault implements MqClientInternal {
                 .at(MqConstants.BROKER_AT_SERVER_ALL);
 
         //::Qos1
-        Entity resp = session.sendAndRequest(MqConstants.MQ_EVENT_UNPUBLISH, entity);
+        Entity resp = session.sendAndRequest(MqConstants.MQ_EVENT_UNPUBLISH, entity).await();
 
         int confirm = Integer.parseInt(resp.metaOrDefault(MqConstants.MQ_META_CONFIRM, "0"));
         if (confirm != 1) {
@@ -249,7 +249,7 @@ public class MqClientDefault implements MqClientInternal {
                 .at(MqConstants.BROKER_AT_SERVER_ALL);
 
         //::Qos1
-        session.sendAndRequest(MqConstants.MQ_EVENT_UNPUBLISH, entity, r -> {
+        session.sendAndRequest(MqConstants.MQ_EVENT_UNPUBLISH, entity).thenReply(r -> {
             int confirm = Integer.parseInt(r.metaOrDefault(MqConstants.MQ_META_CONFIRM, "0"));
             if (confirm == 1) {
                 future.complete(true);

@@ -10,7 +10,7 @@ import org.noear.socketd.transport.core.Entity;
 import org.noear.socketd.transport.core.Flags;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.entity.StringEntity;
-import org.noear.socketd.transport.core.internal.MessageBuilder;
+import org.noear.socketd.transport.core.entity.MessageBuilder;
 import org.noear.socketd.utils.RunUtils;
 import org.noear.socketd.utils.StrUtils;
 import org.slf4j.Logger;

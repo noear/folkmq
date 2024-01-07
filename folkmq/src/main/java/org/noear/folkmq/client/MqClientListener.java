@@ -78,7 +78,7 @@ public class MqClientListener extends EventListener {
                 .metaPut(MqConstants.MQ_META_BATCH, "1")
                 .at(MqConstants.BROKER_AT_SERVER);
 
-        session.sendAndRequest(MqConstants.MQ_EVENT_SUBSCRIBE, entity);
+        session.sendAndRequest(MqConstants.MQ_EVENT_SUBSCRIBE, entity).await();
 
         log.info("Client onOpen batch subscribe successfully, sessionId={}", session.sessionId());
     }

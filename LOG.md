@@ -1,3 +1,6 @@
+### 1.0.27
+* sokcet.d 升为 2.3.0
+
 ### 1.0.26
 * 添加 folkmq-broker 对 ws 协议的支持
 * sokcet.d 升为 2.2.2

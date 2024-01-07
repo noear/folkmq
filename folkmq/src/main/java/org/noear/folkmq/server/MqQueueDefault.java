@@ -199,8 +199,8 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
             //::Qos1
 
             //1.给会话发送消息 //如果有异步，上面会加入队列
-            s1.sendAndRequest(MqConstants.MQ_EVENT_DISTRIBUTE, messageHolder.getContent(), m -> {
-                int ack = Integer.parseInt(m.metaOrDefault(MqConstants.MQ_META_ACK, "0"));
+            s1.sendAndRequest(MqConstants.MQ_EVENT_DISTRIBUTE, messageHolder.getContent()).thenReply(r -> {
+                int ack = Integer.parseInt(r.metaOrDefault(MqConstants.MQ_META_ACK, "0"));
                 acknowledgeDo(messageHolder, ack, true);
             });
 

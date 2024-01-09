@@ -1,0 +1,17 @@
+{
+  "name": "@noear/folkmq",
+  "description": "@noear/folkmq typescript project",
+  "author": "noear",
+  "license": "LGPL-2.1",
+  "scripts": {
+    "devBuild": "webpack --mode none",
+    "prodBuild": "webpack --mode production"
+  },
+  "devDependencies": {
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.4"
+  },
+  "dependencies": {
+    "@noear/socket.d": "2.3.3"
+  }
+}

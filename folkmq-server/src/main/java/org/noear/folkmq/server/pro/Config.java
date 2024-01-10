@@ -13,6 +13,7 @@ import org.noear.solon.annotation.Configuration;
  */
 @Configuration
 public class Config {
+    public static boolean isStandalone;
     @Bean
     public void custom(MeterRegistry registry) {
         //添加几个 meter

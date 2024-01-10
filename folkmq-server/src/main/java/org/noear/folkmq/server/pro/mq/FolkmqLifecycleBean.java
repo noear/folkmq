@@ -5,7 +5,9 @@ import org.noear.folkmq.common.MqConstants;
 import org.noear.folkmq.server.MqServer;
 import org.noear.folkmq.server.MqServiceInternal;
 import org.noear.folkmq.server.MqServiceListener;
+import org.noear.folkmq.server.pro.Config;
 import org.noear.folkmq.server.pro.MqWatcherSnapshotPlus;
+import org.noear.folkmq.server.pro.admin.dso.QueueForceService;
 import org.noear.folkmq.server.pro.admin.dso.ViewUtils;
 import org.noear.folkmq.server.pro.common.ConfigNames;
 import org.noear.snack.ONode;
@@ -37,6 +39,9 @@ public class FolkmqLifecycleBean implements LifecycleBean {
     @Inject
     private AppContext appContext;
 
+    @Inject
+    private QueueForceService queueForceService;
+
     private MqServer localServer;
 
     private MqServiceListener brokerServiceListener;
@@ -63,8 +68,10 @@ public class FolkmqLifecycleBean implements LifecycleBean {
         appContext.wrapAndPut(MqWatcherSnapshotPlus.class, snapshotPlus);
 
         if (Utils.isEmpty(brokerServer)) {
+            Config.isStandalone = true;
             startLocalServerMode(snapshotPlus);
         } else {
+            Config.isStandalone = false;
             startBrokerSession(brokerServer, snapshotPlus);
         }
 
@@ -116,6 +123,22 @@ public class FolkmqLifecycleBean implements LifecycleBean {
                 String json = ONode.stringify(ViewUtils.queueView(brokerServiceListener));
                 s.replyEnd(m, new StringEntity(json));
             }
+        });
+
+        //允许控制台强制派发
+        brokerServiceListener.doOn(MqConstants.ADMIN_QUEUE_FORCE_DISTRIBUTE, (s,m)->{
+            String topic = m.meta(MqConstants.MQ_META_TOPIC);
+            String consumerGroup = m.meta(MqConstants.MQ_META_CONSUMER_GROUP);
+
+            queueForceService.forceDistribute(brokerServiceListener, topic, consumerGroup, false);
+        });
+
+        //允许控制台强制派发
+        brokerServiceListener.doOn(MqConstants.ADMIN_QUEUE_FORCE_DELETE, (s,m)->{
+            String topic = m.meta(MqConstants.MQ_META_TOPIC);
+            String consumerGroup = m.meta(MqConstants.MQ_META_CONSUMER_GROUP);
+
+            queueForceService.forceDelete(brokerServiceListener,topic, consumerGroup, false);
         });
 
         //快照

@@ -41,19 +41,28 @@ public class ViewQueueService implements LifecycleBean {
     public List<QueueVo> getQueueListVo() {
         List<QueueVo> list = new ArrayList<>();
 
-        for (String queue : new ArrayList<>(queueSet)) {
-            QueueVo queueVo = queueVoMap.get(queue);
+        for (String queueName : new ArrayList<>(queueSet)) {
+            QueueVo queueVo = queueVoMap.get(queueName);
             if (queueVo == null) {
                 queueVo = new QueueVo();//初始化
-                queueVo.queue = queue;
+                queueVo.queue = queueName;
             }
 
             //随时刷新
-            queueVo.sessionCount = brokerListener.getPlayerNum(queue);
+            queueVo.sessionCount = brokerListener.getPlayerNum(queueName);
             list.add(queueVo);
         }
 
         return list;
+    }
+
+    public QueueVo getQueueVo(String queueName) {
+        QueueVo queueVo = queueVoMap.get(queueName);
+        if (queueVo != null) {
+            queueVo.sessionCount = brokerListener.getPlayerNum(queueName);
+        }
+
+        return queueVo;
     }
 
     @Override

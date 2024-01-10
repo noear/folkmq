@@ -2,23 +2,17 @@ package org.noear.folkmq.broker.admin;
 
 import org.noear.folkmq.broker.admin.dso.LicenceUtils;
 import org.noear.folkmq.broker.admin.dso.ViewQueueService;
-import org.noear.folkmq.broker.admin.model.QueueVo;
 import org.noear.folkmq.broker.admin.model.ServerVo;
 import org.noear.folkmq.broker.admin.model.TopicVo;
 import org.noear.folkmq.broker.mq.BrokerListenerFolkmq;
 import org.noear.folkmq.client.MqMessage;
 import org.noear.folkmq.common.MqConstants;
-import org.noear.folkmq.common.MqUtils;
-import org.noear.folkmq.server.MqQueue;
 import org.noear.snack.core.utils.DateUtil;
-import org.noear.socketd.transport.core.Entity;
-import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
 import org.noear.socketd.transport.core.entity.StringEntity;
 import org.noear.solon.annotation.Controller;
 import org.noear.solon.annotation.Inject;
 import org.noear.solon.annotation.Mapping;
-import org.noear.solon.annotation.Post;
 import org.noear.solon.core.handle.ModelAndView;
 import org.noear.solon.core.handle.Result;
 import org.noear.solon.validation.annotation.Logined;
@@ -30,7 +24,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * 管理控制器
@@ -148,124 +141,6 @@ public class AdminController extends BaseController {
         list.sort(Comparator.comparing(TopicVo::getTopic));
 
         return view("admin_topic").put("list", list);
-    }
-
-    @Mapping("/admin/queue")
-    public ModelAndView queue() {
-        List<QueueVo> list = viewQueueService.getQueueListVo();
-        list.sort(Comparator.comparing(v -> v.queue));
-
-        return view("admin_queue").put("list", list);
-    }
-
-    @Mapping("/admin/queue_session")
-    public ModelAndView queue_session(@NotEmpty String topic, @NotEmpty String consumerGroup) throws IOException {
-        String queueName = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP + consumerGroup;
-        List<String> list = new ArrayList<>();
-
-        Collection<Session> sessionList = brokerListener.getPlayerAll(queueName);
-        if (sessionList != null) {
-            List<Session> sessions = new ArrayList<>(sessionList);
-            for (Session s1 : sessions) {
-                list.add(s1.remoteAddress().toString());
-
-                //不超过99
-                if (list.size() == 99) {
-                    break;
-                }
-            }
-        }
-
-        return view("admin_queue_session").put("list", list);
-    }
-
-    @Mapping("/admin/queue_details")
-    public ModelAndView queue_details(@NotEmpty String topic, @NotEmpty String consumerGroup) throws IOException {
-        String queueName = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP + consumerGroup;
-
-
-        return view("admin_queue_details")
-                .put("topic", topic)
-                .put("consumerGroup", consumerGroup);
-    }
-
-
-    static AtomicBoolean force_lock = new AtomicBoolean(false);
-
-    @Post
-    @Mapping("/admin/queue_details/ajax/distribute")
-    public Result queue_details_ajax_distribute(@NotEmpty String topic, @NotEmpty String consumerGroup) {
-        if (force_lock.get()) {
-            return Result.failure("正在进行别的强制操作!");
-        }
-
-        try {
-            //增加安全锁控制
-            force_lock.set(true);
-
-            String queueName = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP + consumerGroup;
-
-            log.warn("Queue forceDistribute: queueName={}", queueName);
-
-
-            Collection<Session> tmp = brokerListener.getPlayerAll(MqConstants.BROKER_AT_SERVER);
-
-            if (tmp != null) {
-                List<Session> serverList = new ArrayList<>(tmp);
-                Entity entity = new StringEntity("")
-                        .metaPut(MqConstants.MQ_META_TOPIC, topic)
-                        .metaPut(MqConstants.MQ_META_CONSUMER_GROUP, consumerGroup);
-
-                for (Session s1 : serverList) {
-                    s1.send(MqConstants.ADMIN_QUEUE_FORCE_DISTRIBUTE, entity);
-                }
-
-                return Result.succeed();
-            } else {
-                return Result.failure("没有找到队列!");
-            }
-        } catch (Throwable e) {
-            return Result.failure(e.getLocalizedMessage());
-        } finally {
-            force_lock.set(false);
-        }
-    }
-
-    @Post
-    @Mapping("/admin/queue_details/ajax/delete")
-    public Result queue_details_ajax_delete(@NotEmpty String topic, @NotEmpty String consumerGroup) {
-        if (force_lock.get()) {
-            return Result.failure("正在进行别的强制操作!");
-        }
-
-        try {
-            //增加安全锁控制
-            force_lock.set(true);
-            String queueName = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP + consumerGroup;
-
-            log.warn("Queue forceDelete: queueName={}", queueName);
-
-
-            Collection<Session> tmp = brokerListener.getPlayerAll(MqConstants.BROKER_AT_SERVER);
-
-            if (tmp != null && tmp.size() > 0) {
-                List<Session> serverList = new ArrayList<>(tmp);
-                Entity entity = new StringEntity("")
-                        .metaPut(MqConstants.MQ_META_TOPIC, topic)
-                        .metaPut(MqConstants.MQ_META_CONSUMER_GROUP, consumerGroup);
-
-                for (Session s1 : serverList) {
-                    s1.send(MqConstants.ADMIN_QUEUE_FORCE_DELETE, entity);
-                }
-            }
-
-            return Result.succeed();
-
-        } catch (Throwable e) {
-            return Result.failure(e.getLocalizedMessage());
-        } finally {
-            force_lock.set(false);
-        }
     }
 
     @Mapping("/admin/server")

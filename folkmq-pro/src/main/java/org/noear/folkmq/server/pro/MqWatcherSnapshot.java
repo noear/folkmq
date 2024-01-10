@@ -126,7 +126,7 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
 
     /**
      * @deprecated 1.0.18
-     * */
+     */
     private void loadSubscribeMapOldDo(File subscribeMapFile) throws Exception {
         String subscribeMapJsonStr = readSnapshotFile(subscribeMapFile);
 
@@ -251,7 +251,7 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
                         scheduled = Long.parseLong(scheduledStr);
                     }
 
-                    if(scheduled == 0){
+                    if (scheduled == 0) {
                         //默认为当前ms（相对于后面者，有个排序作用）
                         scheduled = System.currentTimeMillis();
                     }
@@ -279,7 +279,7 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
         saveDo();
     }
 
-    private void saveDo(){
+    private void saveDo() {
         if (isStarted.get() == false) {
             //未加载完成（不可保存，否则会盖掉加载中的数据）
             return;
@@ -327,11 +327,14 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
             subscribeMapFileTmp.createNewFile();
         }
 
-        List<String> topicList = new ArrayList<>(subscribeMap.keySet());
+        Iterator<Map.Entry<String, Set<String>>> subscribeIterator = subscribeMap.entrySet().iterator();
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(subscribeMapFileTmp))) {
-            for (String topic : topicList) {
-                List<String> topicConsumerList = new ArrayList<>(subscribeMap.get(topic));
+            while (subscribeIterator.hasNext()){
+                Map.Entry<String, Set<String>> kv = subscribeIterator.next();
+                String topic = kv.getKey();
+                Set<String> topicConsumerList = kv.getValue();
+
                 ONode topicJson = new ONode(Options.def().add(Feature.DisThreadLocal));
                 topicJson.set("topic", topic);
                 topicJson.getOrNew("queues").addAll(topicConsumerList);
@@ -355,20 +358,22 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
             return;
         }
 
-        List<String> topicList = new ArrayList<>(subscribeMap.keySet());
+        Iterator<Map.Entry<String, Set<String>>> subscribeIterator = subscribeMap.entrySet().iterator();
 
         Set<String> queueNameSet = new HashSet<>();
-        for (String topic : topicList) {
-            Set<String> tmp = subscribeMap.get(topic);
-            if (tmp != null) {
-                queueNameSet.addAll(tmp);
+        while (subscribeIterator.hasNext()) {
+            Map.Entry<String, Set<String>> kv = subscribeIterator.next();
+            if (kv.getValue() != null) {
+                queueNameSet.addAll(kv.getValue());
             }
         }
 
-        Map<String, MqQueue> queueMap = serverRef.getQueueMap();
+        Iterator<Map.Entry<String, MqQueue>> queueIterator = serverRef.getQueueMap().entrySet().iterator();
 
-        for (String queueName : queueNameSet) {
-            MqQueue queue = queueMap.get(queueName);
+        while (queueIterator.hasNext()) {
+            Map.Entry<String, MqQueue> kv = queueIterator.next();
+            String queueName = kv.getKey();
+            MqQueue queue = kv.getValue();
 
             try {
                 saveQueue1(queueName, (MqQueueDefault) queue);
@@ -390,7 +395,7 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
         }
 
         String queueFileName = topicConsumerGroupAry[0] + "/" + topicConsumerGroupAry[1] + file_suffix;
-        String queueFileNameTmp = queueFileName +".tmp";
+        String queueFileNameTmp = queueFileName + ".tmp";
 
         File queueFileTmp = new File(directory, queueFileNameTmp);
         if (queueFileTmp.exists() == false) {
@@ -399,10 +404,12 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
 
 
         if (queue != null) {
-            List<MqMessageHolder> messageList = new ArrayList<>(queue.getMessageMap().values());
+            Iterator<Map.Entry<String, MqMessageHolder>> messageIterator = queue.getMessageMap().entrySet().iterator();
 
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(queueFileTmp))) {
-                for (MqMessageHolder messageHolder : messageList) {
+                while (messageIterator.hasNext()) {
+                    Map.Entry<String, MqMessageHolder> kv = messageIterator.next();
+                    MqMessageHolder messageHolder = kv.getValue();
                     if (messageHolder.isDone()) {
                         continue;
                     }

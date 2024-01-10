@@ -140,7 +140,7 @@ public class BrokerListenerFolkmq extends BrokerListener {
             if (subscribeMap.size() > 0) {
                 String json = ONode.stringify(subscribeMap);
                 Entity entity = new StringEntity(json).metaPut(MqConstants.MQ_META_BATCH, "1");
-                requester.sendAndRequest(MqConstants.MQ_EVENT_SUBSCRIBE, entity).await();
+                requester.sendAndRequest(MqConstants.MQ_EVENT_SUBSCRIBE, entity, 30_000).await();
             }
 
             //注册服务

@@ -23,7 +23,7 @@ public interface MqQueue {
 
     /**
      * 获取队列名
-     * */
+     */
     String getQueueName();
 
     /**
@@ -38,12 +38,12 @@ public interface MqQueue {
 
     /**
      * 获取所有消息会话
-     * */
+     */
     Collection<Session> getSessions();
 
     /**
      * 消费者会话数量
-     * */
+     */
     int sessionCount();
 
     /**
@@ -53,22 +53,32 @@ public interface MqQueue {
 
     /**
      * 移除消息
-     * */
+     */
     void removeAt(String tid);
 
     /**
      * 派发消息
-     * */
+     */
     boolean distribute();
 
     /**
+     * 强制清空
+     */
+    void forceClear();
+
+    /**
+     * 强制派发
+     */
+    void forceDistribute(int times, int count);
+
+    /**
      * 消息总量
-     * */
+     */
     int messageTotal();
 
     /**
      * 消息总量2（用作校验）
-     * */
+     */
     int messageTotal2();
 
     /**

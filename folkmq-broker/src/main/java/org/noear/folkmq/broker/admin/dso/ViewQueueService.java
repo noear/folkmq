@@ -33,7 +33,7 @@ public class ViewQueueService implements LifecycleBean {
 
     private Set<String> queueSet = Collections.newSetFromMap(new ConcurrentHashMap<>());
     private Map<String, QueueVo> queueVoMap = new ConcurrentHashMap<>();
-    private Map<String, QueueVo> queueVoMap2 = new ConcurrentHashMap<>();
+    private Map<String, QueueVo> queueVoMapTmp = new ConcurrentHashMap<>();
     private Object QUEUE_LOCK = new Object();
 
     private ScheduledFuture<?> scheduledFuture;
@@ -84,8 +84,8 @@ public class ViewQueueService implements LifecycleBean {
 
             //一种切换效果。把上次收集的效果切换给当前的。然后重新开始收集
             queueVoMap.clear();
-            queueVoMap.putAll(queueVoMap2);
-            queueVoMap2.clear();
+            queueVoMap.putAll(queueVoMapTmp);
+            queueVoMapTmp.clear();
 
             List<Session> sessions = new ArrayList<>(tmp);
             for (Session session : sessions) {
@@ -93,7 +93,7 @@ public class ViewQueueService implements LifecycleBean {
                     session.sendAndRequest(MqConstants.ADMIN_VIEW_QUEUE, new StringEntity("")).thenReply(r -> {
                         String json = r.dataAsString();
                         List<QueueVo> list = ONode.loadStr(json).toObjectList(QueueVo.class);
-                        addQueueVo(list, queueVoMap2);
+                        addQueueVo(list, queueVoMapTmp);
                     });
                 } catch (Throwable e) {
                     log.warn("Cmd 'admin.view.queue' call error", e);

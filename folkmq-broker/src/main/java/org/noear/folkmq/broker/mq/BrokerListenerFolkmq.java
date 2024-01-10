@@ -111,7 +111,7 @@ public class BrokerListenerFolkmq extends BrokerListener {
 
             removePlayer(queueName, requester);
         } else if (MqConstants.MQ_EVENT_DISTRIBUTE.equals(message.event())) {
-            String atName = message.at();
+            String atName = message.atName();
 
             //单发模式（给同名的某个玩家，轮询负截均衡）
             Session responder = getPlayerOne(atName);
@@ -130,7 +130,7 @@ public class BrokerListenerFolkmq extends BrokerListener {
             return;
         } else if (MqConstants.MQ_EVENT_JOIN.equals(message.event())) {
             //同步订阅
-            if(subscribeMap.size() > 0) {
+            if (subscribeMap.size() > 0) {
                 String json = ONode.stringify(subscribeMap);
                 Entity entity = new StringEntity(json).metaPut(MqConstants.MQ_META_BATCH, "1");
                 requester.sendAndRequest(MqConstants.MQ_EVENT_SUBSCRIBE, entity).await();
@@ -147,6 +147,13 @@ public class BrokerListenerFolkmq extends BrokerListener {
                     requester.remoteAddress());
 
             //结束处理
+            return;
+        }
+
+        if (message.event().startsWith(MqConstants.ADMIN_PREFIX)) {
+            log.warn("Player channel admin events are not allowed, sessionId={}, ip={}",
+                    requester.sessionId(),
+                    requester.remoteAddress());
             return;
         }
 

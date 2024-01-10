@@ -127,6 +127,46 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
     }
 
     /**
+     * 强制清空
+     */
+    @Override
+    public void forceClear() {
+        messageMap.clear();
+        messageQueue.clear();
+    }
+
+    /**
+     * 强制派发
+     */
+    @Override
+    public void forceDistribute(int times, int count) {
+        if (count == 0 || count > messageTotal()) {
+            count = messageTotal();
+        }
+
+        List<MqMessageHolder> msgList = new ArrayList<>(count);
+
+        Iterator<Map.Entry<String, MqMessageHolder>> iterator = messageMap.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<String, MqMessageHolder> kv = iterator.next();
+            MqMessageHolder msg = kv.getValue();
+            if (msg.getDistributeCount() >= times && msg.isDone() == false) {
+                msgList.add(msg);
+            }
+
+            if (msgList.size() == count) {
+                break;
+            }
+        }
+
+        for (MqMessageHolder msg : msgList) {
+            messageQueue.remove(msg);
+            msg.setDistributeTime(System.currentTimeMillis());
+            messageQueue.add(msg);
+        }
+    }
+
+    /**
      * 消息总量
      */
     public int messageTotal() {

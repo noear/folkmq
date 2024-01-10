@@ -328,6 +328,17 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
         return Collections.unmodifiableMap(queueMap);
     }
 
+    @Override
+    public void removeQueue(String queueName) {
+        //先删订阅关系
+        String[] ss = queueName.split(MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP);
+        Set<String> tmp = subscribeMap.get(ss[0]);
+        tmp.remove(queueName);
+
+        //再删队列
+        queueMap.remove(queueName);
+    }
+
     /**
      * 执行订阅
      */

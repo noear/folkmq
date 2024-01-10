@@ -12,11 +12,11 @@ public class ConsumerTest {
 
         //订阅
         client.subscribe("hot", "a", message -> {
-            //System.out.println("::" + topic + " - " + message);
+            System.out.println("::" + message.getTopic() + " - " + message);
         });
 
         client.subscribe("test", "a", message -> {
-            //System.out.println("::" + topic + " - " + message);
+            System.out.println("::" + message.getTopic() + " - " + message);
         });
     }
 }

@@ -24,6 +24,11 @@ public interface MqServiceInternal {
     Map<String, MqQueue> getQueueMap();
 
     /**
+     * 移除队列
+     * */
+    void removeQueue(String queueName);
+
+    /**
      * 执行订阅
      *
      * @param topic         主题

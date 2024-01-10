@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html class="frm10">
 <head>
-    <title>${app} - 队列消息</title>
+    <title>${app} - 队列</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8 "/>
     <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico"/>
     <link rel="stylesheet" href="${css}/main.css"/>
@@ -26,14 +26,39 @@
                 title: '消费者列表',
                 area: ['50%', '50%'],
                 type: 2,
-                content: "/admin/queue_session?topic=" + ss[0] + "&consumerGroup=" + ss[1]
+                content: "/admin/queue_session?topic=" + ss[0] + "&consumerGroup=" + ss[1],
+                end: function () {
+                    self.location.reload();
+                }
+            });
+        }
+
+        function showDetails(queue){
+            if(!queue){
+                return;
+            }
+
+            let ss = queue.split('#');
+
+            if(ss.length !=2){
+                return;
+            }
+
+            top.layer.open({
+                title: '队列操作',
+                area: ['600px', '300px'],
+                type: 2,
+                content: "/admin/queue_details?topic=" + ss[0] + "&consumerGroup=" + ss[1],
+                end: function () {
+                    self.location.reload();
+                }
             });
         }
     </script>
 </head>
 <body>
 <toolbar class="blockquote">
-    <left>队列消息</left>
+    <left>队列</left>
     <right></right>
 </toolbar>
 <datagrid class="list">
@@ -59,7 +84,7 @@
         <tbody id="tbody">
         <#list list as item>
             <tr>
-                <td class="left">${item.queue}</td>
+                <td class="left"><a href="#" onclick="return showDetails('${item.queue}')">${item.queue}</a></td>
                 <td class="center">${item.messageCount}</td>
                 <td class="center">${item.messageDelayedCount1}</td>
                 <td class="center">${item.messageDelayedCount2}</td>

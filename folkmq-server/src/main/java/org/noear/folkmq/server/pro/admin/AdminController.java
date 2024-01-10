@@ -16,14 +16,18 @@ import org.noear.socketd.utils.RunUtils;
 import org.noear.solon.annotation.Controller;
 import org.noear.solon.annotation.Inject;
 import org.noear.solon.annotation.Mapping;
+import org.noear.solon.annotation.Post;
 import org.noear.solon.core.handle.ModelAndView;
 import org.noear.solon.core.handle.Result;
 import org.noear.solon.validation.annotation.Logined;
 import org.noear.solon.validation.annotation.NotEmpty;
 import org.noear.solon.validation.annotation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * 管理控制器
@@ -35,6 +39,8 @@ import java.util.*;
 @Valid
 @Controller
 public class AdminController extends BaseController {
+    static final Logger log = LoggerFactory.getLogger(AdminController.class);
+
     @Inject
     MqServiceInternal server;
 
@@ -48,13 +54,15 @@ public class AdminController extends BaseController {
 
     @Mapping("/admin/topic")
     public ModelAndView topic() {
-        Map<String, Set<String>> subscribeMap = server.getSubscribeMap();
+        Iterator<Map.Entry<String, Set<String>>> iterator = server.getSubscribeMap().entrySet().iterator();
 
         List<TopicVo> list = new ArrayList<>();
 
         //用 list 转一下，免避线程安全
-        for (String topic : new ArrayList<String>(subscribeMap.keySet())) {
-            Set<String> queueSet = subscribeMap.get(topic);
+        while (iterator.hasNext()) {
+            Map.Entry<String, Set<String>> kv = iterator.next();
+            String topic = kv.getKey();
+            Set<String> queueSet = kv.getValue();
 
             TopicVo topicVo = new TopicVo();
             topicVo.setTopic(topic);
@@ -105,6 +113,88 @@ public class AdminController extends BaseController {
         }
 
         return view("admin_queue_session").put("list", list);
+    }
+
+
+    @Mapping("/admin/queue_details")
+    public ModelAndView queue_details(@NotEmpty String topic, @NotEmpty String consumerGroup) throws IOException {
+        String queueName = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP + consumerGroup;
+
+
+        return view("admin_queue_details")
+                .put("topic", topic)
+                .put("consumerGroup", consumerGroup);
+    }
+
+
+    static AtomicBoolean force_lock = new AtomicBoolean(false);
+
+    @Post
+    @Mapping("/admin/queue_details/ajax/distribute")
+    public Result queue_details_ajax_distribute(@NotEmpty String topic, @NotEmpty String consumerGroup) {
+        if (force_lock.get()) {
+            return Result.failure("正在进行别的强制操作!");
+        }
+
+        try {
+            //增加安全锁控制
+            force_lock.set(true);
+
+            String queueName = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP + consumerGroup;
+
+            log.warn("Queue forceDistribute: queueName={}", queueName);
+
+            MqQueue queue = server.getQueueMap().get(queueName);
+            if (queue != null) {
+                if (queue.sessionCount() == 0) {
+                    return Result.failure("没有消费者连接，不能派发!");
+                }
+
+                if (queue.messageTotal() == 0) {
+                    return Result.failure("没有消息可派发!");
+                }
+
+                queue.forceDistribute(2, 0);
+
+                return Result.succeed();
+            } else {
+                return Result.failure("没有找到队列!");
+            }
+        } finally {
+            force_lock.set(false);
+        }
+    }
+
+    @Post
+    @Mapping("/admin/queue_details/ajax/delete")
+    public Result queue_details_ajax_delete(@NotEmpty String topic, @NotEmpty String consumerGroup) {
+        if (force_lock.get()) {
+            return Result.failure("正在进行别的强制操作!");
+        }
+
+        try {
+            //增加安全锁控制
+            force_lock.set(true);
+            String queueName = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP + consumerGroup;
+
+            log.warn("Queue forceDelete: queueName={}", queueName);
+
+            MqQueue queue = server.getQueueMap().get(queueName);
+            if (queue != null) {
+                if (queue.sessionCount() > 0) {
+                    return Result.failure("有消费者连接，不能删除!");
+                }
+
+                server.removeQueue(queueName);
+                queue.forceClear();
+
+                return Result.succeed();
+            } else {
+                return Result.failure("没有找到队列!");
+            }
+        } finally {
+            force_lock.set(false);
+        }
     }
 
     @Mapping("/admin/publish")

@@ -75,9 +75,23 @@ public interface MqConstants {
     String MQ_EVENT_JOIN = "mq.event.join";
 
     /**
+     * 管理指令
+     */
+    String ADMIN_PREFIX = "admin.";
+
+    /**
      * 管理视图-队列
      */
     String ADMIN_VIEW_QUEUE = "admin.view.queue";
+
+    /**
+     * 管理队列-强制删除
+     */
+    String ADMIN_QUEUE_FORCE_DELETE = "admin.queue.force.delete";
+    /**
+     * 管理队列-强制派发
+     */
+    String ADMIN_QUEUE_FORCE_DISTRIBUTE = "admin.queue.force.distribute";
 
     /**
      * 连接参数：ak

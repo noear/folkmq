@@ -10,7 +10,7 @@ public class ProducerTest {
         MqClient client = FolkMQ.createClient("folkmq://127.0.0.1:18602?ak=folkmq&sk=YapLHTx19RlsEE16")
                 .connect();
 
-        int count = 1000_000;
+        int count = 10_000;
 
         //发布预热
         for (int i = 0; i < 100; i++) {

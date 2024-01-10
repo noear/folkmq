@@ -1,11 +1,11 @@
-import {MqConsumeHandler} from "./MqConsumeHandler";
 import {MqMessageReceived} from "./IMqMessage";
+import {IoConsumer} from "@noear/socket.d/transport/core/Typealias";
 
-export class MqSubscription implements MqConsumeHandler {
+export class MqSubscription {
     private readonly _topic: string;
     private readonly _consumerGroup: string;
     private readonly _queueName: string;
-    private readonly _consumeHandler: MqConsumeHandler;
+    private readonly _consumeHandler: IoConsumer<MqMessageReceived>;
 
 
     /**
@@ -30,19 +30,11 @@ export class MqSubscription implements MqConsumeHandler {
     }
 
     /**
-     * 消费处理器
-     */
-    getConsumeHandler(): MqConsumeHandler {
-        return this._consumeHandler;
-    }
-
-
-    /**
      * @param topic          主题
      * @param consumerGroup  消费者组
      * @param consumeHandler 消费处理器
      */
-    constructor(topic: string, consumerGroup: string, consumeHandler: MqConsumeHandler) {
+    constructor(topic: string, consumerGroup: string, consumeHandler: IoConsumer<MqMessageReceived>) {
         this._topic = topic;
         this._consumerGroup = consumerGroup;
         this._queueName = topic + '#' + consumerGroup;
@@ -55,6 +47,6 @@ export class MqSubscription implements MqConsumeHandler {
      * @param message 收到的消息
      */
     consume(message: MqMessageReceived) {
-        this._consumeHandler.consume(message);
+        this._consumeHandler(message);
     }
 }

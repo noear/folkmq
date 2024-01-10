@@ -2,8 +2,7 @@ import {ClientConfig} from "@noear/socket.d/transport/client/ClientConfig";
 import {IoConsumer} from "@noear/socket.d/transport/core/Typealias";
 import {Session} from "@noear/socket.d/transport/core/Session";
 import {Message} from "@noear/socket.d/transport/core/Message";
-import {MqConsumeHandler} from "./MqConsumeHandler";
-import {IMqMessage, MqMessageReceivedImpl} from "./IMqMessage";
+import {IMqMessage, MqMessageReceived, MqMessageReceivedImpl} from "./IMqMessage";
 import {MqClientListener} from "./MqClientListener";
 import {ClusterClientSession} from "@noear/socket.d/cluster/ClusterClientSession";
 import {SocketD} from "@noear/socket.d";
@@ -49,7 +48,7 @@ export interface MqClient {
      * @param consumerGroup   消费者组
      * @param consumerHandler 消费处理
      */
-    subscribe(topic: string, consumerGroup: string, consumerHandler: MqConsumeHandler);
+    subscribe(topic: string, consumerGroup: string, consumerHandler: IoConsumer<MqMessageReceived>);
 
     /**
      * 取消订阅主题
@@ -150,7 +149,7 @@ export class MqClientDefault implements MqClientInternal {
      * @param consumerGroup   消费者组
      * @param consumerHandler 消费处理
      */
-    subscribe(topic: string, consumerGroup: string, consumerHandler: MqConsumeHandler) {
+    subscribe(topic: string, consumerGroup: string, consumerHandler: IoConsumer<MqMessageReceived>) {
         let subscription = new MqSubscription(topic, consumerGroup, consumerHandler);
 
         this._subscriptionMap.set(topic, subscription);
@@ -161,7 +160,7 @@ export class MqClientDefault implements MqClientInternal {
                 let entity = SocketD.newEntity("")
                     .metaPut(MqConstants.MQ_META_TOPIC, subscription.getTopic())
                     .metaPut(MqConstants.MQ_META_CONSUMER_GROUP, subscription.getConsumerGroup())
-                    .metaPut("@", MqConstants.BROKER_AT_SERVER_ALL);
+                    .at(MqConstants.BROKER_AT_SERVER_ALL);
 
                 //使用 Qos1
                 session.sendAndRequest(MqConstants.MQ_EVENT_SUBSCRIBE, entity).await();
@@ -180,7 +179,7 @@ export class MqClientDefault implements MqClientInternal {
                 let entity = SocketD.newEntity("")
                     .metaPut(MqConstants.MQ_META_TOPIC, topic)
                     .metaPut(MqConstants.MQ_META_CONSUMER_GROUP, consumerGroup)
-                    .metaPut("@", MqConstants.BROKER_AT_SERVER_ALL);
+                    .at(MqConstants.BROKER_AT_SERVER_ALL);
 
                 //使用 Qos1
                 session.sendAndRequest(MqConstants.MQ_EVENT_UNSUBSCRIBE, entity).await();

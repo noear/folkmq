@@ -65,6 +65,12 @@ public class ViewQueueService implements LifecycleBean {
         return queueVo;
     }
 
+    public void removeQueueVo(String queueName){
+        queueVoMap.remove(queueName);
+        queueVoMapTmp.remove(queueName);
+        queueSet.remove(queueName);
+    }
+
     @Override
     public void start() throws Throwable {
         delay();

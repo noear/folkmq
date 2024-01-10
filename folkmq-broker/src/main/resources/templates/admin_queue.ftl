@@ -43,7 +43,7 @@
 
             top.layer.open({
                 title: '队列操作',
-                area: ['600px', '300px'],
+                area: ['500px', '300px'],
                 type: 2,
                 content: "/admin/queue_details?topic=" + ss[0] + "&consumerGroup=" + ss[1],
                 end: function () {

@@ -148,12 +148,14 @@ public class AdminQueueController extends BaseController{
 
             log.warn("Queue forceDelete: queueName={}", queueName);
 
-
             QueueVo queueVo = viewQueueService.getQueueVo(queueName);
             if (queueVo != null) {
                 if (queueVo.getSessionCount() > 0) {
                     return Result.failure("有消费者连接，不能删除!");
                 }
+
+                viewQueueService.removeQueueVo(queueName);
+                brokerListener.removeSubscribe(topic, queueName);
 
                 Collection<Session> tmp = brokerListener.getPlayerAll(MqConstants.BROKER_AT_SERVER);
                 List<Session> serverList = new ArrayList<>(tmp);

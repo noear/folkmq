@@ -33,6 +33,13 @@ public class BrokerListenerFolkmq extends BrokerListener {
         return subscribeMap;
     }
 
+    public void removeSubscribe(String topic, String queueName) {
+        Set<String> tmp = subscribeMap.get(topic);
+        if (tmp != null) {
+            tmp.remove(queueName);
+        }
+    }
+
     /**
      * 配置访问账号
      *

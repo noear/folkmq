@@ -75,10 +75,12 @@
         <table>
             <tbody id="tbody">
             <tr>
-                <td class="left">前面有停过消费者服务？立即派发延时消息！（不要乱点）</td><td width="100px"><button id="distributeBtn" class="edit">强制派发</button></td>
+                <td class="left">前面有停过消费者服务？立即派发延时消息！（不要乱点）</td>
+                <td class="right"><button id="distributeBtn" class="edit">强制派发</button></td>
             </tr>
             <tr>
-                <td class="left">队列不要了？或者无用的？</td><td><button id="deleteBtn" class="edit">强制删除</button></td>
+                <td class="left">队列不要了？或者无用的？</td>
+                <td class="right"><button id="deleteBtn" class="edit">强制删除</button></td>
             </tr>
             </tbody>
         </table>

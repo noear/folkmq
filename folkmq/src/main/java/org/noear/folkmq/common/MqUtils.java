@@ -33,6 +33,12 @@ public class MqUtils {
         } else {
             entity.metaPut(MqConstants.MQ_META_SCHEDULED, String.valueOf(message.getScheduled().getTime()));
         }
+        if (message.getExpiration() == null) {
+            entity.metaPut(MqConstants.MQ_META_EXPIRATION, "0");
+        } else {
+            entity.metaPut(MqConstants.MQ_META_EXPIRATION, String.valueOf(message.getExpiration().getTime()));
+        }
+
         entity.at(MqConstants.BROKER_AT_SERVER);
 
         return entity;

@@ -20,6 +20,10 @@ public interface MqConstants {
      */
     String MQ_META_SCHEDULED = "mq.scheduled";
     /**
+     * 元信息：消息过期时间
+     */
+    String MQ_META_EXPIRATION = "mq.expiration";
+    /**
      * 元信息：消息质量等级
      */
     String MQ_META_QOS = "mq.qos";

@@ -14,6 +14,7 @@ public class MqMessage implements IMqMessage {
     private String tid;
     private String content;
     private Date scheduled;
+    private Date expiration;
     private int qos = 1;
 
     public MqMessage(String content){
@@ -34,12 +35,22 @@ public class MqMessage implements IMqMessage {
         return scheduled;
     }
 
+    @Override
+    public Date getExpiration() {
+        return expiration;
+    }
+
     public int getQos() {
         return qos;
     }
 
     public MqMessage scheduled(Date scheduled) {
         this.scheduled = scheduled;
+        return this;
+    }
+
+    public MqMessage expiration(Date expiration){
+        this.expiration = expiration;
         return this;
     }
 

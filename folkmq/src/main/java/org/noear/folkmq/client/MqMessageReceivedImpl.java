@@ -22,6 +22,7 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
     private final String topic;
     private final String content;
     private final Date scheduled;
+    private final Date expiration;
     private final int qos;
     private final int times;
 
@@ -36,6 +37,12 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
 
         this.qos = Integer.parseInt(from.metaOrDefault(MqConstants.MQ_META_QOS, "1"));
         this.times = Integer.parseInt(from.metaOrDefault(MqConstants.MQ_META_TIMES, "0"));
+        long expirationL = Long.parseLong(from.metaOrDefault(MqConstants.MQ_META_EXPIRATION, "0"));
+        if (expirationL == 0) {
+            this.expiration = null;
+        } else {
+            this.expiration = new Date(expirationL);
+        }
         this.scheduled = null;
     }
 
@@ -77,6 +84,14 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
     @Override
     public int getQos() {
         return qos;
+    }
+
+    /**
+     * 过期时间
+     * */
+    @Override
+    public Date getExpiration() {
+        return expiration;
     }
 
     /**

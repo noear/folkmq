@@ -37,6 +37,13 @@ public class CaseTest {
     }
 
     @Test
+    public void TestCase08_expiration() throws Exception {
+        BaseTestCase testCase = new TestCase08_expiration(2008);
+        testCase.start();
+        testCase.stop();
+    }
+
+    @Test
     public void TestCase09_persistent() throws Exception {
         BaseTestCase testCase = new TestCase09_persistent(2009);
         testCase.start();

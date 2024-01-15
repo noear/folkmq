@@ -25,6 +25,11 @@ public interface IMqMessage {
     Date getScheduled();
 
     /**
+     * 过期时间
+     * */
+    Date getExpiration();
+
+    /**
      * 质量等级（0 或 1）
      */
     int getQos();

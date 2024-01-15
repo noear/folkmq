@@ -187,6 +187,13 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
         messageCountSub(messageHolder);
 
         if (messageHolder.isDone()) {
+            //已完成
+            messageMap.remove(messageHolder.getTid());
+            return;
+        }
+
+        if(messageHolder.getExpiration() > 0 && messageHolder.getExpiration() > System.currentTimeMillis()){
+            //已过期
             messageMap.remove(messageHolder.getTid());
             return;
         }

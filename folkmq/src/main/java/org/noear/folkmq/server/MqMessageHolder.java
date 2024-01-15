@@ -21,6 +21,8 @@ public class MqMessageHolder implements Delayed {
     private final String tid;
     //质量等级（0 或 1）
     private final int qos;
+    //存活时间
+    private final long expiration;
 
     //派发时间
     private volatile long distributeTime;
@@ -29,7 +31,7 @@ public class MqMessageHolder implements Delayed {
     //是否完成
     private AtomicBoolean isDone;
 
-    public MqMessageHolder(String queueName, String consumerGroup, Message from, String tid, int qos, int distributeCount, long distributeTime) {
+    public MqMessageHolder(String queueName, String consumerGroup, Message from, String tid, int qos, long expiration, int distributeCount, long distributeTime) {
         this.content = new EntityDefault().dataSet(from.data()).metaMapPut(from.metaMap());
         this.content.metaPut(MqConstants.MQ_META_CONSUMER_GROUP, consumerGroup).at(queueName);
 
@@ -37,6 +39,7 @@ public class MqMessageHolder implements Delayed {
 
         this.tid = tid;
         this.qos = qos;
+        this.expiration = expiration;
         this.distributeCount = distributeCount;
         this.distributeTime = distributeTime;
     }
@@ -60,6 +63,13 @@ public class MqMessageHolder implements Delayed {
      */
     public int getQos() {
         return qos;
+    }
+
+    /**
+     * 过期时间
+     * */
+    public long getExpiration() {
+        return expiration;
     }
 
     public void setDistributeTime(long distributeTime) {

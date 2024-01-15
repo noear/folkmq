@@ -25,7 +25,7 @@ public interface MqServiceInternal {
 
     /**
      * 移除队列
-     * */
+     */
     void removeQueue(String queueName);
 
     /**
@@ -56,14 +56,15 @@ public interface MqServiceInternal {
     /**
      * 执行路由
      *
-     * @param queueName 队列名
-     * @param message   消息
-     * @param tid       事务Id
-     * @param qos       质量等级
-     * @param times     派发次数
-     * @param scheduled 计划时间
+     * @param queueName  队列名
+     * @param message    消息
+     * @param tid        事务Id
+     * @param qos        质量等级
+     * @param expiration 过期时间
+     * @param times      派发次数
+     * @param scheduled  计划时间
      */
-    void routingDo(String queueName, Message message, String tid, int qos, int times, long scheduled);
+    void routingDo(String queueName, Message message, String tid, int qos, long expiration, int times, long scheduled);
 
     /**
      * 保存

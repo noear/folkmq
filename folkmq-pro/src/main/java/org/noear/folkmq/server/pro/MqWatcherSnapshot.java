@@ -244,22 +244,18 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
                     String tid = message.meta(MqConstants.MQ_META_TID);
                     int qos = "0".equals(message.meta(MqConstants.MQ_META_QOS)) ? 0 : 1;
                     int times = Integer.parseInt(message.metaOrDefault(MqConstants.MQ_META_TIMES, "0"));
-                    long scheduled = 0;
+                    long expiration = Long.parseLong(message.metaOrDefault(MqConstants.MQ_META_EXPIRATION, "0"));
+                    long scheduled = Long.parseLong(message.metaOrDefault(MqConstants.MQ_META_SCHEDULED, "0"));
 
-                    String scheduledStr = message.meta(MqConstants.MQ_META_SCHEDULED);
-                    if (StrUtils.isNotEmpty(scheduledStr)) {
-                        scheduled = Long.parseLong(scheduledStr);
-                    }
 
                     if (scheduled == 0) {
                         //默认为当前ms（相对于后面者，有个排序作用）
                         scheduled = System.currentTimeMillis();
                     }
 
-                    serverRef.routingDo(queueName, message, tid, qos, times, scheduled);
+                    serverRef.routingDo(queueName, message, tid, qos, expiration, times, scheduled);
                 }
             }
-
         }
 
         return true;

@@ -1,5 +1,7 @@
 ### 1.0.29
 * 添加 消息过期支持
+* sokcet.d 升为 2.3.6
+* solon 升为 2.6.5
 
 ```java
 let msg = new MqMessage("hello").expiration(new Date(System.currentTimeMillis() + 5000));

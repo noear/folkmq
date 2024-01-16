@@ -1,3 +1,11 @@
+### 1.0.29
+* 添加 消息过期支持
+
+```java
+let msg = new MqMessage("hello").expiration(new Date(System.currentTimeMillis() + 5000));
+client.publish("demo", msg);
+```
+
 ### 1.0.28
 * 添加 管理后台“强制派发”和“强制删除”功能
 * 优化 快照保存的速度

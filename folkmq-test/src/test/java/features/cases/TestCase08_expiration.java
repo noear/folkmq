@@ -37,7 +37,11 @@ public class TestCase08_expiration extends BaseTestCase {
 
         assert server.getServerInternal().getQueueMap().get("demo#a").messageTotal() == 1L;
 
-        Thread.sleep(10000);
+        Thread.sleep(3000);
+
+        assert server.getServerInternal().getQueueMap().get("demo#a").messageTotal() == 1L;
+
+        Thread.sleep(3000);
 
         assert server.getServerInternal().getQueueMap().get("demo#a").messageTotal() == 0L;
     }

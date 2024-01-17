@@ -192,7 +192,7 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
             return;
         }
 
-        if(messageHolder.getExpiration() > 0 && messageHolder.getExpiration() > System.currentTimeMillis()){
+        if(messageHolder.getExpiration() > 0 && messageHolder.getExpiration() < System.currentTimeMillis()){
             //已过期
             messageMap.remove(messageHolder.getTid());
             return;

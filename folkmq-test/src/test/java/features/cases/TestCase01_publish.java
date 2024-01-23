@@ -30,6 +30,7 @@ public class TestCase01_publish extends BaseTestCase {
         CountDownLatch countDownLatch = new CountDownLatch(1);
 
         client = new MqClientDefault("folkmq://127.0.0.1:" + getPort())
+                .config(c->c.metaPut("ak","").metaPut("sk",""))
                 .connect();
 
         client.subscribe("demo", "a", ((message) -> {

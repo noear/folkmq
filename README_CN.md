@@ -14,7 +14,7 @@
         <img src="https://img.shields.io/maven-central/v/org.noear/folkmq.svg?label=Maven%20Central" alt="Maven" />
     </a>
     <a target="_blank" href="LICENSE">
-		<img src="https://img.shields.io/:license-LGPL2.1-blue.svg" alt="Apache 2" />
+		<img src="https://img.shields.io/:license-LGPL2.1-blue.svg" alt="LGPL2.1" />
 	</a>
    <a target="_blank" href="https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html">
 		<img src="https://img.shields.io/badge/JDK-8-green.svg" alt="jdk-8" />

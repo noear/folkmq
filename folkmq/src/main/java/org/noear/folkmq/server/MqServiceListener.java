@@ -7,6 +7,7 @@ import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
 import org.noear.socketd.transport.core.entity.StringEntity;
 import org.noear.socketd.transport.core.listener.EventListener;
+import org.noear.socketd.utils.RunUtils;
 import org.noear.socketd.utils.StrUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -153,15 +154,17 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
 
         //接收保存指令
         doOn(MqConstants.MQ_EVENT_SAVE, (s, m) -> {
-            save();
+            RunUtils.asyncAndTry(()->{
+                save();
 
-            if (m.isRequest() || m.isSubscribe()) { //此判断兼容 Qos0, Qos1
-                //发送“确认”，表示服务端收到了
-                if (s.isValid()) {
-                    //如果会话仍有效，则答复（有可能会半路关掉）
-                    s.replyEnd(m, new StringEntity("").metaPut(MqConstants.MQ_META_CONFIRM, "1"));
+                if (m.isRequest() || m.isSubscribe()) { //此判断兼容 Qos0, Qos1
+                    //发送“确认”，表示服务端收到了
+                    if (s.isValid()) {
+                        //如果会话仍有效，则答复（有可能会半路关掉）
+                        s.replyEnd(m, new StringEntity("").metaPut(MqConstants.MQ_META_CONFIRM, "1"));
+                    }
                 }
-            }
+            });
         });
     }
 

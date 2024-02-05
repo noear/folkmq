@@ -31,6 +31,8 @@ folkmq:
     queue:
       syncInterval: 5000
 
+#folkmq.api.token: "GhVPG@hjJMViC7xN"
+
 #folkmq.access:
 #  ak : "demo"
 #  sk : "YapLHTx19RlsEE16"

@@ -3,6 +3,7 @@ package org.noear.folkmq.broker.mq;
 import org.noear.folkmq.FolkMQ;
 import org.noear.folkmq.broker.admin.dso.QueueForceService;
 import org.noear.folkmq.broker.common.ConfigNames;
+import org.noear.folkmq.broker.common.MqBrokerConfig;
 import org.noear.socketd.SocketD;
 import org.noear.socketd.broker.BrokerFragmentHandler;
 import org.noear.socketd.transport.core.Session;
@@ -20,7 +21,6 @@ import org.noear.solon.net.websocket.socketd.ToSocketdWebSocketListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -42,31 +42,16 @@ public class BrokerLifecycleBean implements LifecycleBean , EventListener<AppPre
     private BrokerListenerFolkmq brokerListener;
     private ToSocketdWebSocketListener webSocketListener;
 
-    private Map<String, String> getAccessMap() {
-        Map<String, String> accessMap = Solon.cfg().getMap(ConfigNames.folkmq_access_x);
-        accessMap.remove("ak");
-        accessMap.remove("sk");
-
-        String ak = Solon.cfg().get(ConfigNames.folkmq_access_ak);
-        String sk = Solon.cfg().get(ConfigNames.folkmq_access_sk);
-
-        if (StrUtils.isNotEmpty(ak)) {
-            accessMap.put(ak, sk);
-        }
-
-        return accessMap;
-    }
-
     @Override
     public void start() throws Throwable {
         BrokerFragmentHandler brokerFragmentHandler = new BrokerFragmentHandler();
         brokerListener = new BrokerListenerFolkmq(new BrokerApiHandler(queueForceService))
-                .addAccessAll(getAccessMap());
+                .addAccessAll(MqBrokerConfig.getAccessMap());
 
         brokerServerTcp = SocketD.createServer("sd:tcp")
                 .config(c -> c.port(Solon.cfg().serverPort() + 10000)
-                        .coreThreads(2)
-                        .maxThreads(4)
+                        .coreThreads(MqBrokerConfig.coreThreads)
+                        .maxThreads(MqBrokerConfig.maxThreads)
                         .fragmentHandler(brokerFragmentHandler))
                 .listen(brokerListener)
                 .start();
@@ -76,8 +61,8 @@ public class BrokerLifecycleBean implements LifecycleBean , EventListener<AppPre
             //添加 sd:ws 协议监听支持
             brokerServerWs = SocketD.createServer("sd:ws")
                     .config(c -> c.port(Solon.cfg().serverPort() + 10001)
-                            .coreThreads(2)
-                            .maxThreads(4)
+                            .coreThreads(MqBrokerConfig.coreThreads)
+                            .maxThreads(MqBrokerConfig.maxThreads)
                             .channelExecutor(brokerServerTcp.getConfig().getChannelExecutor()) //复用通用执行器
                             .fragmentHandler(brokerFragmentHandler))
                     .listen(brokerListener)

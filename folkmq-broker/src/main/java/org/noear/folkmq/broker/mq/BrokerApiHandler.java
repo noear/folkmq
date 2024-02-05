@@ -3,7 +3,7 @@ package org.noear.folkmq.broker.mq;
 import org.noear.folkmq.broker.admin.dso.QueueForceService;
 import org.noear.folkmq.broker.admin.dso.ViewQueueService;
 import org.noear.folkmq.broker.admin.model.QueueVo;
-import org.noear.folkmq.broker.common.ConfigNames;
+import org.noear.folkmq.broker.common.MqBrokerConfig;
 import org.noear.folkmq.common.MqApis;
 import org.noear.folkmq.common.MqConstants;
 import org.noear.snack.ONode;
@@ -12,7 +12,6 @@ import org.noear.socketd.transport.core.Session;
 import org.noear.socketd.transport.core.entity.StringEntity;
 import org.noear.socketd.transport.core.listener.MessageHandler;
 import org.noear.socketd.utils.StrUtils;
-import org.noear.solon.Solon;
 import org.noear.solon.core.handle.Result;
 
 import java.io.IOException;
@@ -25,12 +24,10 @@ import java.util.List;
 public class BrokerApiHandler implements MessageHandler {
     private final ViewQueueService queueService;
     private final QueueForceService queueForceService;
-    private final String apiToken;
 
     public BrokerApiHandler(QueueForceService queueForceService) {
         this.queueForceService = queueForceService;
         this.queueService = queueForceService.getViewQueueService();
-        this.apiToken = Solon.cfg().get(ConfigNames.folkmq_api_token, "");
     }
 
     @Override
@@ -38,12 +35,12 @@ public class BrokerApiHandler implements MessageHandler {
         String name = m.meta(MqConstants.API_NAME);
         String token = m.meta(MqConstants.API_TOKEN);
 
-        if (StrUtils.isEmpty(apiToken)) {
+        if (StrUtils.isEmpty(MqBrokerConfig.apiToken)) {
             s.sendAlarm(m, "Api calls are not supported");
             return;
         }
 
-        if (apiToken.equals(token) == false) {
+        if (MqBrokerConfig.apiToken.equals(token) == false) {
             s.sendAlarm(m, "Token is invalid");
             return;
         }

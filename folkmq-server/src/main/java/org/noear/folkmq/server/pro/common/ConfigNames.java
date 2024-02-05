@@ -7,9 +7,12 @@ package org.noear.folkmq.server.pro.common;
 public interface ConfigNames {
     //管理密码
     String folkmq_admin = "folkmq.admin";
-
     //经纪人地址
     String folkmq_broker = "folkmq.broker";
+    //核心线程数
+    String folkmq_coreThreads = "folkmq.coreThreads";
+    //最大线程数
+    String folkmq_maxThreads = "folkmq.maxThreads";
 
     //快照相关
     String folkmq_snapshot_enable = "folkmq.snapshot.enable";

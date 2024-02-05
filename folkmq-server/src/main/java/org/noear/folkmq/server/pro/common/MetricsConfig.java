@@ -1,4 +1,4 @@
-package org.noear.folkmq.server.pro;
+package org.noear.folkmq.server.pro.common;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.binder.jvm.JvmMemoryMetrics;
@@ -12,7 +12,7 @@ import org.noear.solon.annotation.Configuration;
  * @since 1.0
  */
 @Configuration
-public class Config {
+public class MetricsConfig {
     public static boolean isStandalone;
     @Bean
     public void custom(MeterRegistry registry) {

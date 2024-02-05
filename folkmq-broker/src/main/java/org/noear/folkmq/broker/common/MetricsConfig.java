@@ -1,4 +1,4 @@
-package org.noear.folkmq.broker;
+package org.noear.folkmq.broker.common;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.binder.jvm.JvmMemoryMetrics;
@@ -12,7 +12,7 @@ import org.noear.solon.annotation.Configuration;
  * @since 1.0
  */
 @Configuration
-public class Config {
+public class MetricsConfig {
     @Bean
     public void custom(MeterRegistry registry) {
         //添加几个 meter

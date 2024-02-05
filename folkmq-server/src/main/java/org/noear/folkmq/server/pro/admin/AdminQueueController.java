@@ -3,7 +3,7 @@ package org.noear.folkmq.server.pro.admin;
 import org.noear.folkmq.common.MqConstants;
 import org.noear.folkmq.server.MqQueue;
 import org.noear.folkmq.server.MqServiceInternal;
-import org.noear.folkmq.server.pro.Config;
+import org.noear.folkmq.server.pro.common.MetricsConfig;
 import org.noear.folkmq.server.pro.MqWatcherSnapshotPlus;
 import org.noear.folkmq.server.pro.admin.dso.QueueForceService;
 import org.noear.folkmq.server.pro.admin.dso.ViewUtils;
@@ -81,12 +81,12 @@ public class AdminQueueController extends BaseController {
     @Post
     @Mapping("/admin/queue_details/ajax/distribute")
     public Result queue_details_ajax_distribute(@NotEmpty String topic, @NotEmpty String consumerGroup) {
-        return queueForceService.forceDistribute(server, topic, consumerGroup, Config.isStandalone);
+        return queueForceService.forceDistribute(server, topic, consumerGroup, MetricsConfig.isStandalone);
     }
 
     @Post
     @Mapping("/admin/queue_details/ajax/delete")
     public Result queue_details_ajax_delete(@NotEmpty String topic, @NotEmpty String consumerGroup) {
-        return queueForceService.forceDelete(server, topic, consumerGroup, Config.isStandalone);
+        return queueForceService.forceDelete(server, topic, consumerGroup, MetricsConfig.isStandalone);
     }
 }

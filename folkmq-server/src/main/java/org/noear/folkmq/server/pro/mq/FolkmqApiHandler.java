@@ -3,11 +3,12 @@ package org.noear.folkmq.server.pro.mq;
 import org.noear.folkmq.common.MqApis;
 import org.noear.folkmq.common.MqConstants;
 import org.noear.folkmq.server.MqServiceListener;
-import org.noear.folkmq.server.pro.Config;
+import org.noear.folkmq.server.pro.common.MetricsConfig;
 import org.noear.folkmq.server.pro.admin.dso.QueueForceService;
 import org.noear.folkmq.server.pro.admin.dso.ViewUtils;
 import org.noear.folkmq.server.pro.admin.model.QueueVo;
 import org.noear.folkmq.server.pro.common.ConfigNames;
+import org.noear.folkmq.server.pro.common.MqServerConfig;
 import org.noear.snack.ONode;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
@@ -27,12 +28,10 @@ import java.util.List;
 public class FolkmqApiHandler implements MessageHandler {
     private MqServiceListener serviceListener;
     private QueueForceService queueForceService;
-    private String apiToken;
 
     public FolkmqApiHandler(QueueForceService queueForceService, MqServiceListener serviceListener) {
         this.queueForceService = queueForceService;
         this.serviceListener = serviceListener;
-        this.apiToken = Solon.cfg().get(ConfigNames.folkmq_api_token, "");
     }
 
     @Override
@@ -40,12 +39,12 @@ public class FolkmqApiHandler implements MessageHandler {
         String name = m.meta(MqConstants.API_NAME);
         String token = m.meta(MqConstants.API_TOKEN);
 
-        if (StrUtils.isEmpty(apiToken)) {
+        if (StrUtils.isEmpty(MqServerConfig.apiToken)) {
             s.sendAlarm(m, "Api calls are not supported");
             return;
         }
 
-        if (apiToken.equals(token) == false) {
+        if (MqServerConfig.apiToken.equals(token) == false) {
             s.sendAlarm(m, "Token is invalid");
             return;
         }
@@ -84,21 +83,21 @@ public class FolkmqApiHandler implements MessageHandler {
 
             if (MqApis.MQ_QUEUE_FORCE_CLEAR.equals(name)) {
                 //{code,data}
-                queueForceService.forceClear(serviceListener, topic, consumerGroup, Config.isStandalone);
+                queueForceService.forceClear(serviceListener, topic, consumerGroup, MetricsConfig.isStandalone);
                 replyDo(s, m, Result.succeed());
                 return;
             }
 
             if (MqApis.MQ_QUEUE_FORCE_DELETE.equals(name)) {
                 //{code,data}
-                queueForceService.forceDelete(serviceListener, topic, consumerGroup, Config.isStandalone);
+                queueForceService.forceDelete(serviceListener, topic, consumerGroup, MetricsConfig.isStandalone);
                 replyDo(s, m, Result.succeed());
                 return;
             }
 
             if (MqApis.MQ_QUEUE_FORCE_DISTRIBUTE.equals(name)) {
                 //{code,data}
-                queueForceService.forceDelete(serviceListener, topic, consumerGroup, Config.isStandalone);
+                queueForceService.forceDelete(serviceListener, topic, consumerGroup, MetricsConfig.isStandalone);
                 replyDo(s, m, Result.succeed());
                 return;
             }

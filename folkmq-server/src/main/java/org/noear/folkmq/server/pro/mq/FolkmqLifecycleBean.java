@@ -5,11 +5,12 @@ import org.noear.folkmq.common.MqConstants;
 import org.noear.folkmq.server.MqServer;
 import org.noear.folkmq.server.MqServiceInternal;
 import org.noear.folkmq.server.MqServiceListener;
-import org.noear.folkmq.server.pro.Config;
+import org.noear.folkmq.server.pro.common.MetricsConfig;
 import org.noear.folkmq.server.pro.MqWatcherSnapshotPlus;
 import org.noear.folkmq.server.pro.admin.dso.QueueForceService;
 import org.noear.folkmq.server.pro.admin.dso.ViewUtils;
 import org.noear.folkmq.server.pro.common.ConfigNames;
+import org.noear.folkmq.server.pro.common.MqServerConfig;
 import org.noear.snack.ONode;
 import org.noear.socketd.SocketD;
 import org.noear.socketd.cluster.ClusterClientSession;
@@ -29,7 +30,6 @@ import org.noear.solon.core.event.EventListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -74,10 +74,10 @@ public class FolkmqLifecycleBean implements LifecycleBean , EventListener<AppPre
         appContext.wrapAndPut(MqWatcherSnapshotPlus.class, snapshotPlus);
 
         if (Utils.isEmpty(brokerServer)) {
-            Config.isStandalone = true;
+            MetricsConfig.isStandalone = true;
             startLocalServerMode(snapshotPlus);
         } else {
-            Config.isStandalone = false;
+            MetricsConfig.isStandalone = false;
             startBrokerSession(brokerServer, snapshotPlus);
         }
 
@@ -87,26 +87,13 @@ public class FolkmqLifecycleBean implements LifecycleBean , EventListener<AppPre
                 FolkMQ.version());
     }
 
-    private Map<String, String> getAccessMap() {
-        Map<String, String> accessMap = Solon.cfg().getMap(ConfigNames.folkmq_access_x);
-        accessMap.remove("ak");
-        accessMap.remove("sk");
 
-        String ak = Solon.cfg().get(ConfigNames.folkmq_access_ak);
-        String sk = Solon.cfg().get(ConfigNames.folkmq_access_sk);
-
-        if (StrUtils.isNotEmpty(ak)) {
-            accessMap.put(ak, sk);
-        }
-
-        return accessMap;
-    }
 
     private void startLocalServerMode(MqWatcherSnapshotPlus snapshotPlus) throws Exception {
         //服务端（鉴权为可选。不添加则不鉴权）
         localServer = FolkMQ.createServer()
-                .config(c -> c.coreThreads(1).maxThreads(1).sequenceMode(true))
-                .addAccessAll(getAccessMap());
+                .config(c -> c.coreThreads(MqServerConfig.coreThreads).maxThreads(MqServerConfig.maxThreads).sequenceMode(true))
+                .addAccessAll(MqServerConfig.getAccessMap());
 
         if (saveEnable) {
             localServer.watcher(snapshotPlus);
@@ -190,7 +177,7 @@ public class FolkmqLifecycleBean implements LifecycleBean , EventListener<AppPre
         }
 
         brokerSession = (ClusterClientSession) SocketD.createClusterClient(serverUrls)
-                .config(c -> c.coreThreads(1).maxThreads(1))
+                .config(c -> c.coreThreads(MqServerConfig.coreThreads).maxThreads(MqServerConfig.maxThreads))
                 .listen(brokerServiceListener)
                 .open();
 

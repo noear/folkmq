@@ -12,7 +12,9 @@ import org.noear.folkmq.server.pro.admin.dso.ViewUtils;
 import org.noear.folkmq.server.pro.common.ConfigNames;
 import org.noear.snack.ONode;
 import org.noear.socketd.SocketD;
+import org.noear.socketd.cluster.ClusterClientSession;
 import org.noear.socketd.transport.client.ClientSession;
+import org.noear.socketd.transport.core.Session;
 import org.noear.socketd.transport.core.entity.StringEntity;
 import org.noear.socketd.utils.StrUtils;
 import org.noear.solon.Solon;
@@ -21,6 +23,8 @@ import org.noear.solon.annotation.Component;
 import org.noear.solon.annotation.Inject;
 import org.noear.solon.core.AppContext;
 import org.noear.solon.core.bean.LifecycleBean;
+import org.noear.solon.core.event.AppPrestopEndEvent;
+import org.noear.solon.core.event.EventListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +37,7 @@ import java.util.Map;
  * @since 1.0
  */
 @Component
-public class FolkmqLifecycleBean implements LifecycleBean {
+public class FolkmqLifecycleBean implements LifecycleBean , EventListener<AppPrestopEndEvent> {
     private static final Logger log = LoggerFactory.getLogger(FolkmqLifecycleBean.class);
 
     @Inject
@@ -45,7 +49,7 @@ public class FolkmqLifecycleBean implements LifecycleBean {
     private MqServer localServer;
 
     private MqServiceListener brokerServiceListener;
-    private ClientSession brokerSession;
+    private ClusterClientSession brokerSession;
     private MqWatcherSnapshotPlus snapshotPlus;
     private boolean saveEnable;
 
@@ -81,7 +85,7 @@ public class FolkmqLifecycleBean implements LifecycleBean {
                 FolkMQ.version());
     }
 
-    private Map<String,String> getAccessMap() {
+    private Map<String, String> getAccessMap() {
         Map<String, String> accessMap = Solon.cfg().getMap(ConfigNames.folkmq_access_x);
         accessMap.remove("ak");
         accessMap.remove("sk");
@@ -99,7 +103,7 @@ public class FolkmqLifecycleBean implements LifecycleBean {
     private void startLocalServerMode(MqWatcherSnapshotPlus snapshotPlus) throws Exception {
         //服务端（鉴权为可选。不添加则不鉴权）
         localServer = FolkMQ.createServer()
-                .config(c -> c.coreThreads(1).maxThreads(1))
+                .config(c -> c.coreThreads(1).maxThreads(1).sequenceMode(true))
                 .addAccessAll(getAccessMap());
 
         if (saveEnable) {
@@ -126,7 +130,7 @@ public class FolkmqLifecycleBean implements LifecycleBean {
         });
 
         //允许控制台强制派发
-        brokerServiceListener.doOn(MqConstants.ADMIN_QUEUE_FORCE_DISTRIBUTE, (s,m)->{
+        brokerServiceListener.doOn(MqConstants.ADMIN_QUEUE_FORCE_DISTRIBUTE, (s, m) -> {
             String topic = m.meta(MqConstants.MQ_META_TOPIC);
             String consumerGroup = m.meta(MqConstants.MQ_META_CONSUMER_GROUP);
 
@@ -134,11 +138,11 @@ public class FolkmqLifecycleBean implements LifecycleBean {
         });
 
         //允许控制台强制派发
-        brokerServiceListener.doOn(MqConstants.ADMIN_QUEUE_FORCE_DELETE, (s,m)->{
+        brokerServiceListener.doOn(MqConstants.ADMIN_QUEUE_FORCE_DELETE, (s, m) -> {
             String topic = m.meta(MqConstants.MQ_META_TOPIC);
             String consumerGroup = m.meta(MqConstants.MQ_META_CONSUMER_GROUP);
 
-            queueForceService.forceDelete(brokerServiceListener,topic, consumerGroup, false);
+            queueForceService.forceDelete(brokerServiceListener, topic, consumerGroup, false);
         });
 
         //快照
@@ -171,10 +175,11 @@ public class FolkmqLifecycleBean implements LifecycleBean {
             serverUrls.add(url);
         }
 
-        brokerSession = SocketD.createClusterClient(serverUrls)
+        brokerSession = (ClusterClientSession) SocketD.createClusterClient(serverUrls)
                 .config(c -> c.coreThreads(1).maxThreads(1))
                 .listen(brokerServiceListener)
                 .open();
+
 
         //启动时恢复快照
         brokerServiceListener.start(null);
@@ -196,6 +201,23 @@ public class FolkmqLifecycleBean implements LifecycleBean {
             brokerSession.close();
             //停止时会触发快照
             brokerServiceListener.stop(null);
+        }
+    }
+
+    @Override
+    public void onEvent(AppPrestopEndEvent appPrestopEndEvent) throws Throwable {
+        if (localServer != null) {
+            for (Session s1 : localServer.getServerInternal().getSessionAll()) {
+                s1.closeStarting();
+            }
+        }
+
+        if (brokerSession != null) {
+            for (ClientSession s1 : brokerSession.getSessionAll()) {
+                if (s1 instanceof Session) {
+                    ((Session) s1).closeStarting();
+                }
+            }
         }
     }
 }

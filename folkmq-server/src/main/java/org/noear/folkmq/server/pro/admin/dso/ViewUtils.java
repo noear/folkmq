@@ -58,6 +58,9 @@ public class ViewUtils {
 
     public static QueueVo queueOneView(MqServiceInternal server, String queueName) {
         MqQueueDefault queue = (MqQueueDefault) server.getQueueMap().get(queueName);
+        if(queue == null){
+            return null;
+        }
 
         QueueVo queueVo = new QueueVo();
         queueVo.queue = queue.getQueueName();

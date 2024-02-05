@@ -8,8 +8,6 @@ import java.io.Serializable;
  */
 public class QueueVo implements Serializable {
     public String queue ="";
-    public boolean isAlive;
-    public String state = "";
 
     public int sessionCount;
     public int messageCount;
@@ -29,14 +27,6 @@ public class QueueVo implements Serializable {
 
     public String getQueue() {
         return queue;
-    }
-
-    public boolean isAlive() {
-        return isAlive;
-    }
-
-    public String getState() {
-        return state;
     }
 
     public int getSessionCount() {

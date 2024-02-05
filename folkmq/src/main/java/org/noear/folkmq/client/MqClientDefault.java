@@ -89,11 +89,11 @@ public class MqClientDefault implements MqClientInternal {
     }
 
     @Override
-    public CompletableFuture<String> call(String name, String token, String topic, String consumerGroup) throws IOException {
+    public CompletableFuture<String> call(String apiName, String apiToken, String topic, String consumerGroup) throws IOException {
         if (clientSession != null) {
             Entity entity = new StringEntity("")
-                    .metaPut(MqConstants.API_NAME, name)
-                    .metaPut(MqConstants.API_TOKEN, token)
+                    .metaPut(MqConstants.API_NAME, apiName)
+                    .metaPut(MqConstants.API_TOKEN, apiToken)
                     .metaPut(MqConstants.MQ_META_TOPIC, topic)
                     .metaPut(MqConstants.MQ_META_CONSUMER_GROUP, consumerGroup);
 

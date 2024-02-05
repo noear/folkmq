@@ -38,7 +38,7 @@ public interface MqClient extends Closeable {
     /**
      * 接口调用
      * */
-    CompletableFuture<String> call(String name, String token, String topic, String consumerGroup) throws IOException;
+    CompletableFuture<String> call(String apiName, String apiToken, String topic, String consumerGroup) throws IOException;
 
     /**
      * 订阅主题

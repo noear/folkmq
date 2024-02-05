@@ -67,7 +67,11 @@ public class FolkmqApiHandler implements MessageHandler {
             if (MqApis.MQ_QUEUE_VIEW_MESSAGE.equals(name)) {
                 //{code,data:{queue,sessionCount,messageCount,....}}
                 QueueVo queueVo = ViewUtils.queueOneView(serviceListener, queueName);
-                replyDo(s, m, Result.succeed(queueVo));
+                if (queueVo == null) {
+                    replyDo(s, m, Result.failure("Queue does not exist"));
+                } else {
+                    replyDo(s, m, Result.succeed(queueVo));
+                }
                 return;
             }
 

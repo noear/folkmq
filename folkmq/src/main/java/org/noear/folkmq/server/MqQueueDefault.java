@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.DelayQueue;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * 队列默认实现
@@ -18,6 +19,9 @@ import java.util.concurrent.DelayQueue;
  */
 public class MqQueueDefault extends MqQueueBase implements MqQueue {
     private static final Logger log = LoggerFactory.getLogger(MqQueueDefault.class);
+
+    //消息计数器
+    private final AtomicLong counter = new AtomicLong();
 
     //主题
     private final String topic;
@@ -99,6 +103,8 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
      */
     @Override
     public void add(MqMessageHolder messageHolder) {
+        messageHolder.setDistributeIdx(counter.incrementAndGet());
+
         messageMap.put(messageHolder.getTid(), messageHolder);
         messageQueue.add(messageHolder);
 

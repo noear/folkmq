@@ -27,6 +27,8 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
 
     private Object SUBSCRIBE_LOCK = new Object();
 
+    //所有会话
+    private Map<String,Session> sessionAllMap = new ConcurrentHashMap<>();
     //服务端访问账号
     private Map<String, String> serverAccessMap = new ConcurrentHashMap<>();
     //观察者
@@ -281,6 +283,9 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
 
             log.info("Client channel opened, sessionId={}", session.sessionId());
         }
+
+        //添加会话，用于停止通知
+        sessionAllMap.put(session.sessionId(), session);
     }
 
     /**
@@ -319,6 +324,11 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
                 log.warn("Server channel error, sessionId={}", session.sessionId(), error);
             }
         }
+    }
+
+    @Override
+    public Collection<Session> getSessionAll() {
+        return sessionAllMap.values();
     }
 
     @Override

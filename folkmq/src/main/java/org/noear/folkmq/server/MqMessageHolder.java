@@ -28,6 +28,8 @@ public class MqMessageHolder implements Delayed {
     private volatile long distributeTime;
     //派发次数
     private volatile int distributeCount;
+    //派发顺序
+    private volatile long distributeIdx;
     //是否完成
     private AtomicBoolean isDone;
 
@@ -67,13 +69,23 @@ public class MqMessageHolder implements Delayed {
 
     /**
      * 过期时间
-     * */
+     */
     public long getExpiration() {
         return expiration;
     }
 
+    /**
+     * 设置派发时间
+     */
     public void setDistributeTime(long distributeTime) {
         this.distributeTime = distributeTime;
+    }
+
+    /**
+     * 设置派发顺序位
+     */
+    public void setDistributeIdx(long distributeIdx) {
+        this.distributeIdx = distributeIdx;
     }
 
     /**
@@ -89,6 +101,7 @@ public class MqMessageHolder implements Delayed {
     public int getDistributeCount() {
         return distributeCount;
     }
+
 
     public boolean isDone() {
         return isDone.get();
@@ -123,17 +136,22 @@ public class MqMessageHolder implements Delayed {
             return 0;
         }
 
-        long diff = this.distributeTime - ((MqMessageHolder) o).distributeTime;
+        MqMessageHolder dst = ((MqMessageHolder) o);
+        long diff = this.distributeTime - dst.distributeTime;
 
         if (diff == 0) {
-            return 0;
+            if (this.distributeIdx < dst.distributeIdx) {
+                return -1;
+            } else {
+                return 1;
+            }
         }
 
         if (diff < 0) {
             return -1;
+        } else {
+            return 1;
         }
-
-        return 1;
     }
 
     //不要加 hashCode, equals 重写！

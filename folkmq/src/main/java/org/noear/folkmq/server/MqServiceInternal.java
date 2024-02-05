@@ -3,6 +3,7 @@ package org.noear.folkmq.server;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
@@ -13,6 +14,11 @@ import java.util.Set;
  * @since 1.0
  */
 public interface MqServiceInternal {
+    /**
+     * 获取所有会话
+     */
+    Collection<Session> getSessionAll();
+
     /**
      * 获取订阅关系(topic=>[queueName]) //queueName='topic#consumer'
      */

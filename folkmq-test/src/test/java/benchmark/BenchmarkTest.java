@@ -28,11 +28,11 @@ public class BenchmarkTest {
 
         //订阅
         client.subscribe("hot", "demo", message -> {
-            //System.out.println("::" + topic + " - " + message);
+            //System.out.println("::" +  message.getContent());
         });
 
         client.subscribe("test", "test", message -> {
-            //System.out.println("::" + topic + " - " + message);
+            //System.out.println("::" +  message.getContent());
             countDownLatch.countDown();
         });
 

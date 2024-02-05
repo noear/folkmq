@@ -149,6 +149,14 @@ public class FolkmqLifecycleBean implements LifecycleBean , EventListener<AppPre
             queueForceService.forceDelete(brokerServiceListener, topic, consumerGroup, false);
         });
 
+        //允许控制台强制清空
+        brokerServiceListener.doOn(MqConstants.ADMIN_QUEUE_FORCE_CLEAR, (s, m) -> {
+            String topic = m.meta(MqConstants.MQ_META_TOPIC);
+            String consumerGroup = m.meta(MqConstants.MQ_META_CONSUMER_GROUP);
+
+            queueForceService.forceClear(brokerServiceListener, topic, consumerGroup, false);
+        });
+
         addApiEvent(brokerServiceListener);
 
         //快照

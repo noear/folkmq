@@ -109,6 +109,10 @@ public interface MqConstants {
      */
     String ADMIN_QUEUE_FORCE_DELETE = "admin.queue.force.delete";
     /**
+     * 管理队列-强制删除
+     */
+    String ADMIN_QUEUE_FORCE_CLEAR = "admin.queue.force.clear";
+    /**
      * 管理队列-强制派发
      */
     String ADMIN_QUEUE_FORCE_DISTRIBUTE = "admin.queue.force.distribute";

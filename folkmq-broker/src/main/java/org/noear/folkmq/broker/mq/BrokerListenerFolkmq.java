@@ -22,6 +22,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * @since 1.0
  */
 public class BrokerListenerFolkmq extends BrokerListener {
+    private final BrokerApiHandler apiHandler;
+
     //访问账号
     private Map<String, String> accessMap = new HashMap<>();
 
@@ -31,6 +33,11 @@ public class BrokerListenerFolkmq extends BrokerListener {
 
     public Map<String, Set<String>> getSubscribeMap() {
         return subscribeMap;
+    }
+
+
+    public BrokerListenerFolkmq(BrokerApiHandler apiHandler){
+        this.apiHandler = apiHandler;
     }
 
     public void removeSubscribe(String topic, String queueName) {
@@ -154,6 +161,9 @@ public class BrokerListenerFolkmq extends BrokerListener {
                     requester.remoteAddress());
 
             //结束处理
+            return;
+        } else if(MqConstants.MQ_API.equals(message.event())){
+            apiHandler.handle(requester, message);
             return;
         }
 

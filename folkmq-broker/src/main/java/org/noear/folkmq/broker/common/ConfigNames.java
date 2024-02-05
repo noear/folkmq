@@ -18,4 +18,7 @@ public interface ConfigNames {
     //访问账号(ak:sk)
     String folkmq_access_ak = "folkmq.access.ak";
     String folkmq_access_sk = "folkmq.access.sk";
+
+    //接口请求令牌
+    String folkmq_api_token = "folkmq.api.token";
 }

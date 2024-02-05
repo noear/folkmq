@@ -1,6 +1,7 @@
 package org.noear.folkmq.broker.mq;
 
 import org.noear.folkmq.FolkMQ;
+import org.noear.folkmq.broker.admin.dso.QueueForceService;
 import org.noear.folkmq.broker.common.ConfigNames;
 import org.noear.socketd.SocketD;
 import org.noear.socketd.broker.BrokerFragmentHandler;
@@ -33,6 +34,9 @@ public class BrokerLifecycleBean implements LifecycleBean , EventListener<AppPre
     @Inject
     private AppContext appContext;
 
+    @Inject
+    private QueueForceService queueForceService;
+
     private Server brokerServerTcp;
     private Server brokerServerWs;
     private BrokerListenerFolkmq brokerListener;
@@ -56,7 +60,7 @@ public class BrokerLifecycleBean implements LifecycleBean , EventListener<AppPre
     @Override
     public void start() throws Throwable {
         BrokerFragmentHandler brokerFragmentHandler = new BrokerFragmentHandler();
-        brokerListener = new BrokerListenerFolkmq()
+        brokerListener = new BrokerListenerFolkmq(new BrokerApiHandler(queueForceService))
                 .addAccessAll(getAccessMap());
 
         brokerServerTcp = SocketD.createServer("sd:tcp")

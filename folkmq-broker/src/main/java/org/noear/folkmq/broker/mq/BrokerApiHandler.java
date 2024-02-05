@@ -1,13 +1,11 @@
-package org.noear.folkmq.server.pro.mq;
+package org.noear.folkmq.broker.mq;
 
+import org.noear.folkmq.broker.admin.dso.QueueForceService;
+import org.noear.folkmq.broker.admin.dso.ViewQueueService;
+import org.noear.folkmq.broker.admin.model.QueueVo;
+import org.noear.folkmq.broker.common.ConfigNames;
 import org.noear.folkmq.common.MqApis;
 import org.noear.folkmq.common.MqConstants;
-import org.noear.folkmq.server.MqServiceListener;
-import org.noear.folkmq.server.pro.Config;
-import org.noear.folkmq.server.pro.admin.dso.QueueForceService;
-import org.noear.folkmq.server.pro.admin.dso.ViewUtils;
-import org.noear.folkmq.server.pro.admin.model.QueueVo;
-import org.noear.folkmq.server.pro.common.ConfigNames;
 import org.noear.snack.ONode;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
@@ -24,14 +22,14 @@ import java.util.List;
  * @author noear
  * @since 2.3
  */
-public class FolkmqApiHandler implements MessageHandler {
-    private MqServiceListener serviceListener;
-    private QueueForceService queueForceService;
-    private String apiToken;
+public class BrokerApiHandler implements MessageHandler {
+    private final ViewQueueService queueService;
+    private final QueueForceService queueForceService;
+    private final String apiToken;
 
-    public FolkmqApiHandler(QueueForceService queueForceService, MqServiceListener serviceListener) {
+    public BrokerApiHandler(QueueForceService queueForceService) {
         this.queueForceService = queueForceService;
-        this.serviceListener = serviceListener;
+        this.queueService = queueForceService.getViewQueueService();
         this.apiToken = Solon.cfg().get(ConfigNames.folkmq_api_token, "");
     }
 
@@ -59,42 +57,42 @@ public class FolkmqApiHandler implements MessageHandler {
         try {
             if (MqApis.MQ_QUEUE_LIST.equals(name)) {
                 //{code,data:[{queue,sessionCount,messageCount,....}]}
-                List<QueueVo> queueVolist = ViewUtils.queueView(serviceListener);
+                List<QueueVo> queueVolist = queueService.getQueueListVo();
                 replyDo(s, m, Result.succeed(queueVolist));
                 return;
             }
 
             if (MqApis.MQ_QUEUE_VIEW_MESSAGE.equals(name)) {
                 //{code,data:{queue,sessionCount,messageCount,....}}
-                QueueVo queueVo = ViewUtils.queueOneView(serviceListener, queueName);
+                QueueVo queueVo = queueService.getQueueVo(queueName);
                 replyDo(s, m, Result.succeed(queueVo));
                 return;
             }
 
             if (MqApis.MQ_QUEUE_VIEW_SESSION.equals(name)) {
                 //{code,data:[ip,ip]}
-                List<String> list = ViewUtils.queueSessionListView(serviceListener, queueName);
+                List<String> list = queueService.getQueueSessionList(queueName);
                 replyDo(s, m, Result.succeed(list));
                 return;
             }
 
             if (MqApis.MQ_QUEUE_FORCE_CLEAR.equals(name)) {
                 //{code,data}
-                queueForceService.forceClear(serviceListener, topic, consumerGroup, Config.isStandalone);
+                queueForceService.forceClear(topic, consumerGroup);
                 replyDo(s, m, Result.succeed());
                 return;
             }
 
             if (MqApis.MQ_QUEUE_FORCE_DELETE.equals(name)) {
                 //{code,data}
-                queueForceService.forceDelete(serviceListener, topic, consumerGroup, Config.isStandalone);
+                queueForceService.forceDelete(topic, consumerGroup);
                 replyDo(s, m, Result.succeed());
                 return;
             }
 
             if (MqApis.MQ_QUEUE_FORCE_DISTRIBUTE.equals(name)) {
                 //{code,data}
-                queueForceService.forceDelete(serviceListener, topic, consumerGroup, Config.isStandalone);
+                queueForceService.forceDelete(topic, consumerGroup);
                 replyDo(s, m, Result.succeed());
                 return;
             }

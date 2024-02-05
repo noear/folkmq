@@ -16,6 +16,7 @@ import org.noear.solon.core.util.RunUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
@@ -56,6 +57,7 @@ public class ViewQueueService implements LifecycleBean {
         return list;
     }
 
+
     public QueueVo getQueueVo(String queueName) {
         QueueVo queueVo = queueVoMap.get(queueName);
         if (queueVo != null) {
@@ -63,6 +65,25 @@ public class ViewQueueService implements LifecycleBean {
         }
 
         return queueVo;
+    }
+
+    public List<String> getQueueSessionList(String queueName) throws IOException {
+        List<String> list = new ArrayList<>();
+
+        Collection<Session> sessionList = brokerListener.getPlayerAll(queueName);
+        if (sessionList != null) {
+            List<Session> sessions = new ArrayList<>(sessionList);
+            for (Session s1 : sessions) {
+                list.add(s1.remoteAddress().toString());
+
+                //不超过99
+                if (list.size() == 99) {
+                    break;
+                }
+            }
+        }
+        
+        return list;
     }
 
     public void removeQueueVo(String queueName){

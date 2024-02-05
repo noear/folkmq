@@ -23,6 +23,6 @@ public interface ConfigNames {
     String folkmq_access_ak = "folkmq.access.ak";
     String folkmq_access_sk = "folkmq.access.sk";
 
-    //工具请求令牌
+    //接口请求令牌
     String folkmq_api_token = "folkmq.api.token";
 }

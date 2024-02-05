@@ -36,6 +36,11 @@ public interface MqClient extends Closeable {
     MqClient autoAcknowledge(boolean auto);
 
     /**
+     * 接口调用
+     * */
+    CompletableFuture<String> call(String name, String token, String topic, String consumerGroup) throws IOException;
+
+    /**
      * 订阅主题
      *
      * @param topic           主题

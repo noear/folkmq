@@ -90,4 +90,32 @@ public class QueueForceService {
             force_lock.set(false);
         }
     }
+
+    /**
+     * 强制删除
+     */
+    public Result forceClear(MqServiceInternal server, String topic, String consumerGroup, boolean isStandalone) {
+        if (force_lock.get()) {
+            return Result.failure("正在进行别的强制操作!");
+        }
+
+        try {
+            //增加安全锁控制
+            force_lock.set(true);
+            String queueName = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP + consumerGroup;
+
+            log.warn("Queue forceClear: queueName={}", queueName);
+
+            MqQueue queue = server.getQueueMap().get(queueName);
+            if (queue != null) {
+                queue.forceClear();
+
+                return Result.succeed();
+            } else {
+                return Result.failure("没有找到队列!");
+            }
+        } finally {
+            force_lock.set(false);
+        }
+    }
 }

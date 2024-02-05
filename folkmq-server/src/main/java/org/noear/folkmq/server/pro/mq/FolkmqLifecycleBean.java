@@ -29,6 +29,7 @@ import org.noear.solon.core.event.EventListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -113,6 +114,8 @@ public class FolkmqLifecycleBean implements LifecycleBean , EventListener<AppPre
 
         localServer.start(Solon.cfg().serverPort() + 10000);
 
+        addApiEvent(localServer.getServerInternal());
+
         //加入容器
         appContext.wrapAndPut(MqServiceInternal.class, localServer.getServerInternal());
 
@@ -138,13 +141,15 @@ public class FolkmqLifecycleBean implements LifecycleBean , EventListener<AppPre
             queueForceService.forceDistribute(brokerServiceListener, topic, consumerGroup, false);
         });
 
-        //允许控制台强制派发
+        //允许控制台强制删除
         brokerServiceListener.doOn(MqConstants.ADMIN_QUEUE_FORCE_DELETE, (s, m) -> {
             String topic = m.meta(MqConstants.MQ_META_TOPIC);
             String consumerGroup = m.meta(MqConstants.MQ_META_CONSUMER_GROUP);
 
             queueForceService.forceDelete(brokerServiceListener, topic, consumerGroup, false);
         });
+
+        addApiEvent(brokerServiceListener);
 
         //快照
         if (saveEnable) {
@@ -220,5 +225,10 @@ public class FolkmqLifecycleBean implements LifecycleBean , EventListener<AppPre
                 }
             }
         }
+    }
+
+    private void addApiEvent(MqServiceInternal serviceInternal) {
+        FolkmqApiHandler handler = new FolkmqApiHandler(queueForceService, (MqServiceListener) serviceInternal);
+        serviceInternal.doOnEvent(MqConstants.MQ_API, handler);
     }
 }

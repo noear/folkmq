@@ -7,6 +7,7 @@ import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
 import org.noear.socketd.transport.core.entity.StringEntity;
 import org.noear.socketd.transport.core.listener.EventListener;
+import org.noear.socketd.transport.core.listener.MessageHandler;
 import org.noear.socketd.utils.RunUtils;
 import org.noear.socketd.utils.StrUtils;
 import org.slf4j.Logger;
@@ -28,7 +29,7 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
     private Object SUBSCRIBE_LOCK = new Object();
 
     //所有会话
-    private Map<String,Session> sessionAllMap = new ConcurrentHashMap<>();
+    private Map<String, Session> sessionAllMap = new ConcurrentHashMap<>();
     //服务端访问账号
     private Map<String, String> serverAccessMap = new ConcurrentHashMap<>();
     //观察者
@@ -60,12 +61,12 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
         doOn(MqConstants.MQ_EVENT_SUBSCRIBE, (s, m) -> {
             String is_batch = m.meta(MqConstants.MQ_META_BATCH);
 
-            if("1".equals(is_batch)){
-               ONode oNode = ONode.loadStr(m.dataAsString());
+            if ("1".equals(is_batch)) {
+                ONode oNode = ONode.loadStr(m.dataAsString());
                 Map<String, Collection<String>> subscribeData = oNode.toObject();
-                if(subscribeData != null){
-                    for(Map.Entry<String, Collection<String>> kv : subscribeData.entrySet()){
-                        for(String queueName : kv.getValue()){
+                if (subscribeData != null) {
+                    for (Map.Entry<String, Collection<String>> kv : subscribeData.entrySet()) {
+                        for (String queueName : kv.getValue()) {
                             String consumerGroup = queueName.split(MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP)[1];
 
                             //观察者::订阅时（适配时，可选择同步或异步。同步可靠性高，异步性能好）
@@ -76,7 +77,7 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
                         }
                     }
                 }
-            }else {
+            } else {
                 String topic = m.meta(MqConstants.MQ_META_TOPIC);
                 String consumerGroup = m.meta(MqConstants.MQ_META_CONSUMER_GROUP);
 
@@ -137,7 +138,7 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
         });
 
         //接收取消发布指令
-        doOn(MqConstants.MQ_EVENT_UNPUBLISH, (s,m)->{
+        doOn(MqConstants.MQ_EVENT_UNPUBLISH, (s, m) -> {
             //观察者::取消发布时（适配时，可选择同步或异步。同步可靠性高，异步性能好）
             watcher.onUnPublish(m);
 
@@ -156,7 +157,7 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
 
         //接收保存指令
         doOn(MqConstants.MQ_EVENT_SAVE, (s, m) -> {
-            RunUtils.asyncAndTry(()->{
+            RunUtils.asyncAndTry(() -> {
                 save();
 
                 if (m.isRequest() || m.isSubscribe()) { //此判断兼容 Qos0, Qos1
@@ -431,7 +432,7 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
         long expiration = Long.parseLong(message.metaOrDefault(MqConstants.MQ_META_EXPIRATION, "0"));
         long scheduled = Long.parseLong(message.metaOrDefault(MqConstants.MQ_META_SCHEDULED, "0"));
 
-        if(scheduled == 0){
+        if (scheduled == 0) {
             //默认为当前ms（相对于后面者，有个排序作用）
             scheduled = System.currentTimeMillis();
         }
@@ -448,6 +449,12 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
                 routingDo(topicConsumer, message, tid, qos, expiration, times, scheduled);
             }
         }
+    }
+
+
+    @Override
+    public void doOnEvent(String event, MessageHandler handler) {
+        doOn(event, handler);
     }
 
     /**

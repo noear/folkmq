@@ -20,8 +20,8 @@ import java.util.concurrent.atomic.AtomicLong;
 public class MqQueueDefault extends MqQueueBase implements MqQueue {
     private static final Logger log = LoggerFactory.getLogger(MqQueueDefault.class);
 
-    //消息计数器
-    private final AtomicLong counter = new AtomicLong();
+    //消息索引器
+    private final AtomicLong indexer = new AtomicLong();
 
     //主题
     private final String topic;
@@ -103,7 +103,7 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
      */
     @Override
     public void add(MqMessageHolder messageHolder) {
-        messageHolder.setDistributeIdx(counter.incrementAndGet());
+        messageHolder.setDistributeIdx(indexer.incrementAndGet());
 
         messageMap.put(messageHolder.getTid(), messageHolder);
         messageQueue.add(messageHolder);

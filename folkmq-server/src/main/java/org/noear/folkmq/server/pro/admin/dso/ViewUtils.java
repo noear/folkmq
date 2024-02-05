@@ -4,7 +4,9 @@ import org.noear.folkmq.server.MqServiceInternal;
 import org.noear.folkmq.server.MqQueue;
 import org.noear.folkmq.server.MqQueueDefault;
 import org.noear.folkmq.server.pro.admin.model.QueueVo;
+import org.noear.socketd.transport.core.Session;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -48,6 +50,46 @@ public class ViewUtils {
             //不超过99
             if (list.size() == 99) {
                 break;
+            }
+        }
+
+        return list;
+    }
+
+    public static QueueVo queueOneView(MqServiceInternal server, String queueName) {
+        MqQueueDefault queue = (MqQueueDefault) server.getQueueMap().get(queueName);
+
+        QueueVo queueVo = new QueueVo();
+        queueVo.queue = queue.getQueueName();
+
+        queueVo.sessionCount = (queue.sessionCount());
+        queueVo.messageCount = (queue.messageTotal());
+
+        queueVo.messageDelayedCount1 = queue.messageCount(1);
+        queueVo.messageDelayedCount2 = queue.messageCount(2);
+        queueVo.messageDelayedCount3 = queue.messageCount(3);
+        queueVo.messageDelayedCount4 = queue.messageCount(4);
+        queueVo.messageDelayedCount5 = queue.messageCount(5);
+        queueVo.messageDelayedCount6 = queue.messageCount(6);
+        queueVo.messageDelayedCount7 = queue.messageCount(7);
+        queueVo.messageDelayedCount8 = queue.messageCount(8);
+
+        return queueVo;
+    }
+
+    public static List<String> queueSessionListView(MqServiceInternal server, String queueName) throws IOException {
+        List<String> list = new ArrayList<>();
+
+        MqQueue queue = server.getQueueMap().get(queueName);
+        if (queue != null) {
+            List<Session> sessions = new ArrayList<>(queue.getSessions());
+            for (Session s1 : sessions) {
+                list.add(s1.remoteAddress().toString());
+
+                //不超过99
+                if (list.size() == 99) {
+                    break;
+                }
             }
         }
 

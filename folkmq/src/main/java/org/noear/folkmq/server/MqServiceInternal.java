@@ -2,6 +2,7 @@ package org.noear.folkmq.server;
 
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
+import org.noear.socketd.transport.core.listener.MessageHandler;
 
 import java.util.Collection;
 import java.util.Map;
@@ -71,6 +72,14 @@ public interface MqServiceInternal {
      * @param scheduled  计划时间
      */
     void routingDo(String queueName, Message message, String tid, int qos, long expiration, int times, long scheduled);
+
+    /**
+     * 添加事件扩展
+     *
+     * @param event   事件
+     * @param handler 处理
+     */
+    void doOnEvent(String event, MessageHandler handler);
 
     /**
      * 保存

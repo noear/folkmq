@@ -78,6 +78,22 @@ public interface MqConstants {
      * */
     String MQ_EVENT_JOIN = "mq.event.join";
 
+
+    /**
+     * 事件：接口
+     */
+    String MQ_API = "mq.api";
+
+    /**
+     * 接口名
+     */
+    String API_NAME = "api.name";
+
+    /**
+     * 接口访问令牌
+     */
+    String API_TOKEN = "api.token";
+
     /**
      * 管理指令
      */

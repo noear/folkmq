@@ -88,6 +88,28 @@ public class MqClientDefault implements MqClientInternal {
         return this;
     }
 
+    @Override
+    public CompletableFuture<String> call(String name, String token, String topic, String consumerGroup) throws IOException {
+        if (clientSession != null) {
+            Entity entity = new StringEntity("")
+                    .metaPut(MqConstants.API_NAME, name)
+                    .metaPut(MqConstants.API_TOKEN, token)
+                    .metaPut(MqConstants.MQ_META_TOPIC, topic)
+                    .metaPut(MqConstants.MQ_META_CONSUMER_GROUP, consumerGroup);
+
+            CompletableFuture<String> completableFuture = new CompletableFuture<>();
+            clientSession.sendAndRequest(MqConstants.MQ_API, entity).thenReply(r -> {
+                completableFuture.complete(r.dataAsString());
+            }).thenError(err -> {
+                completableFuture.completeExceptionally(err);
+            });
+
+            return completableFuture;
+        } else {
+            throw new IOException("No sessions are available");
+        }
+    }
+
     /**
      * 订阅主题
      *
@@ -130,7 +152,7 @@ public class MqClientDefault implements MqClientInternal {
                         .at(MqConstants.BROKER_AT_SERVER_ALL);
 
                 //使用 Qos1
-                session.sendAndRequest(MqConstants.MQ_EVENT_UNSUBSCRIBE, entity,30_000).await();
+                session.sendAndRequest(MqConstants.MQ_EVENT_UNSUBSCRIBE, entity, 30_000).await();
 
                 log.info("Client unsubscribe successfully: {}#{}， sessionId={}", topic, consumerGroup, session.sessionId());
             }

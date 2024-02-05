@@ -228,9 +228,7 @@ public class FolkmqLifecycleBean implements LifecycleBean , EventListener<AppPre
 
         if (brokerSession != null) {
             for (ClientSession s1 : brokerSession.getSessionAll()) {
-                if (s1 instanceof Session) {
-                    RunUtils.runAndTry(((Session) s1)::closeStarting);
-                }
+                RunUtils.runAndTry(s1::closeStarting);
             }
         }
     }

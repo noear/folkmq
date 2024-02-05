@@ -95,12 +95,8 @@ public class BrokerLifecycleBean implements LifecycleBean , EventListener<AppPre
     @Override
     public void stop() throws Throwable {
         if (brokerListener != null) {
-            Collection<String> nameAll = brokerListener.getNameAll();
-            for (String name : nameAll) {
-                Collection<Session> sessions = brokerListener.getPlayerAll(name);
-                for (Session session : sessions) {
-                    RunUtils.runAndTry(session::close);
-                }
+            for (Session session : brokerListener.getSessionAll()) {
+                RunUtils.runAndTry(session::close);
             }
         }
 
@@ -116,12 +112,8 @@ public class BrokerLifecycleBean implements LifecycleBean , EventListener<AppPre
     @Override
     public void onEvent(AppPrestopEndEvent appPrestopEndEvent) throws Throwable {
         if (brokerListener != null) {
-            Collection<String> nameAll = brokerListener.getNameAll();
-            for (String name : nameAll) {
-                Collection<Session> sessions = brokerListener.getPlayerAll(name);
-                for (Session session : sessions) {
-                    RunUtils.runAndTry(session::closeStarting);
-                }
+            for (Session session : brokerListener.getSessionAll()) {
+                RunUtils.runAndTry(session::closeStarting);
             }
         }
     }

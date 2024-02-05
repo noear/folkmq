@@ -13,6 +13,8 @@ import org.noear.solon.annotation.Component;
 import org.noear.solon.annotation.Inject;
 import org.noear.solon.core.AppContext;
 import org.noear.solon.core.bean.LifecycleBean;
+import org.noear.solon.core.event.AppPrestopEndEvent;
+import org.noear.solon.core.event.EventListener;
 import org.noear.solon.net.websocket.socketd.ToSocketdWebSocketListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +27,7 @@ import java.util.Map;
  * @since 1.0
  */
 @Component
-public class BrokerLifecycleBean implements LifecycleBean {
+public class BrokerLifecycleBean implements LifecycleBean , EventListener<AppPrestopEndEvent> {
     private static final Logger log = LoggerFactory.getLogger(BrokerLifecycleBean.class);
 
     @Inject
@@ -104,6 +106,19 @@ public class BrokerLifecycleBean implements LifecycleBean {
 
         if (brokerServerWs != null) {
             brokerServerWs.stop();
+        }
+    }
+
+    @Override
+    public void onEvent(AppPrestopEndEvent appPrestopEndEvent) throws Throwable {
+        if (brokerListener != null) {
+            Collection<String> nameAll = brokerListener.getNameAll();
+            for (String name : nameAll) {
+                Collection<Session> sessions = brokerListener.getPlayerAll(name);
+                for (Session session : sessions) {
+                    RunUtils.runAndTry(session::closeStarting);
+                }
+            }
         }
     }
 }

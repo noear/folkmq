@@ -12,6 +12,9 @@ import org.noear.solon.validation.ValidatorException;
 public class App {
     public static void main(String[] args) {
         Solon.start(App.class, args, app -> {
+            //启用安全停止
+            app.cfg().stopSafe(true);
+
             //加载环境变量
             app.cfg().loadEnv("folkmq.");
 

@@ -24,8 +24,8 @@ public class MqBrokerConfig {
         accessSk = Solon.cfg().get(ConfigNames.folkmq_access_sk);
 
 
-        coreThreads = Solon.cfg().getInt(ConfigNames.folkmq_coreThreads, 2);
-        maxThreads = Solon.cfg().getInt(ConfigNames.folkmq_maxThreads, 4);
+        coreThreads = Solon.cfg().getInt(ConfigNames.folkmq_coreThreads, 1);
+        maxThreads = Solon.cfg().getInt(ConfigNames.folkmq_maxThreads, 1);
 
         apiToken = Solon.cfg().get(ConfigNames.folkmq_api_token, "");
     }

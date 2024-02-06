@@ -48,6 +48,7 @@ public class BrokerLifecycleBean implements LifecycleBean , EventListener<AppPre
 
         brokerServerTcp = SocketD.createServer("sd:tcp")
                 .config(c -> c.port(Solon.cfg().serverPort() + 10000)
+                        .sequenceMode(true)
                         .coreThreads(MqBrokerConfig.coreThreads)
                         .maxThreads(MqBrokerConfig.maxThreads)
                         .fragmentHandler(brokerFragmentHandler))

@@ -19,6 +19,8 @@ public class MqMessageHolder implements Delayed {
     private final EntityDefault content;
     //事务Id
     private final String tid;
+    //投放目标
+    private final String atName;
     //质量等级（0 或 1）
     private final int qos;
     //存活时间
@@ -34,6 +36,7 @@ public class MqMessageHolder implements Delayed {
     private AtomicBoolean isDone;
 
     public MqMessageHolder(String queueName, String consumerGroup, Message from, String tid, int qos, long expiration, int distributeCount, long distributeTime) {
+        this.atName = from.atName();
         this.content = new EntityDefault().dataSet(from.data()).metaMapPut(from.metaMap());
         this.content.metaPut(MqConstants.MQ_META_CONSUMER_GROUP, consumerGroup).at(queueName);
 
@@ -51,6 +54,13 @@ public class MqMessageHolder implements Delayed {
      */
     public String getTid() {
         return tid;
+    }
+
+    /**
+     * 获取投放目标
+     * */
+    public String getAtName() {
+        return atName;
     }
 
     /**

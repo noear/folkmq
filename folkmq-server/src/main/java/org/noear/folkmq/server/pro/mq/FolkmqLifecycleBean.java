@@ -90,7 +90,7 @@ public class FolkmqLifecycleBean implements LifecycleBean , EventListener<AppPre
     private void startLocalServerMode(MqWatcherSnapshotPlus snapshotPlus) throws Exception {
         //服务端（鉴权为可选。不添加则不鉴权）
         localServer = FolkMQ.createServer()
-                .config(c -> c.coreThreads(MqServerConfig.coreThreads).maxThreads(MqServerConfig.maxThreads).sequenceMode(true))
+                .config(c -> c.sequenceMode(true).coreThreads(MqServerConfig.coreThreads).maxThreads(MqServerConfig.maxThreads))
                 .addAccessAll(MqServerConfig.getAccessMap());
 
         if (saveEnable) {
@@ -175,7 +175,7 @@ public class FolkmqLifecycleBean implements LifecycleBean , EventListener<AppPre
         }
 
         brokerSession = (ClusterClientSession) SocketD.createClusterClient(serverUrls)
-                .config(c -> c.coreThreads(MqServerConfig.coreThreads).maxThreads(MqServerConfig.maxThreads))
+                .config(c -> c.sequenceMode(true).coreThreads(MqServerConfig.coreThreads).maxThreads(MqServerConfig.maxThreads))
                 .listen(brokerServiceListener)
                 .open();
 

@@ -231,7 +231,7 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
         //如果有会话
         if (sessionCount() > 0) {
             //获取一个会话（轮询负载均衡）
-            Session s1 = getSession();
+            Session s1 = getSessionOne(messageHolder);
 
             //::派发
             try {

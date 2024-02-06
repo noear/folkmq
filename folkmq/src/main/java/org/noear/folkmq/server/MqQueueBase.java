@@ -1,11 +1,14 @@
 package org.noear.folkmq.server;
 
+import org.noear.socketd.transport.core.EntityMetas;
 import org.noear.socketd.transport.core.Session;
+import org.noear.socketd.utils.StrUtils;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.atomic.LongAdder;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * 队列基类
@@ -15,7 +18,7 @@ import java.util.concurrent.atomic.LongAdder;
  */
 public abstract class MqQueueBase implements MqQueue {
     //会话操作锁
-    private final Object SESSION_LOCK = new Object();
+    private final ReentrantLock SESSION_LOCK = new ReentrantLock(true);
 
     //消费者会话列表
     private final List<Session> consumerSessions = new Vector<>();
@@ -90,8 +93,12 @@ public abstract class MqQueueBase implements MqQueue {
     @Override
     public void removeSession(Session session) {
         //removeSession 可能会对 get(idx) 带来安全，所以锁一下
-        synchronized (SESSION_LOCK) {
+        SESSION_LOCK.lock();
+
+        try {
             consumerSessions.remove(session);
+        } finally {
+            SESSION_LOCK.unlock();
         }
     }
 
@@ -106,21 +113,34 @@ public abstract class MqQueueBase implements MqQueue {
     /**
      * 获取一个会话（轮询负载均衡）
      * */
-    public Session getSession() {
+    protected Session getSessionOne(MqMessageHolder messageHolder) {
         //removeSession 可能会对 get(idx) 带来安全，所以锁一下
 
-        synchronized (SESSION_LOCK) {
+        SESSION_LOCK.lock();
+
+        try {
             int idx = 0;
             if (consumerSessions.size() > 1) {
+                if(messageHolder.getAtName() != null && messageHolder.getAtName().endsWith("!")) {
+                    //尝试 ip_hash
+                    String ip = messageHolder.getContent().meta(EntityMetas.META_X_REAL_IP);
+                    if (StrUtils.isNotEmpty(ip)) {
+                        idx = ip.hashCode() & consumerSessions.size();
+                        return consumerSessions.get(idx);
+                    }
+                }
+
                 //使用轮询
                 sessionRoundIdx++;
                 idx = sessionRoundIdx % consumerSessions.size();
-                if (sessionRoundIdx > 999_999_999) {
+                if (sessionRoundIdx > 999_999) {
                     sessionRoundIdx = 0;
                 }
             }
 
             return consumerSessions.get(idx);
+        }finally {
+            SESSION_LOCK.unlock();
         }
     }
 

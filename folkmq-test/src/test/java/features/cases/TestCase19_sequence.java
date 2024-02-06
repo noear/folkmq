@@ -44,6 +44,11 @@ public class TestCase19_sequence extends BaseTestCase {
             client.publish("demo", new MqMessage(String.valueOf(i)).sequence(true));
         }
 
+        //检验客户端
+        if(countDownLatch.getCount() > 0) {
+            System.out.println("还有未收：" + countDownLatch.getCount());
+        }
+
         countDownLatch.await(2, TimeUnit.SECONDS);
 
         //检验客户端
@@ -52,6 +57,7 @@ public class TestCase19_sequence extends BaseTestCase {
         int val = 0;
         for (Integer v1 : msgList) {
             if (v1 < val) {
+                System.out.println(v1);
                 assert false;
             } else {
                 val = v1;

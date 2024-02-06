@@ -32,7 +32,7 @@ public class MqClientListener extends EventListener {
 
             try {
                 message = new MqMessageReceivedImpl(client, s, m);
-                MqSubscription subscription = client.subscriptionMap.get(message.getTopic());
+                MqSubscription subscription = client.getSubscription(message.getTopic(), message.getConsumerGroup());
 
                 if (subscription != null) {
                     subscription.consume(message);
@@ -62,13 +62,13 @@ public class MqClientListener extends EventListener {
 
         log.info("Client session opened, sessionId={}", session.sessionId());
 
-        if(client.subscriptionMap.size() == 0){
+        if(client.getSubscriptionSize() == 0){
             return;
         }
 
         //用于重连时重新订阅
         Map<String, Set<String>> subscribeData = new HashMap<>();
-        for (MqSubscription subscription : client.subscriptionMap.values()) {
+        for (MqSubscription subscription : client.getSubscriptionAll()) {
             Set<String> queueNameSet = subscribeData.computeIfAbsent(subscription.getTopic(), n -> new HashSet<>());
             queueNameSet.add(subscription.getQueueName());
         }

@@ -20,6 +20,7 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
 
     private final String tid;
     private final String topic;
+    private final String consumerGroup;
     private final String content;
     private final Date scheduled;
     private final Date expiration;
@@ -33,6 +34,7 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
 
         this.tid = from.metaOrDefault(MqConstants.MQ_META_TID, "");
         this.topic = from.metaOrDefault(MqConstants.MQ_META_TOPIC, "");
+        this.consumerGroup = from.metaOrDefault(MqConstants.MQ_META_CONSUMER_GROUP, "");
         this.content = from.dataAsString();
 
         this.qos = Integer.parseInt(from.metaOrDefault(MqConstants.MQ_META_QOS, "1"));
@@ -60,6 +62,13 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
     @Override
     public String getTopic() {
         return topic;
+    }
+
+    /**
+     * 消费者组
+     * */
+    public String getConsumerGroup() {
+        return consumerGroup;
     }
 
     /**

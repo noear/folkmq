@@ -17,10 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -41,7 +38,7 @@ public class MqClientDefault implements MqClientInternal {
     //客户端配置
     private ClientConfigHandler clientConfigHandler;
     //订阅字典
-    protected Map<String, MqSubscription> subscriptionMap = new HashMap<>();
+    private Map<String, MqSubscription> subscriptionMap = new HashMap<>();
 
     //自动回执
     protected boolean autoAcknowledge = true;
@@ -121,7 +118,7 @@ public class MqClientDefault implements MqClientInternal {
     public void subscribe(String topic, String consumerGroup, MqConsumeHandler consumerHandler) throws IOException {
         MqSubscription subscription = new MqSubscription(topic, consumerGroup, consumerHandler);
 
-        subscriptionMap.put(topic, subscription);
+        subscriptionMap.put(subscription.getQueueName(), subscription);
 
         if (clientSession != null) {
             for (ClientSession session : clientSession.getSessionAll()) {
@@ -141,7 +138,8 @@ public class MqClientDefault implements MqClientInternal {
 
     @Override
     public void unsubscribe(String topic, String consumerGroup) throws IOException {
-        subscriptionMap.remove(topic);
+        String queueName = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP + consumerGroup;
+        subscriptionMap.remove(queueName);
 
         if (clientSession != null) {
             for (ClientSession session : clientSession.getSessionAll()) {
@@ -300,6 +298,19 @@ public class MqClientDefault implements MqClientInternal {
                         .metaPut(MqConstants.MQ_META_ACK, isOk ? "1" : "0"));
             }
         }
+    }
+
+    protected MqSubscription getSubscription(String topic, String consumerGroup)  {
+        String queueName = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP + consumerGroup;
+        return subscriptionMap.get(queueName);
+    }
+
+    protected Collection<MqSubscription> getSubscriptionAll(){
+        return subscriptionMap.values();
+    }
+
+    protected int getSubscriptionSize(){
+        return subscriptionMap.size();
     }
 
     /**

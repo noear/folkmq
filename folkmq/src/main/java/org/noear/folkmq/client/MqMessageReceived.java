@@ -15,6 +15,11 @@ public interface MqMessageReceived extends IMqMessage {
     String getTopic();
 
     /**
+     * 消费者组
+     */
+    String getConsumerGroup();
+
+    /**
      * 已派发次数
      */
     int getTimes();

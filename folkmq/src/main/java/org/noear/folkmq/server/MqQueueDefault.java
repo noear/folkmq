@@ -137,6 +137,8 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
      */
     @Override
     public void forceClear() {
+        indexer.set(0);
+
         messageMap.clear();
         messageQueue.clear();
     }
@@ -146,6 +148,8 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
      */
     @Override
     public void forceDistribute(int times, int count) {
+        indexer.set(0);
+
         if (count == 0 || count > messageTotal()) {
             count = messageTotal();
         }

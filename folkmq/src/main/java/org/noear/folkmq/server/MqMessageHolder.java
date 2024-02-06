@@ -29,7 +29,7 @@ public class MqMessageHolder implements Delayed {
     //派发次数
     private volatile int distributeCount;
     //派发顺序
-    private volatile long distributeIdx;
+    private volatile int distributeIdx;
     //是否完成
     private AtomicBoolean isDone;
 
@@ -84,7 +84,7 @@ public class MqMessageHolder implements Delayed {
     /**
      * 设置派发顺序位
      */
-    public void setDistributeIdx(long distributeIdx) {
+    public void setDistributeIdx(int distributeIdx) {
         this.distributeIdx = distributeIdx;
     }
 

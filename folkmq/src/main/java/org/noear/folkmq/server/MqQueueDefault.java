@@ -9,7 +9,9 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.DelayQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * 队列默认实现
@@ -21,7 +23,7 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
     private static final Logger log = LoggerFactory.getLogger(MqQueueDefault.class);
 
     //消息索引器
-    private final AtomicLong indexer = new AtomicLong();
+    private final AtomicInteger indexer = new AtomicInteger();
 
     //主题
     private final String topic;
@@ -38,6 +40,10 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
 
     //消息队列与处理线程
     private final DelayQueue<MqMessageHolder> messageQueue;
+    //最后消息派发时间
+    private final AtomicLong messageDistributeTime = new AtomicLong(0);
+    //添加锁
+    private final ReentrantLock addLock = new ReentrantLock(true);
 
     public MqQueueDefault(MqWatcher watcher, String topic, String consumerGroup, String queueName) {
         super();
@@ -52,20 +58,6 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
         this.messageQueue = new DelayQueue<>();
     }
 
-    /**
-     * 提取
-     */
-    @Override
-    public boolean distribute() {
-        MqMessageHolder messageHolder = messageQueue.poll();
-
-        if (messageHolder != null) {
-            distribute0(messageHolder);
-            return true;
-        } else {
-            return false;
-        }
-    }
 
     /**
      * 获取主题
@@ -97,18 +89,46 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
         return Collections.unmodifiableMap(messageMap);
     }
 
-
     /**
      * 添加消息
      */
     @Override
     public void add(MqMessageHolder messageHolder) {
-        messageHolder.setDistributeIdx(indexer.incrementAndGet());
+        addLock.lock();
 
-        messageMap.put(messageHolder.getTid(), messageHolder);
-        messageQueue.add(messageHolder);
+        try {
+            if (messageHolder.getDistributeTime() != messageDistributeTime.get()) {
+                //如果超过1秒的，理解为定时消息
+                if (messageHolder.getDistributeTime() < System.currentTimeMillis() + 1_000) {
+                    messageDistributeTime.set(messageHolder.getDistributeTime());
+                    indexer.set(0);
+                }
+            }
 
-        messageCountAdd(messageHolder);
+            messageHolder.setDistributeIdx(indexer.incrementAndGet());
+
+            messageMap.put(messageHolder.getTid(), messageHolder);
+            messageQueue.add(messageHolder);
+
+            messageCountAdd(messageHolder);
+        } finally {
+            addLock.unlock();
+        }
+    }
+
+    /**
+     * 提取
+     */
+    @Override
+    public boolean distribute() {
+        MqMessageHolder messageHolder = messageQueue.poll();
+
+        if (messageHolder != null) {
+            distribute0(messageHolder);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**

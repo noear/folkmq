@@ -41,7 +41,7 @@ public class TestCase19_sequence extends BaseTestCase {
         }));
 
         for (int i = 0; i < count; i++) {
-            client.publish("demo", new MqMessage(String.valueOf(i)));
+            client.publish("demo", new MqMessage(String.valueOf(i)).sequence(true));
         }
 
         countDownLatch.await(2, TimeUnit.SECONDS);

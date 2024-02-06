@@ -42,7 +42,7 @@ public class TestCase20_sequence_async extends BaseTestCase {
         }));
 
         for (int i = 0; i < count; i++) {
-            client.publishAsync("demo", new MqMessage(String.valueOf(i)));
+            client.publishAsync("demo", new MqMessage(String.valueOf(i)).sequence(true));
         }
 
         countDownLatch.await(10, TimeUnit.SECONDS);

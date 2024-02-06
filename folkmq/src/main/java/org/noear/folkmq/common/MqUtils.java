@@ -1,6 +1,6 @@
 package org.noear.folkmq.common;
 
-import org.noear.folkmq.client.IMqMessage;
+import org.noear.folkmq.client.MqMessage;
 import org.noear.socketd.transport.core.Entity;
 import org.noear.socketd.transport.core.Flags;
 import org.noear.socketd.transport.core.Message;
@@ -22,7 +22,7 @@ public class MqUtils {
      * @param topic   主题
      * @param message 消息
      */
-    public static StringEntity publishEntityBuild(String topic, IMqMessage message) {
+    public static StringEntity publishEntityBuild(String topic, MqMessage message) {
         //构建消息实体
         StringEntity entity = new StringEntity(message.getContent());
         entity.metaPut(MqConstants.MQ_META_TID, message.getTid());
@@ -39,7 +39,11 @@ public class MqUtils {
             entity.metaPut(MqConstants.MQ_META_EXPIRATION, String.valueOf(message.getExpiration().getTime()));
         }
 
-        entity.at(MqConstants.BROKER_AT_SERVER);
+        if (message.getSequence()) {
+            entity.at(MqConstants.BROKER_AT_SERVER_HASH);
+        } else {
+            entity.at(MqConstants.BROKER_AT_SERVER);
+        }
 
         return entity;
     }
@@ -50,7 +54,7 @@ public class MqUtils {
      * @param topic   主题
      * @param message 消息
      */
-    public static Message routingMessageBuild(String topic, IMqMessage message) {
+    public static Message routingMessageBuild(String topic, MqMessage message) {
         Entity entity = MqUtils.publishEntityBuild(topic, message)
                 .at(MqConstants.BROKER_AT_SERVER);
 

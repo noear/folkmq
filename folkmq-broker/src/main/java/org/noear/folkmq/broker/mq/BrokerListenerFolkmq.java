@@ -1,6 +1,6 @@
 package org.noear.folkmq.broker.mq;
 
-import org.noear.folkmq.client.IMqMessage;
+import org.noear.folkmq.client.MqMessage;
 import org.noear.folkmq.common.MqConstants;
 import org.noear.folkmq.common.MqUtils;
 import org.noear.snack.ONode;
@@ -36,7 +36,7 @@ public class BrokerListenerFolkmq extends BrokerListener {
     }
 
 
-    public BrokerListenerFolkmq(BrokerApiHandler apiHandler){
+    public BrokerListenerFolkmq(BrokerApiHandler apiHandler) {
         this.apiHandler = apiHandler;
     }
 
@@ -88,7 +88,7 @@ public class BrokerListenerFolkmq extends BrokerListener {
             }
         }
 
-        if(MqConstants.BROKER_AT_SERVER.equals(session.name()) == false) {
+        if (MqConstants.BROKER_AT_SERVER.equals(session.name()) == false) {
             //如果不是 server，直接添加为 player
             super.onOpen(session);
         }
@@ -128,7 +128,7 @@ public class BrokerListenerFolkmq extends BrokerListener {
             String atName = message.atName();
 
             //单发模式（给同名的某个玩家，轮询负截均衡）
-            Session responder = getPlayerOne(atName);
+            Session responder = getPlayerAny(atName, requester);
             if (responder != null && responder.isValid()) {
                 //转发消息
                 try {
@@ -162,7 +162,7 @@ public class BrokerListenerFolkmq extends BrokerListener {
 
             //结束处理
             return;
-        } else if(MqConstants.MQ_API.equals(message.event())){
+        } else if (MqConstants.MQ_API.equals(message.event())) {
             apiHandler.handle(requester, message);
             return;
         }
@@ -214,10 +214,10 @@ public class BrokerListenerFolkmq extends BrokerListener {
         }
     }
 
-    public boolean publishDo(String topic, IMqMessage message) throws IOException {
+    public boolean publishDo(String topic, MqMessage message) throws IOException {
         Message routingMessage = MqUtils.routingMessageBuild(topic, message);
 
-        Session responder = this.getPlayerOne(MqConstants.BROKER_AT_SERVER);
+        Session responder = this.getPlayerAny(MqConstants.BROKER_AT_SERVER,null);
         if (responder != null) {
             if (message.getQos() > 0) {
                 responder.sendAndRequest(MqConstants.MQ_EVENT_PUBLISH, routingMessage).await();
@@ -230,8 +230,6 @@ public class BrokerListenerFolkmq extends BrokerListener {
             return false;
         }
     }
-
-
 
     private void acknowledgeAsNo(Session requester, Message message) throws IOException {
         //如果没有会话，自动转为ACK失败

@@ -158,12 +158,12 @@ public class MqClientDefault implements MqClientInternal {
     }
 
     @Override
-    public void publish(String topic, IMqMessage message) throws IOException {
+    public void publish(String topic, MqMessage message) throws IOException {
         if (clientSession == null) {
             throw new SocketdConnectionException("Not connected!");
         }
 
-        ClientSession session = clientSession.getSessionOne();
+        ClientSession session = clientSession.getSessionOne(message.getSequence());
         if (session == null || session.isValid() == false) {
             throw new SocketdException("No session is available!");
         }
@@ -192,12 +192,12 @@ public class MqClientDefault implements MqClientInternal {
      * @param message 消息
      */
     @Override
-    public CompletableFuture<Boolean> publishAsync(String topic, IMqMessage message) throws IOException {
+    public CompletableFuture<Boolean> publishAsync(String topic, MqMessage message) throws IOException {
         if (clientSession == null) {
             throw new SocketdConnectionException("Not connected!");
         }
 
-        ClientSession session = clientSession.getSessionOne();
+        ClientSession session = clientSession.getSessionOne(message.getSequence());
         if (session == null || session.isValid() == false) {
             throw new SocketdException("No session is available!");
         }
@@ -231,7 +231,7 @@ public class MqClientDefault implements MqClientInternal {
             throw new SocketdConnectionException("Not connected!");
         }
 
-        ClientSession session = clientSession.getSessionOne();
+        ClientSession session = clientSession.getSessionAny();
         if (session == null || session.isValid() == false) {
             throw new SocketdException("No session is available!");
         }
@@ -257,7 +257,7 @@ public class MqClientDefault implements MqClientInternal {
             throw new SocketdConnectionException("Not connected!");
         }
 
-        ClientSession session = clientSession.getSessionOne();
+        ClientSession session = clientSession.getSessionAny();
         if (session == null || session.isValid() == false) {
             throw new SocketdException("No session is available!");
         }

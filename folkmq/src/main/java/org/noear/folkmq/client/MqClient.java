@@ -63,7 +63,7 @@ public interface MqClient extends Closeable {
      * @param topic   主题
      * @param message 消息
      */
-    void publish(String topic, IMqMessage message) throws IOException;
+    void publish(String topic, MqMessage message) throws IOException;
 
     /**
      * 异步发布消息
@@ -71,7 +71,7 @@ public interface MqClient extends Closeable {
      * @param topic   主题
      * @param message 消息
      */
-    CompletableFuture<Boolean> publishAsync(String topic, IMqMessage message) throws IOException;
+    CompletableFuture<Boolean> publishAsync(String topic, MqMessage message) throws IOException;
 
     /**
      * 取消发布

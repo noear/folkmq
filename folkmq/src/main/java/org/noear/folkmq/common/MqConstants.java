@@ -137,6 +137,11 @@ public interface MqConstants {
     String BROKER_AT_SERVER = "folkmq-server";
 
     /**
+     * 经理人服务
+     */
+    String BROKER_AT_SERVER_HASH = "folkmq-server!";
+
+    /**
      * 经理人所有服务
      */
     String BROKER_AT_SERVER_ALL = "folkmq-server*";

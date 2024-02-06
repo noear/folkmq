@@ -15,6 +15,7 @@ public class MqMessage implements IMqMessage {
     private String content;
     private Date scheduled;
     private Date expiration;
+    private boolean sequence;
     private int qos = 1;
 
     public MqMessage(String content){
@@ -40,6 +41,10 @@ public class MqMessage implements IMqMessage {
         return expiration;
     }
 
+    public boolean getSequence() {
+        return sequence;
+    }
+
     public int getQos() {
         return qos;
     }
@@ -51,6 +56,11 @@ public class MqMessage implements IMqMessage {
 
     public MqMessage expiration(Date expiration){
         this.expiration = expiration;
+        return this;
+    }
+
+    public MqMessage sequence(boolean sequence) {
+        this.sequence = sequence;
         return this;
     }
 

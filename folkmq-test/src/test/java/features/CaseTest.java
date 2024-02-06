@@ -103,7 +103,21 @@ public class CaseTest {
 
     @Test
     public void TestCase18_batch_subscribe() throws Exception {
-        BaseTestCase testCase = new TestCase18_batch_subscribe(2017);
+        BaseTestCase testCase = new TestCase18_batch_subscribe(2018);
+        testCase.start();
+        testCase.stop();
+    }
+
+    @Test
+    public void TestCase19_sequence() throws Exception {
+        BaseTestCase testCase = new TestCase19_sequence(2019);
+        testCase.start();
+        testCase.stop();
+    }
+
+    @Test
+    public void TestCase20_sequence_async() throws Exception {
+        BaseTestCase testCase = new TestCase20_sequence_async(2020);
         testCase.start();
         testCase.stop();
     }

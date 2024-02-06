@@ -29,8 +29,6 @@ public class App {
         });
 
         //授权自动检测
-        if (LicenceUtils.isValid()) {
-            RunUtils.runAndTry(LicenceUtils::auth);
-        }
+        RunUtils.runAndTry(LicenceUtils::auth);
     }
 }

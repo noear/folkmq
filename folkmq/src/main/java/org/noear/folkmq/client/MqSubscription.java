@@ -2,8 +2,6 @@ package org.noear.folkmq.client;
 
 import org.noear.folkmq.common.MqConstants;
 
-import java.io.IOException;
-
 /**
  * 订阅记录
  *
@@ -63,7 +61,7 @@ public class MqSubscription implements MqConsumeHandler {
      * @param message 收到的消息
      */
     @Override
-    public void consume(MqMessageReceived message) throws IOException {
+    public void consume(MqMessageReceived message) throws Exception {
         consumeHandler.consume(message);
     }
 }

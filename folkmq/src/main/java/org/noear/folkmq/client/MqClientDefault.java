@@ -57,8 +57,13 @@ public class MqClientDefault implements MqClientInternal {
     @Override
     public MqClient connect() throws IOException {
         clientSession = (ClusterClientSession) SocketD.createClusterClient(serverUrls)
-                .config(c -> c.sequenceMode(true).coreThreads(1).maxThreads(1).fragmentSize(MqConstants.MAX_FRAGMENT_SIZE))
-                .config(clientConfigHandler)
+                .config(c -> {
+                    c.codecThreads(1).fragmentSize(MqConstants.MAX_FRAGMENT_SIZE);
+
+                    if (clientConfigHandler != null) {
+                        clientConfigHandler.clientConfig(c);
+                    }
+                })
                 .listen(clientListener)
                 .open();
 

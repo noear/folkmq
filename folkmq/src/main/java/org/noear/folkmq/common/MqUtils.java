@@ -9,9 +9,6 @@ import org.noear.socketd.transport.core.entity.StringEntity;
 import org.noear.socketd.transport.core.entity.MessageBuilder;
 import org.noear.socketd.utils.StrUtils;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 /**
  * 消息工具类
  *
@@ -19,12 +16,6 @@ import java.util.concurrent.Executors;
  * @see 1.0
  */
 public class MqUtils {
-    private static ExecutorService singleExecutor = Executors.newSingleThreadExecutor();
-
-    public static void singleRun(Runnable runnable){
-        singleExecutor.submit(runnable);
-    }
-
     /**
      * 发布实体构建
      *

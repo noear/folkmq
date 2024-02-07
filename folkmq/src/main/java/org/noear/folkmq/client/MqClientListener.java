@@ -1,7 +1,6 @@
 package org.noear.folkmq.client;
 
 import org.noear.folkmq.common.MqConstants;
-import org.noear.folkmq.common.MqUtils;
 import org.noear.snack.ONode;
 import org.noear.socketd.exception.SocketDAlarmException;
 import org.noear.socketd.transport.core.Entity;
@@ -9,7 +8,6 @@ import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
 import org.noear.socketd.transport.core.entity.StringEntity;
 import org.noear.socketd.transport.core.listener.EventListener;
-import org.noear.socketd.utils.RunUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,20 +31,9 @@ public class MqClientListener extends EventListener {
         doOn(MqConstants.MQ_EVENT_DISTRIBUTE, (s, m) -> {
             try {
                 MqMessageReceivedImpl message = new MqMessageReceivedImpl(client, s, m);
-
-                if (message.isSequence()) {
-                    //单线程运行
-                    MqUtils.singleRun(() -> {
-                        onDistribute(s, m, message);
-                    });
-                } else {
-                    //多线程运行
-                    RunUtils.async(() -> {
-                        onDistribute(s, m, message);
-                    });
-                }
+                onDistribute(s, m, message);
             } catch (Throwable e) {
-                log.warn("Client consume handle error", e);
+                log.warn("Client consume handle error, sid={}", m.sid(), e);
             }
         });
     }
@@ -68,7 +55,7 @@ public class MqClientListener extends EventListener {
                 client.acknowledge(s, m, message, false);
                 log.warn("Client consume handle error, tid={}", message.getTid(), e);
             } catch (Throwable err) {
-                log.warn("Client consume handle error", err);
+                log.warn("Client consume handle error, tid={}", message.getTid(), e);
             }
         }
     }

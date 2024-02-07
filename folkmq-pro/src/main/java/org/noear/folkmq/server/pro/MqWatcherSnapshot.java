@@ -246,6 +246,7 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
                     int times = Integer.parseInt(message.metaOrDefault(MqConstants.MQ_META_TIMES, "0"));
                     long expiration = Long.parseLong(message.metaOrDefault(MqConstants.MQ_META_EXPIRATION, "0"));
                     long scheduled = Long.parseLong(message.metaOrDefault(MqConstants.MQ_META_SCHEDULED, "0"));
+                    boolean sequence = Integer.parseInt(message.metaOrDefault(MqConstants.MQ_META_SEQUENCE, "0")) == 1;
 
 
                     if (scheduled == 0) {
@@ -253,7 +254,7 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
                         scheduled = System.currentTimeMillis();
                     }
 
-                    serverRef.routingDo(queueName, message, tid, qos, expiration, times, scheduled);
+                    serverRef.routingDo(queueName, message, tid, qos, sequence, expiration, times, scheduled);
                 }
             }
         }
@@ -326,7 +327,7 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
         Iterator<Map.Entry<String, Set<String>>> subscribeIterator = subscribeMap.entrySet().iterator();
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(subscribeMapFileTmp))) {
-            while (subscribeIterator.hasNext()){
+            while (subscribeIterator.hasNext()) {
                 Map.Entry<String, Set<String>> kv = subscribeIterator.next();
                 String topic = kv.getKey();
                 Set<String> topicConsumerList = kv.getValue();

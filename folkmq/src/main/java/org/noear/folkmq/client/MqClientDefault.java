@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
 
 /**
  * 消息客户端默认实现
@@ -28,6 +29,9 @@ import java.util.concurrent.CompletableFuture;
  */
 public class MqClientDefault implements MqClientInternal {
     private static final Logger log = LoggerFactory.getLogger(MqClientDefault.class);
+
+    //处理执行器
+    protected ExecutorService handleExecutor;
 
     //服务端地址
     private final List<String> serverUrls;
@@ -58,7 +62,10 @@ public class MqClientDefault implements MqClientInternal {
     public MqClient connect() throws IOException {
         clientSession = (ClusterClientSession) SocketD.createClusterClient(serverUrls)
                 .config(c -> {
-                    c.codecThreads(1).fragmentSize(MqConstants.MAX_FRAGMENT_SIZE);
+                    c.ioThreads(1)
+                            .codecThreads(1)
+                            .exchangeThreads(1)
+                            .fragmentSize(MqConstants.MAX_FRAGMENT_SIZE);
 
                     if (clientConfigHandler != null) {
                         clientConfigHandler.clientConfig(c);
@@ -78,6 +85,12 @@ public class MqClientDefault implements MqClientInternal {
     @Override
     public MqClient config(ClientConfigHandler configHandler) {
         clientConfigHandler = configHandler;
+        return this;
+    }
+
+    @Override
+    public MqClient handleExecutor(ExecutorService handleExecutor) {
+        this.handleExecutor = handleExecutor;
         return this;
     }
 

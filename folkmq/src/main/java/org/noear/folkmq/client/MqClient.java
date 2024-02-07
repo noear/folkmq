@@ -5,6 +5,7 @@ import org.noear.socketd.transport.client.ClientConfigHandler;
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
 
 /**
  * 消息客户端
@@ -28,6 +29,12 @@ public interface MqClient extends Closeable {
      */
     MqClient config(ClientConfigHandler configHandler);
 
+
+    /**
+     * 消息处理执行器
+     */
+    MqClient handleExecutor(ExecutorService handleExecutor);
+
     /**
      * 自动回执
      *
@@ -37,7 +44,7 @@ public interface MqClient extends Closeable {
 
     /**
      * 接口调用
-     * */
+     */
     CompletableFuture<String> call(String apiName, String apiToken, String topic, String consumerGroup) throws IOException;
 
     /**

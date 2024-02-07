@@ -8,6 +8,7 @@ import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
 import org.noear.socketd.transport.core.entity.StringEntity;
 import org.noear.socketd.transport.core.listener.EventListener;
+import org.noear.socketd.utils.RunUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +32,16 @@ public class MqClientListener extends EventListener {
         doOn(MqConstants.MQ_EVENT_DISTRIBUTE, (s, m) -> {
             try {
                 MqMessageReceivedImpl message = new MqMessageReceivedImpl(client, s, m);
-                onDistribute(s, m, message);
+
+                if (message.isSequence()) {
+                    RunUtils.single(() -> onDistribute(s, m, message));
+                } else {
+                    if (client.handleExecutor == null) {
+                        RunUtils.async(() -> onDistribute(s, m, message));
+                    } else {
+                        client.handleExecutor.submit(() -> onDistribute(s, m, message));
+                    }
+                }
             } catch (Throwable e) {
                 log.warn("Client consume handle error, sid={}", m.sid(), e);
             }

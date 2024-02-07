@@ -9,10 +9,12 @@ public interface ConfigNames {
     String folkmq_admin = "folkmq.admin";
     //许可证
     String folkmq_licence = "folkmq.licence";
-    //核心线程数
-    String folkmq_coreThreads = "folkmq.coreThreads";
-    //最大线程数
-    String folkmq_maxThreads = "folkmq.maxThreads";
+    //io线程数
+    String folkmq_ioThreads = "folkmq.ioThreads";
+    //解码线程数
+    String folkmq_codecThreads = "folkmq.codecThreads";
+    //交换线程数
+    String folkmq_exchangeThreads = "folkmq.exchangeThreads";
 
     //视图队列同步间隔（ms）
     String folkmq_view_queue_syncInterval = "folkmq.view.queue.syncInterval";

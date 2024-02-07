@@ -19,8 +19,6 @@ import org.noear.solon.net.websocket.socketd.ToSocketdWebSocketListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Map;
-
 /**
  * @author noear
  * @since 1.0
@@ -49,8 +47,9 @@ public class BrokerLifecycleBean implements LifecycleBean , EventListener<AppPre
         brokerServerTcp = SocketD.createServer("sd:tcp")
                 .config(c -> c.port(Solon.cfg().serverPort() + 10000)
                         .sequenceMode(true)
-                        .coreThreads(MqBrokerConfig.coreThreads)
-                        .maxThreads(MqBrokerConfig.maxThreads)
+                        .ioThreads(MqBrokerConfig.ioThreads)
+                        .codecThreads(MqBrokerConfig.codecThreads)
+                        .exchangeThreads(MqBrokerConfig.exchangeThreads)
                         .fragmentHandler(brokerFragmentHandler))
                 .listen(brokerListener)
                 .start();
@@ -60,9 +59,10 @@ public class BrokerLifecycleBean implements LifecycleBean , EventListener<AppPre
             //添加 sd:ws 协议监听支持
             brokerServerWs = SocketD.createServer("sd:ws")
                     .config(c -> c.port(Solon.cfg().serverPort() + 10001)
-                            .coreThreads(MqBrokerConfig.coreThreads)
-                            .maxThreads(MqBrokerConfig.maxThreads)
-                            .channelExecutor(brokerServerTcp.getConfig().getChannelExecutor()) //复用通用执行器
+                            .ioThreads(MqBrokerConfig.ioThreads)
+                            .codecThreads(MqBrokerConfig.codecThreads)
+                            .exchangeThreads(MqBrokerConfig.exchangeThreads)
+                            .exchangeExecutor(brokerServerTcp.getConfig().getExchangeExecutor()) //复用通用执行器
                             .fragmentHandler(brokerFragmentHandler))
                     .listen(brokerListener)
                     .start();

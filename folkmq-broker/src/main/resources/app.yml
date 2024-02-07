@@ -26,8 +26,6 @@ solon.logging.logger:
 folkmq:
   admin: admin
   licence: ""
-  coreThreads: 1
-  maxThreads: 1
   websocket: false
   view:
     queue:

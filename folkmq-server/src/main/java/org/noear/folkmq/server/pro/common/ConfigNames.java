@@ -9,10 +9,12 @@ public interface ConfigNames {
     String folkmq_admin = "folkmq.admin";
     //经纪人地址
     String folkmq_broker = "folkmq.broker";
+    //io线程数
+    String folkmq_ioThreads = "folkmq.ioThreads";
     //核心线程数
-    String folkmq_coreThreads = "folkmq.coreThreads";
+    String folkmq_codecThreads = "folkmq.codecThreads";
     //最大线程数
-    String folkmq_maxThreads = "folkmq.maxThreads";
+    String folkmq_exchangeThreads = "folkmq.exchangeThreads";
 
     //快照相关
     String folkmq_snapshot_enable = "folkmq.snapshot.enable";

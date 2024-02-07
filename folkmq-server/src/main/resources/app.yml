@@ -26,8 +26,6 @@ solon.logging.logger:
 
 folkmq:
   admin: admin
-  coreThreads: 1
-  maxThreads: 1
   maxConsumeWaiting: "180s"
   snapshot:
     enable: true

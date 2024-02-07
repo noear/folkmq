@@ -2,7 +2,7 @@ package org.noear.folkmq.server;
 
 import org.noear.folkmq.common.MqConstants;
 import org.noear.snack.ONode;
-import org.noear.socketd.exception.SocketdAlarmException;
+import org.noear.socketd.exception.SocketDAlarmException;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
 import org.noear.socketd.transport.core.entity.StringEntity;
@@ -318,8 +318,8 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
         super.onError(session, error);
 
         if (log.isWarnEnabled()) {
-            if (error instanceof SocketdAlarmException) {
-                SocketdAlarmException alarmException = (SocketdAlarmException) error;
+            if (error instanceof SocketDAlarmException) {
+                SocketDAlarmException alarmException = (SocketDAlarmException) error;
                 log.warn("Server channel error, sessionId={}, from={}", session.sessionId(), alarmException.getAlarm(), error);
             } else {
                 log.warn("Server channel error, sessionId={}", session.sessionId(), error);

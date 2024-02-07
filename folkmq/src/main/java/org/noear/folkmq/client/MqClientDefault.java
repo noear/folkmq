@@ -5,8 +5,8 @@ import org.noear.folkmq.common.MqUtils;
 import org.noear.folkmq.exception.FolkmqException;
 import org.noear.socketd.SocketD;
 import org.noear.socketd.cluster.ClusterClientSession;
-import org.noear.socketd.exception.SocketdConnectionException;
-import org.noear.socketd.exception.SocketdException;
+import org.noear.socketd.exception.SocketDConnectionException;
+import org.noear.socketd.exception.SocketDException;
 import org.noear.socketd.transport.client.ClientConfigHandler;
 import org.noear.socketd.transport.client.ClientSession;
 import org.noear.socketd.transport.core.Entity;
@@ -175,12 +175,12 @@ public class MqClientDefault implements MqClientInternal {
         Objects.requireNonNull(message, "Param 'message' can not be null");
 
         if (clientSession == null) {
-            throw new SocketdConnectionException("Not connected!");
+            throw new SocketDConnectionException("Not connected!");
         }
 
         ClientSession session = clientSession.getSessionAny(message.getSequence() ? topic : null);
         if (session == null || session.isValid() == false) {
-            throw new SocketdException("No session is available!");
+            throw new SocketDException("No session is available!");
         }
 
         Entity entity = MqUtils.publishEntityBuild(topic, message);
@@ -213,12 +213,12 @@ public class MqClientDefault implements MqClientInternal {
 
 
         if (clientSession == null) {
-            throw new SocketdConnectionException("Not connected!");
+            throw new SocketDConnectionException("Not connected!");
         }
 
         ClientSession session = clientSession.getSessionAny(message.getSequence() ? topic : null);
         if (session == null || session.isValid() == false) {
-            throw new SocketdException("No session is available!");
+            throw new SocketDException("No session is available!");
         }
 
         CompletableFuture<Boolean> future = new CompletableFuture<>();
@@ -251,12 +251,12 @@ public class MqClientDefault implements MqClientInternal {
 
 
         if (clientSession == null) {
-            throw new SocketdConnectionException("Not connected!");
+            throw new SocketDConnectionException("Not connected!");
         }
 
         ClientSession session = clientSession.getSessionAny(null);
         if (session == null || session.isValid() == false) {
-            throw new SocketdException("No session is available!");
+            throw new SocketDException("No session is available!");
         }
 
         Entity entity = new StringEntity("")
@@ -281,12 +281,12 @@ public class MqClientDefault implements MqClientInternal {
 
 
         if (clientSession == null) {
-            throw new SocketdConnectionException("Not connected!");
+            throw new SocketDConnectionException("Not connected!");
         }
 
         ClientSession session = clientSession.getSessionAny(null);
         if (session == null || session.isValid() == false) {
-            throw new SocketdException("No session is available!");
+            throw new SocketDException("No session is available!");
         }
 
         CompletableFuture<Boolean> future = new CompletableFuture<>();

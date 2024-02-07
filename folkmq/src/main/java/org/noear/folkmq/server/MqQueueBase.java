@@ -121,7 +121,7 @@ public abstract class MqQueueBase implements MqQueue {
         try {
             int idx = 0;
             if (consumerSessions.size() > 1) {
-                if(messageHolder.getAtName() != null && messageHolder.getAtName().endsWith("!")) {
+                if(messageHolder.isSequence()) {
                     //尝试 ip_hash //不要检测有效性（如果无效，则让它出错）
                     String ip = messageHolder.getContent().meta(EntityMetas.META_X_REAL_IP);
                     if (StrUtils.isNotEmpty(ip)) {

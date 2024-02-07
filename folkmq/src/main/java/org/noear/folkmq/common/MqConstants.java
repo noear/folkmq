@@ -24,6 +24,10 @@ public interface MqConstants {
      */
     String MQ_META_EXPIRATION = "mq.expiration";
     /**
+     * 元信息：消息是否有序
+     */
+    String MQ_META_SEQUENCE = "mq.sequence";
+    /**
      * 元信息：消息质量等级
      */
     String MQ_META_QOS = "mq.qos";

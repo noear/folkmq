@@ -18,53 +18,83 @@ public class MqMessage implements IMqMessage {
     private boolean sequence;
     private int qos = 1;
 
-    public MqMessage(String content){
+    public MqMessage(String content) {
         this.tid = StrUtils.guid();
         this.content = content;
     }
 
+    /**
+     * 事务ID
+     */
     @Override
     public String getTid() {
         return tid;
     }
 
+    /**
+     * 内容
+     */
     @Override
     public String getContent() {
         return content;
     }
 
+    /**
+     * 定时派发
+     */
     public Date getScheduled() {
         return scheduled;
     }
 
+    /**
+     * 过期时间
+     */
     @Override
     public Date getExpiration() {
         return expiration;
     }
 
-    public boolean getSequence() {
+    /**
+     * 是否顺序
+     */
+    public boolean isSequence() {
         return sequence;
     }
 
+    /**
+     * 质量等级（0 或 1）
+     */
     public int getQos() {
         return qos;
     }
 
+    /**
+     * 定时派发
+     */
     public MqMessage scheduled(Date scheduled) {
         this.scheduled = scheduled;
         return this;
     }
 
-    public MqMessage expiration(Date expiration){
+    /**
+     * 过期时间
+     */
+    public MqMessage expiration(Date expiration) {
         this.expiration = expiration;
         return this;
     }
 
+    /**
+     * 是否顺序
+     */
     public MqMessage sequence(boolean sequence) {
         this.sequence = sequence;
         return this;
     }
 
+    /**
+     * 质量等级（0 或 1）
+     */
     public MqMessage qos(int qos) {
         this.qos = qos;
         return this;

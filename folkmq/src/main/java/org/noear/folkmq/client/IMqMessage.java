@@ -21,8 +21,13 @@ public interface IMqMessage {
 
     /**
      * 过期时间
-     * */
+     */
     Date getExpiration();
+
+    /**
+     * 是否有序
+     */
+    boolean isSequence();
 
     /**
      * 质量等级（0 或 1）

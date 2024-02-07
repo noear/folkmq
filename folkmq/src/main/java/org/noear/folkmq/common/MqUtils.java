@@ -9,6 +9,9 @@ import org.noear.socketd.transport.core.entity.StringEntity;
 import org.noear.socketd.transport.core.entity.MessageBuilder;
 import org.noear.socketd.utils.StrUtils;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 /**
  * 消息工具类
  *
@@ -16,6 +19,12 @@ import org.noear.socketd.utils.StrUtils;
  * @see 1.0
  */
 public class MqUtils {
+    private static ExecutorService singleExecutor = Executors.newSingleThreadExecutor();
+
+    public static void singleRun(Runnable runnable){
+        singleExecutor.submit(runnable);
+    }
+
     /**
      * 发布实体构建
      *
@@ -28,19 +37,25 @@ public class MqUtils {
         entity.metaPut(MqConstants.MQ_META_TID, message.getTid());
         entity.metaPut(MqConstants.MQ_META_TOPIC, topic);
         entity.metaPut(MqConstants.MQ_META_QOS, (message.getQos() == 0 ? "0" : "1"));
+
+        //定时派发
         if (message.getScheduled() == null) {
             entity.metaPut(MqConstants.MQ_META_SCHEDULED, "0");
         } else {
             entity.metaPut(MqConstants.MQ_META_SCHEDULED, String.valueOf(message.getScheduled().getTime()));
         }
+
+        //过期时间
         if (message.getExpiration() == null) {
             entity.metaPut(MqConstants.MQ_META_EXPIRATION, "0");
         } else {
             entity.metaPut(MqConstants.MQ_META_EXPIRATION, String.valueOf(message.getExpiration().getTime()));
         }
 
-        if (message.getSequence()) {
+        //是否有序
+        if (message.isSequence()) {
             entity.at(MqConstants.BROKER_AT_SERVER_HASH);
+            entity.metaPut(MqConstants.MQ_META_SEQUENCE, "1");
         } else {
             entity.at(MqConstants.BROKER_AT_SERVER);
         }

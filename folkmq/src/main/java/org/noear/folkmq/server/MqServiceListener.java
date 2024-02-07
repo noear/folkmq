@@ -431,6 +431,7 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
         int times = Integer.parseInt(message.metaOrDefault(MqConstants.MQ_META_TIMES, "0"));
         long expiration = Long.parseLong(message.metaOrDefault(MqConstants.MQ_META_EXPIRATION, "0"));
         long scheduled = Long.parseLong(message.metaOrDefault(MqConstants.MQ_META_SCHEDULED, "0"));
+        boolean sequence = Integer.parseInt(message.metaOrDefault(MqConstants.MQ_META_SEQUENCE, "0")) == 1;
 
         if (scheduled == 0) {
             //默认为当前ms（相对于后面者，有个排序作用）
@@ -446,7 +447,7 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
             List<String> topicConsumerList = new ArrayList<>(topicConsumerSet);
 
             for (String topicConsumer : topicConsumerList) {
-                routingDo(topicConsumer, message, tid, qos, expiration, times, scheduled);
+                routingDo(topicConsumer, message, tid, qos, sequence, expiration, times, scheduled);
             }
         }
     }
@@ -460,11 +461,11 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
     /**
      * 执行路由
      */
-    public void routingDo(String queueName, Message message, String tid, int qos, long expiration, int times, long scheduled) {
+    public void routingDo(String queueName, Message message, String tid, int qos, boolean sequence, long expiration, int times, long scheduled) {
         MqQueue queue = queueMap.get(queueName);
 
         if (queue != null) {
-            MqMessageHolder messageHolder = new MqMessageHolder(queueName, queue.getConsumerGroup(), message, tid, qos, expiration, times, scheduled);
+            MqMessageHolder messageHolder = new MqMessageHolder(queueName, queue.getConsumerGroup(), message, tid, qos, sequence, expiration, times, scheduled);
             queue.add(messageHolder);
         }
     }

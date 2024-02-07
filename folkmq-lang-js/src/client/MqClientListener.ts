@@ -4,7 +4,7 @@ import {MqConstants} from "../common/MqConstants";
 import {MqMessageReceivedImpl} from "./IMqMessage";
 import {Session} from "@noear/socket.d/transport/core/Session";
 import {SocketD} from "@noear/socket.d";
-import {SocketdAlarmException} from "@noear/socket.d/exception/SocketdException";
+import {SocketDAlarmException} from "@noear/socket.d/exception/SocketDException";
 
 export class MqClientListener extends EventListener {
     private _client: MqClientDefault;
@@ -88,7 +88,7 @@ export class MqClientListener extends EventListener {
     override onError(session: Session, error: Error) {
         super.onError(session, error);
 
-        if (error instanceof SocketdAlarmException) {
+        if (error instanceof SocketDAlarmException) {
             console.warn("Client error, sessionId=" + session.sessionId(), error);
         } else {
             console.warn("Client error, sessionId=" + session.sessionId(), error);

@@ -2,13 +2,13 @@ import {ClientConfig} from "@noear/socket.d/transport/client/ClientConfig";
 import {IoConsumer} from "@noear/socket.d/transport/core/Typealias";
 import {Session} from "@noear/socket.d/transport/core/Session";
 import {Message} from "@noear/socket.d/transport/core/Message";
-import {IMqMessage, MqMessageReceived, MqMessageReceivedImpl} from "./IMqMessage";
+import {IMqMessage, MqMessage, MqMessageReceived, MqMessageReceivedImpl} from "./IMqMessage";
 import {MqClientListener} from "./MqClientListener";
 import {ClusterClientSession} from "@noear/socket.d/cluster/ClusterClientSession";
 import {SocketD} from "@noear/socket.d";
 import {MqConstants} from "../common/MqConstants";
 import {MqSubscription} from "./MqSubscription";
-import {SocketdConnectionException, SocketdException} from "@noear/socket.d/exception/SocketdException";
+import {SocketDConnectionException, SocketDException} from "@noear/socket.d/exception/SocketDException";
 import {MqUtils} from "../common/MqUtils";
 
 
@@ -64,7 +64,7 @@ export interface MqClient {
      * @param topic   主题
      * @param message 消息
      */
-    publish(topic: string, message: IMqMessage);
+    publish(topic: string, message: MqMessage);
 
     /**
      * 取消发布
@@ -116,11 +116,16 @@ export class MqClientDefault implements MqClientInternal {
     }
 
     async connect(): Promise<MqClient> {
-        this._clientSession = await SocketD.createClusterClient(this._serverUrls)
-            .config(c => c.fragmentSize(MqConstants.MAX_FRAGMENT_SIZE))
-            .config(this._clientConfigHandler)
+        this._clientSession = (await SocketD.createClusterClient(this._serverUrls)
+            .config(c => {
+                c.fragmentSize(MqConstants.MAX_FRAGMENT_SIZE);
+
+                if (this._clientConfigHandler) {
+                    this._clientConfigHandler(c);
+                }
+            })
             .listen(this._clientListener)
-            .open();
+            .open()) as ClusterClientSession;
 
         return this;
     }
@@ -189,14 +194,14 @@ export class MqClientDefault implements MqClientInternal {
         }
     }
 
-    async publish(topic: string, message: IMqMessage) {
+    async publish(topic: string, message: MqMessage) {
         if (this._clientSession == null) {
-            throw new SocketdConnectionException("Not connected!");
+            throw new SocketDConnectionException("Not connected!");
         }
 
         let session = this._clientSession.getSessionOne();
         if (session == null || session.isValid() == false) {
-            throw new SocketdException("No session is available!");
+            throw new SocketDException("No session is available!");
         }
 
         let entity = MqUtils.publishEntityBuild(topic, message);
@@ -208,7 +213,7 @@ export class MqClientDefault implements MqClientInternal {
             let confirm = parseInt(resp.metaOrDefault(MqConstants.MQ_META_CONFIRM, "0"));
             if (confirm != 1) {
                 let messsage = "Client message publish confirm failed: " + resp.dataAsString();
-                throw new SocketdException(messsage);//throw new FolkmqException(messsage);
+                throw new SocketDException(messsage);//throw new FolkmqException(messsage);
             }
         } else {
             //::Qos0
@@ -218,12 +223,12 @@ export class MqClientDefault implements MqClientInternal {
 
     async unpublish(topic: string, tid: string) {
         if (this._clientSession == null) {
-            throw new SocketdConnectionException("Not connected!");
+            throw new SocketDConnectionException("Not connected!");
         }
 
         let session = this._clientSession.getSessionOne();
         if (session == null || session.isValid() == false) {
-            throw new SocketdException("No session is available!");
+            throw new SocketDException("No session is available!");
         }
 
         let entity = SocketD.newEntity("")
@@ -237,7 +242,7 @@ export class MqClientDefault implements MqClientInternal {
         let confirm = parseInt(resp.metaOrDefault(MqConstants.MQ_META_CONFIRM, "0"));
         if (confirm != 1) {
             let messsage = "Client message unpublish confirm failed: " + resp.dataAsString();
-            throw new SocketdException(messsage);//throw new FolkmqException(messsage);
+            throw new SocketDException(messsage);//throw new FolkmqException(messsage);
         }
     }
 

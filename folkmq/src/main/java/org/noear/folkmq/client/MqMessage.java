@@ -28,6 +28,7 @@ public class MqMessage implements IMqMessage {
         return tid;
     }
 
+    @Override
     public String getContent() {
         return content;
     }

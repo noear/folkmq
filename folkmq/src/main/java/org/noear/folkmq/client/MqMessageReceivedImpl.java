@@ -22,7 +22,6 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
     private final String topic;
     private final String consumerGroup;
     private final String content;
-    private final Date scheduled;
     private final Date expiration;
     private final int qos;
     private final int times;
@@ -45,7 +44,6 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
         } else {
             this.expiration = new Date(expirationL);
         }
-        this.scheduled = null;
     }
 
     /**
@@ -66,7 +64,7 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
 
     /**
      * 消费者组
-     * */
+     */
     public String getConsumerGroup() {
         return consumerGroup;
     }
@@ -80,14 +78,6 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
     }
 
     /**
-     * 计划时间
-     */
-    @Override
-    public Date getScheduled() {
-        return scheduled;
-    }
-
-    /**
      * 质量等级（0 或 1）
      */
     @Override
@@ -97,7 +87,7 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
 
     /**
      * 过期时间
-     * */
+     */
     @Override
     public Date getExpiration() {
         return expiration;
@@ -125,6 +115,7 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
         return "MqMessageReceived{" +
                 "tid='" + tid + '\'' +
                 ", topic='" + topic + '\'' +
+                ", consumerGroup='" + consumerGroup + '\'' +
                 ", content='" + content + '\'' +
                 ", qos=" + qos +
                 ", times=" + times +

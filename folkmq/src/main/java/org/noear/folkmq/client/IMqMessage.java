@@ -20,11 +20,6 @@ public interface IMqMessage {
     String getContent();
 
     /**
-     * 计划时间
-     */
-    Date getScheduled();
-
-    /**
      * 过期时间
      * */
     Date getExpiration();

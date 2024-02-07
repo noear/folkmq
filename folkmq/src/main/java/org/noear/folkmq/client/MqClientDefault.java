@@ -87,6 +87,11 @@ public class MqClientDefault implements MqClientInternal {
 
     @Override
     public CompletableFuture<String> call(String apiName, String apiToken, String topic, String consumerGroup) throws IOException {
+        Objects.requireNonNull(apiName, "Param 'apiName' can not be null");
+        Objects.requireNonNull(apiToken, "Param 'apiToken' can not be null");
+        Objects.requireNonNull(topic, "Param 'topic' can not be null");
+        Objects.requireNonNull(consumerGroup, "Param 'consumerGroup' can not be null");
+
         if (clientSession != null) {
             Entity entity = new StringEntity("")
                     .metaPut(MqConstants.API_NAME, apiName)
@@ -116,6 +121,10 @@ public class MqClientDefault implements MqClientInternal {
      */
     @Override
     public void subscribe(String topic, String consumerGroup, MqConsumeHandler consumerHandler) throws IOException {
+        Objects.requireNonNull(topic, "Param 'topic' can not be null");
+        Objects.requireNonNull(consumerGroup, "Param 'consumerGroup' can not be null");
+        Objects.requireNonNull(consumerHandler, "Param 'consumerHandler' can not be null");
+
         MqSubscription subscription = new MqSubscription(topic, consumerGroup, consumerHandler);
 
         subscriptionMap.put(subscription.getQueueName(), subscription);
@@ -138,6 +147,9 @@ public class MqClientDefault implements MqClientInternal {
 
     @Override
     public void unsubscribe(String topic, String consumerGroup) throws IOException {
+        Objects.requireNonNull(topic, "Param 'topic' can not be null");
+        Objects.requireNonNull(consumerGroup, "Param 'consumerGroup' can not be null");
+
         String queueName = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP + consumerGroup;
         subscriptionMap.remove(queueName);
 
@@ -159,11 +171,14 @@ public class MqClientDefault implements MqClientInternal {
 
     @Override
     public void publish(String topic, MqMessage message) throws IOException {
+        Objects.requireNonNull(topic, "Param 'topic' can not be null");
+        Objects.requireNonNull(message, "Param 'message' can not be null");
+
         if (clientSession == null) {
             throw new SocketdConnectionException("Not connected!");
         }
 
-        ClientSession session = clientSession.getSessionOne(message.getSequence());
+        ClientSession session = clientSession.getSessionAny(message.getSequence() ? topic : null);
         if (session == null || session.isValid() == false) {
             throw new SocketdException("No session is available!");
         }
@@ -193,11 +208,15 @@ public class MqClientDefault implements MqClientInternal {
      */
     @Override
     public CompletableFuture<Boolean> publishAsync(String topic, MqMessage message) throws IOException {
+        Objects.requireNonNull(topic, "Param 'topic' can not be null");
+        Objects.requireNonNull(message, "Param 'message' can not be null");
+
+
         if (clientSession == null) {
             throw new SocketdConnectionException("Not connected!");
         }
 
-        ClientSession session = clientSession.getSessionOne(message.getSequence());
+        ClientSession session = clientSession.getSessionAny(message.getSequence() ? topic : null);
         if (session == null || session.isValid() == false) {
             throw new SocketdException("No session is available!");
         }
@@ -227,11 +246,15 @@ public class MqClientDefault implements MqClientInternal {
 
     @Override
     public void unpublish(String topic, String tid) throws IOException {
+        Objects.requireNonNull(topic, "Param 'topic' can not be null");
+        Objects.requireNonNull(tid, "Param 'tid' can not be null");
+
+
         if (clientSession == null) {
             throw new SocketdConnectionException("Not connected!");
         }
 
-        ClientSession session = clientSession.getSessionAny();
+        ClientSession session = clientSession.getSessionAny(null);
         if (session == null || session.isValid() == false) {
             throw new SocketdException("No session is available!");
         }
@@ -253,11 +276,15 @@ public class MqClientDefault implements MqClientInternal {
 
     @Override
     public CompletableFuture<Boolean> unpublishAsync(String topic, String tid) throws IOException {
+        Objects.requireNonNull(topic, "Param 'topic' can not be null");
+        Objects.requireNonNull(tid, "Param 'tid' can not be null");
+
+
         if (clientSession == null) {
             throw new SocketdConnectionException("Not connected!");
         }
 
-        ClientSession session = clientSession.getSessionAny();
+        ClientSession session = clientSession.getSessionAny(null);
         if (session == null || session.isValid() == false) {
             throw new SocketdException("No session is available!");
         }
@@ -300,16 +327,16 @@ public class MqClientDefault implements MqClientInternal {
         }
     }
 
-    protected MqSubscription getSubscription(String topic, String consumerGroup)  {
+    protected MqSubscription getSubscription(String topic, String consumerGroup) {
         String queueName = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP + consumerGroup;
         return subscriptionMap.get(queueName);
     }
 
-    protected Collection<MqSubscription> getSubscriptionAll(){
+    protected Collection<MqSubscription> getSubscriptionAll() {
         return subscriptionMap.values();
     }
 
-    protected int getSubscriptionSize(){
+    protected int getSubscriptionSize() {
         return subscriptionMap.size();
     }
 

@@ -31,7 +31,6 @@ public class TestCase19_sequence extends BaseTestCase {
         CountDownLatch countDownLatch = new CountDownLatch(count);
 
         client = new MqClientDefault("folkmq://127.0.0.1:" + getPort())
-                .config(c -> c.sequenceMode(true).coreThreads(1).maxThreads(1))
                 .connect();
 
         List<Integer> msgList = new ArrayList<>();

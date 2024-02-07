@@ -20,11 +20,11 @@ public class SequenceTest {
         //客户端
         MqClient client = FolkMQ.createClient("folkmq://127.0.0.1:18601?ak=ak1&sk=sk1",
                         "folkmq://127.0.0.1:18602?ak=ak1&sk=sk1")
-                .config(c->c.sequenceMode(true).coreThreads(1).maxThreads(1))
+                .config(c->c.coreThreads(1).maxThreads(1))
                 .connect();
 
         //客户端
-        int count = 10000;
+        int count = 100_000;
         CountDownLatch countDownLatch = new CountDownLatch(count);
 
 
@@ -38,7 +38,7 @@ public class SequenceTest {
             client.publishAsync("demo", new MqMessage(String.valueOf(i)).sequence(true));
         }
 
-        countDownLatch.await(10, TimeUnit.SECONDS);
+        countDownLatch.await(20, TimeUnit.SECONDS);
 
         //检验客户端
         if(countDownLatch.getCount() > 0) {

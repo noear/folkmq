@@ -46,7 +46,7 @@ public class BrokerLifecycleBean implements LifecycleBean , EventListener<AppPre
 
         brokerServerTcp = SocketD.createServer("sd:tcp")
                 .config(c -> c.port(Solon.cfg().serverPort() + 10000)
-                        .sequenceMode(true)
+                        .sequenceSend(true)
                         .ioThreads(MqBrokerConfig.ioThreads)
                         .codecThreads(MqBrokerConfig.codecThreads)
                         .exchangeThreads(MqBrokerConfig.exchangeThreads)
@@ -59,6 +59,7 @@ public class BrokerLifecycleBean implements LifecycleBean , EventListener<AppPre
             //添加 sd:ws 协议监听支持
             brokerServerWs = SocketD.createServer("sd:ws")
                     .config(c -> c.port(Solon.cfg().serverPort() + 10001)
+                            .sequenceSend(true)
                             .ioThreads(MqBrokerConfig.ioThreads)
                             .codecThreads(MqBrokerConfig.codecThreads)
                             .exchangeThreads(MqBrokerConfig.exchangeThreads)

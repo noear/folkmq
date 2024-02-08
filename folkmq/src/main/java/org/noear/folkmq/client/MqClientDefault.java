@@ -60,12 +60,13 @@ public class MqClientDefault implements MqClientInternal {
 
     @Override
     public MqClient connect() throws IOException {
+        //默认不缩小分片，方便无锁发送
         clientSession = (ClusterClientSession) SocketD.createClusterClient(serverUrls)
                 .config(c -> {
-                    c.ioThreads(1)
+                    c.nolockSend(true)
+                            .ioThreads(1)
                             .codecThreads(1)
-                            .exchangeThreads(1)
-                            .fragmentSize(MqConstants.MAX_FRAGMENT_SIZE);
+                            .exchangeThreads(1);
 
                     if (clientConfigHandler != null) {
                         clientConfigHandler.clientConfig(c);

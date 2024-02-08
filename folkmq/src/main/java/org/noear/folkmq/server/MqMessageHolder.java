@@ -40,7 +40,13 @@ public class MqMessageHolder implements Delayed {
     public MqMessageHolder(String queueName, String consumerGroup, Message from, String tid, int qos, boolean sequence, long expiration, int distributeCount, long distributeTime) {
         this.atName = from.atName();
         this.content = new EntityDefault().dataSet(from.data()).metaMapPut(from.metaMap());
-        this.content.metaPut(MqConstants.MQ_META_CONSUMER_GROUP, consumerGroup).at(queueName);
+        this.content.metaPut(MqConstants.MQ_META_CONSUMER_GROUP, consumerGroup);
+
+        if (sequence) {
+            this.content.at(queueName);
+        } else {
+            this.content.at(queueName + "!");
+        }
 
         this.isDone = new AtomicBoolean();
 

@@ -9,6 +9,7 @@
 	<a href="https://folkmq.noear.org/">https://folkmq.noear.org</a>
 </p>
 
+
 <p align="center">
     <a target="_blank" href="https://search.maven.org/artifact/org.noear/folkmq">
         <img src="https://img.shields.io/maven-central/v/org.noear/folkmq.svg?label=Maven%20Central" alt="Maven" />
@@ -49,19 +50,19 @@
 
 ## 简介
 
-* 采用 “多路复用” + "内存运行" + "快照持久化" + "Broker 集群模式"（可选）
+* 采用 “单线程” + “多路复用” + "内存运行" + "快照持久化" + "Broker 集群模式"（可选）
 * 基于 [Socket.D 网络应用协议](https://socketd.noear.org/) 开发。全新设计，自主架构！
 
 | 角色  | 功能                                                     | 
 |-----|--------------------------------------------------------|
-| 生产端 | 发布消息（Qos0、Qos1）、发布定时消息（Qos0、Qos1）                      |
+| 生产端 | 发布消息、发布定时消息、发布顺序消息、发布可过期消息。支持 Qos0、Qos1                   |
 |     |                                                        |  
 | 消费端 | 订阅、取消订阅                                                |   
 | 消费端 | 消费-ACK（自动、手动）                                          |      
 |     |                                                        |    
 | 服务端 | 发布-Confirm、订阅-Confirm、取消订阅-Confirm、派发-Retry、派发-Delayed | 
 | 服务端 | 内存运行、快照持久化（自动、停机、手动）                                   |  
-| 服务端 | 集群热扩展                                                       |
+| 服务端 | 集群热扩展                                                  |
 
 
 ## 软件使用授权

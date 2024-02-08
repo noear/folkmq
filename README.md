@@ -9,6 +9,7 @@
 	<a href="https://folkmq.noear.org/">https://folkmq.noear.org</a>
 </p>
 
+
 <p align="center">
     <a target="_blank" href="https://search.maven.org/artifact/org.noear/folkmq">
         <img src="https://img.shields.io/maven-central/v/org.noear/folkmq.svg?label=Maven%20Central" alt="Maven" />
@@ -58,7 +59,7 @@
 
 | role     | function                                                                                    | 
 |----------|---------------------------------------------------------------------------------------------|
-| Producer | Publish messages (Qos0, Qos1), publish timed messages (Qos0, Qos1)                          |     
+| Producer | Publish messages, publish timed messages, publish sequential messages, publish expireable messages. Qos0 and Qos1 are supported                          |     
 |          |                                                                                             |       
 | Consumer | Subscribe, unsubscribe                                                                      |        
 | Consumer | Consume-ACK (automatic, manual)                                                             |      

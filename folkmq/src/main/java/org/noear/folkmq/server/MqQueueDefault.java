@@ -23,7 +23,7 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
     private static final Logger log = LoggerFactory.getLogger(MqQueueDefault.class);
 
     //消息索引器
-    private final AtomicInteger indexer = new AtomicInteger();
+    private final AtomicLong indexer = new AtomicLong();
 
     //主题
     private final String topic;
@@ -101,7 +101,7 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
                 //如果超过1秒的，理解为定时消息
                 if (messageHolder.getDistributeTime() < System.currentTimeMillis() + 1_000) {
                     messageDistributeTime.set(messageHolder.getDistributeTime());
-                    indexer.set(0);
+                    indexer.set(0L);
                 }
             }
 
@@ -157,10 +157,15 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
      */
     @Override
     public void forceClear() {
-        indexer.set(0);
+        addLock.lock();
+        try {
+            indexer.set(0L);
 
-        messageMap.clear();
-        messageQueue.clear();
+            messageMap.clear();
+            messageQueue.clear();
+        } finally {
+            addLock.unlock();
+        }
     }
 
     /**
@@ -168,8 +173,6 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
      */
     @Override
     public void forceDistribute(int times, int count) {
-        indexer.set(0);
-
         if (count == 0 || count > messageTotal()) {
             count = messageTotal();
         }

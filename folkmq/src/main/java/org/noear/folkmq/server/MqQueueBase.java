@@ -122,12 +122,9 @@ public abstract class MqQueueBase implements MqQueue {
             int idx = 0;
             if (consumerSessions.size() > 1) {
                 if(messageHolder.isSequence()) {
-                    //尝试 ip_hash //不要检测有效性（如果无效，则让它出错）
-                    String ip = messageHolder.getContent().meta(EntityMetas.META_X_REAL_IP);
-                    if (StrUtils.isNotEmpty(ip)) {
-                        idx = Math.abs(ip.hashCode()) % consumerSessions.size();
-                        return consumerSessions.get(idx);
-                    }
+                    //尝试 topic_hash //不要检测有效性（如果无效，则让它出错）
+                    idx = Math.abs(getTopic().hashCode()) % consumerSessions.size();
+                    return consumerSessions.get(idx);
                 }
 
                 //使用 poll

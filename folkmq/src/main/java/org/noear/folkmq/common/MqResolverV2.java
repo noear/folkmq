@@ -122,7 +122,10 @@ public class MqResolverV2 implements MqResolver {
         //是否有序
         if (message.isSequence() || message.isTransaction()) {
             entity.at(MqConstants.BROKER_AT_SERVER_HASH);
-            entity.metaPut(MqMetasV2.MQ_META_SEQUENCE, "1");
+
+            if (message.isSequence()) {
+                entity.metaPut(MqMetasV2.MQ_META_SEQUENCE, "1");
+            }
         } else {
             entity.at(MqConstants.BROKER_AT_SERVER);
         }

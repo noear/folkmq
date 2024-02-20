@@ -11,13 +11,16 @@ import org.noear.folkmq.server.MqServerDefault;
  */
 public class FolkMQ {
     /**
-     * 获取版本代号
+     * 获取版本代号（用于控制元信息版本）
      */
-    public static int versionCode(){
-        return 1;
+    public static int versionCode() {
+        return 2;
     }
 
-    public static String versionCodeAsString(){
+    /**
+     * 获取版本代号并转为字符串
+     */
+    public static String versionCodeAsString() {
         return String.valueOf(versionCode());
     }
 

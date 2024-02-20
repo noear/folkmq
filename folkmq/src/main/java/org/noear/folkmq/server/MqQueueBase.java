@@ -1,7 +1,5 @@
 package org.noear.folkmq.server;
 
-import org.noear.folkmq.client.MqMessage;
-import org.noear.socketd.transport.core.EntityMetas;
 import org.noear.socketd.transport.core.Session;
 import org.noear.socketd.utils.StrUtils;
 
@@ -124,7 +122,7 @@ public abstract class MqQueueBase implements MqQueue {
             if (consumerSessions.size() > 1) {
                 if(messageHolder.isSequence()) {
                     //尝试 partition_hash //不要检测有效性（如果无效，则让它出错）
-                    idx = Math.abs(partition(messageHolder).hashCode()) % consumerSessions.size();
+                    idx = Math.abs(diversion(messageHolder).hashCode()) % consumerSessions.size();
                     return consumerSessions.get(idx);
                 }
 
@@ -142,7 +140,7 @@ public abstract class MqQueueBase implements MqQueue {
         }
     }
 
-    protected String partition(MqMessageHolder message) {
+    protected String diversion(MqMessageHolder message) {
         if (StrUtils.isEmpty(message.getPartition())) {
             return getTopic();
         } else {

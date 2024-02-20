@@ -200,7 +200,7 @@ public class MqClientDefault implements MqClientInternal {
             throw new SocketDConnectionException("Not connected!");
         }
 
-        ClientSession session = clientSession.getSessionAny(message.isSequence() ? partition(topic, message) : null);
+        ClientSession session = clientSession.getSessionAny(diversionOrNull(topic, message));
         if (session == null || session.isValid() == false) {
             throw new SocketDException("No session is available!");
         }
@@ -238,7 +238,7 @@ public class MqClientDefault implements MqClientInternal {
             throw new SocketDConnectionException("Not connected!");
         }
 
-        ClientSession session = clientSession.getSessionAny(message.isSequence() ? partition(topic, message) : null);
+        ClientSession session = clientSession.getSessionAny(diversionOrNull(topic, message));
         if (session == null || session.isValid() == false) {
             throw new SocketDException("No session is available!");
         }
@@ -349,14 +349,17 @@ public class MqClientDefault implements MqClientInternal {
         }
     }
 
-    protected String partition(String topic, MqMessage message) {
-        if (StrUtils.isEmpty(message.getPartition())) {
-            return topic;
+    protected String diversionOrNull(String topic, MqMessage message) {
+        if (message.isSequence()) {
+            if (StrUtils.isEmpty(message.getPartition())) {
+                return topic;
+            } else {
+                return message.getPartition();
+            }
         } else {
-            return message.getPartition();
+            return null;
         }
     }
-
 
     protected MqSubscription getSubscription(String topic, String consumerGroup) {
         String queueName = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP + consumerGroup;

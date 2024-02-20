@@ -65,6 +65,10 @@ public interface MqConstants {
      * 元信息：批量处理
      */
     String MQ_META_BATCH = "mq.batch";
+    /**
+     * 元信息：执行回滚
+     */
+    String MQ_META_ROLLBACK = "mq.rollback";
 
     /**
      * 事件：订阅

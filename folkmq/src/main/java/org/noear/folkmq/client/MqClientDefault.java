@@ -376,7 +376,7 @@ public class MqClientDefault implements MqClientInternal {
             }
 
             Entity entity = new StringEntity(String.join(",", tidAry))
-                    .metaPut("isRollback", (isRollback ? "1" : "0"));
+                    .metaPut(MqConstants.MQ_META_ROLLBACK, (isRollback ? "1" : "0"));
 
             //::Qos1
             Entity resp = session.sendAndRequest(MqConstants.MQ_EVENT_PUBLISH2, entity).await();

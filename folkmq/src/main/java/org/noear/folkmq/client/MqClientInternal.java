@@ -4,6 +4,7 @@ import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * 客户端，内部扩展接口
@@ -12,6 +13,15 @@ import java.io.IOException;
  * @since 1.0
  */
 public interface MqClientInternal extends MqClient {
+    /**
+     * 发布二次提交
+     *
+     * @param tmid       事务管理id
+     * @param tidAry     事务集合
+     * @param isRollback 是否回滚
+     */
+    void publish2(String tmid, List<String> tidAry, boolean isRollback) throws IOException;
+
     /**
      * 消费回执
      *

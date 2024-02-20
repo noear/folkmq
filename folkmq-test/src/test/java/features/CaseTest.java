@@ -115,9 +115,24 @@ public class CaseTest {
         testCase.stop();
     }
 
+
     @Test
     public void TestCase20_sequence_async() throws Exception {
         BaseTestCase testCase = new TestCase20_sequence_async(2020);
+        testCase.start();
+        testCase.stop();
+    }
+
+    @Test
+    public void TestCase21_publish_tran_commit() throws Exception {
+        BaseTestCase testCase = new TestCase21_publish_tran_commit(2021);
+        testCase.start();
+        testCase.stop();
+    }
+
+    @Test
+    public void TestCase22_publish_tran_rollback() throws Exception {
+        BaseTestCase testCase = new TestCase22_publish_tran_rollback(2022);
         testCase.start();
         testCase.stop();
     }

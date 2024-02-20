@@ -103,9 +103,9 @@ public class MqMessage implements IMqMessage {
     }
 
     /**
-     * 是否事务
+     * 是否事务（内部接口）
      */
-    public MqMessage transaction(boolean transaction) {
+    protected MqMessage internalTransaction(boolean transaction) {
         this.transaction = transaction;
         return this;
     }

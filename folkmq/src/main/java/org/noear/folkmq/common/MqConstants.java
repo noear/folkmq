@@ -78,6 +78,12 @@ public interface MqConstants {
      * 事件：发布
      */
     String MQ_EVENT_PUBLISH = "mq.event.publish";
+
+    /**
+     * 事件：发布二次提交
+     */
+    String MQ_EVENT_PUBLISH2 = "mq.event.publish2";
+
     /**
      * 事件：取消发布
      */

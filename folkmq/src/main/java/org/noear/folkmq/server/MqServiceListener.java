@@ -40,6 +40,8 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
     private Map<String, Set<String>> subscribeMap = new ConcurrentHashMap<>();
     //队列字典(queueName=>Queue)
     private Map<String, MqQueue> queueMap = new ConcurrentHashMap<>();
+    //预备消息
+    private Map<String, Message> readyMessageMap = new ConcurrentHashMap<>();
 
     //派发线程
     private Thread distributeThread;
@@ -122,11 +124,50 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
 
         //接收发布指令
         doOn(MqConstants.MQ_EVENT_PUBLISH, (s, m) -> {
-            //观察者::发布时（适配时，可选择同步或异步。同步可靠性高，异步性能好）
-            watcher.onPublish(m);
+            String tranStr = m.meta(MqConstants.MQ_META_TRANSACTION);
 
-            //执行交换
-            routingDo(m);
+            if ("1".equals(tranStr)) {
+                //预备存储
+                readyMessageMap.put(m.meta(MqConstants.MQ_META_TID), m);
+            } else {
+                //观察者::发布时（适配时，可选择同步或异步。同步可靠性高，异步性能好）
+                watcher.onPublish(m);
+
+                //执行交换
+                routingDo(m);
+            }
+
+            //再答复（以支持同步的原子性需求。同步或异步，由用户按需控制）
+            if (m.isRequest() || m.isSubscribe()) { //此判断兼容 Qos0, Qos1
+                //发送“确认”，表示服务端收到了
+                if (s.isValid()) {
+                    //如果会话仍有效，则答复（有可能会半路关掉）
+                    s.replyEnd(m, new StringEntity("").metaPut(MqConstants.MQ_META_CONFIRM, "1"));
+                }
+            }
+        });
+
+        //接收二段发布指令
+        doOn(MqConstants.MQ_EVENT_PUBLISH2, (s, m) -> {
+            String isRollback = m.meta("isRollback");
+            String[] tidAry = m.dataAsString().split(",");
+
+            if ("1".equals(isRollback)) {
+                for (String tid : tidAry) {
+                    readyMessageMap.remove(tid);
+                }
+            } else {
+                for (String tid : tidAry) {
+                    Message message = readyMessageMap.remove(tid);
+                    if (message != null) {
+                        //观察者::发布时（适配时，可选择同步或异步。同步可靠性高，异步性能好）
+                        watcher.onPublish(message);
+
+                        //执行交换
+                        routingDo(message);
+                    }
+                }
+            }
 
             //再答复（以支持同步的原子性需求。同步或异步，由用户按需控制）
             if (m.isRequest() || m.isSubscribe()) { //此判断兼容 Qos0, Qos1
@@ -466,7 +507,7 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
     /**
      * 执行路由
      */
-    public void routingDo(String queueName, Message message, String tid, int qos, boolean sequence, long expiration, String partition,int times, long scheduled) {
+    public void routingDo(String queueName, Message message, String tid, int qos, boolean sequence, long expiration, String partition, int times, long scheduled) {
         MqQueue queue = queueMap.get(queueName);
 
         if (queue != null) {

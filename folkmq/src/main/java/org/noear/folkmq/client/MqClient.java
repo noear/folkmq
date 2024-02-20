@@ -95,4 +95,15 @@ public interface MqClient extends Closeable {
      * @param tid   事务id
      */
     CompletableFuture<Boolean> unpublishAsync(String topic, String tid) throws IOException;
+
+
+    /**
+     * 开始事务
+     */
+    MqTransaction beginTransaction();
+
+    /**
+     * 清理事务
+     */
+    void clearTransaction();
 }

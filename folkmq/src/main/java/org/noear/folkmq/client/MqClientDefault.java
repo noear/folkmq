@@ -34,7 +34,8 @@ public class MqClientDefault implements MqClientInternal {
 
     //处理执行器
     protected ExecutorService handleExecutor;
-
+    //事务状态
+    private final ThreadLocal<MqTransactionImpl> tranThreadLocal = new ThreadLocal<>();
     //服务端地址
     private final List<String> serverUrls;
     //客户端会话
@@ -200,6 +201,11 @@ public class MqClientDefault implements MqClientInternal {
             throw new SocketDConnectionException("Not connected!");
         }
 
+        //事务支持
+        if (tranThreadLocal.get() != null) {
+            tranThreadLocal.get().begin(message);
+        }
+
         ClientSession session = clientSession.getSessionAny(diversionOrNull(topic, message));
         if (session == null || session.isValid() == false) {
             throw new SocketDException("No session is available!");
@@ -236,6 +242,11 @@ public class MqClientDefault implements MqClientInternal {
 
         if (clientSession == null) {
             throw new SocketDConnectionException("Not connected!");
+        }
+
+        //事务支持
+        if (tranThreadLocal.get() != null) {
+            tranThreadLocal.get().begin(message);
         }
 
         ClientSession session = clientSession.getSessionAny(diversionOrNull(topic, message));
@@ -331,6 +342,54 @@ public class MqClientDefault implements MqClientInternal {
         return future;
     }
 
+    @Override
+    public MqTransaction beginTransaction() {
+        MqTransactionImpl tmp = tranThreadLocal.get();
+        if (tmp == null) {
+            tmp = new MqTransactionImpl(this);
+            tranThreadLocal.set(tmp);
+        }
+
+        return tmp;
+    }
+
+    @Override
+    public void clearTransaction() {
+        tranThreadLocal.set(null);
+    }
+
+
+    @Override
+    public void publish2(String tmid, List<String> tidAry, boolean isRollback) throws IOException {
+        try {
+            if (tidAry == null || tidAry.size() == 0) {
+                return;
+            }
+
+            if (clientSession == null) {
+                throw new SocketDConnectionException("Not connected!");
+            }
+
+            ClientSession session = clientSession.getSessionAny(tmid);
+            if (session == null || session.isValid() == false) {
+                throw new SocketDException("No session is available!");
+            }
+
+            Entity entity = new StringEntity(String.join(",", tidAry))
+                    .metaPut("isRollback", (isRollback ? "1" : "0"));
+
+            //::Qos1
+            Entity resp = session.sendAndRequest(MqConstants.MQ_EVENT_PUBLISH2, entity).await();
+
+            int confirm = Integer.parseInt(resp.metaOrDefault(MqConstants.MQ_META_CONFIRM, "0"));
+            if (confirm != 1) {
+                String messsage = "Client message publish2 confirm failed: " + resp.dataAsString();
+                throw new FolkmqException(messsage);
+            }
+        } finally {
+            clearTransaction();
+        }
+    }
 
     /**
      * 消费回执
@@ -350,7 +409,9 @@ public class MqClientDefault implements MqClientInternal {
     }
 
     protected String diversionOrNull(String topic, MqMessage message) {
-        if (message.isSequence() || message.isTransaction()) {
+        if (message.isTransaction()) {
+            return tranThreadLocal.get().tmid();
+        } else if (message.isSequence()) {
             if (StrUtils.isEmpty(message.getPartition())) {
                 return topic;
             } else {

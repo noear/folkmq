@@ -350,7 +350,7 @@ public class MqClientDefault implements MqClientInternal {
     }
 
     protected String diversionOrNull(String topic, MqMessage message) {
-        if (message.isSequence()) {
+        if (message.isSequence() || message.isTransaction()) {
             if (StrUtils.isEmpty(message.getPartition())) {
                 return topic;
             } else {

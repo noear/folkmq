@@ -17,6 +17,7 @@ public class MqMessage implements IMqMessage {
     private Date expiration;
     private String partition;
     private boolean sequence;
+    private boolean transaction;
     private int qos = 1;
 
     public MqMessage(String content) {
@@ -63,6 +64,14 @@ public class MqMessage implements IMqMessage {
     }
 
     /**
+     * 是否事务
+     */
+    @Override
+    public boolean isTransaction() {
+        return transaction;
+    }
+
+    /**
      * 是否顺序
      */
     @Override
@@ -90,6 +99,14 @@ public class MqMessage implements IMqMessage {
      */
     public MqMessage expiration(Date expiration) {
         this.expiration = expiration;
+        return this;
+    }
+
+    /**
+     * 是否事务
+     */
+    public MqMessage transaction(boolean transaction) {
+        this.transaction = transaction;
         return this;
     }
 

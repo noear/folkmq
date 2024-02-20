@@ -24,6 +24,7 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
     private final String content;
     private final Date expiration;
     private final boolean sequence;
+    private final boolean transaction;
     private final int qos;
     private final int times;
 
@@ -40,6 +41,7 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
         this.qos = Integer.parseInt(from.metaOrDefault(MqConstants.MQ_META_QOS, "1"));
         this.times = Integer.parseInt(from.metaOrDefault(MqConstants.MQ_META_TIMES, "0"));
         this.sequence = Integer.parseInt(from.metaOrDefault(MqConstants.MQ_META_SEQUENCE, "0")) == 1;
+        this.transaction = Integer.parseInt(from.metaOrDefault(MqConstants.MQ_META_TRANSACTION, "0")) == 1;
 
 
         long expirationL = Long.parseLong(from.metaOrDefault(MqConstants.MQ_META_EXPIRATION, "0"));
@@ -95,6 +97,11 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
     @Override
     public Date getExpiration() {
         return expiration;
+    }
+
+    @Override
+    public boolean isTransaction() {
+        return false;
     }
 
     /**

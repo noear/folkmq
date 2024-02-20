@@ -25,6 +25,11 @@ public interface IMqMessage {
     Date getExpiration();
 
     /**
+     * 是否事务
+     * */
+    boolean isTransaction();
+
+    /**
      * 是否有序
      */
     boolean isSequence();

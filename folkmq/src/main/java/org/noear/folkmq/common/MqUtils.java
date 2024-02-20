@@ -28,7 +28,7 @@ public class MqUtils {
         entity.metaPut(MqConstants.MQ_META_TID, message.getTid());
         entity.metaPut(MqConstants.MQ_META_TOPIC, topic);
         entity.metaPut(MqConstants.MQ_META_QOS, (message.getQos() == 0 ? "0" : "1"));
-        if(message.getPartition() != null) {
+        if (message.getPartition() != null) {
             entity.metaPut(MqConstants.MQ_META_PARTITION, message.getPartition());
         }
 
@@ -46,8 +46,12 @@ public class MqUtils {
             entity.metaPut(MqConstants.MQ_META_EXPIRATION, String.valueOf(message.getExpiration().getTime()));
         }
 
+        if (message.isTransaction()) {
+            entity.metaPut(MqConstants.MQ_META_TRANSACTION, "1");
+        }
+
         //是否有序
-        if (message.isSequence()) {
+        if (message.isSequence() || message.isTransaction()) {
             entity.at(MqConstants.BROKER_AT_SERVER_HASH);
             entity.metaPut(MqConstants.MQ_META_SEQUENCE, "1");
         } else {

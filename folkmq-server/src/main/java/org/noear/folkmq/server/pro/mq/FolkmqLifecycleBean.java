@@ -2,7 +2,6 @@ package org.noear.folkmq.server.pro.mq;
 
 import org.noear.folkmq.FolkMQ;
 import org.noear.folkmq.common.MqConstants;
-import org.noear.folkmq.common.MqMetasV1;
 import org.noear.folkmq.server.MqServer;
 import org.noear.folkmq.server.MqServiceInternal;
 import org.noear.folkmq.server.MqServiceListener;
@@ -25,8 +24,6 @@ import org.noear.solon.annotation.Component;
 import org.noear.solon.annotation.Inject;
 import org.noear.solon.core.AppContext;
 import org.noear.solon.core.bean.LifecycleBean;
-import org.noear.solon.core.event.AppPrestopEndEvent;
-import org.noear.solon.core.event.EventListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +35,7 @@ import java.util.List;
  * @since 1.0
  */
 @Component
-public class FolkmqLifecycleBean implements LifecycleBean , EventListener<AppPrestopEndEvent> {
+public class FolkmqLifecycleBean implements LifecycleBean {
     private static final Logger log = LoggerFactory.getLogger(FolkmqLifecycleBean.class);
 
     @Inject
@@ -85,7 +82,6 @@ public class FolkmqLifecycleBean implements LifecycleBean , EventListener<AppPre
                 SocketD.version(),
                 FolkMQ.versionName());
     }
-
 
 
     private void startLocalServerMode(MqWatcherSnapshotPlus snapshotPlus) throws Exception {
@@ -199,21 +195,7 @@ public class FolkmqLifecycleBean implements LifecycleBean , EventListener<AppPre
     }
 
     @Override
-    public void stop() throws Throwable {
-        if (localServer != null) {
-            //停止时会触发快照
-            localServer.stop();
-        }
-
-        if (brokerSession != null) {
-            brokerSession.close();
-            //停止时会触发快照
-            brokerServiceListener.stop(null);
-        }
-    }
-
-    @Override
-    public void onEvent(AppPrestopEndEvent appPrestopEndEvent) throws Throwable {
+    public void prestop() throws Throwable {
         if (localServer != null) {
             for (Session s1 : localServer.getServerInternal().getSessionAll()) {
                 RunUtils.runAndTry(s1::closeStarting);
@@ -224,6 +206,20 @@ public class FolkmqLifecycleBean implements LifecycleBean , EventListener<AppPre
             for (ClientSession s1 : brokerSession.getSessionAll()) {
                 RunUtils.runAndTry(s1::closeStarting);
             }
+        }
+    }
+
+    @Override
+    public void stop() throws Throwable {
+        if (localServer != null) {
+            //停止时会触发快照
+            localServer.stop();
+        }
+
+        if (brokerSession != null) {
+            brokerSession.close();
+            //停止时会触发快照
+            brokerServiceListener.stop(null);
         }
     }
 

@@ -13,8 +13,6 @@ import org.noear.solon.annotation.Component;
 import org.noear.solon.annotation.Inject;
 import org.noear.solon.core.AppContext;
 import org.noear.solon.core.bean.LifecycleBean;
-import org.noear.solon.core.event.AppPrestopEndEvent;
-import org.noear.solon.core.event.EventListener;
 import org.noear.solon.net.websocket.socketd.ToSocketdWebSocketListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +22,7 @@ import org.slf4j.LoggerFactory;
  * @since 1.0
  */
 @Component
-public class BrokerLifecycleBean implements LifecycleBean , EventListener<AppPrestopEndEvent> {
+public class BrokerLifecycleBean implements LifecycleBean {
     private static final Logger log = LoggerFactory.getLogger(BrokerLifecycleBean.class);
 
     @Inject
@@ -78,6 +76,15 @@ public class BrokerLifecycleBean implements LifecycleBean , EventListener<AppPre
     }
 
     @Override
+    public void prestop() throws Throwable {
+        if (brokerListener != null) {
+            for (Session session : brokerListener.getSessionAll()) {
+                RunUtils.runAndTry(session::closeStarting);
+            }
+        }
+    }
+
+    @Override
     public void stop() throws Throwable {
         if (brokerListener != null) {
             for (Session session : brokerListener.getSessionAll()) {
@@ -91,15 +98,6 @@ public class BrokerLifecycleBean implements LifecycleBean , EventListener<AppPre
 
         if (brokerServerWs != null) {
             brokerServerWs.stop();
-        }
-    }
-
-    @Override
-    public void onEvent(AppPrestopEndEvent appPrestopEndEvent) throws Throwable {
-        if (brokerListener != null) {
-            for (Session session : brokerListener.getSessionAll()) {
-                RunUtils.runAndTry(session::closeStarting);
-            }
         }
     }
 }

@@ -50,8 +50,8 @@ public class FolkmqApiHandler implements MessageHandler {
         }
 
 
-        String topic = m.meta(MqMetasV1.MQ_META_TOPIC);
-        String consumerGroup = m.meta(MqMetasV1.MQ_META_CONSUMER_GROUP);
+        String topic = m.meta(MqConstants.MQ_META_TOPIC);
+        String consumerGroup = m.meta(MqConstants.MQ_META_CONSUMER_GROUP);
         String queueName = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP + consumerGroup;
 
 

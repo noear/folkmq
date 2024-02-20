@@ -16,6 +16,59 @@ import org.noear.socketd.utils.StrUtils;
  * @see 1.0
  */
 public class MqUtils {
+    public static String getTid(Message m) {
+        return m.metaOrDefault(MqMetasV1.MQ_META_TID, "");
+    }
+
+    public static String getTopic(Message m) {
+        return m.metaOrDefault(MqMetasV1.MQ_META_TOPIC, "");
+    }
+
+    public static String getConsumerGroup(Message m) {
+        return m.metaOrDefault(MqMetasV1.MQ_META_CONSUMER_GROUP, "");
+    }
+
+    public static void setConsumerGroup(Entity m, String consumerGroup){
+        m.putMeta(MqMetasV1.MQ_META_CONSUMER_GROUP, consumerGroup);
+    }
+
+    public static int getQos(Message m) {
+        return "0".equals(m.meta(MqMetasV1.MQ_META_QOS)) ? 0 : 1;
+    }
+
+    public static int getTimes(Message m) {
+        return Integer.parseInt(m.metaOrDefault(MqMetasV1.MQ_META_TIMES, "0"));
+    }
+
+    public static void setTimes(Entity m, int times){
+        m.putMeta(MqMetasV1.MQ_META_TIMES, String.valueOf(times));
+    }
+
+    public static long getExpiration(Message m) {
+        return Long.parseLong(m.metaOrDefault(MqMetasV1.MQ_META_EXPIRATION, "0"));
+    }
+
+    public static String getPartition(Message m){
+        return m.meta(MqMetasV2.MQ_META_PARTITION);
+    }
+
+    public static long getScheduled(Message m) {
+        return Long.parseLong(m.metaOrDefault(MqMetasV1.MQ_META_SCHEDULED, "0"));
+    }
+
+    public static void setScheduled(Entity m, long scheduled){
+        m.putMeta(MqMetasV1.MQ_META_SCHEDULED, String.valueOf(scheduled));
+    }
+
+    public static boolean isSequence(Message m) {
+        return Integer.parseInt(m.metaOrDefault(MqMetasV1.MQ_META_SEQUENCE, "0")) == 1;
+    }
+
+    public static boolean isTransaction(Message m) {
+        return "1".equals(m.meta(MqMetasV2.MQ_META_TRANSACTION));
+    }
+
+
     /**
      * 发布实体构建
      *
@@ -29,7 +82,7 @@ public class MqUtils {
         entity.metaPut(MqMetasV1.MQ_META_TOPIC, topic);
         entity.metaPut(MqMetasV1.MQ_META_QOS, (message.getQos() == 0 ? "0" : "1"));
         if (message.getPartition() != null) {
-            entity.metaPut(MqMetasV1.MQ_META_PARTITION, message.getPartition());
+            entity.metaPut(MqMetasV2.MQ_META_PARTITION, message.getPartition());
         }
 
         //定时派发
@@ -47,7 +100,7 @@ public class MqUtils {
         }
 
         if (message.isTransaction()) {
-            entity.metaPut(MqMetasV1.MQ_META_TRANSACTION, "1");
+            entity.metaPut(MqMetasV2.MQ_META_TRANSACTION, "1");
         }
 
         //是否有序

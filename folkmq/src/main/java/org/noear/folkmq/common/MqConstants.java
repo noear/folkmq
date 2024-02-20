@@ -13,6 +13,20 @@ public interface MqConstants {
     String FOLKMQ_VERSION = "folkmq-version";
 
     /**
+     * 元信息：消息事务Id
+     */
+    String MQ_META_TID = "mq.tid";
+
+    /**
+     * 元信息：消息主题
+     */
+    String MQ_META_TOPIC = "mq.topic";
+    /**
+     * 元信息：消费者组
+     */
+    String MQ_META_CONSUMER_GROUP = "mq.consumer"; //此处不改动，算历史痕迹。保持向下兼容
+
+    /**
      * 元信息：消费回执
      */
     String MQ_META_ACK = "mq.ack";

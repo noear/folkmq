@@ -2,6 +2,7 @@ package org.noear.folkmq.server;
 
 import org.noear.folkmq.common.MqConstants;
 import org.noear.folkmq.common.MqMetasV1;
+import org.noear.folkmq.common.MqUtils;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
 import org.noear.socketd.transport.core.listener.EventListener;
@@ -144,7 +145,7 @@ public abstract class MqServiceListenerBase extends EventListener implements MqS
      */
     @Override
     public void routingDo(Message message) {
-        String tid = message.meta(MqMetasV1.MQ_META_TID);
+        String tid = MqUtils.getTid(message);
         //可能是非法消息
         if (StrUtils.isEmpty(tid)) {
             log.warn("The tid cannot be null, sid={}", message.sid());
@@ -152,13 +153,13 @@ public abstract class MqServiceListenerBase extends EventListener implements MqS
         }
 
         //复用解析
-        String topic = message.meta(MqMetasV1.MQ_META_TOPIC);
-        int qos = "0".equals(message.meta(MqMetasV1.MQ_META_QOS)) ? 0 : 1;
-        int times = Integer.parseInt(message.metaOrDefault(MqMetasV1.MQ_META_TIMES, "0"));
-        long expiration = Long.parseLong(message.metaOrDefault(MqMetasV1.MQ_META_EXPIRATION, "0"));
-        String partition = message.meta(MqMetasV1.MQ_META_PARTITION);
-        long scheduled = Long.parseLong(message.metaOrDefault(MqMetasV1.MQ_META_SCHEDULED, "0"));
-        boolean sequence = Integer.parseInt(message.metaOrDefault(MqMetasV1.MQ_META_SEQUENCE, "0")) == 1;
+        String topic = MqUtils.getTopic(message);
+        int qos = MqUtils.getQos(message);
+        int times = MqUtils.getTimes(message);
+        long expiration = MqUtils.getExpiration(message);
+        String partition = MqUtils.getPartition(message);
+        long scheduled = MqUtils.getScheduled(message);
+        boolean sequence = MqUtils.isSequence(message);
 
         if (scheduled == 0) {
             //默认为当前ms（相对于后面者，有个排序作用）
@@ -195,7 +196,7 @@ public abstract class MqServiceListenerBase extends EventListener implements MqS
      * 执行取消路由
      */
     public void unRoutingDo(Message message) {
-        String tid = message.meta(MqMetasV1.MQ_META_TID);
+        String tid = message.meta(MqConstants.MQ_META_TID);
         //可能是非法消息
         if (StrUtils.isEmpty(tid)) {
             log.warn("The tid cannot be null, sid={}", message.sid());
@@ -203,7 +204,7 @@ public abstract class MqServiceListenerBase extends EventListener implements MqS
         }
 
         //复用解析
-        String topic = message.meta(MqMetasV1.MQ_META_TOPIC);
+        String topic = message.meta(MqConstants.MQ_META_TOPIC);
 
         //取出所有订阅的主题消费者
         Set<String> topicConsumerSet = subscribeMap.get(topic);

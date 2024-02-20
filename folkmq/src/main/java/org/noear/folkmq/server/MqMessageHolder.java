@@ -1,7 +1,6 @@
 package org.noear.folkmq.server;
 
-import org.noear.folkmq.common.MqConstants;
-import org.noear.folkmq.common.MqMetasV1;
+import org.noear.folkmq.common.MqUtils;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.entity.EntityDefault;
 
@@ -43,7 +42,8 @@ public class MqMessageHolder implements Delayed {
     public MqMessageHolder(String queueName, String consumerGroup, Message from, String tid, int qos, boolean sequence, long expiration, String partition, int distributeCount, long distributeTime) {
         this.atName = from.atName();
         this.content = new EntityDefault().dataSet(from.data()).metaMapPut(from.metaMap());
-        this.content.metaPut(MqMetasV1.MQ_META_CONSUMER_GROUP, consumerGroup);
+
+        MqUtils.setConsumerGroup(content, consumerGroup);
 
         if (sequence) {
             this.content.at(queueName);
@@ -99,7 +99,7 @@ public class MqMessageHolder implements Delayed {
 
     /**
      * 哈希分区
-     * */
+     */
     public String getPartition() {
         return partition;
     }
@@ -156,8 +156,8 @@ public class MqMessageHolder implements Delayed {
         distributeTime = MqNextTime.getNextTime(this);
 
         //设置新的派发次数和下次时间
-        content.metaPut(MqMetasV1.MQ_META_TIMES, String.valueOf(distributeCount));
-        content.metaPut(MqMetasV1.MQ_META_SCHEDULED, String.valueOf(distributeTime));
+        MqUtils.setTimes(content, distributeCount);
+        MqUtils.setScheduled(content, distributeTime);
 
         return this;
     }

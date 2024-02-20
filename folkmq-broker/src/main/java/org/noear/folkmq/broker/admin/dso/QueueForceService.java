@@ -67,8 +67,8 @@ public class QueueForceService {
 
                 List<Session> serverList = new ArrayList<>(tmp);
                 Entity entity = new StringEntity("")
-                        .metaPut(MqMetasV1.MQ_META_TOPIC, topic)
-                        .metaPut(MqMetasV1.MQ_META_CONSUMER_GROUP, consumerGroup);
+                        .metaPut(MqConstants.MQ_META_TOPIC, topic)
+                        .metaPut(MqConstants.MQ_META_CONSUMER_GROUP, consumerGroup);
 
                 for (Session s1 : serverList) {
                     s1.send(MqConstants.ADMIN_QUEUE_FORCE_DISTRIBUTE, entity);
@@ -113,8 +113,8 @@ public class QueueForceService {
                 Collection<Session> tmp = brokerListener.getPlayerAll(MqConstants.BROKER_AT_SERVER);
                 List<Session> serverList = new ArrayList<>(tmp);
                 Entity entity = new StringEntity("")
-                        .metaPut(MqMetasV1.MQ_META_TOPIC, topic)
-                        .metaPut(MqMetasV1.MQ_META_CONSUMER_GROUP, consumerGroup);
+                        .metaPut(MqConstants.MQ_META_TOPIC, topic)
+                        .metaPut(MqConstants.MQ_META_CONSUMER_GROUP, consumerGroup);
 
                 for (Session s1 : serverList) {
                     s1.send(MqConstants.ADMIN_QUEUE_FORCE_DELETE, entity);
@@ -159,8 +159,8 @@ public class QueueForceService {
                 Collection<Session> tmp = brokerListener.getPlayerAll(MqConstants.BROKER_AT_SERVER);
                 List<Session> serverList = new ArrayList<>(tmp);
                 Entity entity = new StringEntity("")
-                        .metaPut(MqMetasV1.MQ_META_TOPIC, topic)
-                        .metaPut(MqMetasV1.MQ_META_CONSUMER_GROUP, consumerGroup);
+                        .metaPut(MqConstants.MQ_META_TOPIC, topic)
+                        .metaPut(MqConstants.MQ_META_CONSUMER_GROUP, consumerGroup);
 
                 for (Session s1 : serverList) {
                     s1.send(MqConstants.ADMIN_QUEUE_FORCE_CLEAR, entity);

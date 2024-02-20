@@ -2,6 +2,8 @@ package org.noear.folkmq.server.pro;
 
 import org.noear.folkmq.common.MqConstants;
 import org.noear.folkmq.common.MqMetasV1;
+import org.noear.folkmq.common.MqMetasV2;
+import org.noear.folkmq.common.MqUtils;
 import org.noear.folkmq.server.*;
 import org.noear.folkmq.server.pro.utils.IoUtils;
 import org.noear.snack.ONode;
@@ -242,13 +244,13 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
                             .build();
 
 
-                    String tid = message.meta(MqMetasV1.MQ_META_TID);
-                    int qos = "0".equals(message.meta(MqMetasV1.MQ_META_QOS)) ? 0 : 1;
-                    int times = Integer.parseInt(message.metaOrDefault(MqMetasV1.MQ_META_TIMES, "0"));
-                    long expiration = Long.parseLong(message.metaOrDefault(MqMetasV1.MQ_META_EXPIRATION, "0"));
-                    String partition = message.meta(MqMetasV1.MQ_META_PARTITION);
-                    long scheduled = Long.parseLong(message.metaOrDefault(MqMetasV1.MQ_META_SCHEDULED, "0"));
-                    boolean sequence = Integer.parseInt(message.metaOrDefault(MqMetasV1.MQ_META_SEQUENCE, "0")) == 1;
+                    String tid = MqUtils.getTid(message);
+                    int qos = MqUtils.getQos(message);
+                    int times = MqUtils.getTimes(message);
+                    long expiration = MqUtils.getExpiration(message);
+                    String partition = MqUtils.getPartition(message);
+                    long scheduled = MqUtils.getScheduled(message);
+                    boolean sequence = MqUtils.isSequence(message);
 
 
                     if (scheduled == 0) {

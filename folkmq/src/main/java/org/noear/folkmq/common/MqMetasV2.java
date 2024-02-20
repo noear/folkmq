@@ -11,6 +11,11 @@ public interface MqMetasV2 {
      * 元信息：消息事务Id
      */
     String MQ_META_TID = "t0";
+    /**
+     * 元信息：消息元信息版本id
+     */
+    String MQ_META_VID = "v0";
+
 
     /**
      * 元信息：消息主题

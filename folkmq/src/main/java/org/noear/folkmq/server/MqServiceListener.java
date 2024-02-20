@@ -71,7 +71,9 @@ public class MqServiceListener extends MqServiceListenerBase implements MqServic
             } else {
                 for (String tid : tidAry) {
                     Message m2 = readyMessageMap.remove(tid);
-                    onPublish(s, m2, MqUtils.getOf(m2));
+                    if (m2 != null) {
+                        onPublish(s, m2, MqUtils.getOf(m2));
+                    }
                 }
             }
 

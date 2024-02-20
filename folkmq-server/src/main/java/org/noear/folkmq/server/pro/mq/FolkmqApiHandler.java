@@ -2,12 +2,12 @@ package org.noear.folkmq.server.pro.mq;
 
 import org.noear.folkmq.common.MqApis;
 import org.noear.folkmq.common.MqConstants;
+import org.noear.folkmq.common.MqMetasV1;
 import org.noear.folkmq.server.MqServiceListener;
 import org.noear.folkmq.server.pro.common.MetricsConfig;
 import org.noear.folkmq.server.pro.admin.dso.QueueForceService;
 import org.noear.folkmq.server.pro.admin.dso.ViewUtils;
 import org.noear.folkmq.server.pro.admin.model.QueueVo;
-import org.noear.folkmq.server.pro.common.ConfigNames;
 import org.noear.folkmq.server.pro.common.MqServerConfig;
 import org.noear.snack.ONode;
 import org.noear.socketd.transport.core.Message;
@@ -50,8 +50,8 @@ public class FolkmqApiHandler implements MessageHandler {
         }
 
 
-        String topic = m.meta(MqConstants.MQ_META_TOPIC);
-        String consumerGroup = m.meta(MqConstants.MQ_META_CONSUMER_GROUP);
+        String topic = m.meta(MqMetasV1.MQ_META_TOPIC);
+        String consumerGroup = m.meta(MqMetasV1.MQ_META_CONSUMER_GROUP);
         String queueName = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP + consumerGroup;
 
 

@@ -2,6 +2,7 @@ package org.noear.folkmq.server;
 
 import org.noear.folkmq.FolkMQ;
 import org.noear.folkmq.common.MqConstants;
+import org.noear.folkmq.common.MqMetasV1;
 import org.noear.snack.ONode;
 import org.noear.socketd.exception.SocketDAlarmException;
 import org.noear.socketd.transport.core.Message;
@@ -45,10 +46,10 @@ public class MqServiceListener extends MqServiceListenerBase implements MqServic
 
         doOn(MqConstants.MQ_EVENT_PUBLISH, (s, m) -> {
             //接收发布指令
-            String tranStr = m.meta(MqConstants.MQ_META_TRANSACTION);
+            String tranStr = m.meta(MqMetasV1.MQ_META_TRANSACTION);
             if ("1".equals(tranStr)) {
                 //预备存储
-                readyMessageMap.put(m.meta(MqConstants.MQ_META_TID), m);
+                readyMessageMap.put(m.meta(MqMetasV1.MQ_META_TID), m);
             } else {
                 onPublish(s, m);
             }
@@ -275,8 +276,8 @@ public class MqServiceListener extends MqServiceListenerBase implements MqServic
                 }
             }
         } else {
-            String topic = m.meta(MqConstants.MQ_META_TOPIC);
-            String consumerGroup = m.meta(MqConstants.MQ_META_CONSUMER_GROUP);
+            String topic = m.meta(MqMetasV1.MQ_META_TOPIC);
+            String consumerGroup = m.meta(MqMetasV1.MQ_META_CONSUMER_GROUP);
 
             //观察者::订阅时（适配时，可选择同步或异步。同步可靠性高，异步性能好）
             watcher.onSubscribe(topic, consumerGroup, s);
@@ -287,8 +288,8 @@ public class MqServiceListener extends MqServiceListenerBase implements MqServic
     }
 
     private void onUnsubscribe(Session s, Message m) throws IOException {
-        String topic = m.meta(MqConstants.MQ_META_TOPIC);
-        String consumerGroup = m.meta(MqConstants.MQ_META_CONSUMER_GROUP);
+        String topic = m.meta(MqMetasV1.MQ_META_TOPIC);
+        String consumerGroup = m.meta(MqMetasV1.MQ_META_CONSUMER_GROUP);
 
         //观察者::取消订阅时（适配时，可选择同步或异步。同步可靠性高，异步性能好）
         watcher.onUnSubscribe(topic, consumerGroup, s);

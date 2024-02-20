@@ -1,6 +1,7 @@
 package org.noear.folkmq.client;
 
 import org.noear.folkmq.common.MqConstants;
+import org.noear.folkmq.common.MqMetasV1;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
 
@@ -33,18 +34,18 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
         this.session = session;
         this.from = from;
 
-        this.tid = from.metaOrDefault(MqConstants.MQ_META_TID, "");
-        this.topic = from.metaOrDefault(MqConstants.MQ_META_TOPIC, "");
-        this.consumerGroup = from.metaOrDefault(MqConstants.MQ_META_CONSUMER_GROUP, "");
+        this.tid = from.metaOrDefault(MqMetasV1.MQ_META_TID, "");
+        this.topic = from.metaOrDefault(MqMetasV1.MQ_META_TOPIC, "");
+        this.consumerGroup = from.metaOrDefault(MqMetasV1.MQ_META_CONSUMER_GROUP, "");
         this.content = from.dataAsString();
 
-        this.qos = Integer.parseInt(from.metaOrDefault(MqConstants.MQ_META_QOS, "1"));
-        this.times = Integer.parseInt(from.metaOrDefault(MqConstants.MQ_META_TIMES, "0"));
-        this.sequence = Integer.parseInt(from.metaOrDefault(MqConstants.MQ_META_SEQUENCE, "0")) == 1;
-        this.transaction = Integer.parseInt(from.metaOrDefault(MqConstants.MQ_META_TRANSACTION, "0")) == 1;
+        this.qos = Integer.parseInt(from.metaOrDefault(MqMetasV1.MQ_META_QOS, "1"));
+        this.times = Integer.parseInt(from.metaOrDefault(MqMetasV1.MQ_META_TIMES, "0"));
+        this.sequence = Integer.parseInt(from.metaOrDefault(MqMetasV1.MQ_META_SEQUENCE, "0")) == 1;
+        this.transaction = Integer.parseInt(from.metaOrDefault(MqMetasV1.MQ_META_TRANSACTION, "0")) == 1;
 
 
-        long expirationL = Long.parseLong(from.metaOrDefault(MqConstants.MQ_META_EXPIRATION, "0"));
+        long expirationL = Long.parseLong(from.metaOrDefault(MqMetasV1.MQ_META_EXPIRATION, "0"));
         if (expirationL == 0) {
             this.expiration = null;
         } else {

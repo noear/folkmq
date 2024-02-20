@@ -6,6 +6,7 @@ import org.noear.folkmq.broker.admin.model.QueueVo;
 import org.noear.folkmq.broker.common.MqBrokerConfig;
 import org.noear.folkmq.common.MqApis;
 import org.noear.folkmq.common.MqConstants;
+import org.noear.folkmq.common.MqMetasV1;
 import org.noear.snack.ONode;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
@@ -46,8 +47,8 @@ public class BrokerApiHandler implements MessageHandler {
         }
 
 
-        String topic = m.meta(MqConstants.MQ_META_TOPIC);
-        String consumerGroup = m.meta(MqConstants.MQ_META_CONSUMER_GROUP);
+        String topic = m.meta(MqMetasV1.MQ_META_TOPIC);
+        String consumerGroup = m.meta(MqMetasV1.MQ_META_CONSUMER_GROUP);
         String queueName = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP + consumerGroup;
 
 

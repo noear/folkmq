@@ -25,35 +25,35 @@ public class MqUtils {
     public static StringEntity publishEntityBuild(String topic, MqMessage message) {
         //构建消息实体
         StringEntity entity = new StringEntity(message.getContent());
-        entity.metaPut(MqConstants.MQ_META_TID, message.getTid());
-        entity.metaPut(MqConstants.MQ_META_TOPIC, topic);
-        entity.metaPut(MqConstants.MQ_META_QOS, (message.getQos() == 0 ? "0" : "1"));
+        entity.metaPut(MqMetasV1.MQ_META_TID, message.getTid());
+        entity.metaPut(MqMetasV1.MQ_META_TOPIC, topic);
+        entity.metaPut(MqMetasV1.MQ_META_QOS, (message.getQos() == 0 ? "0" : "1"));
         if (message.getPartition() != null) {
-            entity.metaPut(MqConstants.MQ_META_PARTITION, message.getPartition());
+            entity.metaPut(MqMetasV1.MQ_META_PARTITION, message.getPartition());
         }
 
         //定时派发
         if (message.getScheduled() == null) {
-            entity.metaPut(MqConstants.MQ_META_SCHEDULED, "0");
+            entity.metaPut(MqMetasV1.MQ_META_SCHEDULED, "0");
         } else {
-            entity.metaPut(MqConstants.MQ_META_SCHEDULED, String.valueOf(message.getScheduled().getTime()));
+            entity.metaPut(MqMetasV1.MQ_META_SCHEDULED, String.valueOf(message.getScheduled().getTime()));
         }
 
         //过期时间
         if (message.getExpiration() == null) {
-            entity.metaPut(MqConstants.MQ_META_EXPIRATION, "0");
+            entity.metaPut(MqMetasV1.MQ_META_EXPIRATION, "0");
         } else {
-            entity.metaPut(MqConstants.MQ_META_EXPIRATION, String.valueOf(message.getExpiration().getTime()));
+            entity.metaPut(MqMetasV1.MQ_META_EXPIRATION, String.valueOf(message.getExpiration().getTime()));
         }
 
         if (message.isTransaction()) {
-            entity.metaPut(MqConstants.MQ_META_TRANSACTION, "1");
+            entity.metaPut(MqMetasV1.MQ_META_TRANSACTION, "1");
         }
 
         //是否有序
         if (message.isSequence() || message.isTransaction()) {
             entity.at(MqConstants.BROKER_AT_SERVER_HASH);
-            entity.metaPut(MqConstants.MQ_META_SEQUENCE, "1");
+            entity.metaPut(MqMetasV1.MQ_META_SEQUENCE, "1");
         } else {
             entity.at(MqConstants.BROKER_AT_SERVER);
         }

@@ -3,6 +3,7 @@ package org.noear.folkmq.broker.mq;
 import org.noear.folkmq.FolkMQ;
 import org.noear.folkmq.client.MqMessage;
 import org.noear.folkmq.common.MqConstants;
+import org.noear.folkmq.common.MqMetasV1;
 import org.noear.folkmq.common.MqUtils;
 import org.noear.snack.ONode;
 import org.noear.socketd.broker.BrokerListener;
@@ -123,8 +124,8 @@ public class BrokerListenerFolkmq extends BrokerListener {
             onSubscribe(requester, message);
         } else if (MqConstants.MQ_EVENT_UNSUBSCRIBE.equals(message.event())) {
             //取消订阅，注销玩家
-            String topic = message.meta(MqConstants.MQ_META_TOPIC);
-            String consumerGroup = message.meta(MqConstants.MQ_META_CONSUMER_GROUP);
+            String topic = message.meta(MqMetasV1.MQ_META_TOPIC);
+            String consumerGroup = message.meta(MqMetasV1.MQ_META_CONSUMER_GROUP);
             String queueName = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP + consumerGroup;
 
             removePlayer(queueName, requester);
@@ -196,8 +197,8 @@ public class BrokerListenerFolkmq extends BrokerListener {
             }
         } else {
             //订阅，注册玩家
-            String topic = message.meta(MqConstants.MQ_META_TOPIC);
-            String consumerGroup = message.meta(MqConstants.MQ_META_CONSUMER_GROUP);
+            String topic = message.meta(MqMetasV1.MQ_META_TOPIC);
+            String consumerGroup = message.meta(MqMetasV1.MQ_META_CONSUMER_GROUP);
             String queueName = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP + consumerGroup;
 
 

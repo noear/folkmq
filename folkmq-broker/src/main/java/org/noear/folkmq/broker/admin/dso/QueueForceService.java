@@ -3,6 +3,7 @@ package org.noear.folkmq.broker.admin.dso;
 import org.noear.folkmq.broker.admin.model.QueueVo;
 import org.noear.folkmq.broker.mq.BrokerListenerFolkmq;
 import org.noear.folkmq.common.MqConstants;
+import org.noear.folkmq.common.MqMetasV1;
 import org.noear.socketd.transport.core.Entity;
 import org.noear.socketd.transport.core.Session;
 import org.noear.socketd.transport.core.entity.StringEntity;
@@ -66,8 +67,8 @@ public class QueueForceService {
 
                 List<Session> serverList = new ArrayList<>(tmp);
                 Entity entity = new StringEntity("")
-                        .metaPut(MqConstants.MQ_META_TOPIC, topic)
-                        .metaPut(MqConstants.MQ_META_CONSUMER_GROUP, consumerGroup);
+                        .metaPut(MqMetasV1.MQ_META_TOPIC, topic)
+                        .metaPut(MqMetasV1.MQ_META_CONSUMER_GROUP, consumerGroup);
 
                 for (Session s1 : serverList) {
                     s1.send(MqConstants.ADMIN_QUEUE_FORCE_DISTRIBUTE, entity);
@@ -112,8 +113,8 @@ public class QueueForceService {
                 Collection<Session> tmp = brokerListener.getPlayerAll(MqConstants.BROKER_AT_SERVER);
                 List<Session> serverList = new ArrayList<>(tmp);
                 Entity entity = new StringEntity("")
-                        .metaPut(MqConstants.MQ_META_TOPIC, topic)
-                        .metaPut(MqConstants.MQ_META_CONSUMER_GROUP, consumerGroup);
+                        .metaPut(MqMetasV1.MQ_META_TOPIC, topic)
+                        .metaPut(MqMetasV1.MQ_META_CONSUMER_GROUP, consumerGroup);
 
                 for (Session s1 : serverList) {
                     s1.send(MqConstants.ADMIN_QUEUE_FORCE_DELETE, entity);
@@ -158,8 +159,8 @@ public class QueueForceService {
                 Collection<Session> tmp = brokerListener.getPlayerAll(MqConstants.BROKER_AT_SERVER);
                 List<Session> serverList = new ArrayList<>(tmp);
                 Entity entity = new StringEntity("")
-                        .metaPut(MqConstants.MQ_META_TOPIC, topic)
-                        .metaPut(MqConstants.MQ_META_CONSUMER_GROUP, consumerGroup);
+                        .metaPut(MqMetasV1.MQ_META_TOPIC, topic)
+                        .metaPut(MqMetasV1.MQ_META_CONSUMER_GROUP, consumerGroup);
 
                 for (Session s1 : serverList) {
                     s1.send(MqConstants.ADMIN_QUEUE_FORCE_CLEAR, entity);

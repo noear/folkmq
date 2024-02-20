@@ -2,6 +2,7 @@ package org.noear.folkmq.client;
 
 import org.noear.folkmq.FolkMQ;
 import org.noear.folkmq.common.MqConstants;
+import org.noear.folkmq.common.MqMetasV1;
 import org.noear.folkmq.common.MqUtils;
 import org.noear.folkmq.exception.FolkmqException;
 import org.noear.socketd.SocketD;
@@ -119,8 +120,8 @@ public class MqClientDefault implements MqClientInternal {
             Entity entity = new StringEntity("")
                     .metaPut(MqConstants.API_NAME, apiName)
                     .metaPut(MqConstants.API_TOKEN, apiToken)
-                    .metaPut(MqConstants.MQ_META_TOPIC, topic)
-                    .metaPut(MqConstants.MQ_META_CONSUMER_GROUP, consumerGroup);
+                    .metaPut(MqMetasV1.MQ_META_TOPIC, topic)
+                    .metaPut(MqMetasV1.MQ_META_CONSUMER_GROUP, consumerGroup);
 
             CompletableFuture<String> completableFuture = new CompletableFuture<>();
             clientSession.sendAndRequest(MqConstants.MQ_API, entity).thenReply(r -> {
@@ -156,8 +157,8 @@ public class MqClientDefault implements MqClientInternal {
             for (ClientSession session : clientSession.getSessionAll()) {
                 //如果有连接会话，则执行订阅
                 Entity entity = new StringEntity("")
-                        .metaPut(MqConstants.MQ_META_TOPIC, subscription.getTopic())
-                        .metaPut(MqConstants.MQ_META_CONSUMER_GROUP, subscription.getConsumerGroup())
+                        .metaPut(MqMetasV1.MQ_META_TOPIC, subscription.getTopic())
+                        .metaPut(MqMetasV1.MQ_META_CONSUMER_GROUP, subscription.getConsumerGroup())
                         .at(MqConstants.BROKER_AT_SERVER_ALL);
 
                 //使用 Qos1
@@ -180,8 +181,8 @@ public class MqClientDefault implements MqClientInternal {
             for (ClientSession session : clientSession.getSessionAll()) {
                 //如果有连接会话
                 Entity entity = new StringEntity("")
-                        .metaPut(MqConstants.MQ_META_TOPIC, topic)
-                        .metaPut(MqConstants.MQ_META_CONSUMER_GROUP, consumerGroup)
+                        .metaPut(MqMetasV1.MQ_META_TOPIC, topic)
+                        .metaPut(MqMetasV1.MQ_META_CONSUMER_GROUP, consumerGroup)
                         .at(MqConstants.BROKER_AT_SERVER_ALL);
 
                 //使用 Qos1
@@ -293,8 +294,8 @@ public class MqClientDefault implements MqClientInternal {
         }
 
         Entity entity = new StringEntity("")
-                .metaPut(MqConstants.MQ_META_TOPIC, topic)
-                .metaPut(MqConstants.MQ_META_TID, tid)
+                .metaPut(MqMetasV1.MQ_META_TOPIC, topic)
+                .metaPut(MqMetasV1.MQ_META_TID, tid)
                 .at(MqConstants.BROKER_AT_SERVER_ALL);
 
         //::Qos1
@@ -324,8 +325,8 @@ public class MqClientDefault implements MqClientInternal {
 
         CompletableFuture<Boolean> future = new CompletableFuture<>();
         Entity entity = new StringEntity("")
-                .metaPut(MqConstants.MQ_META_TOPIC, topic)
-                .metaPut(MqConstants.MQ_META_TID, tid)
+                .metaPut(MqMetasV1.MQ_META_TOPIC, topic)
+                .metaPut(MqMetasV1.MQ_META_TID, tid)
                 .at(MqConstants.BROKER_AT_SERVER_ALL);
 
         //::Qos1

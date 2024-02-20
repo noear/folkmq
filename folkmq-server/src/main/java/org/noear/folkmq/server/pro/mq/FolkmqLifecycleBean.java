@@ -2,6 +2,7 @@ package org.noear.folkmq.server.pro.mq;
 
 import org.noear.folkmq.FolkMQ;
 import org.noear.folkmq.common.MqConstants;
+import org.noear.folkmq.common.MqMetasV1;
 import org.noear.folkmq.server.MqServer;
 import org.noear.folkmq.server.MqServiceInternal;
 import org.noear.folkmq.server.MqServiceListener;
@@ -123,24 +124,24 @@ public class FolkmqLifecycleBean implements LifecycleBean , EventListener<AppPre
 
         //允许控制台强制派发
         brokerServiceListener.doOn(MqConstants.ADMIN_QUEUE_FORCE_DISTRIBUTE, (s, m) -> {
-            String topic = m.meta(MqConstants.MQ_META_TOPIC);
-            String consumerGroup = m.meta(MqConstants.MQ_META_CONSUMER_GROUP);
+            String topic = m.meta(MqMetasV1.MQ_META_TOPIC);
+            String consumerGroup = m.meta(MqMetasV1.MQ_META_CONSUMER_GROUP);
 
             queueForceService.forceDistribute(brokerServiceListener, topic, consumerGroup, false);
         });
 
         //允许控制台强制删除
         brokerServiceListener.doOn(MqConstants.ADMIN_QUEUE_FORCE_DELETE, (s, m) -> {
-            String topic = m.meta(MqConstants.MQ_META_TOPIC);
-            String consumerGroup = m.meta(MqConstants.MQ_META_CONSUMER_GROUP);
+            String topic = m.meta(MqMetasV1.MQ_META_TOPIC);
+            String consumerGroup = m.meta(MqMetasV1.MQ_META_CONSUMER_GROUP);
 
             queueForceService.forceDelete(brokerServiceListener, topic, consumerGroup, false);
         });
 
         //允许控制台强制清空
         brokerServiceListener.doOn(MqConstants.ADMIN_QUEUE_FORCE_CLEAR, (s, m) -> {
-            String topic = m.meta(MqConstants.MQ_META_TOPIC);
-            String consumerGroup = m.meta(MqConstants.MQ_META_CONSUMER_GROUP);
+            String topic = m.meta(MqMetasV1.MQ_META_TOPIC);
+            String consumerGroup = m.meta(MqMetasV1.MQ_META_CONSUMER_GROUP);
 
             queueForceService.forceClear(brokerServiceListener, topic, consumerGroup, false);
         });

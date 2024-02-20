@@ -1,10 +1,7 @@
 package org.noear.folkmq.broker.mq;
 
 import org.noear.folkmq.FolkMQ;
-import org.noear.folkmq.client.MqMessage;
 import org.noear.folkmq.common.MqConstants;
-import org.noear.folkmq.common.MqMetasV1;
-import org.noear.folkmq.common.MqUtils;
 import org.noear.snack.ONode;
 import org.noear.socketd.broker.BrokerListener;
 import org.noear.socketd.transport.core.Entity;
@@ -219,12 +216,11 @@ public class BrokerListenerFolkmq extends BrokerListener {
         }
     }
 
-    public boolean publishDo(String topic, MqMessage message) throws IOException {
-        Message routingMessage = MqUtils.routingMessageBuild(topic, message);
+    public boolean publishDo(Message routingMessage, int qos) throws IOException {
+        Session responder = this.getPlayerAny(MqConstants.BROKER_AT_SERVER, null);
 
-        Session responder = this.getPlayerAny(MqConstants.BROKER_AT_SERVER,null);
         if (responder != null) {
-            if (message.getQos() > 0) {
+            if (qos > 0) {
                 responder.sendAndRequest(MqConstants.MQ_EVENT_PUBLISH, routingMessage).await();
             } else {
                 responder.send(MqConstants.MQ_EVENT_PUBLISH, routingMessage);

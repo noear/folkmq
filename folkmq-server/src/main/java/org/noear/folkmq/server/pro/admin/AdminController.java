@@ -87,11 +87,10 @@ public class AdminController extends BaseController {
     public Result publish_ajax_post(String topic, String scheduled, int qos, String content) {
         try {
             Date scheduledDate = DateUtil.parse(scheduled);
-
             MqMessage message = new MqMessage(content).qos(qos).scheduled(scheduledDate);
-            Message routingMessage = MqUtils.routingMessageBuild(topic, message);
+            Message routingMessage = MqUtils.getV2().routingMessageBuild(topic, message);
 
-            server.routingDo(routingMessage);
+            server.routingDo(MqUtils.getV2(), routingMessage);
 
             return Result.succeed();
         } catch (Exception e) {

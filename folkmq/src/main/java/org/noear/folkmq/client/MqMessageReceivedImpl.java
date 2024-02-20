@@ -1,5 +1,6 @@
 package org.noear.folkmq.client;
 
+import org.noear.folkmq.common.MqResolver;
 import org.noear.folkmq.common.MqUtils;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
@@ -35,16 +36,18 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
 
         this.content = from.dataAsString();
 
-        this.tid = MqUtils.getTid(from);
-        this.topic = MqUtils.getTopic(from);
-        this.consumerGroup = MqUtils.getConsumerGroup(from);
+        MqResolver mr = MqUtils.getOf(from);
 
-        this.qos = MqUtils.getQos(from);
-        this.times = MqUtils.getTimes(from);
-        this.sequence = MqUtils.isSequence(from);
-        this.transaction = MqUtils.isTransaction(from);
+        this.tid = mr.getTid(from);
+        this.topic = mr.getTopic(from);
+        this.consumerGroup = mr.getConsumerGroup(from);
 
-        long expirationL = MqUtils.getExpiration(from);
+        this.qos = mr.getQos(from);
+        this.times = mr.getTimes(from);
+        this.sequence = mr.isSequence(from);
+        this.transaction = mr.isTransaction(from);
+
+        long expirationL = mr.getExpiration(from);
         if (expirationL == 0) {
             this.expiration = null;
         } else {

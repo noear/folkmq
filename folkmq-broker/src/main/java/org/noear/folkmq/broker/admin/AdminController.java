@@ -7,7 +7,9 @@ import org.noear.folkmq.broker.admin.model.TopicVo;
 import org.noear.folkmq.broker.mq.BrokerListenerFolkmq;
 import org.noear.folkmq.client.MqMessage;
 import org.noear.folkmq.common.MqConstants;
+import org.noear.folkmq.common.MqUtils;
 import org.noear.snack.core.utils.DateUtil;
+import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
 import org.noear.socketd.transport.core.entity.StringEntity;
 import org.noear.solon.annotation.Controller;
@@ -204,10 +206,10 @@ public class AdminController extends BaseController {
     public Result publish_ajax_post(String topic, String scheduled, int qos, String content) {
         try {
             Date scheduledDate = DateUtil.parse(scheduled);
-
             MqMessage message = new MqMessage(content).qos(qos).scheduled(scheduledDate);
+            Message routingMessage = MqUtils.getV2().routingMessageBuild(topic, message);
 
-            if (brokerListener.publishDo(topic, message)) {
+            if (brokerListener.publishDo(routingMessage, qos)) {
                 return Result.succeed();
             } else {
                 return Result.failure("集群没有服务节点");

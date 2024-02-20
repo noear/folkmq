@@ -1,8 +1,7 @@
 package org.noear.folkmq.server;
 
 import org.noear.folkmq.common.MqConstants;
-import org.noear.folkmq.common.MqMetasV1;
-import org.noear.folkmq.common.MqUtils;
+import org.noear.folkmq.common.MqResolver;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
 import org.noear.socketd.transport.core.listener.EventListener;
@@ -144,22 +143,16 @@ public abstract class MqServiceListenerBase extends EventListener implements MqS
      * 执行路由
      */
     @Override
-    public void routingDo(Message message) {
-        String tid = MqUtils.getTid(message);
-        //可能是非法消息
-        if (StrUtils.isEmpty(tid)) {
-            log.warn("The tid cannot be null, sid={}", message.sid());
-            return;
-        }
-
+    public void routingDo(MqResolver mr, Message message) {
         //复用解析
-        String topic = MqUtils.getTopic(message);
-        int qos = MqUtils.getQos(message);
-        int times = MqUtils.getTimes(message);
-        long expiration = MqUtils.getExpiration(message);
-        String partition = MqUtils.getPartition(message);
-        long scheduled = MqUtils.getScheduled(message);
-        boolean sequence = MqUtils.isSequence(message);
+        String tid = mr.getTid(message);
+        String topic = mr.getTopic(message);
+        int qos = mr.getQos(message);
+        int times = mr.getTimes(message);
+        long expiration = mr.getExpiration(message);
+        String partition = mr.getPartition(message);
+        long scheduled = mr.getScheduled(message);
+        boolean sequence = mr.isSequence(message);
 
         if (scheduled == 0) {
             //默认为当前ms（相对于后面者，有个排序作用）
@@ -175,7 +168,7 @@ public abstract class MqServiceListenerBase extends EventListener implements MqS
             List<String> topicConsumerList = new ArrayList<>(topicConsumerSet);
 
             for (String topicConsumer : topicConsumerList) {
-                routingDo(topicConsumer, message, tid, qos, sequence, expiration, partition, times, scheduled);
+                routingDo(mr, topicConsumer, message, tid, qos, sequence, expiration, partition, times, scheduled);
             }
         }
     }
@@ -183,11 +176,11 @@ public abstract class MqServiceListenerBase extends EventListener implements MqS
     /**
      * 执行路由
      */
-    public void routingDo(String queueName, Message message, String tid, int qos, boolean sequence, long expiration, String partition, int times, long scheduled) {
+    public void routingDo(MqResolver mr, String queueName, Message message, String tid, int qos, boolean sequence, long expiration, String partition, int times, long scheduled) {
         MqQueue queue = queueMap.get(queueName);
 
         if (queue != null) {
-            MqMessageHolder messageHolder = new MqMessageHolder(queueName, queue.getConsumerGroup(), message, tid, qos, sequence, expiration, partition, times, scheduled);
+            MqMessageHolder messageHolder = new MqMessageHolder(mr, queueName, queue.getConsumerGroup(), message, tid, qos, sequence, expiration, partition, times, scheduled);
             queue.add(messageHolder);
         }
     }

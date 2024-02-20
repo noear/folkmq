@@ -1,6 +1,6 @@
 package org.noear.folkmq.server;
 
-import org.noear.folkmq.common.MqUtils;
+import org.noear.folkmq.common.MqResolver;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.entity.EntityDefault;
 
@@ -15,6 +15,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @since 1.0
  */
 public class MqMessageHolder implements Delayed {
+    private final MqResolver mr;
     //消息内容
     private final EntityDefault content;
     //事务Id
@@ -39,11 +40,12 @@ public class MqMessageHolder implements Delayed {
     //是否完成
     private AtomicBoolean isDone;
 
-    public MqMessageHolder(String queueName, String consumerGroup, Message from, String tid, int qos, boolean sequence, long expiration, String partition, int distributeCount, long distributeTime) {
+    public MqMessageHolder(MqResolver mr, String queueName, String consumerGroup, Message from, String tid, int qos, boolean sequence, long expiration, String partition, int distributeCount, long distributeTime) {
+        this.mr = mr;
         this.atName = from.atName();
         this.content = new EntityDefault().dataSet(from.data()).metaMapPut(from.metaMap());
 
-        MqUtils.setConsumerGroup(content, consumerGroup);
+        mr.setConsumerGroup(content, consumerGroup);
 
         if (sequence) {
             this.content.at(queueName);
@@ -156,8 +158,8 @@ public class MqMessageHolder implements Delayed {
         distributeTime = MqNextTime.getNextTime(this);
 
         //设置新的派发次数和下次时间
-        MqUtils.setTimes(content, distributeCount);
-        MqUtils.setScheduled(content, distributeTime);
+        mr.setTimes(content, distributeCount);
+        mr.setScheduled(content, distributeTime);
 
         return this;
     }

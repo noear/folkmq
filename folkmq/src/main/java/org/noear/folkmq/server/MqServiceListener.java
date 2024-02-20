@@ -1,10 +1,7 @@
 package org.noear.folkmq.server;
 
 import org.noear.folkmq.FolkMQ;
-import org.noear.folkmq.common.MqConstants;
-import org.noear.folkmq.common.MqMetasV1;
-import org.noear.folkmq.common.MqMetasV2;
-import org.noear.folkmq.common.MqUtils;
+import org.noear.folkmq.common.*;
 import org.noear.snack.ONode;
 import org.noear.socketd.exception.SocketDAlarmException;
 import org.noear.socketd.transport.core.Message;
@@ -47,15 +44,16 @@ public class MqServiceListener extends MqServiceListenerBase implements MqServic
         });
 
         doOn(MqConstants.MQ_EVENT_PUBLISH, (s, m) -> {
+            MqResolver mr = MqUtils.getOf(m);
             //接收发布指令
-            boolean isTrans = MqUtils.isTransaction(m);
+            boolean isTrans = mr.isTransaction(m);
 
             if (isTrans) {
                 //预备存储
-                String tid = MqUtils.getTid(m);
+                String tid = mr.getTid(m);
                 readyMessageMap.put(tid, m);
             } else {
-                onPublish(s, m);
+                onPublish(s, m, mr);
             }
 
             confirmDo(s, m);
@@ -72,7 +70,8 @@ public class MqServiceListener extends MqServiceListenerBase implements MqServic
                 }
             } else {
                 for (String tid : tidAry) {
-                    onPublish(s, readyMessageMap.remove(tid));
+                    Message m2 = readyMessageMap.remove(tid);
+                    onPublish(s, m2, MqUtils.getOf(m2));
                 }
             }
 
@@ -302,7 +301,7 @@ public class MqServiceListener extends MqServiceListenerBase implements MqServic
         unsubscribeDo(topic, consumerGroup, s);
     }
 
-    private void onPublish(Session s, Message m) throws IOException {
+    private void onPublish(Session s, Message m, MqResolver mr) throws IOException {
         if (m == null) {
             return;
         }
@@ -311,7 +310,7 @@ public class MqServiceListener extends MqServiceListenerBase implements MqServic
         watcher.onPublish(m);
 
         //执行交换
-        routingDo(m);
+        routingDo(mr, m);
     }
 
     private void onUnpublish(Session s, Message m) throws IOException {

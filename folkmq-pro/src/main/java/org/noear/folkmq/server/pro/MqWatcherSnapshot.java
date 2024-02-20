@@ -1,8 +1,7 @@
 package org.noear.folkmq.server.pro;
 
 import org.noear.folkmq.common.MqConstants;
-import org.noear.folkmq.common.MqMetasV1;
-import org.noear.folkmq.common.MqMetasV2;
+import org.noear.folkmq.common.MqResolver;
 import org.noear.folkmq.common.MqUtils;
 import org.noear.folkmq.server.*;
 import org.noear.folkmq.server.pro.utils.IoUtils;
@@ -244,13 +243,15 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
                             .build();
 
 
-                    String tid = MqUtils.getTid(message);
-                    int qos = MqUtils.getQos(message);
-                    int times = MqUtils.getTimes(message);
-                    long expiration = MqUtils.getExpiration(message);
-                    String partition = MqUtils.getPartition(message);
-                    long scheduled = MqUtils.getScheduled(message);
-                    boolean sequence = MqUtils.isSequence(message);
+                    MqResolver mr = MqUtils.getOf(message);
+
+                    String tid = mr.getTid(message);
+                    int qos = mr.getQos(message);
+                    int times = mr.getTimes(message);
+                    long expiration = mr.getExpiration(message);
+                    String partition = mr.getPartition(message);
+                    long scheduled = mr.getScheduled(message);
+                    boolean sequence = mr.isSequence(message);
 
 
                     if (scheduled == 0) {
@@ -258,7 +259,7 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
                         scheduled = System.currentTimeMillis();
                     }
 
-                    serverRef.routingDo(queueName, message, tid, qos, sequence, expiration, partition, times, scheduled);
+                    serverRef.routingDo(mr, queueName, message, tid, qos, sequence, expiration, partition, times, scheduled);
                 }
             }
         }

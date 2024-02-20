@@ -2,7 +2,6 @@ package org.noear.folkmq.client;
 
 import org.noear.folkmq.FolkMQ;
 import org.noear.folkmq.common.MqConstants;
-import org.noear.folkmq.common.MqMetasV1;
 import org.noear.folkmq.common.MqUtils;
 import org.noear.folkmq.exception.FolkmqException;
 import org.noear.socketd.SocketD;
@@ -212,7 +211,7 @@ public class MqClientDefault implements MqClientInternal {
             throw new SocketDException("No session is available!");
         }
 
-        Entity entity = MqUtils.publishEntityBuild(topic, message);
+        Entity entity = MqUtils.getOf((Session) session).publishEntityBuild(topic, message);
 
         if (message.getQos() > 0) {
             //::Qos1
@@ -256,7 +255,7 @@ public class MqClientDefault implements MqClientInternal {
         }
 
         CompletableFuture<Boolean> future = new CompletableFuture<>();
-        Entity entity = MqUtils.publishEntityBuild(topic, message);
+        Entity entity = MqUtils.getOf((Session) session).publishEntityBuild(topic, message);
 
         if (message.getQos() > 0) {
             //::Qos1

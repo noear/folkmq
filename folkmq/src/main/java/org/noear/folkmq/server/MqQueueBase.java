@@ -121,8 +121,8 @@ public abstract class MqQueueBase implements MqQueue {
             int idx = 0;
             if (consumerSessions.size() > 1) {
                 if(messageHolder.isSequence()) {
-                    //尝试 partition_hash //不要检测有效性（如果无效，则让它出错）
-                    idx = Math.abs(diversion(messageHolder).hashCode()) % consumerSessions.size();
+                    //尝试 topic_hash //不要检测有效性（如果无效，则让它出错）
+                    idx = Math.abs(getTopic().hashCode()) % consumerSessions.size();
                     return consumerSessions.get(idx);
                 }
 
@@ -137,14 +137,6 @@ public abstract class MqQueueBase implements MqQueue {
             return consumerSessions.get(idx);
         }finally {
             SESSION_LOCK.unlock();
-        }
-    }
-
-    protected String diversion(MqMessageHolder message) {
-        if (StrUtils.isEmpty(message.getPartition())) {
-            return getTopic();
-        } else {
-            return message.getPartition();
         }
     }
 

@@ -15,7 +15,6 @@ public class MqMessage implements IMqMessage {
     private String content;
     private Date scheduled;
     private Date expiration;
-    private String partition;
     private boolean sequence;
     private boolean transaction;
     private int qos = 1;
@@ -54,13 +53,6 @@ public class MqMessage implements IMqMessage {
     @Override
     public Date getExpiration() {
         return expiration;
-    }
-
-    /**
-     * 哈希分区
-     */
-    public String getPartition() {
-        return partition;
     }
 
     /**
@@ -115,15 +107,6 @@ public class MqMessage implements IMqMessage {
      */
     public MqMessage sequence(boolean sequence) {
         this.sequence = sequence;
-        return this;
-    }
-
-    /**
-     * 是否顺序（并指定哈希分区）
-     */
-    public MqMessage sequence(boolean sequence, String partition) {
-        this.sequence = sequence;
-        this.partition = partition;
         return this;
     }
 

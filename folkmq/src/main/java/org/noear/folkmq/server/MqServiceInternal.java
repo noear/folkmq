@@ -68,11 +68,12 @@ public interface MqServiceInternal {
      * @param message    消息
      * @param tid        事务Id
      * @param qos        质量等级
+     * @param sequence   是否顺序
      * @param expiration 过期时间
      * @param times      派发次数
      * @param scheduled  计划时间
      */
-    void routingDo(MqResolver mr, String queueName, Message message, String tid, int qos, boolean sequence, long expiration, String partition, int times, long scheduled);
+    void routingDo(MqResolver mr, String queueName, Message message, String tid, int qos, boolean sequence, long expiration, int times, long scheduled);
 
     /**
      * 添加事件扩展

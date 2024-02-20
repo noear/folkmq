@@ -249,7 +249,6 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
                     int qos = mr.getQos(message);
                     int times = mr.getTimes(message);
                     long expiration = mr.getExpiration(message);
-                    String partition = mr.getPartition(message);
                     long scheduled = mr.getScheduled(message);
                     boolean sequence = mr.isSequence(message);
 
@@ -259,7 +258,7 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
                         scheduled = System.currentTimeMillis();
                     }
 
-                    serverRef.routingDo(mr, queueName, message, tid, qos, sequence, expiration, partition, times, scheduled);
+                    serverRef.routingDo(mr, queueName, message, tid, qos, sequence, expiration, times, scheduled);
                 }
             }
         }

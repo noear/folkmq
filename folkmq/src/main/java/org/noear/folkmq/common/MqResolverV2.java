@@ -59,11 +59,6 @@ public class MqResolverV2 implements MqResolver {
     }
 
     @Override
-    public String getPartition(Message m) {
-        return m.meta(MqMetasV2.MQ_META_PARTITION);
-    }
-
-    @Override
     public long getScheduled(Message m) {
         return Long.parseLong(m.metaOrDefault(MqMetasV2.MQ_META_SCHEDULED, "0"));
     }
@@ -97,9 +92,6 @@ public class MqResolverV2 implements MqResolver {
         entity.metaPut(MqMetasV2.MQ_META_TID, message.getTid());
         entity.metaPut(MqMetasV2.MQ_META_TOPIC, topic);
         entity.metaPut(MqMetasV2.MQ_META_QOS, (message.getQos() == 0 ? "0" : "1"));
-        if (message.getPartition() != null) {
-            entity.metaPut(MqMetasV2.MQ_META_PARTITION, message.getPartition());
-        }
 
         //定时派发
         if (message.getScheduled() == null) {

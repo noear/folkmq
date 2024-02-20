@@ -150,7 +150,6 @@ public abstract class MqServiceListenerBase extends EventListener implements MqS
         int qos = mr.getQos(message);
         int times = mr.getTimes(message);
         long expiration = mr.getExpiration(message);
-        String partition = mr.getPartition(message);
         long scheduled = mr.getScheduled(message);
         boolean sequence = mr.isSequence(message);
 
@@ -168,7 +167,7 @@ public abstract class MqServiceListenerBase extends EventListener implements MqS
             List<String> topicConsumerList = new ArrayList<>(topicConsumerSet);
 
             for (String topicConsumer : topicConsumerList) {
-                routingDo(mr, topicConsumer, message, tid, qos, sequence, expiration, partition, times, scheduled);
+                routingDo(mr, topicConsumer, message, tid, qos, sequence, expiration, times, scheduled);
             }
         }
     }
@@ -176,11 +175,11 @@ public abstract class MqServiceListenerBase extends EventListener implements MqS
     /**
      * 执行路由
      */
-    public void routingDo(MqResolver mr, String queueName, Message message, String tid, int qos, boolean sequence, long expiration, String partition, int times, long scheduled) {
+    public void routingDo(MqResolver mr, String queueName, Message message, String tid, int qos, boolean sequence, long expiration, int times, long scheduled) {
         MqQueue queue = queueMap.get(queueName);
 
         if (queue != null) {
-            MqMessageHolder messageHolder = new MqMessageHolder(mr, queueName, queue.getConsumerGroup(), message, tid, qos, sequence, expiration, partition, times, scheduled);
+            MqMessageHolder messageHolder = new MqMessageHolder(mr, queueName, queue.getConsumerGroup(), message, tid, qos, sequence, expiration, times, scheduled);
             queue.add(messageHolder);
         }
     }

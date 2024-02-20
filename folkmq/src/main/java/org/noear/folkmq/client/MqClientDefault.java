@@ -412,11 +412,7 @@ public class MqClientDefault implements MqClientInternal {
         if (message.isTransaction()) {
             return tranThreadLocal.get().tmid();
         } else if (message.isSequence()) {
-            if (StrUtils.isEmpty(message.getPartition())) {
-                return topic;
-            } else {
-                return message.getPartition();
-            }
+            return topic;
         } else {
             return null;
         }

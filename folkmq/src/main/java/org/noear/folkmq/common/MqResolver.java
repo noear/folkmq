@@ -28,8 +28,6 @@ public interface MqResolver {
 
     long getExpiration(Message m);
 
-    String getPartition(Message m);
-
     long getScheduled(Message m);
 
     void setScheduled(Entity m, long scheduled);
@@ -37,7 +35,6 @@ public interface MqResolver {
     boolean isSequence(Message m);
 
     boolean isTransaction(Message m);
-
 
     /**
      * 发布实体构建

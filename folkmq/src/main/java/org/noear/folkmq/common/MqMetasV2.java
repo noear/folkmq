@@ -41,10 +41,6 @@ public interface MqMetasV2 {
      */
     String MQ_META_SEQUENCE = "s2";
     /**
-     * 元信息：消息哈希分区
-     */
-    String MQ_META_PARTITION = "p1";
-    /**
      * 元信息：消息是否事务
      */
     String MQ_META_TRANSACTION = "t4";

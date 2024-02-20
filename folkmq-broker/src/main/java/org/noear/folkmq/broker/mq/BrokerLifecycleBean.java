@@ -74,7 +74,7 @@ public class BrokerLifecycleBean implements LifecycleBean , EventListener<AppPre
         log.info("Server:main: folkmq-broker: Started (SOCKET.D/{}-{}, folkmq/{})",
                 SocketD.protocolVersion(),
                 SocketD.version(),
-                FolkMQ.version());
+                FolkMQ.versionName());
     }
 
     @Override

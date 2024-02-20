@@ -25,6 +25,8 @@ public class MqMessageHolder implements Delayed {
     private final int qos;
     //存活时间
     private final long expiration;
+    //哈希分区
+    private final String partition;
     //是否有序
     private final boolean sequence;
 
@@ -37,7 +39,7 @@ public class MqMessageHolder implements Delayed {
     //是否完成
     private AtomicBoolean isDone;
 
-    public MqMessageHolder(String queueName, String consumerGroup, Message from, String tid, int qos, boolean sequence, long expiration, int distributeCount, long distributeTime) {
+    public MqMessageHolder(String queueName, String consumerGroup, Message from, String tid, int qos, boolean sequence, long expiration, String partition, int distributeCount, long distributeTime) {
         this.atName = from.atName();
         this.content = new EntityDefault().dataSet(from.data()).metaMapPut(from.metaMap());
         this.content.metaPut(MqConstants.MQ_META_CONSUMER_GROUP, consumerGroup);
@@ -53,6 +55,7 @@ public class MqMessageHolder implements Delayed {
         this.tid = tid;
         this.qos = qos;
         this.expiration = expiration;
+        this.partition = partition;
         this.sequence = sequence;
         this.distributeCount = distributeCount;
         this.distributeTime = distributeTime;
@@ -91,6 +94,13 @@ public class MqMessageHolder implements Delayed {
      */
     public long getExpiration() {
         return expiration;
+    }
+
+    /**
+     * 哈希分区
+     * */
+    public String getPartition() {
+        return partition;
     }
 
     /**

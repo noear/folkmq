@@ -72,7 +72,7 @@ public class LicenceUtils {
         try {
             String json = HttpUtils.http("https://folkmq.noear.org/licence/auth")
                     .data("licence", LicenceUtils.getLicence())
-                    .data("version", FolkMQ.version())
+                    .data("version", FolkMQ.versionName())
                     .post();
 
             ONode oNode = ONode.loadStr(json);

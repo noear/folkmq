@@ -28,6 +28,9 @@ public class MqUtils {
         entity.metaPut(MqConstants.MQ_META_TID, message.getTid());
         entity.metaPut(MqConstants.MQ_META_TOPIC, topic);
         entity.metaPut(MqConstants.MQ_META_QOS, (message.getQos() == 0 ? "0" : "1"));
+        if(message.getPartition() != null) {
+            entity.metaPut(MqConstants.MQ_META_PARTITION, message.getPartition());
+        }
 
         //定时派发
         if (message.getScheduled() == null) {

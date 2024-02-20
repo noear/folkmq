@@ -8,6 +8,11 @@ package org.noear.folkmq.common;
  */
 public interface MqConstants {
     /**
+     * 版本号
+     */
+    String FOLKMQ_VERSION = "folkmq-version";
+
+    /**
      * 元信息：消息事务Id
      */
     String MQ_META_TID = "mq.tid";
@@ -27,6 +32,10 @@ public interface MqConstants {
      * 元信息：消息是否有序
      */
     String MQ_META_SEQUENCE = "mq.sequence";
+    /**
+     * 元信息：消息分区（用作哈希负载）
+     * */
+    String MQ_META_PARTITION = "p1";
     /**
      * 元信息：消息质量等级
      */

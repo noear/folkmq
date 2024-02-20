@@ -82,7 +82,7 @@ public class FolkmqLifecycleBean implements LifecycleBean , EventListener<AppPre
         log.info("Server:main: folkmq-server: Started (SOCKET.D/{}-{}, folkmq/{})",
                 SocketD.protocolVersion(),
                 SocketD.version(),
-                FolkMQ.version());
+                FolkMQ.versionName());
     }
 
 
@@ -178,10 +178,12 @@ public class FolkmqLifecycleBean implements LifecycleBean , EventListener<AppPre
         }
 
         brokerSession = (ClusterClientSession) SocketD.createClusterClient(serverUrls)
-                .config(c -> c.sequenceSend(true)
-                        .ioThreads(MqServerConfig.ioThreads)
-                        .codecThreads(MqServerConfig.codecThreads)
-                        .exchangeThreads(MqServerConfig.exchangeThreads))
+                .config(c ->
+                        c.metaPut(MqConstants.FOLKMQ_VERSION, FolkMQ.versionCodeAsString())
+                                .sequenceSend(true)
+                                .ioThreads(MqServerConfig.ioThreads)
+                                .codecThreads(MqServerConfig.codecThreads)
+                                .exchangeThreads(MqServerConfig.exchangeThreads))
                 .listen(brokerServiceListener)
                 .open();
 

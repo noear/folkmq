@@ -245,6 +245,7 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
                     int qos = "0".equals(message.meta(MqConstants.MQ_META_QOS)) ? 0 : 1;
                     int times = Integer.parseInt(message.metaOrDefault(MqConstants.MQ_META_TIMES, "0"));
                     long expiration = Long.parseLong(message.metaOrDefault(MqConstants.MQ_META_EXPIRATION, "0"));
+                    String partition = message.meta(MqConstants.MQ_META_PARTITION);
                     long scheduled = Long.parseLong(message.metaOrDefault(MqConstants.MQ_META_SCHEDULED, "0"));
                     boolean sequence = Integer.parseInt(message.metaOrDefault(MqConstants.MQ_META_SEQUENCE, "0")) == 1;
 
@@ -254,7 +255,7 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
                         scheduled = System.currentTimeMillis();
                     }
 
-                    serverRef.routingDo(queueName, message, tid, qos, sequence, expiration, times, scheduled);
+                    serverRef.routingDo(queueName, message, tid, qos, sequence, expiration, partition, times, scheduled);
                 }
             }
         }

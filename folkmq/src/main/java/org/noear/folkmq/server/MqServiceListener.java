@@ -1,5 +1,6 @@
 package org.noear.folkmq.server;
 
+import org.noear.folkmq.FolkMQ;
 import org.noear.folkmq.common.MqConstants;
 import org.noear.snack.ONode;
 import org.noear.socketd.exception.SocketDAlarmException;
@@ -260,6 +261,9 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
     public void onOpen(Session session) throws IOException {
         super.onOpen(session);
 
+        //返馈版本号
+        session.handshake().outMeta(MqConstants.FOLKMQ_VERSION, FolkMQ.versionCodeAsString());
+
         if (brokerMode) {
             //申请加入
             session.send(MqConstants.MQ_EVENT_JOIN, new StringEntity(""));
@@ -430,6 +434,7 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
         int qos = "0".equals(message.meta(MqConstants.MQ_META_QOS)) ? 0 : 1;
         int times = Integer.parseInt(message.metaOrDefault(MqConstants.MQ_META_TIMES, "0"));
         long expiration = Long.parseLong(message.metaOrDefault(MqConstants.MQ_META_EXPIRATION, "0"));
+        String partition = message.meta(MqConstants.MQ_META_PARTITION);
         long scheduled = Long.parseLong(message.metaOrDefault(MqConstants.MQ_META_SCHEDULED, "0"));
         boolean sequence = Integer.parseInt(message.metaOrDefault(MqConstants.MQ_META_SEQUENCE, "0")) == 1;
 
@@ -447,7 +452,7 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
             List<String> topicConsumerList = new ArrayList<>(topicConsumerSet);
 
             for (String topicConsumer : topicConsumerList) {
-                routingDo(topicConsumer, message, tid, qos, sequence, expiration, times, scheduled);
+                routingDo(topicConsumer, message, tid, qos, sequence, expiration, partition, times, scheduled);
             }
         }
     }
@@ -461,11 +466,11 @@ public class MqServiceListener extends EventListener implements MqServiceInterna
     /**
      * 执行路由
      */
-    public void routingDo(String queueName, Message message, String tid, int qos, boolean sequence, long expiration, int times, long scheduled) {
+    public void routingDo(String queueName, Message message, String tid, int qos, boolean sequence, long expiration, String partition,int times, long scheduled) {
         MqQueue queue = queueMap.get(queueName);
 
         if (queue != null) {
-            MqMessageHolder messageHolder = new MqMessageHolder(queueName, queue.getConsumerGroup(), message, tid, qos, sequence, expiration, times, scheduled);
+            MqMessageHolder messageHolder = new MqMessageHolder(queueName, queue.getConsumerGroup(), message, tid, qos, sequence, expiration, partition, times, scheduled);
             queue.add(messageHolder);
         }
     }

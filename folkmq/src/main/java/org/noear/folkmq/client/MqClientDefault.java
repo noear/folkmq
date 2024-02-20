@@ -1,5 +1,6 @@
 package org.noear.folkmq.client;
 
+import org.noear.folkmq.FolkMQ;
 import org.noear.folkmq.common.MqConstants;
 import org.noear.folkmq.common.MqUtils;
 import org.noear.folkmq.exception.FolkmqException;
@@ -13,6 +14,7 @@ import org.noear.socketd.transport.core.Entity;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
 import org.noear.socketd.transport.core.entity.StringEntity;
+import org.noear.socketd.utils.StrUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,7 +65,8 @@ public class MqClientDefault implements MqClientInternal {
         //默认不缩小分片，方便无锁发送
         clientSession = (ClusterClientSession) SocketD.createClusterClient(serverUrls)
                 .config(c -> {
-                    c.nolockSend(true)
+                    c.metaPut(MqConstants.FOLKMQ_VERSION, FolkMQ.versionCodeAsString())
+                            .nolockSend(true)
                             .ioThreads(1)
                             .codecThreads(1)
                             .exchangeThreads(1);
@@ -197,7 +200,7 @@ public class MqClientDefault implements MqClientInternal {
             throw new SocketDConnectionException("Not connected!");
         }
 
-        ClientSession session = clientSession.getSessionAny(message.isSequence() ? topic : null);
+        ClientSession session = clientSession.getSessionAny(message.isSequence() ? partition(topic, message) : null);
         if (session == null || session.isValid() == false) {
             throw new SocketDException("No session is available!");
         }
@@ -235,7 +238,7 @@ public class MqClientDefault implements MqClientInternal {
             throw new SocketDConnectionException("Not connected!");
         }
 
-        ClientSession session = clientSession.getSessionAny(message.isSequence() ? topic : null);
+        ClientSession session = clientSession.getSessionAny(message.isSequence() ? partition(topic, message) : null);
         if (session == null || session.isValid() == false) {
             throw new SocketDException("No session is available!");
         }
@@ -345,6 +348,15 @@ public class MqClientDefault implements MqClientInternal {
             }
         }
     }
+
+    protected String partition(String topic, MqMessage message) {
+        if (StrUtils.isEmpty(message.getPartition())) {
+            return topic;
+        } else {
+            return message.getPartition();
+        }
+    }
+
 
     protected MqSubscription getSubscription(String topic, String consumerGroup) {
         String queueName = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP + consumerGroup;

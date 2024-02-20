@@ -53,7 +53,7 @@
     <header>
     <flex>
         <left class="col-6">
-            <p>${title}<sup>${_version}</sup></p>
+            <p>${title}<sup>${version}</sup></p>
         </left>
         <right class="col-6">
             <p>

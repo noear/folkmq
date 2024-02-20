@@ -1,5 +1,6 @@
 package org.noear.folkmq.broker.mq;
 
+import org.noear.folkmq.FolkMQ;
 import org.noear.folkmq.client.MqMessage;
 import org.noear.folkmq.common.MqConstants;
 import org.noear.folkmq.common.MqUtils;
@@ -72,6 +73,9 @@ public class BrokerListenerFolkmq extends BrokerListener {
 
     @Override
     public void onOpen(Session session) throws IOException {
+        //返馈版本号
+        session.handshake().outMeta(MqConstants.FOLKMQ_VERSION, FolkMQ.versionCodeAsString());
+
         if (accessMap.size() > 0) {
             //如果有 ak/sk 配置，则进行鉴权
             String accessKey = session.param(MqConstants.PARAM_ACCESS_KEY);

@@ -71,7 +71,7 @@ public interface MqServiceInternal {
      * @param times      派发次数
      * @param scheduled  计划时间
      */
-    void routingDo(String queueName, Message message, String tid, int qos, boolean sequence, long expiration, int times, long scheduled);
+    void routingDo(String queueName, Message message, String tid, int qos, boolean sequence, long expiration, String partition, int times, long scheduled);
 
     /**
      * 添加事件扩展

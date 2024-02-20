@@ -11,9 +11,20 @@ import org.noear.folkmq.server.MqServerDefault;
  */
 public class FolkMQ {
     /**
-     * 获取版本
+     * 获取版本代号
      */
-    public static String version() {
+    public static int versionCode(){
+        return 1;
+    }
+
+    public static String versionCodeAsString(){
+        return String.valueOf(versionCode());
+    }
+
+    /**
+     * 获取版本名称
+     */
+    public static String versionName() {
         return "1.1.0";
     }
 

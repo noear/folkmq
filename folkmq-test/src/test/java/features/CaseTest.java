@@ -124,15 +124,15 @@ public class CaseTest {
     }
 
     @Test
-    public void TestCase21_publish_tran_commit() throws Exception {
-        BaseTestCase testCase = new TestCase21_publish_tran_commit(2021);
+    public void TestCase21_tran_commit() throws Exception {
+        BaseTestCase testCase = new TestCase21_tran_commit(2021);
         testCase.start();
         testCase.stop();
     }
 
     @Test
-    public void TestCase22_publish_tran_rollback() throws Exception {
-        BaseTestCase testCase = new TestCase22_publish_tran_rollback(2022);
+    public void TestCase22_tran_rollback() throws Exception {
+        BaseTestCase testCase = new TestCase22_tran_rollback(2022);
         testCase.start();
         testCase.stop();
     }

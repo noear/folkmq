@@ -19,6 +19,11 @@ import org.noear.socketd.utils.StrUtils;
 public class MqResolverV2 implements MqResolver {
 
     @Override
+    public String getSender(Entity m) {
+        return m.metaOrDefault(MqMetasV2.MQ_META_SENDER, "");
+    }
+
+    @Override
     public String getTid(Entity m) {
         return m.metaOrDefault(MqMetasV2.MQ_META_TID, "");
     }

@@ -4,9 +4,7 @@ import org.noear.folkmq.client.MqClientDefault;
 import org.noear.folkmq.client.MqMessage;
 import org.noear.folkmq.client.MqRequestListenRouter;
 import org.noear.folkmq.client.MqTransaction;
-import org.noear.folkmq.server.MqQueue;
 import org.noear.folkmq.server.MqServerDefault;
-import org.noear.folkmq.server.MqServiceInternal;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -15,8 +13,8 @@ import java.util.concurrent.TimeUnit;
  * @author noear
  * @since 1.0
  */
-public class TestCase22_publish_tran_rollback extends BaseTestCase {
-    public TestCase22_publish_tran_rollback(int port) {
+public class TestCase22_tran_rollback extends BaseTestCase {
+    public TestCase22_tran_rollback(int port) {
         super(port);
     }
 
@@ -61,17 +59,5 @@ public class TestCase22_publish_tran_rollback extends BaseTestCase {
 
         //检验客户端
         assert countDownLatch.getCount() == 1;
-
-        Thread.sleep(100);
-
-        //检验服务端
-        MqServiceInternal serverInternal = server.getServerInternal();
-        System.out.println("server topicConsumerMap.size=" + serverInternal.getQueueMap().size());
-        assert serverInternal.getQueueMap().size() == 1;
-
-        MqQueue topicConsumerQueue = serverInternal.getQueueMap().values().toArray(new MqQueue[1])[0];
-        System.out.println("server topicConsumerQueue.size=" + topicConsumerQueue.messageTotal());
-        assert topicConsumerQueue.messageTotal() == 0;
-        assert topicConsumerQueue.messageTotal2() == 0;
     }
 }

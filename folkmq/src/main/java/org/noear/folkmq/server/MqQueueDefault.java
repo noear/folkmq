@@ -1,7 +1,9 @@
 package org.noear.folkmq.server;
 
 import org.noear.folkmq.common.MqConstants;
+import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
+import org.noear.socketd.transport.core.entity.MessageBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,6 +22,11 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class MqQueueDefault extends MqQueueBase implements MqQueue {
     private static final Logger log = LoggerFactory.getLogger(MqQueueDefault.class);
+
+    /**
+     * 服务监听器
+     * */
+    private final MqServiceListener serviceListener;
 
     //消息索引器
     private final AtomicLong indexer = new AtomicLong();
@@ -44,8 +51,9 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
     //添加锁
     private final ReentrantLock addLock = new ReentrantLock(true);
 
-    public MqQueueDefault(MqWatcher watcher, String topic, String consumerGroup, String queueName) {
+    public MqQueueDefault(MqServiceListener serviceListener, MqWatcher watcher, String topic, String consumerGroup, String queueName) {
         super();
+        this.serviceListener = serviceListener;
         this.topic = topic;
         this.consumerGroup = consumerGroup;
         this.queueName = queueName;
@@ -124,8 +132,10 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
 
         if (messageHolder != null) {
             if (messageHolder.isTransaction()) {
-
+                //转发
+                transpond0(messageHolder);
             } else {
+                //派发
                 distribute0(messageHolder);
             }
             return true;
@@ -145,23 +155,26 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
         }
     }
 
+    /**
+     * 事务确认
+     * */
     @Override
-    public void confirmAt(String tid, boolean isRollback) {
-        addLock.lock();
+    public void affirmAt(String tid, boolean isRollback) {
+        MqMessageHolder messageHolder = messageMap.remove(tid);
+        if (messageHolder != null) {
+            internalRemove(messageHolder);
+            affirmAtDo(messageHolder, isRollback);
+        }
+    }
 
-        try {
-            MqMessageHolder messageHolder = messageMap.get(tid);
-            if (messageHolder != null) {
-                internalRemove(messageHolder);
-
-                if (isRollback) {
-                    messageMap.remove(tid);
-                } else {
-                    internalAdd(messageHolder.noTransaction());
-                }
-            }
-        } finally {
-            addLock.unlock();
+    /**
+     * 事务确认处理
+     * */
+    protected void affirmAtDo(MqMessageHolder messageHolder, boolean isRollback) {
+        if (isRollback == false) {
+            messageHolder.noTransaction();
+            Message message = new MessageBuilder().entity(messageHolder.getContent()).build();
+            serviceListener.routingDo(messageHolder.mr, message);
         }
     }
 
@@ -236,21 +249,36 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
         return messageQueue.size();
     }
 
-    protected void request0(MqMessageHolder messageHolder) {
+    /**
+     * 执行转发
+     * */
+    protected void transpond0(MqMessageHolder messageHolder) {
         messageCountSub(messageHolder);
 
         //如果有会话
         if (sessionCount() > 0) {
             //获取一个会话（轮询负载均衡）
-            Session s1 = getSessionOne(messageHolder);
+            Session s1 = null;
+
+
             try {
+                //获取会话
+                if (serviceListener.brokerMode) {
+                    s1 = getSessionOne(messageHolder);
+                } else {
+                    s1 = serviceListener.brokerListener.getPlayerAny(messageHolder.getSender(), null);
+                }
+
+                //开始请求确认
                 s1.sendAndRequest(MqConstants.MQ_EVENT_REQUEST, messageHolder.getContent()).thenReply(r -> {
                     //进入正常队列
                     int ack = Integer.parseInt(r.metaOrDefault(MqConstants.MQ_META_ACK, "0"));
-                    if(ack == 1){
-                        internalAdd(messageHolder.noTransaction());
-                    }else{
-                        //不用再加回去
+                    if (ack == 1) {
+                        //提交
+                        affirmAtDo(messageHolder, false);
+                    } else {
+                        //回滚
+                        affirmAtDo(messageHolder, true);
                     }
                 }).thenError(err -> {
                     //进入延后队列
@@ -263,8 +291,10 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
                 });
             } catch (Throwable e) {
                 //如果无效，则移掉
-                if(s1.isValid() == false){
-                    removeSession(s1);
+                if (s1 != null) {
+                    if (s1.isValid() == false) {
+                        removeSession(s1);
+                    }
                 }
 
                 //进入延后队列

@@ -87,18 +87,9 @@ public abstract class MqServiceListenerBase extends EventListener implements MqS
         String queueName = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP + consumerGroup;
 
         synchronized (SUBSCRIBE_LOCK) {
-            //::1.构建订阅关系
+            //::1.构建订阅关系，并获取队列
+            MqQueue queue = queueGetOrInit(topic, consumerGroup, queueName);
 
-            //建立订阅关系(topic=>[queueName]) //queueName='topic#consumer'
-            Set<String> queueNameSet = subscribeMap.computeIfAbsent(topic, n -> Collections.newSetFromMap(new ConcurrentHashMap<>()));
-            queueNameSet.add(queueName);
-
-            //队列映射关系(queueName=>Queue)
-            MqQueue queue = queueMap.get(queueName);
-            if (queue == null) {
-                queue = new MqQueueDefault(watcher, topic, consumerGroup, queueName);
-                queueMap.put(queueName, queue);
-            }
 
             //::2.标识会话身份（从持久层恢复时，会话可能为 null）
 
@@ -112,6 +103,21 @@ public abstract class MqServiceListenerBase extends EventListener implements MqS
                 queue.addSession(session);
             }
         }
+    }
+
+    protected MqQueue queueGetOrInit(String topic, String consumerGroup, String queueName){
+        //建立订阅关系(topic=>[queueName]) //queueName='topic#consumer'
+        Set<String> queueNameSet = subscribeMap.computeIfAbsent(topic, n -> Collections.newSetFromMap(new ConcurrentHashMap<>()));
+        queueNameSet.add(queueName);
+
+        //队列映射关系(queueName=>Queue)
+        MqQueue queue = queueMap.get(queueName);
+        if (queue == null) {
+            queue = new MqQueueDefault((MqServiceListener) this,watcher, topic, consumerGroup, queueName);
+            queueMap.put(queueName, queue);
+        }
+
+        return queue;
     }
 
     /**
@@ -145,6 +151,7 @@ public abstract class MqServiceListenerBase extends EventListener implements MqS
     @Override
     public void routingDo(MqResolver mr, Message message) {
         //复用解析
+        String sender = mr.getSender(message);
         String tid = mr.getTid(message);
         String topic = mr.getTopic(message);
         int qos = mr.getQos(message);
@@ -168,19 +175,39 @@ public abstract class MqServiceListenerBase extends EventListener implements MqS
             List<String> topicConsumerList = new ArrayList<>(topicConsumerSet);
 
             for (String topicConsumer : topicConsumerList) {
-                routingDo(mr, topicConsumer, message, tid, qos, sequence, expiration, transaction, times, scheduled);
+                routingDo(mr, topicConsumer, message, tid, qos, sequence, expiration, transaction, sender, times, scheduled);
             }
         }
+    }
+
+    protected void routingToQueue(MqResolver mr, Message message, String queueName) {
+        //复用解析
+        String sender = mr.getSender(message);
+        String tid = mr.getTid(message);
+        int qos = mr.getQos(message);
+        int times = mr.getTimes(message);
+        long expiration = mr.getExpiration(message);
+        long scheduled = mr.getScheduled(message);
+        boolean sequence = mr.isSequence(message);
+        boolean transaction = mr.isTransaction(message);
+
+        if (scheduled == 0) {
+            //默认为当前ms（相对于后面者，有个排序作用）
+            scheduled = System.currentTimeMillis();
+        }
+
+        //取出所有订阅的主题消费者
+        routingDo(mr, queueName, message, tid, qos, sequence, expiration, transaction, sender, times, scheduled);
     }
 
     /**
      * 执行路由
      */
-    public void routingDo(MqResolver mr, String queueName, Message message, String tid, int qos, boolean sequence, long expiration, boolean transaction,int times, long scheduled) {
+    public void routingDo(MqResolver mr, String queueName, Message message, String tid, int qos, boolean sequence, long expiration, boolean transaction, String sender, int times, long scheduled) {
         MqQueue queue = queueMap.get(queueName);
 
         if (queue != null) {
-            MqMessageHolder messageHolder = new MqMessageHolder(mr, queueName, queue.getConsumerGroup(), message, tid, qos, sequence, expiration, transaction, times, scheduled);
+            MqMessageHolder messageHolder = new MqMessageHolder(mr, queueName, queue.getConsumerGroup(), message, tid, qos, sequence, expiration, transaction, sender, times, scheduled);
             queue.add(messageHolder);
         }
     }

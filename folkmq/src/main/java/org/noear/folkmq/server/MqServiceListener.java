@@ -21,7 +21,7 @@ import java.util.*;
  * @since 1.0
  */
 public class MqServiceListener extends MqServiceListenerBase implements MqServiceInternal {
-    private BrokerListener brokerListener = new BrokerListener();
+    protected BrokerListener brokerListener = new BrokerListener();
 
     public MqServiceListener(boolean brokerMode) {
         //::初始化 Watcher 接口
@@ -51,17 +51,23 @@ public class MqServiceListener extends MqServiceListenerBase implements MqServic
             boolean isTrans = mr.isTransaction(m);
 
             if (isTrans) {
-                //预备存储
-                String tid = mr.getTid(m);
-                String topic = mr.getTopic(m);
                 //存活为2小时
                 mr.setExpiration(m, System.currentTimeMillis() + MqNextTime.TIME_2H);
                 //延后为1分钟
                 mr.setScheduled(m, System.currentTimeMillis() + MqNextTime.TIME_1M);
+
+                //预备存储
+                String tid = mr.getTid(m);
+                String topic = mr.getTopic(m);
+                String queueName = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP + ".";
+
                 readyMessageMap.put(tid, topic);
+                queueGetOrInit(topic, ".", queueName);
+                routingToQueue(mr, m, queueName);
+            } else {
+                onPublish(s, m, mr);
             }
 
-            onPublish(s, m, mr);
             confirmDo(s, m);
         });
 
@@ -73,12 +79,10 @@ public class MqServiceListener extends MqServiceListenerBase implements MqServic
             for (String tid : tidAry) {
                 String topic = readyMessageMap.remove(tid);
                 if (topic != null) {
-                    Set<String> topicConsumerSet = getSubscribeMap().get(topic);
-                    if (topicConsumerSet != null) {
-                        for (String queueName : topicConsumerSet) {
-                            MqQueue queue = getQueueMap().get(queueName);
-                            queue.confirmAt(tid, isRollback);
-                        }
+                    String queueName = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP + ".";
+                    MqQueue queue = getQueueMap().get(queueName);
+                    if (queue != null) {
+                        queue.affirmAt(tid, isRollback);
                     }
                 }
             }

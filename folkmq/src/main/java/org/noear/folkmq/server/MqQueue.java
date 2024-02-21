@@ -59,7 +59,7 @@ public interface MqQueue {
     /**
      * 确认消息
      * */
-    void confirmAt(String tid, boolean isRollback);
+    void affirmAt(String tid, boolean isRollback);
 
     /**
      * 派发消息

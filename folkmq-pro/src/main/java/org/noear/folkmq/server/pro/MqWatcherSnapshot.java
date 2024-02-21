@@ -245,6 +245,7 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
 
                     MqResolver mr = MqUtils.getOf(message);
 
+                    String sender = mr.getSender(message);
                     String tid = mr.getTid(message);
                     int qos = mr.getQos(message);
                     int times = mr.getTimes(message);
@@ -259,7 +260,7 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
                         scheduled = System.currentTimeMillis();
                     }
 
-                    serverRef.routingDo(mr, queueName, message, tid, qos, sequence, expiration, transaction, times, scheduled);
+                    serverRef.routingDo(mr, queueName, message, tid, qos, sequence, expiration, transaction, sender, times, scheduled);
                 }
             }
         }

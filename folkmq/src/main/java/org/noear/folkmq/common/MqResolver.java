@@ -12,6 +12,7 @@ import org.noear.socketd.transport.core.entity.StringEntity;
  * @since 1.2
  */
 public interface MqResolver {
+    String getSender(Entity m);
     /**
      * 获取事务id
      */

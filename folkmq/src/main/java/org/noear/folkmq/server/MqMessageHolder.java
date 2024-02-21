@@ -15,7 +15,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @since 1.0
  */
 public class MqMessageHolder implements Delayed {
-    private final MqResolver mr;
+    protected final MqResolver mr;
+    //发送人
+    private final String sender;
     //消息内容
     private final EntityDefault content;
     //事务Id
@@ -40,18 +42,14 @@ public class MqMessageHolder implements Delayed {
     //是否完成
     private AtomicBoolean isDone;
 
-    public MqMessageHolder(MqResolver mr, String queueName, String consumerGroup, Message from, String tid, int qos, boolean sequence, long expiration, boolean transaction, int distributeCount, long distributeTime) {
+    public MqMessageHolder(MqResolver mr, String queueName, String consumerGroup, Message from, String tid, int qos, boolean sequence, long expiration, boolean transaction, String sender, int distributeCount, long distributeTime) {
         this.mr = mr;
         this.atName = from.atName();
+        this.sender = sender;
         this.content = new EntityDefault().dataSet(from.data()).metaMapPut(from.metaMap());
 
         mr.setConsumerGroup(content, consumerGroup);
 
-        if (sequence) {
-            this.content.at(queueName);
-        } else {
-            this.content.at(queueName + "!");
-        }
 
         this.isDone = new AtomicBoolean();
 
@@ -62,6 +60,23 @@ public class MqMessageHolder implements Delayed {
         this.transaction = transaction;
         this.distributeCount = distributeCount;
         this.distributeTime = distributeTime;
+
+        if (sequence) {
+            this.content.at(queueName);
+        } else {
+            this.content.at(queueName + "!");
+        }
+
+        if (transaction) {
+            this.content.at(sender);
+        }
+    }
+
+    /**
+     * 发送人
+     * */
+    public String getSender() {
+        return sender;
     }
 
     /**

@@ -164,7 +164,25 @@ public class BrokerListenerFolkmq extends BrokerListener {
 
             //结束处理
             return;
-        } else if (MqConstants.MQ_API.equals(message.event())) {
+        } else if(MqConstants.MQ_EVENT_REQUEST.equals(message.event())) {
+            String atName = message.atName();
+
+            //单发模式（给同名的某个玩家，轮询负截均衡）
+            Session responder = getPlayerAny(atName, requester);
+            if (responder != null && responder.isValid()) {
+                //转发消息
+                try {
+                    forwardToSession(requester, message, responder);
+                } catch (Throwable e) {
+                    requester.sendAlarm(message, "Broker forward '@" + atName + "' error: " + e.getMessage());
+                }
+            } else {
+                requester.sendAlarm(message, "Broker don't have '@" + atName + "' session");
+            }
+            return;
+        }
+
+        if (MqConstants.MQ_API.equals(message.event())) {
             apiHandler.handle(requester, message);
             return;
         }

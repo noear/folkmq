@@ -2,6 +2,7 @@ package org.noear.folkmq.client;
 
 import org.noear.folkmq.common.MqResolver;
 import org.noear.folkmq.common.MqUtils;
+import org.noear.socketd.transport.core.Entity;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
 
@@ -116,13 +117,11 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
         return times;
     }
 
-    /**
-     * 回执
-     */
+
     @Override
-    public void acknowledge(boolean isOk) throws IOException {
+    public void acknowledge(boolean isOk, Entity reply) throws IOException {
         //发送“回执”，向服务端反馈消费情况
-        clientInternal.acknowledge(session, from, this, isOk);
+        clientInternal.acknowledge(session, from, this, isOk, reply);
     }
 
     @Override

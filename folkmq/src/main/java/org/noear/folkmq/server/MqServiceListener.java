@@ -3,6 +3,7 @@ package org.noear.folkmq.server;
 import org.noear.folkmq.FolkMQ;
 import org.noear.folkmq.common.*;
 import org.noear.snack.ONode;
+import org.noear.socketd.broker.BrokerListener;
 import org.noear.socketd.exception.SocketDAlarmException;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
@@ -20,6 +21,7 @@ import java.util.*;
  * @since 1.0
  */
 public class MqServiceListener extends MqServiceListenerBase implements MqServiceInternal {
+    private BrokerListener brokerListener = new BrokerListener();
 
     public MqServiceListener(boolean brokerMode) {
         //::初始化 Watcher 接口
@@ -93,7 +95,25 @@ public class MqServiceListener extends MqServiceListenerBase implements MqServic
                 confirmDo(s, m);
             });
         });
+
+        doOn(MqConstants.MQ_EVENT_REQUEST, (s, m) -> {
+            String atName = m.atName();
+
+            //单发模式（给同名的某个玩家，轮询负截均衡）
+            Session responder = brokerListener.getPlayerAny(atName, s);
+            if (responder != null && responder.isValid()) {
+                //转发消息
+                try {
+                    brokerListener.forwardToSession(s, m, responder);
+                } catch (Throwable e) {
+                    s.sendAlarm(m, "Server forward '@" + atName + "' error: " + e.getMessage());
+                }
+            } else {
+                s.sendAlarm(m, "Server don't have '@" + atName + "' session");
+            }
+        });
     }
+
 
     /**
      * 配置监视器
@@ -216,6 +236,9 @@ public class MqServiceListener extends MqServiceListenerBase implements MqServic
 
         //添加会话，用于停止通知
         sessionAllMap.put(session.sessionId(), session);
+
+        //增加经理人支持
+        brokerListener.onOpen(session);
     }
 
     /**

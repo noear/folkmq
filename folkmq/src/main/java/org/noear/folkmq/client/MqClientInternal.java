@@ -1,5 +1,6 @@
 package org.noear.folkmq.client;
 
+import org.noear.socketd.transport.core.Entity;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
 
@@ -30,5 +31,5 @@ public interface MqClientInternal extends MqClient {
      * @param message 收到的消息
      * @param isOk    回执
      */
-    void acknowledge(Session session, Message from, MqMessageReceivedImpl message, boolean isOk) throws IOException;
+    void acknowledge(Session session, Message from, MqMessageReceivedImpl message, boolean isOk, Entity reply) throws IOException;
 }

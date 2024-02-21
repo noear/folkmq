@@ -16,6 +16,11 @@ public interface MqMetasV2 {
      */
     String MQ_META_VID = "v0";
 
+    /**
+     * 元信息：发送人
+     */
+    String MQ_META_SENDER = "s0";
+
 
     /**
      * 元信息：消息主题

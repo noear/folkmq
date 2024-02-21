@@ -17,6 +17,7 @@ public class MqMessage implements IMqMessage {
     private Date expiration;
     private boolean sequence;
     private boolean transaction;
+    private String sender;
     private int qos = 1;
 
     public MqMessage(String content) {
@@ -53,6 +54,10 @@ public class MqMessage implements IMqMessage {
     @Override
     public Date getExpiration() {
         return expiration;
+    }
+
+    public String getSender() {
+        return sender;
     }
 
     /**
@@ -98,6 +103,11 @@ public class MqMessage implements IMqMessage {
      */
     protected MqMessage internalTransaction(boolean transaction) {
         this.transaction = transaction;
+        return this;
+    }
+
+    protected MqMessage internalSender(String sender){
+        this.sender = sender;
         return this;
     }
 

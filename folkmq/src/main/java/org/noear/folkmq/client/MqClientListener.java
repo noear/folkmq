@@ -46,6 +46,33 @@ public class MqClientListener extends EventListener {
                 log.warn("Client consume handle error, sid={}", m.sid(), e);
             }
         });
+
+        doOn(MqConstants.MQ_EVENT_LISTEN, (s, m) -> {
+            try {
+                MqMessageReceivedImpl message = new MqMessageReceivedImpl(client, s, m);
+
+                if (client.handleExecutor == null) {
+                    RunUtils.async(() -> onListen(s, m, message));
+                } else {
+                    client.handleExecutor.submit(() -> onListen(s, m, message));
+                }
+            } catch (Throwable e) {
+                log.warn("Client consume handle error, sid={}", m.sid(), e);
+            }
+        });
+    }
+
+    private void onListen(Session s, Message m, MqMessageReceivedImpl message) {
+        try {
+            client.requestHandler.onRequest(message);
+        } catch (Throwable e) {
+            try {
+                s.sendAlarm(m, "Request handle error:" + e.getMessage());
+                log.warn("Client request handle error, tid={}", message.getTid(), e);
+            } catch (Throwable err) {
+                log.warn("Client request handle error, tid={}", message.getTid(), e);
+            }
+        }
     }
 
     private void onDistribute(Session s, Message m, MqMessageReceivedImpl message) {
@@ -58,11 +85,11 @@ public class MqClientListener extends EventListener {
 
             //是否自动回执
             if (client.autoAcknowledge) {
-                client.acknowledge(s, m, message, true);
+                client.acknowledge(s, m, message, true,null);
             }
         } catch (Throwable e) {
             try {
-                client.acknowledge(s, m, message, false);
+                client.acknowledge(s, m, message, false, null);
                 log.warn("Client consume handle error, tid={}", message.getTid(), e);
             } catch (Throwable err) {
                 log.warn("Client consume handle error, tid={}", message.getTid(), e);

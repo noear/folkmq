@@ -94,6 +94,7 @@ public class MqResolverV1 implements MqResolver {
 
         if (message.isTransaction()) {
             entity.metaPut(MqMetasV2.MQ_META_TRANSACTION, "1");
+            entity.metaPut(MqMetasV2.MQ_META_SENDER, message.getSender());
         }
 
         //是否有序

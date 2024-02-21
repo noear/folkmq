@@ -78,6 +78,16 @@ public interface MqConstants {
      * */
     String MQ_EVENT_JOIN = "mq.event.join";
 
+    /**
+     * 事件：加入集群
+     * */
+    String MQ_EVENT_REQUEST = "mq.event.request";
+
+    /**
+     * 事件：加入集群
+     * */
+    String MQ_EVENT_LISTEN = "mq.event.listen";
+
 
     /**
      * 事件：接口

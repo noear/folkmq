@@ -13,7 +13,9 @@ import org.noear.socketd.transport.client.ClientSession;
 import org.noear.socketd.transport.core.Entity;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
+import org.noear.socketd.transport.core.entity.EntityDefault;
 import org.noear.socketd.transport.core.entity.StringEntity;
+import org.noear.socketd.transport.stream.RequestStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,6 +33,10 @@ import java.util.concurrent.ExecutorService;
 public class MqClientDefault implements MqClientInternal {
     private static final Logger log = LoggerFactory.getLogger(MqClientDefault.class);
 
+    //客户端名字
+    protected final String clientName;
+    //请求监听器
+    protected MqRequestHandler requestHandler;
     //处理执行器
     protected ExecutorService handleExecutor;
     //事务状态
@@ -46,18 +52,33 @@ public class MqClientDefault implements MqClientInternal {
     //订阅字典
     private Map<String, MqSubscription> subscriptionMap = new HashMap<>();
 
+
     //自动回执
     protected boolean autoAcknowledge = true;
 
-    public MqClientDefault(String... urls) {
+    public MqClientDefault(String clientName, String... urls) {
+        this.clientName = clientName;
         this.serverUrls = new ArrayList<>();
         this.clientListener = new MqClientListener(this);
 
         for (String url : urls) {
             url = url.replaceAll("folkmq:ws://", "sd:ws://");
             url = url.replaceAll("folkmq://", "sd:tcp://");
-            serverUrls.add(url);
+
+            for (String url1 : url.split(",")) {
+                if (url1.contains("?")) {
+                    url1 = url1 + "&@" + clientName;
+                } else {
+                    url1 = url1 + "?@" + clientName;
+                }
+
+                serverUrls.add(url1);
+            }
         }
+    }
+
+    public String clientName() {
+        return clientName;
     }
 
     @Override
@@ -342,6 +363,41 @@ public class MqClientDefault implements MqClientInternal {
     }
 
     @Override
+    public RequestStream requestSend(String atName, String topic, MqMessage message) throws IOException {
+        Objects.requireNonNull(atName, "Param 'atName' can not be null");
+        Objects.requireNonNull(message, "Param 'message' can not be null");
+
+        if (clientSession == null) {
+            throw new SocketDConnectionException("Not connected!");
+        }
+
+        ClientSession session = clientSession.getSessionAny(null);
+        if (session == null || session.isValid() == false) {
+            throw new SocketDException("No session is available!");
+        }
+
+        message.internalSender(clientName());
+        StringEntity entity = MqUtils.getOf((Session) session).publishEntityBuild(topic, message);
+        entity.at(atName);
+
+        if (message.getQos() > 0) {
+            //::Qos1
+            return session.sendAndRequest(MqConstants.MQ_EVENT_REQUEST, entity);
+        } else {
+            //::Qos0
+            session.send(MqConstants.MQ_EVENT_REQUEST, entity);
+            return null;
+        }
+    }
+
+
+
+    @Override
+    public void requestListen(MqRequestHandler requestHandler) {
+        this.requestHandler = requestHandler;
+    }
+
+    @Override
     public MqTransaction beginTransaction() {
         MqTransactionImpl tmp = tranThreadLocal.get();
         if (tmp == null) {
@@ -397,12 +453,16 @@ public class MqClientDefault implements MqClientInternal {
      * @param isOk    回执
      */
     @Override
-    public void acknowledge(Session session, Message from, MqMessageReceivedImpl message, boolean isOk) throws IOException {
+    public void acknowledge(Session session, Message from, MqMessageReceivedImpl message, boolean isOk, Entity reply) throws IOException {
         //发送“回执”，向服务端反馈消费情况
         if (message.getQos() > 0) {
             if (session.isValid()) {
-                session.replyEnd(from, new StringEntity("")
-                        .metaPut(MqConstants.MQ_META_ACK, isOk ? "1" : "0"));
+                if (reply == null) {
+                    reply = new EntityDefault();
+                }
+                reply.putMeta(MqConstants.MQ_META_ACK, isOk ? "1" : "0");
+
+                session.replyEnd(from, reply);
             }
         }
     }

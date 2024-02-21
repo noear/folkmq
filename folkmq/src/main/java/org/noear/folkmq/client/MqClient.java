@@ -1,6 +1,7 @@
 package org.noear.folkmq.client;
 
 import org.noear.socketd.transport.client.ClientConfigHandler;
+import org.noear.socketd.transport.stream.RequestStream;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -14,6 +15,11 @@ import java.util.concurrent.ExecutorService;
  * @since 1.0
  */
 public interface MqClient extends Closeable {
+    /**
+     * 客户端名
+     */
+    String clientName();
+
     /**
      * 连接
      */
@@ -64,6 +70,7 @@ public interface MqClient extends Closeable {
      */
     void unsubscribe(String topic, String consumerGroup) throws IOException;
 
+
     /**
      * 同步发布消息
      *
@@ -96,6 +103,16 @@ public interface MqClient extends Closeable {
      */
     CompletableFuture<Boolean> unpublishAsync(String topic, String tid) throws IOException;
 
+
+    /**
+     * 请求发送
+     */
+    RequestStream requestSend(String atName, String topic, MqMessage message) throws IOException;
+
+    /**
+     * 请求监听
+     */
+    void requestListen(MqRequestHandler requestHandler);
 
     /**
      * 开始事务

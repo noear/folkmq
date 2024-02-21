@@ -1,5 +1,7 @@
 package org.noear.folkmq.client;
 
+import org.noear.socketd.transport.core.Entity;
+
 import java.io.IOException;
 
 /**
@@ -27,5 +29,12 @@ public interface MqMessageReceived extends IMqMessage {
     /**
      * 回执
      */
-    void acknowledge(boolean isOk) throws IOException;
+    default void acknowledge(boolean isOk) throws IOException {
+        acknowledge(isOk, null);
+    }
+
+    /**
+     * 回执
+     */
+    void acknowledge(boolean isOk, Entity reply) throws IOException;
 }

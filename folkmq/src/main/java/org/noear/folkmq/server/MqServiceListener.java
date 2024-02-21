@@ -59,10 +59,10 @@ public class MqServiceListener extends MqServiceListenerBase implements MqServic
                 //预备存储
                 String tid = mr.getTid(m);
                 String topic = mr.getTopic(m);
-                String queueName = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP + ".";
+                String queueName = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP + "_";
 
                 readyMessageMap.put(tid, topic);
-                queueGetOrInit(topic, ".", queueName);
+                queueGetOrInit(topic, "_", queueName);
                 routingToQueue(mr, m, queueName);
             } else {
                 onPublish(s, m, mr);
@@ -79,7 +79,7 @@ public class MqServiceListener extends MqServiceListenerBase implements MqServic
             for (String tid : tidAry) {
                 String topic = readyMessageMap.remove(tid);
                 if (topic != null) {
-                    String queueName = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP + ".";
+                    String queueName = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP + "_";
                     MqQueue queue = getQueueMap().get(queueName);
                     if (queue != null) {
                         queue.affirmAt(tid, isRollback);

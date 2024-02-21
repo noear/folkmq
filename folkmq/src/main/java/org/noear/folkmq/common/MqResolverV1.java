@@ -106,9 +106,7 @@ public class MqResolverV1 implements MqResolver {
         }
 
         //过期时间
-        if (message.getExpiration() == null) {
-            entity.metaPut(MqMetasV1.MQ_META_EXPIRATION, "0");
-        } else {
+        if (message.getExpiration() != null) {
             entity.metaPut(MqMetasV1.MQ_META_EXPIRATION, String.valueOf(message.getExpiration().getTime()));
         }
 

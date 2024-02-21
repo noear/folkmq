@@ -2,7 +2,6 @@ package features.cases;
 
 import org.noear.folkmq.client.MqClientDefault;
 import org.noear.folkmq.client.MqMessage;
-import org.noear.folkmq.client.MqRequestListenRouter;
 import org.noear.folkmq.client.MqTransaction;
 import org.noear.folkmq.server.MqServerDefault;
 
@@ -11,7 +10,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * @author noear
- * @since 1.0
+ * @since 1.2
  */
 public class TestCase21_tran_commit extends BaseTestCase {
     public TestCase21_tran_commit(int port) {
@@ -32,11 +31,11 @@ public class TestCase21_tran_commit extends BaseTestCase {
         client = new MqClientDefault("folkmq://127.0.0.1:" + getPort())
                 .nameAs("demoapp")
                 .config(c -> c.metaPut("ak", "").metaPut("sk", ""))
-                .requestListen(new MqRequestListenRouter().doOnRequest(m->{
-                    if(m.isTransaction()){
+                .response(m -> {
+                    if (m.isTransaction()) {
                         m.acknowledge(true);
                     }
-                }))
+                })
                 .connect();
 
         client.subscribe("demo", "a", ((message) -> {

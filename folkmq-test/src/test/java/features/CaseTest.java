@@ -146,7 +146,14 @@ public class CaseTest {
 
     @Test
     public void TestCase24_tran_rollback2() throws Exception {
-        BaseTestCase testCase = new TestCase24_tran_rollback2(2023);
+        BaseTestCase testCase = new TestCase24_tran_rollback2(2024);
+        testCase.start();
+        testCase.stop();
+    }
+
+    @Test
+    public void TestCase25_rpc() throws Exception {
+        BaseTestCase testCase = new TestCase25_rpc(2025);
         testCase.start();
         testCase.stop();
     }

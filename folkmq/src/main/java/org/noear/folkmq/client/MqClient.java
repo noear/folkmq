@@ -110,14 +110,14 @@ public interface MqClient extends Closeable {
 
 
     /**
-     * 请求发送
+     * 请求
      */
-    RequestStream requestSend(String atName, String topic, MqMessage message) throws IOException;
+    RequestStream request(String atName, String topic, MqMessage message) throws IOException;
 
     /**
-     * 请求监听
+     * 响应
      */
-    MqClient requestListen(MqRequestListener requestListener);
+    MqClient response(MqResponder responder);
 
     /**
      * 开始事务

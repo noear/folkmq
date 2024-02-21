@@ -34,8 +34,8 @@ import java.util.concurrent.ExecutorService;
 public class MqClientDefault implements MqClientInternal {
     private static final Logger log = LoggerFactory.getLogger(MqClientDefault.class);
 
-    //请求监听器
-    protected MqRequestListener requestListener;
+    //请求响应器
+    protected MqResponder responder;
     //处理执行器
     protected ExecutorService handleExecutor;
     //事务状态
@@ -375,14 +375,14 @@ public class MqClientDefault implements MqClientInternal {
     }
 
     @Override
-    public RequestStream requestSend(String atName, String topic, MqMessage message) throws IOException {
+    public RequestStream request(String atName, String topic, MqMessage message) throws IOException {
         //检查必要条件
         if (StrUtils.isEmpty(name)) {
             throw new IllegalArgumentException("Client 'name' can not be empty");
         }
 
-        if(requestListener == null){
-            throw new IllegalArgumentException("Client 'requestListen' can not be null");
+        if (responder == null) {
+            throw new IllegalArgumentException("Client 'responder' can not be null");
         }
 
         //检查参数
@@ -413,10 +413,9 @@ public class MqClientDefault implements MqClientInternal {
     }
 
 
-
     @Override
-    public MqClient requestListen(MqRequestListener requestListener) {
-        this.requestListener = requestListener;
+    public MqClient response(MqResponder responder) {
+        this.responder = responder;
         return this;
     }
 
@@ -427,8 +426,8 @@ public class MqClientDefault implements MqClientInternal {
             throw new IllegalArgumentException("Client 'name' can not be empty");
         }
 
-        if(requestListener == null){
-            throw new IllegalArgumentException("Client 'requestListen' can not be null");
+        if (responder == null) {
+            throw new IllegalArgumentException("Client 'responder' can not be null");
         }
 
         //开始事务管理

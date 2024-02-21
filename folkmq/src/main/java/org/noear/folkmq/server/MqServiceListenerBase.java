@@ -36,7 +36,7 @@ public abstract class MqServiceListenerBase extends EventListener implements MqS
     //队列字典(queueName=>Queue)
     protected Map<String, MqQueue> queueMap = new ConcurrentHashMap<>();
     //预备消息
-    protected Map<String, Message> readyMessageMap = new ConcurrentHashMap<>();
+    protected Map<String, String> readyMessageMap = new ConcurrentHashMap<>();
 
     //派发线程
     protected Thread distributeThread;
@@ -152,6 +152,7 @@ public abstract class MqServiceListenerBase extends EventListener implements MqS
         long expiration = mr.getExpiration(message);
         long scheduled = mr.getScheduled(message);
         boolean sequence = mr.isSequence(message);
+        boolean transaction = mr.isTransaction(message);
 
         if (scheduled == 0) {
             //默认为当前ms（相对于后面者，有个排序作用）
@@ -167,7 +168,7 @@ public abstract class MqServiceListenerBase extends EventListener implements MqS
             List<String> topicConsumerList = new ArrayList<>(topicConsumerSet);
 
             for (String topicConsumer : topicConsumerList) {
-                routingDo(mr, topicConsumer, message, tid, qos, sequence, expiration, times, scheduled);
+                routingDo(mr, topicConsumer, message, tid, qos, sequence, expiration, transaction, times, scheduled);
             }
         }
     }
@@ -175,11 +176,11 @@ public abstract class MqServiceListenerBase extends EventListener implements MqS
     /**
      * 执行路由
      */
-    public void routingDo(MqResolver mr, String queueName, Message message, String tid, int qos, boolean sequence, long expiration, int times, long scheduled) {
+    public void routingDo(MqResolver mr, String queueName, Message message, String tid, int qos, boolean sequence, long expiration, boolean transaction,int times, long scheduled) {
         MqQueue queue = queueMap.get(queueName);
 
         if (queue != null) {
-            MqMessageHolder messageHolder = new MqMessageHolder(mr, queueName, queue.getConsumerGroup(), message, tid, qos, sequence, expiration, times, scheduled);
+            MqMessageHolder messageHolder = new MqMessageHolder(mr, queueName, queue.getConsumerGroup(), message, tid, qos, sequence, expiration, transaction, times, scheduled);
             queue.add(messageHolder);
         }
     }

@@ -16,9 +16,14 @@ import java.util.concurrent.ExecutorService;
  */
 public interface MqClient extends Closeable {
     /**
-     * 客户端名
+     * 名字
      */
-    String clientName();
+    String name();
+
+    /**
+     * 名字取为
+     * */
+    MqClient nameAs(String name);
 
     /**
      * 连接
@@ -112,7 +117,7 @@ public interface MqClient extends Closeable {
     /**
      * 请求监听
      */
-    void requestListen(MqRequestHandler requestHandler);
+    MqClient requestListen(MqRequestListener requestListener);
 
     /**
      * 开始事务

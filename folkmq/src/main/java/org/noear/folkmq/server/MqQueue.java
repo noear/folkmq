@@ -57,6 +57,11 @@ public interface MqQueue {
     void removeAt(String tid);
 
     /**
+     * 确认消息
+     * */
+    void confirmAt(String tid, boolean isRollback);
+
+    /**
      * 派发消息
      */
     boolean distribute();

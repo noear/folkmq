@@ -15,17 +15,17 @@ public interface MqResolver {
     /**
      * 获取事务id
      */
-    String getTid(Message m);
+    String getTid(Entity m);
 
     /**
      * 获取主题
      */
-    String getTopic(Message m);
+    String getTopic(Entity m);
 
     /**
      * 获取消费者组
      */
-    String getConsumerGroup(Message m);
+    String getConsumerGroup(Entity m);
 
     /**
      * 设置消费者组
@@ -35,12 +35,12 @@ public interface MqResolver {
     /**
      * 获取质量等级（0或1）
      */
-    int getQos(Message m);
+    int getQos(Entity m);
 
     /**
      * 获取派发次数
      */
-    int getTimes(Message m);
+    int getTimes(Entity m);
 
     /**
      * 设置派发次数
@@ -50,12 +50,17 @@ public interface MqResolver {
     /**
      * 获取过期时间
      */
-    long getExpiration(Message m);
+    long getExpiration(Entity m);
+
+    /**
+     * 设置过期时间
+     * */
+    void setExpiration(Entity m, Long expiration);
 
     /**
      * 获取定时时间
      */
-    long getScheduled(Message m);
+    long getScheduled(Entity m);
 
     /**
      * 设置定时时间
@@ -65,12 +70,17 @@ public interface MqResolver {
     /**
      * 是否为有序
      */
-    boolean isSequence(Message m);
+    boolean isSequence(Entity m);
 
     /**
      * 是否为事务
      */
-    boolean isTransaction(Message m);
+    boolean isTransaction(Entity m);
+
+    /**
+     * 设置事务
+     * */
+    void setTransaction(Entity m, boolean isTransaction);
 
     /**
      * 发布实体构建

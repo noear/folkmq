@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.DelayQueue;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -124,7 +123,11 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
         MqMessageHolder messageHolder = messageQueue.poll();
 
         if (messageHolder != null) {
-            distribute0(messageHolder);
+            if (messageHolder.isTransaction()) {
+
+            } else {
+                distribute0(messageHolder);
+            }
             return true;
         } else {
             return false;
@@ -139,6 +142,26 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
         MqMessageHolder messageHolder = messageMap.remove(tid);
         if (messageHolder != null) {
             internalRemove(messageHolder);
+        }
+    }
+
+    @Override
+    public void confirmAt(String tid, boolean isRollback) {
+        addLock.lock();
+
+        try {
+            MqMessageHolder messageHolder = messageMap.get(tid);
+            if (messageHolder != null) {
+                internalRemove(messageHolder);
+
+                if (isRollback) {
+                    messageMap.remove(tid);
+                } else {
+                    internalAdd(messageHolder.noTransaction());
+                }
+            }
+        } finally {
+            addLock.unlock();
         }
     }
 
@@ -211,6 +234,59 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
      */
     public int messageTotal2() {
         return messageQueue.size();
+    }
+
+    protected void request0(MqMessageHolder messageHolder) {
+        messageCountSub(messageHolder);
+
+        //如果有会话
+        if (sessionCount() > 0) {
+            //获取一个会话（轮询负载均衡）
+            Session s1 = getSessionOne(messageHolder);
+            try {
+                s1.sendAndRequest(MqConstants.MQ_EVENT_REQUEST, messageHolder.getContent()).thenReply(r -> {
+                    //进入正常队列
+                    int ack = Integer.parseInt(r.metaOrDefault(MqConstants.MQ_META_ACK, "0"));
+                    if(ack == 1){
+                        internalAdd(messageHolder.noTransaction());
+                    }else{
+                        //不用再加回去
+                    }
+                }).thenError(err -> {
+                    //进入延后队列
+                    internalAdd(messageHolder.delayed());
+
+                    if (log.isWarnEnabled()) {
+                        log.warn("MqQueue request then error, tid={}",
+                                messageHolder.getTid(), err);
+                    }
+                });
+            } catch (Throwable e) {
+                //如果无效，则移掉
+                if(s1.isValid() == false){
+                    removeSession(s1);
+                }
+
+                //进入延后队列
+                internalAdd(messageHolder.delayed());
+
+                if (log.isWarnEnabled()) {
+                    log.warn("MqQueue request error, tid={}",
+                            messageHolder.getTid(), e);
+                }
+            }
+        } else {
+            //::进入延后队列
+            internalAdd(messageHolder.delayed());
+
+            //记日志
+            if (log.isDebugEnabled()) {
+                log.debug("MqQueue request: @{} no sessions, times={}, tid={}",
+                        consumerGroup,
+                        messageHolder.getDistributeCount(),
+                        messageHolder.getTid());
+            }
+        }
     }
 
     /**

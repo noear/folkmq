@@ -64,7 +64,7 @@ public class MqClientListener extends EventListener {
 
     private void onListen(Session s, Message m, MqMessageReceivedImpl message) {
         try {
-            client.requestHandler.onRequest(message);
+            client.requestListener.onRequest(message);
         } catch (Throwable e) {
             try {
                 s.sendAlarm(m, "Request handle error:" + e.getMessage());

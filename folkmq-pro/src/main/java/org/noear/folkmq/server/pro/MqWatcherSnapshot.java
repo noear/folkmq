@@ -251,6 +251,7 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
                     long expiration = mr.getExpiration(message);
                     long scheduled = mr.getScheduled(message);
                     boolean sequence = mr.isSequence(message);
+                    boolean transaction = mr.isTransaction(message);
 
 
                     if (scheduled == 0) {
@@ -258,7 +259,7 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
                         scheduled = System.currentTimeMillis();
                     }
 
-                    serverRef.routingDo(mr, queueName, message, tid, qos, sequence, expiration, times, scheduled);
+                    serverRef.routingDo(mr, queueName, message, tid, qos, sequence, expiration, transaction, times, scheduled);
                 }
             }
         }

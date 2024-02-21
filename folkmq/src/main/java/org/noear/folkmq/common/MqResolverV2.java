@@ -19,17 +19,17 @@ import org.noear.socketd.utils.StrUtils;
 public class MqResolverV2 implements MqResolver {
 
     @Override
-    public String getTid(Message m) {
+    public String getTid(Entity m) {
         return m.metaOrDefault(MqMetasV2.MQ_META_TID, "");
     }
 
     @Override
-    public String getTopic(Message m) {
+    public String getTopic(Entity m) {
         return m.metaOrDefault(MqMetasV2.MQ_META_TOPIC, "");
     }
 
     @Override
-    public String getConsumerGroup(Message m) {
+    public String getConsumerGroup(Entity m) {
         return m.metaOrDefault(MqMetasV2.MQ_META_CONSUMER_GROUP, "");
     }
 
@@ -39,12 +39,12 @@ public class MqResolverV2 implements MqResolver {
     }
 
     @Override
-    public int getQos(Message m) {
+    public int getQos(Entity m) {
         return "0".equals(m.meta(MqMetasV2.MQ_META_QOS)) ? 0 : 1;
     }
 
     @Override
-    public int getTimes(Message m) {
+    public int getTimes(Entity m) {
         return Integer.parseInt(m.metaOrDefault(MqMetasV2.MQ_META_TIMES, "0"));
     }
 
@@ -53,13 +53,23 @@ public class MqResolverV2 implements MqResolver {
         m.putMeta(MqMetasV2.MQ_META_TIMES, String.valueOf(times));
     }
 
+
     @Override
-    public long getExpiration(Message m) {
+    public void setExpiration(Entity m, Long expiration) {
+        if (expiration == null) {
+            m.putMeta(MqMetasV2.MQ_META_EXPIRATION, null);
+        } else {
+            m.putMeta(MqMetasV2.MQ_META_EXPIRATION, expiration.toString());
+        }
+    }
+
+    @Override
+    public long getExpiration(Entity m) {
         return Long.parseLong(m.metaOrDefault(MqMetasV2.MQ_META_EXPIRATION, "0"));
     }
 
     @Override
-    public long getScheduled(Message m) {
+    public long getScheduled(Entity m) {
         return Long.parseLong(m.metaOrDefault(MqMetasV2.MQ_META_SCHEDULED, "0"));
     }
 
@@ -69,13 +79,18 @@ public class MqResolverV2 implements MqResolver {
     }
 
     @Override
-    public boolean isSequence(Message m) {
+    public boolean isSequence(Entity m) {
         return Integer.parseInt(m.metaOrDefault(MqMetasV2.MQ_META_SEQUENCE, "0")) == 1;
     }
 
     @Override
-    public boolean isTransaction(Message m) {
+    public boolean isTransaction(Entity m) {
         return "1".equals(m.meta(MqMetasV2.MQ_META_TRANSACTION));
+    }
+
+    @Override
+    public void setTransaction(Entity m, boolean isTransaction) {
+        m.putMeta(MqMetasV2.MQ_META_TRANSACTION, (isTransaction ? "1" : "0"));
     }
 
 

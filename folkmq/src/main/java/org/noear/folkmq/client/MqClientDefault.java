@@ -16,6 +16,7 @@ import org.noear.socketd.transport.core.Session;
 import org.noear.socketd.transport.core.entity.EntityDefault;
 import org.noear.socketd.transport.core.entity.StringEntity;
 import org.noear.socketd.transport.stream.RequestStream;
+import org.noear.socketd.utils.StrUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,16 +34,14 @@ import java.util.concurrent.ExecutorService;
 public class MqClientDefault implements MqClientInternal {
     private static final Logger log = LoggerFactory.getLogger(MqClientDefault.class);
 
-    //客户端名字
-    protected final String clientName;
     //请求监听器
-    protected MqRequestHandler requestHandler;
+    protected MqRequestListener requestListener;
     //处理执行器
     protected ExecutorService handleExecutor;
     //事务状态
     private final ThreadLocal<MqTransactionImpl> tranThreadLocal = new ThreadLocal<>();
     //服务端地址
-    private final List<String> serverUrls;
+    private final String[] urls;
     //客户端会话
     private ClusterClientSession clientSession;
     //客户端监听
@@ -51,38 +50,51 @@ public class MqClientDefault implements MqClientInternal {
     private ClientConfigHandler clientConfigHandler;
     //订阅字典
     private Map<String, MqSubscription> subscriptionMap = new HashMap<>();
+    //客户端名字
+    private String name;
 
 
     //自动回执
     protected boolean autoAcknowledge = true;
 
-    public MqClientDefault(String clientName, String... urls) {
-        this.clientName = clientName;
-        this.serverUrls = new ArrayList<>();
+    public MqClientDefault(String... urls) {
+        this.urls = urls;
         this.clientListener = new MqClientListener(this);
+    }
+
+    @Override
+    public String name() {
+        return name;
+    }
+
+    @Override
+    public MqClient nameAs(String name) {
+        this.name = name;
+        return this;
+    }
+
+    @Override
+    public MqClient connect() throws IOException {
+        List<String> serverUrls = new ArrayList<>();
 
         for (String url : urls) {
             url = url.replaceAll("folkmq:ws://", "sd:ws://");
             url = url.replaceAll("folkmq://", "sd:tcp://");
 
             for (String url1 : url.split(",")) {
-                if (url1.contains("?")) {
-                    url1 = url1 + "&@" + clientName;
-                } else {
-                    url1 = url1 + "?@" + clientName;
+                if (StrUtils.isNotEmpty(name)) {
+                    if (url1.contains("?")) {
+                        url1 = url1 + "&@" + name;
+                    } else {
+                        url1 = url1 + "?@" + name;
+                    }
                 }
 
                 serverUrls.add(url1);
             }
         }
-    }
 
-    public String clientName() {
-        return clientName;
-    }
 
-    @Override
-    public MqClient connect() throws IOException {
         //默认不缩小分片，方便无锁发送
         clientSession = (ClusterClientSession) SocketD.createClusterClient(serverUrls)
                 .config(c -> {
@@ -364,6 +376,16 @@ public class MqClientDefault implements MqClientInternal {
 
     @Override
     public RequestStream requestSend(String atName, String topic, MqMessage message) throws IOException {
+        //检查必要条件
+        if (StrUtils.isEmpty(name)) {
+            throw new IllegalArgumentException("Client 'name' can not be empty");
+        }
+
+        if(requestListener == null){
+            throw new IllegalArgumentException("Client 'requestListen' can not be null");
+        }
+
+        //检查参数
         Objects.requireNonNull(atName, "Param 'atName' can not be null");
         Objects.requireNonNull(message, "Param 'message' can not be null");
 
@@ -376,7 +398,7 @@ public class MqClientDefault implements MqClientInternal {
             throw new SocketDException("No session is available!");
         }
 
-        message.internalSender(clientName());
+        message.internalSender(name());
         StringEntity entity = MqUtils.getOf((Session) session).publishEntityBuild(topic, message);
         entity.at(atName);
 
@@ -393,12 +415,23 @@ public class MqClientDefault implements MqClientInternal {
 
 
     @Override
-    public void requestListen(MqRequestHandler requestHandler) {
-        this.requestHandler = requestHandler;
+    public MqClient requestListen(MqRequestListener requestListener) {
+        this.requestListener = requestListener;
+        return this;
     }
 
     @Override
     public MqTransaction beginTransaction() {
+        //检查必要条件
+        if (StrUtils.isEmpty(name)) {
+            throw new IllegalArgumentException("Client 'name' can not be empty");
+        }
+
+        if(requestListener == null){
+            throw new IllegalArgumentException("Client 'requestListen' can not be null");
+        }
+
+        //开始事务管理
         MqTransactionImpl tmp = tranThreadLocal.get();
         if (tmp == null) {
             tmp = new MqTransactionImpl(this);

@@ -24,10 +24,12 @@ public class MqMessageHolder implements Delayed {
     private final String atName;
     //质量等级（0 或 1）
     private final int qos;
-    //存活时间
+    //过期时间
     private final long expiration;
-    //是否有序
+    //是否为有序
     private final boolean sequence;
+    //是否为事务
+    private boolean transaction;
 
     //派发时间
     private volatile long distributeTime;
@@ -38,7 +40,7 @@ public class MqMessageHolder implements Delayed {
     //是否完成
     private AtomicBoolean isDone;
 
-    public MqMessageHolder(MqResolver mr, String queueName, String consumerGroup, Message from, String tid, int qos, boolean sequence, long expiration, int distributeCount, long distributeTime) {
+    public MqMessageHolder(MqResolver mr, String queueName, String consumerGroup, Message from, String tid, int qos, boolean sequence, long expiration, boolean transaction, int distributeCount, long distributeTime) {
         this.mr = mr;
         this.atName = from.atName();
         this.content = new EntityDefault().dataSet(from.data()).metaMapPut(from.metaMap());
@@ -57,6 +59,7 @@ public class MqMessageHolder implements Delayed {
         this.qos = qos;
         this.expiration = expiration;
         this.sequence = sequence;
+        this.transaction = transaction;
         this.distributeCount = distributeCount;
         this.distributeTime = distributeTime;
     }
@@ -97,7 +100,28 @@ public class MqMessageHolder implements Delayed {
     }
 
     /**
-     * 是否有序
+     * 是否有事务
+     * */
+    public boolean isTransaction(){
+        return transaction;
+    }
+
+    public MqMessageHolder noTransaction() {
+        transaction = false;
+        distributeCount = 0;
+        distributeTime = System.currentTimeMillis();
+
+        //设置新的派发次数和下次时间
+        mr.setTimes(content, distributeCount);
+        mr.setScheduled(content, distributeTime);
+        mr.setExpiration(content, null);
+        mr.setTransaction(content, false);
+
+        return this;
+    }
+
+    /**
+     * 是否为有序
      */
     public boolean isSequence() {
         return sequence;

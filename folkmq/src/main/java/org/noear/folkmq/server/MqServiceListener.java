@@ -53,28 +53,32 @@ public class MqServiceListener extends MqServiceListenerBase implements MqServic
             if (isTrans) {
                 //预备存储
                 String tid = mr.getTid(m);
-                readyMessageMap.put(tid, m);
-            } else {
-                onPublish(s, m, mr);
+                String topic = mr.getTopic(m);
+                //存活为2小时
+                mr.setExpiration(m, System.currentTimeMillis() + MqNextTime.TIME_2H);
+                //延后为1分钟
+                mr.setScheduled(m, System.currentTimeMillis() + MqNextTime.TIME_1M);
+                readyMessageMap.put(tid, topic);
             }
 
+            onPublish(s, m, mr);
             confirmDo(s, m);
         });
 
         doOn(MqConstants.MQ_EVENT_PUBLISH2, (s, m) -> {
             //接收二段发布指令
-            String isRollback = m.meta(MqConstants.MQ_META_ROLLBACK);
+            boolean isRollback = "1".equals(m.meta(MqConstants.MQ_META_ROLLBACK));
             String[] tidAry = m.dataAsString().split(",");
 
-            if ("1".equals(isRollback)) {
-                for (String tid : tidAry) {
-                    readyMessageMap.remove(tid);
-                }
-            } else {
-                for (String tid : tidAry) {
-                    Message m2 = readyMessageMap.remove(tid);
-                    if (m2 != null) {
-                        onPublish(s, m2, MqUtils.getOf(m2));
+            for (String tid : tidAry) {
+                String topic = readyMessageMap.remove(tid);
+                if (topic != null) {
+                    Set<String> topicConsumerSet = getSubscribeMap().get(topic);
+                    if (topicConsumerSet != null) {
+                        for (String queueName : topicConsumerSet) {
+                            MqQueue queue = getQueueMap().get(queueName);
+                            queue.confirmAt(tid, isRollback);
+                        }
                     }
                 }
             }
@@ -260,6 +264,9 @@ public class MqServiceListener extends MqServiceListenerBase implements MqServic
                 queue.removeSession(session);
             }
         }
+
+        //增加经理人支持
+        brokerListener.onClose(session);
     }
 
     /**

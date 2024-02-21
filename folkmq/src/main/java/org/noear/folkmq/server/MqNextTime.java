@@ -9,6 +9,9 @@ package org.noear.folkmq.server;
 public class MqNextTime {
     private static long maxConsumeMillis = 1000 * 60 * 3;
 
+    public static final long TIME_2H = 1000 * 60 * 60 * 2;
+    public static final long TIME_1M = 1000 * 60;
+
     static {
         String tmp = System.getProperty("folkmq.maxConsumeWaiting");
         if (tmp != null) {

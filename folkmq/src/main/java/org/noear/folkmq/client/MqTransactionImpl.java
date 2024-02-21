@@ -27,7 +27,7 @@ public class MqTransactionImpl implements MqTransaction {
      */
     protected void begin(MqMessage message) {
         message.internalTransaction(true);
-        message.internalSender(client.clientName());
+        message.internalSender(client.name());
         tidAry.add(message.getTid());
     }
 

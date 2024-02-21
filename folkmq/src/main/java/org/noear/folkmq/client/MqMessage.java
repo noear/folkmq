@@ -58,7 +58,6 @@ public class MqMessage implements IMqMessage {
     /**
      * 是否事务
      */
-    @Override
     public boolean isTransaction() {
         return transaction;
     }

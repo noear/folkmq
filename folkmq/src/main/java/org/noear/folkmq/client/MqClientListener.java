@@ -47,7 +47,7 @@ public class MqClientListener extends EventListener {
             }
         });
 
-        doOn(MqConstants.MQ_EVENT_LISTEN, (s, m) -> {
+        doOn(MqConstants.MQ_EVENT_REQUEST, (s, m) -> {
             try {
                 MqMessageReceivedImpl message = new MqMessageReceivedImpl(client, s, m);
 

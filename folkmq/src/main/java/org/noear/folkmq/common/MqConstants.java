@@ -69,6 +69,10 @@ public interface MqConstants {
      */
     String MQ_EVENT_DISTRIBUTE = "mq.event.distribute";
     /**
+     * 事件：请求
+     * */
+    String MQ_EVENT_REQUEST = "mq.event.request";
+    /**
      * 事件：保存快照
      */
     String MQ_EVENT_SAVE = "mq.event.save";
@@ -77,16 +81,6 @@ public interface MqConstants {
      * 事件：加入集群
      * */
     String MQ_EVENT_JOIN = "mq.event.join";
-
-    /**
-     * 事件：加入集群
-     * */
-    String MQ_EVENT_REQUEST = "mq.event.request";
-
-    /**
-     * 事件：加入集群
-     * */
-    String MQ_EVENT_LISTEN = "mq.event.listen";
 
 
     /**

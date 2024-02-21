@@ -131,8 +131,22 @@ public class CaseTest {
     }
 
     @Test
-    public void TestCase22_tran_rollback() throws Exception {
-        BaseTestCase testCase = new TestCase22_tran_rollback(2022);
+    public void TestCase22_tran_commit2() throws Exception {
+        BaseTestCase testCase = new TestCase22_tran_commit2(2022);
+        testCase.start();
+        testCase.stop();
+    }
+
+    @Test
+    public void TestCase23_tran_rollback() throws Exception {
+        BaseTestCase testCase = new TestCase23_tran_rollback(2023);
+        testCase.start();
+        testCase.stop();
+    }
+
+    @Test
+    public void TestCase24_tran_rollback2() throws Exception {
+        BaseTestCase testCase = new TestCase24_tran_rollback2(2023);
         testCase.start();
         testCase.stop();
     }

@@ -255,20 +255,19 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
     protected void transpond0(MqMessageHolder messageHolder) {
         messageCountSub(messageHolder);
 
-        //如果有会话
-        if (sessionCount() > 0) {
-            //获取一个会话（轮询负载均衡）
-            Session s1 = null;
 
+        //获取一个会话（轮询负载均衡）
+        Session s1 = null;
 
+        //获取会话
+        if (serviceListener.brokerMode) {
+            s1 = serviceListener.brokerListener.getSessionAny();
+        } else {
+            s1 = serviceListener.brokerListener.getPlayerAny(messageHolder.getSender());
+        }
+
+        if (s1 != null) {
             try {
-                //获取会话
-                if (serviceListener.brokerMode) {
-                    s1 = getSessionOne(messageHolder);
-                } else {
-                    s1 = serviceListener.brokerListener.getPlayerAny(messageHolder.getSender(), null);
-                }
-
                 //开始请求确认
                 s1.sendAndRequest(MqConstants.MQ_EVENT_REQUEST, messageHolder.getContent()).thenReply(r -> {
                     //进入正常队列
@@ -306,6 +305,7 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
                 }
             }
         } else {
+
             //::进入延后队列
             internalAdd(messageHolder.delayed());
 

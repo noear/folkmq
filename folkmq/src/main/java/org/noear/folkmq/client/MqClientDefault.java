@@ -84,9 +84,9 @@ public class MqClientDefault implements MqClientInternal {
             for (String url1 : url.split(",")) {
                 if (StrUtils.isNotEmpty(name)) {
                     if (url1.contains("?")) {
-                        url1 = url1 + "&@" + name;
+                        url1 = url1 + "&@=" + name;
                     } else {
-                        url1 = url1 + "?@" + name;
+                        url1 = url1 + "?@=" + name;
                     }
                 }
 

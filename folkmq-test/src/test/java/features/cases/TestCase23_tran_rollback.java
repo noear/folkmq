@@ -13,8 +13,8 @@ import java.util.concurrent.TimeUnit;
  * @author noear
  * @since 1.0
  */
-public class TestCase22_tran_rollback extends BaseTestCase {
-    public TestCase22_tran_rollback(int port) {
+public class TestCase23_tran_rollback extends BaseTestCase {
+    public TestCase23_tran_rollback(int port) {
         super(port);
     }
 

@@ -1,13 +1,13 @@
 package org.noear.folkmq.client;
 
 /**
- * 请求监听器
+ * 请求响应器
  *
  * @author noear
  * @since 1.2
  */
 @FunctionalInterface
-public interface MqRequestListener {
+public interface MqResponder {
     /**
      * 请求时
      *

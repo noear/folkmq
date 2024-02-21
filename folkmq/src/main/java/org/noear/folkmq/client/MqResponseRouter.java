@@ -5,19 +5,19 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * 请求监听路由器
+ * 请求响应路由器
  *
  * @author noear
  * @since 1.2
  */
-public class MqRequestListenRouter implements MqRequestListener {
-    private MqRequestListener requestHandler;
-    private Map<String, MqRequestListener> doOnMap = new ConcurrentHashMap<>();
+public class MqResponseRouter implements MqResponder {
+    private MqResponder requestHandler;
+    private Map<String, MqResponder> doOnMap = new ConcurrentHashMap<>();
 
     /**
      * 配置所有请求处理
      */
-    public MqRequestListenRouter doOnRequest(MqRequestListener requestHandler) {
+    public MqResponseRouter doOnRequest(MqResponder requestHandler) {
         this.requestHandler = requestHandler;
         return this;
     }
@@ -25,7 +25,7 @@ public class MqRequestListenRouter implements MqRequestListener {
     /**
      * 配置主题请求处理
      */
-    public MqRequestListenRouter doOn(String topic, MqRequestListener requestHandler) {
+    public MqResponseRouter doOn(String topic, MqResponder requestHandler) {
         doOnMap.put(topic, requestHandler);
         return this;
     }
@@ -36,7 +36,7 @@ public class MqRequestListenRouter implements MqRequestListener {
             requestHandler.onRequest(message);
         }
 
-        MqRequestListener topicHanler = doOnMap.get(message.getTopic());
+        MqResponder topicHanler = doOnMap.get(message.getTopic());
         if (topicHanler != null) {
             topicHanler.onRequest(message);
         }

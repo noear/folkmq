@@ -13,7 +13,7 @@ import org.noear.socketd.utils.StrUtils;
  * 消息元信息分析器 v1
  *
  * @author noear
- * @see 1.0
+ * @see 1.2
  */
 public class MqResolverV1 implements MqResolver {
     public String getTid(Message m) {

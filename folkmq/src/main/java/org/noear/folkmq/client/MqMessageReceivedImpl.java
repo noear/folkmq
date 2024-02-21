@@ -26,6 +26,7 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
     private final String content;
     private final Date expiration;
     private final boolean sequence;
+    private final boolean transaction;
     private final int qos;
     private final int times;
 
@@ -45,6 +46,7 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
         this.qos = mr.getQos(from);
         this.times = mr.getTimes(from);
         this.sequence = mr.isSequence(from);
+        this.transaction = mr.isTransaction(from);
 
         long expirationL = mr.getExpiration(from);
         if (expirationL == 0) {
@@ -102,7 +104,15 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
     }
 
     /**
-     * 是否有序
+     * 是否为事务
+     */
+    @Override
+    public boolean isTransaction() {
+        return transaction;
+    }
+
+    /**
+     * 是否为有序
      */
     @Override
     public boolean isSequence() {

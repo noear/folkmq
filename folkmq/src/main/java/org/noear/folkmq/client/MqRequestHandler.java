@@ -4,7 +4,7 @@ package org.noear.folkmq.client;
  * 请求处理器
  *
  * @author noear
- * @since 1.0
+ * @since 1.2
  */
 @FunctionalInterface
 public interface MqRequestHandler {

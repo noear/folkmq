@@ -4,7 +4,7 @@ package org.noear.folkmq.common;
  * 消息元信息 v2
  *
  * @author noear
- * @since 1.1
+ * @since 1.2
  */
 public interface MqMetasV2 {
     /**

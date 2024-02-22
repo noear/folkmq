@@ -159,10 +159,6 @@ public class AdminController extends BaseController {
                 String adminPort = session.param("port");
                 String adminAddr = socketAddress.getAddress().getHostAddress();
 
-                if (adminAddr.startsWith("/")) {
-                    adminAddr = adminAddr.substring(1);
-                }
-
                 ServerVo serverVo = new ServerVo();
                 serverVo.sid = session.sessionId();
                 serverVo.addree = adminAddr + ":" + socketAddress.getPort();

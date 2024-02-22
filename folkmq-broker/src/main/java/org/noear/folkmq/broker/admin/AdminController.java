@@ -157,7 +157,7 @@ public class AdminController extends BaseController {
             for (Session session : serverList) {
                 InetSocketAddress socketAddress = session.remoteAddress();
                 String adminPort = session.param("port");
-                String adminAddr = socketAddress.getAddress().toString();
+                String adminAddr = socketAddress.getAddress().getHostAddress();
 
                 if (adminAddr.startsWith("/")) {
                     adminAddr = adminAddr.substring(1);

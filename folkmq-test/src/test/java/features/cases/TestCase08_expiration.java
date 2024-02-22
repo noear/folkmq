@@ -36,7 +36,7 @@ public class TestCase08_expiration extends BaseTestCase {
         client.publish("demo", new MqMessage("demo1")
                 .expiration(new Date(System.currentTimeMillis() + 5000)));
 
-        MqQueue queue = server.getServerInternal().getQueueMap().get("demo#a");
+        MqQueue queue = server.getServerInternal().getQueue("demo#a");
 
         System.out.println(queue.messageTotal());
         assert queue.messageTotal() == 1L;

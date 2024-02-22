@@ -52,7 +52,7 @@ public class AdminQueueController extends BaseController {
         String queueName = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP + consumerGroup;
         List<String> list = new ArrayList<>();
 
-        MqQueue queue = server.getQueueMap().get(queueName);
+        MqQueue queue = server.getQueue(queueName);
         if (queue != null) {
             List<Session> sessions = new ArrayList<>(queue.getSessions());
             for (Session s1 : sessions) {

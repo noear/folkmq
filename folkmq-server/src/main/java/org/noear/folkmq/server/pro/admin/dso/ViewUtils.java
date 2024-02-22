@@ -57,7 +57,7 @@ public class ViewUtils {
     }
 
     public static QueueVo queueOneView(MqServiceInternal server, String queueName) {
-        MqQueueDefault queue = (MqQueueDefault) server.getQueueMap().get(queueName);
+        MqQueueDefault queue = (MqQueueDefault) server.getQueue(queueName);
         if(queue == null){
             return null;
         }
@@ -83,7 +83,7 @@ public class ViewUtils {
     public static List<String> queueSessionListView(MqServiceInternal server, String queueName) throws IOException {
         List<String> list = new ArrayList<>();
 
-        MqQueue queue = server.getQueueMap().get(queueName);
+        MqQueue queue = server.getQueue(queueName);
         if (queue != null) {
             List<Session> sessions = new ArrayList<>(queue.getSessions());
             for (Session s1 : sessions) {

@@ -67,7 +67,7 @@ public class TestCase16_ack_retry_multi_server extends BaseTestCase {
         System.out.println("server topicConsumerMap.size=" + serverInternal.getQueueMap().size());
         assert serverInternal.getQueueMap().size() == 1;
 
-        MqQueue topicConsumerQueue = serverInternal.getQueueMap().get("demo#a");
+        MqQueue topicConsumerQueue = serverInternal.getQueue("demo#a");
         System.out.println("server topicConsumerQueue.size=" + topicConsumerQueue.messageTotal());
         assert topicConsumerQueue.messageTotal() == 0;
         assert topicConsumerQueue.messageTotal2() == 0;
@@ -79,7 +79,7 @@ public class TestCase16_ack_retry_multi_server extends BaseTestCase {
         System.out.println("server topicConsumerMap.size=" + serverInternal2.getQueueMap().size());
         assert serverInternal2.getQueueMap().size() == 1;
 
-        MqQueue topicConsumerQueue2 = serverInternal2.getQueueMap().get("demo#a");
+        MqQueue topicConsumerQueue2 = serverInternal2.getQueue("demo#a");
         System.out.println("server topicConsumerQueue.size=" + topicConsumerQueue2.messageTotal());
         assert topicConsumerQueue2.messageTotal() == 0;
         assert topicConsumerQueue2.messageTotal2() == 0;

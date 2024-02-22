@@ -3,6 +3,7 @@ package features.cases;
 import org.noear.folkmq.client.MqClientDefault;
 import org.noear.folkmq.client.MqMessage;
 import org.noear.folkmq.client.MqTransaction;
+import org.noear.folkmq.server.MqQueue;
 import org.noear.folkmq.server.MqServerDefault;
 
 import java.util.concurrent.CountDownLatch;
@@ -58,5 +59,10 @@ public class TestCase23_tran_rollback extends BaseTestCase {
 
         //检验客户端
         assert countDownLatch.getCount() == 1;
+
+        MqQueue queue = server.getServerInternal().getQueue("demo#_");
+        assert queue != null;
+        System.out.println(queue.messageTotal());
+        assert queue.messageTotal() == 0L;
     }
 }

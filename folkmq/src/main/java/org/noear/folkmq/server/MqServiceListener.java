@@ -80,7 +80,7 @@ public class MqServiceListener extends MqServiceListenerBase implements MqServic
                 String topic = readyMessageMap.remove(tid);
                 if (topic != null) {
                     String queueName = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP + MqConstants.MQ_TRAN_CONSUMER_GROUP;
-                    MqQueue queue = getQueueMap().get(queueName);
+                    MqQueue queue = getQueue(queueName);
                     if (queue != null) {
                         queue.affirmAt(tid, isRollback);
                     }

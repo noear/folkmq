@@ -213,20 +213,6 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
     }
 
     /**
-     * 消息总量
-     */
-    public int messageTotal() {
-        return messageMap.size();
-    }
-
-    /**
-     * 消息总量2（用于做校验）
-     */
-    public int messageTotal2() {
-        return messageQueue.size();
-    }
-
-    /**
      * 执行转发
      */
     protected void transpond0(MqMessageHolder messageHolder) {

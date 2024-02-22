@@ -37,6 +37,11 @@ public interface MqServiceInternal {
     Map<String, MqQueue> getQueueMap();
 
     /**
+     * 获取队列
+     * */
+    MqQueue getQueue(String queueName);
+
+    /**
      * 移除队列
      */
     void removeQueue(String queueName);

@@ -37,7 +37,7 @@ public class QueueForceService {
 
             log.warn("Queue forceDistribute: queueName={}", queueName);
 
-            MqQueue queue = server.getQueueMap().get(queueName);
+            MqQueue queue = server.getQueue(queueName);
             if (queue != null) {
                 if (queue.sessionCount() == 0 && isStandalone) {
                     return Result.failure("没有消费者连接，不能派发!");
@@ -73,7 +73,7 @@ public class QueueForceService {
 
             log.warn("Queue forceDelete: queueName={}", queueName);
 
-            MqQueue queue = server.getQueueMap().get(queueName);
+            MqQueue queue = server.getQueue(queueName);
             if (queue != null) {
                 if (queue.sessionCount() > 0 && isStandalone) {
                     return Result.failure("有消费者连接，不能删除!");
@@ -106,7 +106,7 @@ public class QueueForceService {
 
             log.warn("Queue forceClear: queueName={}", queueName);
 
-            MqQueue queue = server.getQueueMap().get(queueName);
+            MqQueue queue = server.getQueue(queueName);
             if (queue != null) {
                 queue.forceClear();
 

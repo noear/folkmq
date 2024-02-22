@@ -64,7 +64,7 @@ public class TestCase18_batch_subscribe extends BaseTestCase {
         System.out.println("server topicConsumerMap.size=" + serverInternal.getQueueMap().size());
         assert serverInternal.getQueueMap().size() == 3;
 
-        MqQueue topicConsumerQueue = serverInternal.getQueueMap().get("demo#a");
+        MqQueue topicConsumerQueue = serverInternal.getQueue("demo#a");
         System.out.println("server topicConsumerQueue.size=" + topicConsumerQueue.messageTotal());
         assert topicConsumerQueue.messageTotal() == 0;
         assert topicConsumerQueue.messageTotal2() == 0;

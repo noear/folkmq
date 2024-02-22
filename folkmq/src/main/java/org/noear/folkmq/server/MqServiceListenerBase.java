@@ -26,18 +26,18 @@ public abstract class MqServiceListenerBase extends EventListener implements MqS
     //群集模式（有经理人的模式）
     protected boolean brokerMode;
     //订阅锁
-    protected Object SUBSCRIBE_LOCK = new Object();
+    protected final Object SUBSCRIBE_LOCK = new Object();
     //所有会话
-    protected Map<String, Session> sessionAllMap = new ConcurrentHashMap<>();
+    protected final Map<String, Session> sessionAllMap = new ConcurrentHashMap<>();
     //服务端访问账号
-    protected Map<String, String> serverAccessMap = new ConcurrentHashMap<>();
+    protected final Map<String, String> serverAccessMap = new ConcurrentHashMap<>();
 
     //订阅关系(topic=>[queueName]) //queueName='topic#consumer'
-    protected Map<String, Set<String>> subscribeMap = new ConcurrentHashMap<>();
+    protected final Map<String, Set<String>> subscribeMap = new ConcurrentHashMap<>();
     //队列字典(queueName=>Queue)
-    protected Map<String, MqQueue> queueMap = new ConcurrentHashMap<>();
+    protected final Map<String, MqQueue> queueMap = new ConcurrentHashMap<>();
     //预备消息
-    protected Map<String, String> readyMessageMap = new ConcurrentHashMap<>();
+    protected final Map<String, String> readyMessageMap = new ConcurrentHashMap<>();
 
     //派发线程
     protected Thread distributeThread;
@@ -74,6 +74,14 @@ public abstract class MqServiceListenerBase extends EventListener implements MqS
     @Override
     public Map<String, MqQueue> getQueueMap() {
         return Collections.unmodifiableMap(queueMap);
+    }
+
+    /**
+     * 获取队列
+     * */
+    @Override
+    public MqQueue getQueue(String queueName) {
+        return queueMap.get(queueName);
     }
 
     /**

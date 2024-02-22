@@ -41,19 +41,19 @@ public class TestCase17_unpublish extends BaseTestCase {
 
         Thread.sleep(1000);
 
-        assert server.getServerInternal().getQueueMap().get("demo#a").messageTotal() == 1;
-        assert server.getServerInternal().getQueueMap().get("demo#a").messageTotal2() == 1;
+        assert server.getServerInternal().getQueue("demo#a").messageTotal() == 1;
+        assert server.getServerInternal().getQueue("demo#a").messageTotal2() == 1;
 
         Thread.sleep(1000);
 
-        assert server.getServerInternal().getQueueMap().get("demo#a").messageTotal() == 1;
-        assert server.getServerInternal().getQueueMap().get("demo#a").messageTotal2() == 1;
+        assert server.getServerInternal().getQueue("demo#a").messageTotal() == 1;
+        assert server.getServerInternal().getQueue("demo#a").messageTotal2() == 1;
 
         client.unpublish("demo", mqMessage.getTid());
 
         Thread.sleep(10);
 
-        assert server.getServerInternal().getQueueMap().get("demo#a").messageTotal() == 0;
-        assert server.getServerInternal().getQueueMap().get("demo#a").messageTotal2() == 0;
+        assert server.getServerInternal().getQueue("demo#a").messageTotal() == 0;
+        assert server.getServerInternal().getQueue("demo#a").messageTotal2() == 0;
     }
 }

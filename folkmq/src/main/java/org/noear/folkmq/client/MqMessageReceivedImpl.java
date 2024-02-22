@@ -9,6 +9,7 @@ import org.noear.socketd.transport.core.Session;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.Map;
 
 /**
  * 收到的消息
@@ -142,13 +143,21 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
 
     @Override
     public String toString() {
-        return "MqMessageReceived{" +
-                "tid='" + tid + '\'' +
-                ", topic='" + topic + '\'' +
-                ", consumerGroup='" + consumerGroup + '\'' +
-                ", content='" + content + '\'' +
-                ", qos=" + qos +
-                ", times=" + times +
-                '}';
+        StringBuilder buf = new StringBuilder();
+        buf.append("MqMessageReceived{");
+        buf.append("tid='").append(tid).append("',");
+        buf.append("topic='").append(topic).append("',");
+        buf.append("content='").append(content).append("',");
+
+        for (Map.Entry<String, String> kv : from.metaMap().entrySet()) {
+            if (kv.getKey().startsWith(MqConstants.MQ_ATTR_PREFIX)) {
+                buf.append(kv.getKey()).append("='").append(kv.getValue()).append("',");
+            }
+        }
+
+        buf.setLength(buf.length()-1);
+        buf.append("}");
+
+        return buf.toString();
     }
 }

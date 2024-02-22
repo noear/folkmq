@@ -157,4 +157,11 @@ public class CaseTest {
         testCase.start();
         testCase.stop();
     }
+
+    @Test
+    public void TestCase26_attr() throws Exception {
+        BaseTestCase testCase = new TestCase26_attr(2026);
+        testCase.start();
+        testCase.stop();
+    }
 }

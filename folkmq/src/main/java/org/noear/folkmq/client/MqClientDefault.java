@@ -99,6 +99,7 @@ public class MqClientDefault implements MqClientInternal {
         clientSession = (ClusterClientSession) SocketD.createClusterClient(serverUrls)
                 .config(c -> {
                     c.metaPut(MqConstants.FOLKMQ_VERSION, FolkMQ.versionCodeAsString())
+                            .heartbeatInterval(6_000)
                             .nolockSend(true)
                             .ioThreads(1)
                             .codecThreads(1)

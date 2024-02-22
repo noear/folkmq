@@ -177,6 +177,7 @@ public class FolkmqLifecycleBean implements LifecycleBean {
         brokerSession = (ClusterClientSession) SocketD.createClusterClient(serverUrls)
                 .config(c ->
                         c.metaPut(MqConstants.FOLKMQ_VERSION, FolkMQ.versionCodeAsString())
+                                .heartbeatInterval(6_000)
                                 .sequenceSend(true)
                                 .ioThreads(MqServerConfig.ioThreads)
                                 .codecThreads(MqServerConfig.codecThreads)

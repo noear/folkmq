@@ -160,7 +160,7 @@ public class BrokerListenerFolkmq extends BrokerListener {
 
             log.info("Player channel joined, sessionId={}, ip={}",
                     requester.sessionId(),
-                    requester.remoteAddress());
+                    requester.remoteAddress().getAddress().getHostAddress());
 
             //结束处理
             return;

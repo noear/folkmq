@@ -13,7 +13,6 @@ import org.noear.socketd.transport.core.Flags;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.entity.StringEntity;
 import org.noear.socketd.transport.core.entity.MessageBuilder;
-import org.noear.socketd.utils.RunUtils;
 import org.noear.socketd.utils.StrUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,18 +91,18 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
     @Override
     public void onStartBefore() {
         isStarted.set(false);
-        loadSubscribeMap();
+
+        try {
+            loadSubscribeMap();
+            loadQueue();
+        } finally {
+            isStarted.set(true);
+        }
     }
 
     @Override
     public void onStartAfter() {
-        RunUtils.asyncAndTry(() -> {
-            try {
-                loadQueue();
-            } finally {
-                isStarted.set(true);
-            }
-        });
+
     }
 
     /**

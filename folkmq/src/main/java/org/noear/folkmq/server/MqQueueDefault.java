@@ -37,6 +37,8 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
     private final String consumerGroup;
     //队列名字 //queueName='topic#consumer'
     private final String queueName;
+    //是否为事务缓存
+    private final boolean isTransaction;
 
     //观察者（由上层传入）
     private final MqWatcher watcher;
@@ -57,6 +59,8 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
         this.topic = topic;
         this.consumerGroup = consumerGroup;
         this.queueName = queueName;
+
+        this.isTransaction = MqConstants.MQ_TRAN_CONSUMER_GROUP.equals(consumerGroup);
 
         this.watcher = watcher;
 
@@ -94,6 +98,16 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
      */
     public Map<String, MqMessageHolder> getMessageMap() {
         return Collections.unmodifiableMap(messageMap);
+    }
+
+
+    @Override
+    public int sessionCount() {
+        if (isTransaction) {
+            return serviceListener.brokerListener.getSessionCount();
+        } else {
+            return super.sessionCount();
+        }
     }
 
     /**

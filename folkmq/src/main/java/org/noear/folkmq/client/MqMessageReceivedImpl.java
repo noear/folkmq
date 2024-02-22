@@ -1,5 +1,6 @@
 package org.noear.folkmq.client;
 
+import org.noear.folkmq.common.MqConstants;
 import org.noear.folkmq.common.MqResolver;
 import org.noear.folkmq.common.MqUtils;
 import org.noear.socketd.transport.core.Entity;
@@ -93,6 +94,11 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
     @Override
     public int getQos() {
         return qos;
+    }
+
+    @Override
+    public String getAttr(String name) {
+        return from.meta(MqConstants.MQ_ATTR_PREFIX + name);
     }
 
     /**

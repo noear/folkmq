@@ -26,6 +26,7 @@ public interface MqMessageReceived extends IMqMessage {
      */
     int getTimes();
 
+
     /**
      * 回执
      */

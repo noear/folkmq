@@ -38,4 +38,9 @@ public interface IMqMessage {
      * 质量等级（0 或 1）
      */
     int getQos();
+
+    /**
+     * 获取属性
+     */
+    String getAttr(String name);
 }

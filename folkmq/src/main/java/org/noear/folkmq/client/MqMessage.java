@@ -3,6 +3,8 @@ package org.noear.folkmq.client;
 import org.noear.socketd.utils.StrUtils;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 消息
@@ -19,6 +21,7 @@ public class MqMessage implements IMqMessage {
     private boolean transaction;
     private String sender;
     private int qos = 1;
+    protected Map<String, String> attrMap = new HashMap<>();
 
     public MqMessage(String content) {
         this.tid = StrUtils.guid();
@@ -106,7 +109,7 @@ public class MqMessage implements IMqMessage {
         return this;
     }
 
-    protected MqMessage internalSender(String sender){
+    protected MqMessage internalSender(String sender) {
         this.sender = sender;
         return this;
     }
@@ -124,6 +127,29 @@ public class MqMessage implements IMqMessage {
      */
     public MqMessage qos(int qos) {
         this.qos = qos;
+        return this;
+    }
+
+    /**
+     * 属性获取
+     */
+    @Override
+    public String getAttr(String name) {
+        return attrMap.get(name);
+    }
+
+    /**
+     * 获取属性字典
+     */
+    public Map<String, String> getAttrMap() {
+        return attrMap;
+    }
+
+    /**
+     * 属性配置
+     */
+    public MqMessage attr(String name, String value) {
+        attrMap.put(name, value);
         return this;
     }
 }

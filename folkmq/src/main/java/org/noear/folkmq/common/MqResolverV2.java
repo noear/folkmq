@@ -10,6 +10,8 @@ import org.noear.socketd.transport.core.entity.MessageBuilder;
 import org.noear.socketd.transport.core.entity.StringEntity;
 import org.noear.socketd.utils.StrUtils;
 
+import java.util.Map;
+
 /**
  * 消息元信息分析器 v2
  *
@@ -142,6 +144,11 @@ public class MqResolverV2 implements MqResolver {
         }
 
         entity.metaPut(MqMetasV2.MQ_META_VID, String.valueOf(FolkMQ.versionCode()));
+
+        //用户属性
+        for (Map.Entry<String, String> kv : message.getAttrMap().entrySet()) {
+            entity.putMeta(MqConstants.MQ_ATTR_PREFIX + kv.getKey(), kv.getValue());
+        }
 
         return entity;
     }

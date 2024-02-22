@@ -242,6 +242,10 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
         if (messageHolder.getExpiration() > 0 && messageHolder.getExpiration() < System.currentTimeMillis()) {
             //已过期
             messageMap.remove(messageHolder.getTid());
+
+            if (log.isWarnEnabled()) {
+                log.warn("MqMessage have expired, tid={}", messageHolder.getTid());
+            }
             return;
         }
 
@@ -329,6 +333,10 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
         if (messageHolder.getExpiration() > 0 && messageHolder.getExpiration() < System.currentTimeMillis()) {
             //已过期
             messageMap.remove(messageHolder.getTid());
+
+            if (log.isWarnEnabled()) {
+                log.warn("MqMessage have expired, tid={}", messageHolder.getTid());
+            }
             return;
         }
 

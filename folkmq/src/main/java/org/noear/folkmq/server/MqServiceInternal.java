@@ -38,7 +38,7 @@ public interface MqServiceInternal {
 
     /**
      * 获取队列
-     * */
+     */
     MqQueue getQueue(String queueName);
 
     /**
@@ -74,7 +74,7 @@ public interface MqServiceInternal {
     /**
      * 执行路由
      *
-     * @param queueName   队列名
+     * @param queue       队列
      * @param message     消息
      * @param tid         事务Id
      * @param qos         质量等级
@@ -84,7 +84,7 @@ public interface MqServiceInternal {
      * @param times       派发次数
      * @param scheduled   计划时间
      */
-    void routingDo(MqResolver mr, String queueName, Message message, String tid, int qos, boolean sequence, long expiration, boolean transaction, String sender, int times, long scheduled);
+    void routingToQueueDo(MqResolver mr, MqQueue queue, Message message, String tid, int qos, boolean sequence, long expiration, boolean transaction, String sender, int times, long scheduled);
 
     /**
      * 添加事件扩展

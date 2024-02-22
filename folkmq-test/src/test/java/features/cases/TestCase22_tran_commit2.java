@@ -27,7 +27,7 @@ public class TestCase22_tran_commit2 extends BaseTestCase {
                 .start(getPort());
 
         //客户端
-        CountDownLatch countDownLatch = new CountDownLatch(1);
+        CountDownLatch countDownLatch = new CountDownLatch(2);
 
         client = new MqClientDefault("folkmq://127.0.0.1:" + getPort())
                 .nameAs("demoapp")
@@ -48,6 +48,7 @@ public class TestCase22_tran_commit2 extends BaseTestCase {
         MqTransaction tran = client.beginTransaction();
         try {
             client.publish("demo", new MqMessage("demo1"));
+            client.publish("demo", new MqMessage("demo2"));
         } catch (Throwable e) {
             tran.rollback();
         }

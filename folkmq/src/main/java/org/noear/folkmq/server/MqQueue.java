@@ -12,6 +12,10 @@ import java.util.Collection;
  */
 public interface MqQueue {
     /**
+     * 是否为事务缓存队列
+     * */
+    boolean isTransaction();
+    /**
      * 获取主题
      */
     String getTopic();

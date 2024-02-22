@@ -63,7 +63,7 @@ public class MqServiceListener extends MqServiceListenerBase implements MqServic
 
                 readyMessageMap.put(tid, topic);
                 queueGetOrInit(topic, MqConstants.MQ_TRAN_CONSUMER_GROUP, queueName);
-                routingToQueue(mr, m, queueName);
+                routingToQueueName(mr, m, queueName);
             } else {
                 onPublish(s, m, mr);
             }

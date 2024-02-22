@@ -22,6 +22,8 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
     //服务监听器
     private final MqServiceListener serviceListener;
 
+    //是否为事务缓存队列
+    private final boolean transaction;
     //主题
     private final String topic;
     //消费者组
@@ -34,14 +36,22 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
 
     public MqQueueDefault(MqServiceListener serviceListener, MqWatcher watcher, String topic, String consumerGroup, String queueName) {
         super();
+
         this.serviceListener = serviceListener;
         this.topic = topic;
         this.consumerGroup = consumerGroup;
         this.queueName = queueName;
 
+        this.transaction = MqConstants.MQ_TRAN_CONSUMER_GROUP.equals(consumerGroup);
+
         this.watcher = watcher;
     }
 
+
+    @Override
+    public boolean isTransaction() {
+        return transaction;
+    }
 
     /**
      * 获取主题
@@ -137,7 +147,8 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
      */
     @Override
     public void affirmAt(String tid, boolean isRollback) {
-        MqMessageHolder messageHolder = messageMap.remove(tid);
+        MqMessageHolder messageHolder = messageMap.get(tid);
+
         if (messageHolder != null) {
             internalRemove(messageHolder);
             affirmAtDo(messageHolder, isRollback);
@@ -148,6 +159,8 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
      * 事务确认处理
      */
     protected void affirmAtDo(MqMessageHolder messageHolder, boolean isRollback) {
+        messageMap.remove(messageHolder.getTid());
+
         if (isRollback == false) {
             messageHolder.noTransaction();
             Message message = new MessageBuilder()
@@ -275,10 +288,16 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
 
             //记日志
             if (log.isDebugEnabled()) {
-                log.debug("MqQueue request: @{} no sessions, times={}, tid={}",
-                        consumerGroup,
-                        messageHolder.getDistributeCount(),
-                        messageHolder.getTid());
+                if (serviceListener.brokerMode) {
+                    log.debug("MqQueue request: broker no sessions, times={}, tid={}",
+                            messageHolder.getDistributeCount(),
+                            messageHolder.getTid());
+                } else {
+                    log.debug("MqQueue request: @{} no sessions, times={}, tid={}",
+                            messageHolder.getSender(),
+                            messageHolder.getDistributeCount(),
+                            messageHolder.getTid());
+                }
             }
         }
     }

@@ -78,7 +78,7 @@ public abstract class MqServiceListenerBase extends EventListener implements MqS
 
     /**
      * 获取队列
-     * */
+     */
     @Override
     public MqQueue getQueue(String queueName) {
         return queueMap.get(queueName);
@@ -194,17 +194,17 @@ public abstract class MqServiceListenerBase extends EventListener implements MqS
             List<String> topicConsumerList = new ArrayList<>(topicConsumerSet);
 
             for (String topicConsumer : topicConsumerList) {
-                if (topicConsumer.endsWith(MqConstants.MQ_TRAN_CONSUMER_GROUP2)) {
-                    //避免重复进入事务缓存队列
+                MqQueue queue = queueMap.get(topicConsumer);
+                if (queue == null || queue.isTransaction()) {
                     continue;
                 }
 
-                routingDo(mr, topicConsumer, message, tid, qos, sequence, expiration, transaction, sender, times, scheduled);
+                routingToQueueDo(mr, queue, message, tid, qos, sequence, expiration, transaction, sender, times, scheduled);
             }
         }
     }
 
-    protected void routingToQueue(MqResolver mr, Message message, String queueName) {
+    protected void routingToQueueName(MqResolver mr, Message message, String queueName) {
         //复用解析
         String sender = mr.getSender(message);
         String tid = mr.getTid(message);
@@ -221,17 +221,17 @@ public abstract class MqServiceListenerBase extends EventListener implements MqS
         }
 
         //取出所有订阅的主题消费者
-        routingDo(mr, queueName, message, tid, qos, sequence, expiration, transaction, sender, times, scheduled);
+        MqQueue queue = queueMap.get(queueName);
+
+        routingToQueueDo(mr, queue, message, tid, qos, sequence, expiration, transaction, sender, times, scheduled);
     }
 
     /**
      * 执行路由
      */
-    public void routingDo(MqResolver mr, String queueName, Message message, String tid, int qos, boolean sequence, long expiration, boolean transaction, String sender, int times, long scheduled) {
-        MqQueue queue = queueMap.get(queueName);
-
+    public void routingToQueueDo(MqResolver mr, MqQueue queue, Message message, String tid, int qos, boolean sequence, long expiration, boolean transaction, String sender, int times, long scheduled) {
         if (queue != null) {
-            MqMessageHolder messageHolder = new MqMessageHolder(mr, queueName, queue.getConsumerGroup(), message, tid, qos, sequence, expiration, transaction, sender, times, scheduled);
+            MqMessageHolder messageHolder = new MqMessageHolder(mr, queue.getQueueName(), queue.getConsumerGroup(), message, tid, qos, sequence, expiration, transaction, sender, times, scheduled);
             queue.add(messageHolder);
         }
     }

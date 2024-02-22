@@ -27,7 +27,7 @@ public class TestCase24_tran_rollback2 extends BaseTestCase {
                 .start(getPort());
 
         //客户端
-        CountDownLatch countDownLatch = new CountDownLatch(1);
+        CountDownLatch countDownLatch = new CountDownLatch(2);
 
         client = new MqClientDefault("folkmq://127.0.0.1:" + getPort())
                 .nameAs("demoapp")
@@ -48,6 +48,7 @@ public class TestCase24_tran_rollback2 extends BaseTestCase {
         MqTransaction tran = client.beginTransaction();
         try {
             client.publish("demo", new MqMessage("demo1"));
+            client.publish("demo", new MqMessage("demo2"));
         } catch (Throwable e) {
             tran.rollback();
         }
@@ -56,7 +57,7 @@ public class TestCase24_tran_rollback2 extends BaseTestCase {
         countDownLatch.await(66, TimeUnit.SECONDS);
 
         //检验客户端
-        assert countDownLatch.getCount() == 1;
+        assert countDownLatch.getCount() == 2;
 
         MqQueue queue = server.getServerInternal().getQueue("demo#_");
         assert queue != null;

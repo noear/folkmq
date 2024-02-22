@@ -259,7 +259,8 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
                         scheduled = System.currentTimeMillis();
                     }
 
-                    serverRef.routingDo(mr, queueName, message, tid, qos, sequence, expiration, transaction, sender, times, scheduled);
+                    MqQueue queue = serverRef.getQueue(queueName);
+                    serverRef.routingToQueueDo(mr, queue, message, tid, qos, sequence, expiration, transaction, sender, times, scheduled);
                 }
             }
         }

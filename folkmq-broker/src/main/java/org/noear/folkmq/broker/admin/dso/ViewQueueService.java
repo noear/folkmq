@@ -50,7 +50,7 @@ public class ViewQueueService implements LifecycleBean {
             }
 
             //随时刷新
-            queueVo.sessionCount = brokerListener.getPlayerNum(queueName);
+            queueVo.sessionCount = brokerListener.getPlayerCount(queueName);
             list.add(queueVo);
         }
 
@@ -61,7 +61,7 @@ public class ViewQueueService implements LifecycleBean {
     public QueueVo getQueueVo(String queueName) {
         QueueVo queueVo = queueVoMap.get(queueName);
         if (queueVo != null) {
-            queueVo.sessionCount = brokerListener.getPlayerNum(queueName);
+            queueVo.sessionCount = brokerListener.getPlayerCount(queueName);
         }
 
         return queueVo;

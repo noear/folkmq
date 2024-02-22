@@ -113,7 +113,7 @@ public abstract class MqServiceListenerBase extends EventListener implements MqS
         //队列映射关系(queueName=>Queue)
         MqQueue queue = queueMap.get(queueName);
         if (queue == null) {
-            queue = new MqQueueDefault((MqServiceListener) this,watcher, topic, consumerGroup, queueName);
+            queue = new MqQueueDefault((MqServiceListener) this, watcher, topic, consumerGroup, queueName);
             queueMap.put(queueName, queue);
         }
 
@@ -251,8 +251,11 @@ public abstract class MqServiceListenerBase extends EventListener implements MqS
                 List<MqQueue> queueList = new ArrayList<>(queueMap.values());
                 for (MqQueue queue : queueList) {
                     try {
-                        if (queue.distribute()) {
-                            count++;
+                        if(queue.sessionCount() > 0) {
+                            //有会话才执行派发，避免不断延时
+                            if (queue.distribute()) {
+                                count++;
+                            }
                         }
                     } catch (Throwable e) {
                         if (log.isWarnEnabled()) {

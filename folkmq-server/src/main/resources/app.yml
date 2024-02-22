@@ -7,6 +7,10 @@ solon.app:
   group: folkmq
   name: folkmq-server
 
+solon:
+  stop:
+    delay: "4s"
+
 solon.logging.appender:
   console:
     level: INFO

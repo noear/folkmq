@@ -11,13 +11,19 @@ import java.util.concurrent.CountDownLatch;
 //单连接三线程发
 public class BenchmarkTest3 {
     public static void main(String[] args) throws Exception {
-
         //服务端
+        MqServer server = new MqServerDefault()
+                .addAccess("folkmq", "YapLHTx19RlsEE16")
+                .start(18602);
+
+        Thread.sleep(1000);
+
+        //客户端
         int count = 100_000;
         CountDownLatch consumeDownLatch = new CountDownLatch(count * 3);
         CountDownLatch sendDownLatch = new CountDownLatch(3);
 
-        //客户端
+
         MqClient client = FolkMQ.createClient("folkmq://127.0.0.1:18602?ak=folkmq&sk=YapLHTx19RlsEE16")
                 .connect();
 

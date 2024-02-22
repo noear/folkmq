@@ -159,6 +159,15 @@ public class MqServiceListener extends MqServiceListenerBase implements MqServic
     }
 
     /**
+     * 保存
+     */
+    @Override
+    public void save() {
+        //观察者::保存时
+        watcher.onSave();
+    }
+
+    /**
      * 启动
      */
     public void start(OnStart onStart) throws Exception {
@@ -173,15 +182,9 @@ public class MqServiceListener extends MqServiceListenerBase implements MqServic
 
         //观察者::服务启动之后
         watcher.onStartAfter();
-    }
 
-    /**
-     * 保存
-     */
-    @Override
-    public void save() {
-        //观察者::保存时
-        watcher.onSave();
+        //标为已启动
+        isStarted.set(true);
     }
 
     /**
@@ -205,6 +208,9 @@ public class MqServiceListener extends MqServiceListenerBase implements MqServic
         for (MqQueue queue : queueList) {
             queue.close();
         }
+
+        //标为已停止
+        isStarted.set(false);
     }
 
     /**

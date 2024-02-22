@@ -2,6 +2,7 @@ package features.cases;
 
 import org.noear.folkmq.client.MqClientDefault;
 import org.noear.folkmq.client.MqMessage;
+import org.noear.folkmq.server.MqQueue;
 import org.noear.folkmq.server.MqServerDefault;
 
 import java.util.Date;
@@ -35,14 +36,19 @@ public class TestCase08_expiration extends BaseTestCase {
         client.publish("demo", new MqMessage("demo1")
                 .expiration(new Date(System.currentTimeMillis() + 5000)));
 
-        assert server.getServerInternal().getQueueMap().get("demo#a").messageTotal() == 1L;
+        MqQueue queue = server.getServerInternal().getQueueMap().get("demo#a");
+
+        System.out.println(queue.messageTotal());
+        assert queue.messageTotal() == 1L;
 
         Thread.sleep(3000);
 
-        assert server.getServerInternal().getQueueMap().get("demo#a").messageTotal() == 1L;
+        System.out.println(queue.messageTotal());
+        assert queue.messageTotal() == 1L;
 
         Thread.sleep(3000);
 
-        assert server.getServerInternal().getQueueMap().get("demo#a").messageTotal() == 0L;
+        System.out.println(queue.messageTotal());
+        assert queue.messageTotal() == 0L;
     }
 }

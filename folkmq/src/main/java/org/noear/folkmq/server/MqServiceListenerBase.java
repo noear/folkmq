@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author noear
@@ -41,12 +42,22 @@ public abstract class MqServiceListenerBase extends EventListener implements MqS
     //派发线程
     protected Thread distributeThread;
 
+    protected final AtomicBoolean isStarted = new AtomicBoolean(false);
+
     /**
      * 获取所有会话
      */
     @Override
     public Collection<Session> getSessionAll() {
         return sessionAllMap.values();
+    }
+
+    /**
+     * 获取所有会话数量
+     */
+    @Override
+    public int getSessionCount() {
+        return sessionAllMap.size();
     }
 
     /**
@@ -105,7 +116,7 @@ public abstract class MqServiceListenerBase extends EventListener implements MqS
         }
     }
 
-    protected MqQueue queueGetOrInit(String topic, String consumerGroup, String queueName){
+    protected MqQueue queueGetOrInit(String topic, String consumerGroup, String queueName) {
         //建立订阅关系(topic=>[queueName]) //queueName='topic#consumer'
         Set<String> queueNameSet = subscribeMap.computeIfAbsent(topic, n -> Collections.newSetFromMap(new ConcurrentHashMap<>()));
         queueNameSet.add(queueName);
@@ -248,18 +259,17 @@ public abstract class MqServiceListenerBase extends EventListener implements MqS
             try {
                 int count = 0;
 
-                List<MqQueue> queueList = new ArrayList<>(queueMap.values());
-                for (MqQueue queue : queueList) {
-                    try {
-                        if(queue.sessionCount() > 0) {
-                            //有会话才执行派发，避免不断延时
+                if (isStarted.get()) {
+                    List<MqQueue> queueList = new ArrayList<>(queueMap.values());
+                    for (MqQueue queue : queueList) {
+                        try {
                             if (queue.distribute()) {
                                 count++;
                             }
-                        }
-                    } catch (Throwable e) {
-                        if (log.isWarnEnabled()) {
-                            log.warn("MqQueue take error, queue={}", queue.getQueueName(), e);
+                        } catch (Throwable e) {
+                            if (log.isWarnEnabled()) {
+                                log.warn("MqQueue take error, queue={}", queue.getQueueName(), e);
+                            }
                         }
                     }
                 }

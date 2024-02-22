@@ -22,6 +22,11 @@ public interface MqServiceInternal {
     Collection<Session> getSessionAll();
 
     /**
+     * 获取所有会话数量
+     */
+    int getSessionCount();
+
+    /**
      * 获取订阅关系(topic=>[queueName]) //queueName='topic#consumer'
      */
     Map<String, Set<String>> getSubscribeMap();
@@ -74,7 +79,7 @@ public interface MqServiceInternal {
      * @param times       派发次数
      * @param scheduled   计划时间
      */
-    void routingDo(MqResolver mr, String queueName, Message message, String tid, int qos, boolean sequence, long expiration, boolean transaction, String sender,int times, long scheduled);
+    void routingDo(MqResolver mr, String queueName, Message message, String tid, int qos, boolean sequence, long expiration, boolean transaction, String sender, int times, long scheduled);
 
     /**
      * 添加事件扩展

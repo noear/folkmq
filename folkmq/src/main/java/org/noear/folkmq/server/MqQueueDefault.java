@@ -273,8 +273,8 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
                     //进入延后队列
                     internalAdd(messageHolder.delayed());
 
-                    if (log.isWarnEnabled()) {
-                        log.warn("MqQueue request then error, tid={}",
+                    if (log.isDebugEnabled()) {
+                        log.debug("MqQueue request then error, tid={}",
                                 messageHolder.getTid(), err);
                     }
                 });

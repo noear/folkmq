@@ -207,6 +207,12 @@ public class FolkmqLifecycleBean implements LifecycleBean {
                 RunUtils.runAndTry(s1::closeStarting);
             }
         }
+
+
+        log.info("Server:main: folkmq-server: Stop starting (SOCKET.D/{}-{}, folkmq/{})",
+                SocketD.protocolVersion(),
+                SocketD.version(),
+                FolkMQ.versionName());
     }
 
     @Override
@@ -221,6 +227,11 @@ public class FolkmqLifecycleBean implements LifecycleBean {
             //停止时会触发快照
             brokerServiceListener.stop(null);
         }
+
+        log.info("Server:main: folkmq-server: Has Stopped (SOCKET.D/{}-{}, folkmq/{})",
+                SocketD.protocolVersion(),
+                SocketD.version(),
+                FolkMQ.versionName());
     }
 
     private void addApiEvent(MqServiceInternal serviceInternal) {

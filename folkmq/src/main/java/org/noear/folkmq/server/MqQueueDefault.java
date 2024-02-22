@@ -150,7 +150,9 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
     protected void affirmAtDo(MqMessageHolder messageHolder, boolean isRollback) {
         if (isRollback == false) {
             messageHolder.noTransaction();
-            Message message = new MessageBuilder().entity(messageHolder.getContent()).build();
+            Message message = new MessageBuilder()
+                    .sid(messageHolder.getTid())
+                    .entity(messageHolder.getContent()).build();
             serviceListener.routingDo(messageHolder.mr, message);
         }
     }

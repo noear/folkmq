@@ -194,6 +194,11 @@ public abstract class MqServiceListenerBase extends EventListener implements MqS
             List<String> topicConsumerList = new ArrayList<>(topicConsumerSet);
 
             for (String topicConsumer : topicConsumerList) {
+                if (MqConstants.MQ_TRAN_CONSUMER_GROUP.equals(topicConsumer)) {
+                    //避免重复进入事务缓存队列
+                    continue;
+                }
+
                 routingDo(mr, topicConsumer, message, tid, qos, sequence, expiration, transaction, sender, times, scheduled);
             }
         }

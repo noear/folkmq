@@ -225,6 +225,39 @@ public class MqClientDefault implements MqClientInternal {
     }
 
     @Override
+    public void publish2(String tmid, List<String> tidAry, boolean isRollback) throws IOException {
+        try {
+            if (tidAry == null || tidAry.size() == 0) {
+                return;
+            }
+
+            if (clientSession == null) {
+                throw new SocketDConnectionException("Not connected!");
+            }
+
+            ClientSession session = clientSession.getSessionAny(tmid);
+            if (session == null || session.isValid() == false) {
+                throw new SocketDException("No session is available!");
+            }
+
+            Entity entity = new StringEntity(String.join(",", tidAry))
+                    .metaPut(MqConstants.MQ_META_ROLLBACK, (isRollback ? "1" : "0"))
+                    .at(MqConstants.BROKER_AT_SERVER_HASH); //事务走哈希
+
+            //::Qos1
+            Entity resp = session.sendAndRequest(MqConstants.MQ_EVENT_PUBLISH2, entity).await();
+
+            int confirm = Integer.parseInt(resp.metaOrDefault(MqConstants.MQ_META_CONFIRM, "0"));
+            if (confirm != 1) {
+                String messsage = "Client message publish2 confirm failed: " + resp.dataAsString();
+                throw new FolkmqException(messsage);
+            }
+        } finally {
+            clearTransaction();
+        }
+    }
+
+    @Override
     public void publish(String topic, MqMessage message) throws IOException {
         Objects.requireNonNull(topic, "Param 'topic' can not be null");
         Objects.requireNonNull(message, "Param 'message' can not be null");
@@ -445,38 +478,6 @@ public class MqClientDefault implements MqClientInternal {
         tranThreadLocal.set(null);
     }
 
-
-    @Override
-    public void publish2(String tmid, List<String> tidAry, boolean isRollback) throws IOException {
-        try {
-            if (tidAry == null || tidAry.size() == 0) {
-                return;
-            }
-
-            if (clientSession == null) {
-                throw new SocketDConnectionException("Not connected!");
-            }
-
-            ClientSession session = clientSession.getSessionAny(tmid);
-            if (session == null || session.isValid() == false) {
-                throw new SocketDException("No session is available!");
-            }
-
-            Entity entity = new StringEntity(String.join(",", tidAry))
-                    .metaPut(MqConstants.MQ_META_ROLLBACK, (isRollback ? "1" : "0"));
-
-            //::Qos1
-            Entity resp = session.sendAndRequest(MqConstants.MQ_EVENT_PUBLISH2, entity).await();
-
-            int confirm = Integer.parseInt(resp.metaOrDefault(MqConstants.MQ_META_CONFIRM, "0"));
-            if (confirm != 1) {
-                String messsage = "Client message publish2 confirm failed: " + resp.dataAsString();
-                throw new FolkmqException(messsage);
-            }
-        } finally {
-            clearTransaction();
-        }
-    }
 
     /**
      * 消费回执

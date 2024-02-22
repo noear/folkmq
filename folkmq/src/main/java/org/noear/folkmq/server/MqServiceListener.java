@@ -52,7 +52,7 @@ public class MqServiceListener extends MqServiceListenerBase implements MqServic
 
             if (isTrans) {
                 //存活为2小时
-                mr.setExpiration(m, System.currentTimeMillis() + MqNextTime.TIME_2H);
+                mr.setExpiration(m, System.currentTimeMillis() + MqNextTime.TIME_1H);
                 //延后为1分钟
                 mr.setScheduled(m, System.currentTimeMillis() + MqNextTime.TIME_1M);
 

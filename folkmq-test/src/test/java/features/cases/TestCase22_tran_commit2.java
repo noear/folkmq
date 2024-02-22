@@ -3,6 +3,7 @@ package features.cases;
 import org.noear.folkmq.client.MqClientDefault;
 import org.noear.folkmq.client.MqMessage;
 import org.noear.folkmq.client.MqTransaction;
+import org.noear.folkmq.common.MqConstants;
 import org.noear.folkmq.server.MqQueue;
 import org.noear.folkmq.server.MqServerDefault;
 
@@ -58,7 +59,7 @@ public class TestCase22_tran_commit2 extends BaseTestCase {
         //检验客户端
         assert countDownLatch.getCount() == 0;
 
-        MqQueue queue = server.getServerInternal().getQueue("demo#_");
+        MqQueue queue = server.getServerInternal().getQueue("demo#" + MqConstants.MQ_TRAN_CONSUMER_GROUP);
         assert queue != null;
         System.out.println(queue.messageTotal());
         assert queue.messageTotal() == 0L;

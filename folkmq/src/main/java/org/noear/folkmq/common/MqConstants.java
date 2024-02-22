@@ -156,6 +156,11 @@ public interface MqConstants {
     String MQ_TRAN_CONSUMER_GROUP = "_";
 
     /**
+     * 事件缓存队列消息费者
+     * */
+    String MQ_TRAN_CONSUMER_GROUP2 = "#_";
+
+    /**
      * 最大分片大小（1m）
      */
     int MAX_FRAGMENT_SIZE = 1024 * 1024;

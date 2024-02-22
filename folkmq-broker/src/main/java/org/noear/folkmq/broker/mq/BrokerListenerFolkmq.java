@@ -97,7 +97,7 @@ public class BrokerListenerFolkmq extends BrokerListener {
 
         log.info("Player channel opened, sessionId={}, ip={}",
                 session.sessionId(),
-                session.remoteAddress());
+                session.remoteAddress().getAddress().getHostAddress());
     }
 
     @Override
@@ -190,7 +190,7 @@ public class BrokerListenerFolkmq extends BrokerListener {
         if (message.event().startsWith(MqConstants.ADMIN_PREFIX)) {
             log.warn("Player channel admin events are not allowed, sessionId={}, ip={}",
                     requester.sessionId(),
-                    requester.remoteAddress());
+                    requester.remoteAddress().getAddress().getHostAddress());
             return;
         }
 

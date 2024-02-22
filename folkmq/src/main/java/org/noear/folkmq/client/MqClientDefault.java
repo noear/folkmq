@@ -1,6 +1,7 @@
 package org.noear.folkmq.client;
 
 import org.noear.folkmq.FolkMQ;
+import org.noear.folkmq.common.MqAssert;
 import org.noear.folkmq.common.MqConstants;
 import org.noear.folkmq.common.MqUtils;
 import org.noear.folkmq.exception.FolkmqException;
@@ -69,6 +70,9 @@ public class MqClientDefault implements MqClientInternal {
 
     @Override
     public MqClient nameAs(String name) {
+        Objects.requireNonNull(name, "Param 'name' can't be null");
+        MqAssert.assertMeta(name, "name");
+
         this.name = name;
         return this;
     }
@@ -143,10 +147,15 @@ public class MqClientDefault implements MqClientInternal {
 
     @Override
     public CompletableFuture<String> call(String apiName, String apiToken, String topic, String consumerGroup) throws IOException {
-        Objects.requireNonNull(apiName, "Param 'apiName' can not be null");
-        Objects.requireNonNull(apiToken, "Param 'apiToken' can not be null");
-        Objects.requireNonNull(topic, "Param 'topic' can not be null");
-        Objects.requireNonNull(consumerGroup, "Param 'consumerGroup' can not be null");
+        Objects.requireNonNull(apiName, "Param 'apiName' can't be null");
+        Objects.requireNonNull(apiToken, "Param 'apiToken' can't be null");
+        Objects.requireNonNull(topic, "Param 'topic' can't be null");
+        Objects.requireNonNull(consumerGroup, "Param 'consumerGroup' can't be null");
+
+        MqAssert.assertMeta(apiName, "apiName");
+        MqAssert.assertMeta(apiToken, "apiToken");
+        MqAssert.assertMeta(topic, "topic");
+        MqAssert.assertMeta(consumerGroup, "consumerGroup");
 
         if (clientSession != null) {
             Entity entity = new StringEntity("")
@@ -177,9 +186,12 @@ public class MqClientDefault implements MqClientInternal {
      */
     @Override
     public void subscribe(String topic, String consumerGroup, MqConsumeHandler consumerHandler) throws IOException {
-        Objects.requireNonNull(topic, "Param 'topic' can not be null");
-        Objects.requireNonNull(consumerGroup, "Param 'consumerGroup' can not be null");
-        Objects.requireNonNull(consumerHandler, "Param 'consumerHandler' can not be null");
+        Objects.requireNonNull(topic, "Param 'topic' can't be null");
+        Objects.requireNonNull(consumerGroup, "Param 'consumerGroup' can't be null");
+        Objects.requireNonNull(consumerHandler, "Param 'consumerHandler' can't be null");
+
+        MqAssert.assertMeta(topic, "topic");
+        MqAssert.assertMeta(consumerGroup, "consumerGroup");
 
         MqSubscription subscription = new MqSubscription(topic, consumerGroup, consumerHandler);
 
@@ -203,8 +215,11 @@ public class MqClientDefault implements MqClientInternal {
 
     @Override
     public void unsubscribe(String topic, String consumerGroup) throws IOException {
-        Objects.requireNonNull(topic, "Param 'topic' can not be null");
-        Objects.requireNonNull(consumerGroup, "Param 'consumerGroup' can not be null");
+        Objects.requireNonNull(topic, "Param 'topic' can't be null");
+        Objects.requireNonNull(consumerGroup, "Param 'consumerGroup' can't be null");
+
+        MqAssert.assertMeta(topic, "topic");
+        MqAssert.assertMeta(consumerGroup, "consumerGroup");
 
         String queueName = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP + consumerGroup;
         subscriptionMap.remove(queueName);
@@ -260,8 +275,10 @@ public class MqClientDefault implements MqClientInternal {
 
     @Override
     public void publish(String topic, MqMessage message) throws IOException {
-        Objects.requireNonNull(topic, "Param 'topic' can not be null");
-        Objects.requireNonNull(message, "Param 'message' can not be null");
+        Objects.requireNonNull(topic, "Param 'topic' can't be null");
+        Objects.requireNonNull(message, "Param 'message' can't be null");
+
+        MqAssert.assertMeta(topic, "topic");
 
         if (clientSession == null) {
             throw new SocketDConnectionException("Not connected!");
@@ -302,9 +319,10 @@ public class MqClientDefault implements MqClientInternal {
      */
     @Override
     public CompletableFuture<Boolean> publishAsync(String topic, MqMessage message) throws IOException {
-        Objects.requireNonNull(topic, "Param 'topic' can not be null");
-        Objects.requireNonNull(message, "Param 'message' can not be null");
+        Objects.requireNonNull(topic, "Param 'topic' can't be null");
+        Objects.requireNonNull(message, "Param 'message' can't be null");
 
+        MqAssert.assertMeta(topic, "topic");
 
         if (clientSession == null) {
             throw new SocketDConnectionException("Not connected!");
@@ -345,9 +363,11 @@ public class MqClientDefault implements MqClientInternal {
 
     @Override
     public void unpublish(String topic, String tid) throws IOException {
-        Objects.requireNonNull(topic, "Param 'topic' can not be null");
-        Objects.requireNonNull(tid, "Param 'tid' can not be null");
+        Objects.requireNonNull(topic, "Param 'topic' can't be null");
+        Objects.requireNonNull(tid, "Param 'tid' can't be null");
 
+        MqAssert.assertMeta(topic, "topic");
+        MqAssert.assertMeta(tid, "tid");
 
         if (clientSession == null) {
             throw new SocketDConnectionException("Not connected!");
@@ -375,9 +395,11 @@ public class MqClientDefault implements MqClientInternal {
 
     @Override
     public CompletableFuture<Boolean> unpublishAsync(String topic, String tid) throws IOException {
-        Objects.requireNonNull(topic, "Param 'topic' can not be null");
-        Objects.requireNonNull(tid, "Param 'tid' can not be null");
+        Objects.requireNonNull(topic, "Param 'topic' can't be null");
+        Objects.requireNonNull(tid, "Param 'tid' can't be null");
 
+        MqAssert.assertMeta(topic, "topic");
+        MqAssert.assertMeta(tid, "tid");
 
         if (clientSession == null) {
             throw new SocketDConnectionException("Not connected!");
@@ -412,16 +434,20 @@ public class MqClientDefault implements MqClientInternal {
     public RequestStream request(String atName, String topic, MqMessage message) throws IOException {
         //检查必要条件
         if (StrUtils.isEmpty(name)) {
-            throw new IllegalArgumentException("Client 'name' can not be empty");
+            throw new IllegalArgumentException("Client 'name' can't be empty");
         }
 
         if (responder == null) {
-            throw new IllegalArgumentException("Client 'responder' can not be null");
+            throw new IllegalArgumentException("Client 'responder' can't be null");
         }
 
         //检查参数
-        Objects.requireNonNull(atName, "Param 'atName' can not be null");
-        Objects.requireNonNull(message, "Param 'message' can not be null");
+        Objects.requireNonNull(atName, "Param 'atName' can't be null");
+        Objects.requireNonNull(topic, "Param 'topic' can't be null");
+        Objects.requireNonNull(message, "Param 'message' can't be null");
+
+        MqAssert.assertMeta(topic, "topic");
+        MqAssert.assertMeta(atName, "atName");
 
         if (clientSession == null) {
             throw new SocketDConnectionException("Not connected!");
@@ -457,11 +483,11 @@ public class MqClientDefault implements MqClientInternal {
     public MqTransaction beginTransaction() {
         //检查必要条件
         if (StrUtils.isEmpty(name)) {
-            throw new IllegalArgumentException("Client 'name' can not be empty");
+            throw new IllegalArgumentException("Client 'name' can't be empty");
         }
 
         if (responder == null) {
-            throw new IllegalArgumentException("Client 'responder' can not be null");
+            throw new IllegalArgumentException("Client 'responder' can't be null");
         }
 
         //开始事务管理

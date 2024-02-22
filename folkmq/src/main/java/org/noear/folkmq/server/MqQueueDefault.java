@@ -233,6 +233,18 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
     protected void transpond0(MqMessageHolder messageHolder) {
         messageCountSub(messageHolder);
 
+        if (messageHolder.isDone()) {
+            //已完成
+            messageMap.remove(messageHolder.getTid());
+            return;
+        }
+
+        if (messageHolder.getExpiration() > 0 && messageHolder.getExpiration() < System.currentTimeMillis()) {
+            //已过期
+            messageMap.remove(messageHolder.getTid());
+            return;
+        }
+
 
         //获取一个会话（轮询负载均衡）
         Session s1 = null;

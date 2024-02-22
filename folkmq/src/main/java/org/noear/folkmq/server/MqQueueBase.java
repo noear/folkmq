@@ -1,11 +1,15 @@
 package org.noear.folkmq.server;
 
+import org.noear.socketd.cluster.LoadBalancer;
 import org.noear.socketd.transport.core.Session;
-import org.noear.socketd.utils.StrUtils;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.DelayQueue;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.LongAdder;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -16,8 +20,16 @@ import java.util.concurrent.locks.ReentrantLock;
  * @since 1.0
  */
 public abstract class MqQueueBase implements MqQueue {
-    //会话操作锁
-    private final ReentrantLock SESSION_LOCK = new ReentrantLock(true);
+    //消息字典
+    protected final Map<String, MqMessageHolder> messageMap;
+    //消息队列与处理线程
+    protected final DelayQueue<MqMessageHolder> messageQueue;
+    //消息最后派发时间
+    protected final AtomicLong messageDistributeTime = new AtomicLong(0);
+    //消息索引器
+    protected final AtomicLong messageIndexer = new AtomicLong();
+    //消息添加锁（公平锁）
+    protected final ReentrantLock messageAddLock = new ReentrantLock(true);
 
     //消费者会话列表
     private final List<Session> consumerSessions = new Vector<>();
@@ -25,6 +37,9 @@ public abstract class MqQueueBase implements MqQueue {
     private final LongAdder[] messageCounters = new LongAdder[9];
 
     public MqQueueBase() {
+        this.messageMap = new ConcurrentHashMap<>();
+        this.messageQueue = new DelayQueue<>();
+
         //初始化计数器
         for (int i = 0; i < messageCounters.length; i++) {
             messageCounters[i] = new LongAdder();
@@ -91,57 +106,30 @@ public abstract class MqQueueBase implements MqQueue {
      */
     @Override
     public void removeSession(Session session) {
-        //removeSession 可能会对 get(idx) 带来安全，所以锁一下
-        SESSION_LOCK.lock();
-
-        try {
-            consumerSessions.remove(session);
-        } finally {
-            SESSION_LOCK.unlock();
-        }
+        consumerSessions.remove(session);
     }
 
     @Override
-    public Collection<Session> getSessions(){
+    public Collection<Session> getSessions() {
         return consumerSessions;
     }
 
-    //在锁内执行（是线程安全的）
-    private int sessionRoundIdx;
-
     /**
      * 获取一个会话（轮询负载均衡）
-     * */
+     */
     protected Session getSessionOne(MqMessageHolder messageHolder) {
-        //removeSession 可能会对 get(idx) 带来安全，所以锁一下
-
-        SESSION_LOCK.lock();
-
-        try {
-            int idx = 0;
-            if (consumerSessions.size() > 1) {
-                if(messageHolder.isSequence()) {
-                    //尝试 topic_hash //不要检测有效性（如果无效，则让它出错）
-                    idx = Math.abs(getTopic().hashCode()) % consumerSessions.size();
-                    return consumerSessions.get(idx);
-                }
-
-                //使用 poll
-                sessionRoundIdx++;
-                idx = sessionRoundIdx % consumerSessions.size();
-                if (sessionRoundIdx > 999_999) {
-                    sessionRoundIdx = 0;
-                }
-            }
-
-            return consumerSessions.get(idx);
-        }finally {
-            SESSION_LOCK.unlock();
+        if (messageHolder.isSequence()) {
+            return LoadBalancer.getAnyByHash(consumerSessions, getTopic());
+        } else {
+            return LoadBalancer.getAnyByPoll(consumerSessions);
         }
     }
 
     @Override
     public void close() {
         consumerSessions.clear();
+
+        messageQueue.clear();
+        messageMap.clear();
     }
 }

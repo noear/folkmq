@@ -9,10 +9,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.DelayQueue;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * 队列默认实现
@@ -23,13 +19,8 @@ import java.util.concurrent.locks.ReentrantLock;
 public class MqQueueDefault extends MqQueueBase implements MqQueue {
     private static final Logger log = LoggerFactory.getLogger(MqQueueDefault.class);
 
-    /**
-     * 服务监听器
-     * */
+    //服务监听器
     private final MqServiceListener serviceListener;
-
-    //消息索引器
-    private final AtomicLong indexer = new AtomicLong();
 
     //主题
     private final String topic;
@@ -37,21 +28,9 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
     private final String consumerGroup;
     //队列名字 //queueName='topic#consumer'
     private final String queueName;
-    //是否为事务缓存
-    private final boolean isTransaction;
 
     //观察者（由上层传入）
     private final MqWatcher watcher;
-
-    //消息字典
-    private final Map<String, MqMessageHolder> messageMap;
-
-    //消息队列与处理线程
-    private final DelayQueue<MqMessageHolder> messageQueue;
-    //最后消息派发时间
-    private final AtomicLong messageDistributeTime = new AtomicLong(0);
-    //添加锁
-    private final ReentrantLock addLock = new ReentrantLock(true);
 
     public MqQueueDefault(MqServiceListener serviceListener, MqWatcher watcher, String topic, String consumerGroup, String queueName) {
         super();
@@ -60,13 +39,7 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
         this.consumerGroup = consumerGroup;
         this.queueName = queueName;
 
-        this.isTransaction = MqConstants.MQ_TRAN_CONSUMER_GROUP.equals(consumerGroup);
-
         this.watcher = watcher;
-
-        this.messageMap = new ConcurrentHashMap<>();
-
-        this.messageQueue = new DelayQueue<>();
     }
 
 
@@ -100,40 +73,30 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
         return Collections.unmodifiableMap(messageMap);
     }
 
-
-    @Override
-    public int sessionCount() {
-        if (isTransaction) {
-            return serviceListener.brokerListener.getSessionCount();
-        } else {
-            return super.sessionCount();
-        }
-    }
-
     /**
      * 添加消息
      */
     @Override
     public void add(MqMessageHolder messageHolder) {
-        addLock.lock();
+        messageAddLock.lock();
 
         try {
             if (messageHolder.getDistributeTime() != messageDistributeTime.get()) {
                 //如果超过1秒的，理解为定时消息
                 if (messageHolder.getDistributeTime() < System.currentTimeMillis() + 1_000) {
                     messageDistributeTime.set(messageHolder.getDistributeTime());
-                    indexer.set(0L);
+                    messageIndexer.set(0L);
                 }
             }
 
-            messageHolder.setDistributeIdx(indexer.incrementAndGet());
+            messageHolder.setDistributeIdx(messageIndexer.incrementAndGet());
 
             messageMap.put(messageHolder.getTid(), messageHolder);
             messageQueue.add(messageHolder);
 
             messageCountAdd(messageHolder);
         } finally {
-            addLock.unlock();
+            messageAddLock.unlock();
         }
     }
 
@@ -171,7 +134,7 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
 
     /**
      * 事务确认
-     * */
+     */
     @Override
     public void affirmAt(String tid, boolean isRollback) {
         MqMessageHolder messageHolder = messageMap.remove(tid);
@@ -183,7 +146,7 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
 
     /**
      * 事务确认处理
-     * */
+     */
     protected void affirmAtDo(MqMessageHolder messageHolder, boolean isRollback) {
         if (isRollback == false) {
             messageHolder.noTransaction();
@@ -207,14 +170,14 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
      */
     @Override
     public void forceClear() {
-        addLock.lock();
+        messageAddLock.lock();
         try {
-            indexer.set(0L);
+            messageIndexer.set(0L);
 
             messageMap.clear();
             messageQueue.clear();
         } finally {
-            addLock.unlock();
+            messageAddLock.unlock();
         }
     }
 
@@ -265,7 +228,7 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
 
     /**
      * 执行转发
-     * */
+     */
     protected void transpond0(MqMessageHolder messageHolder) {
         messageCountSub(messageHolder);
 
@@ -319,7 +282,6 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
                 }
             }
         } else {
-
             //::进入延后队列
             internalAdd(messageHolder.delayed());
 
@@ -345,7 +307,7 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
             return;
         }
 
-        if(messageHolder.getExpiration() > 0 && messageHolder.getExpiration() < System.currentTimeMillis()){
+        if (messageHolder.getExpiration() > 0 && messageHolder.getExpiration() < System.currentTimeMillis()) {
             //已过期
             messageMap.remove(messageHolder.getTid());
             return;
@@ -358,10 +320,15 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
 
             //::派发
             try {
-                distributeDo(s1, messageHolder);
+                if (s1 == null) {
+                    //进入延后队列
+                    internalAdd(messageHolder.delayed());
+                } else {
+                    distributeDo(s1, messageHolder);
+                }
             } catch (Throwable e) {
                 //如果无效，则移掉
-                if(s1.isValid() == false){
+                if (s1 != null && s1.isValid() == false) {
                     removeSession(s1);
                 }
 
@@ -431,15 +398,5 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
             internalRemove(messageHolder);
             internalAdd(messageHolder.delayed());
         }
-    }
-
-    /**
-     * 关闭
-     */
-    @Override
-    public void close() {
-        messageQueue.clear();
-        messageMap.clear();
-        super.close();
     }
 }

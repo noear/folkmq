@@ -19,7 +19,7 @@ import java.util.Map;
  */
 public class MqMessageReceivedImpl implements MqMessageReceived {
     private final transient MqClientInternal clientInternal;
-    private final transient Message from;
+    private final transient Message source;
     private final transient Session session;
 
     private final String tid;
@@ -32,30 +32,37 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
     private final int qos;
     private final int times;
 
-    public MqMessageReceivedImpl(MqClientInternal clientInternal, Session session, Message from) {
+    public MqMessageReceivedImpl(MqClientInternal clientInternal, Session session, Message source) {
         this.clientInternal = clientInternal;
         this.session = session;
-        this.from = from;
+        this.source = source;
 
-        this.content = from.dataAsString();
+        this.content = source.dataAsString();
 
-        MqResolver mr = MqUtils.getOf(from);
+        MqResolver mr = MqUtils.getOf(source);
 
-        this.tid = mr.getTid(from);
-        this.topic = mr.getTopic(from);
-        this.consumerGroup = mr.getConsumerGroup(from);
+        this.tid = mr.getTid(source);
+        this.topic = mr.getTopic(source);
+        this.consumerGroup = mr.getConsumerGroup(source);
 
-        this.qos = mr.getQos(from);
-        this.times = mr.getTimes(from);
-        this.sequence = mr.isSequence(from);
-        this.transaction = mr.isTransaction(from);
+        this.qos = mr.getQos(source);
+        this.times = mr.getTimes(source);
+        this.sequence = mr.isSequence(source);
+        this.transaction = mr.isTransaction(source);
 
-        long expirationL = mr.getExpiration(from);
+        long expirationL = mr.getExpiration(source);
         if (expirationL == 0) {
             this.expiration = null;
         } else {
             this.expiration = new Date(expirationL);
         }
+    }
+
+    /**
+     * 获取消息源
+     */
+    public Message getSource() {
+        return source;
     }
 
     /**
@@ -99,7 +106,7 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
 
     @Override
     public String getAttr(String name) {
-        return from.meta(MqConstants.MQ_ATTR_PREFIX + name);
+        return source.meta(MqConstants.MQ_ATTR_PREFIX + name);
     }
 
     /**
@@ -138,7 +145,7 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
     @Override
     public void acknowledge(boolean isOk, Entity reply) throws IOException {
         //发送“回执”，向服务端反馈消费情况
-        clientInternal.acknowledge(session, from, this, isOk, reply);
+        clientInternal.acknowledge(session, source, this, isOk, reply);
     }
 
     @Override
@@ -149,13 +156,13 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
         buf.append("topic='").append(topic).append("',");
         buf.append("content='").append(content).append("',");
 
-        for (Map.Entry<String, String> kv : from.metaMap().entrySet()) {
+        for (Map.Entry<String, String> kv : source.metaMap().entrySet()) {
             if (kv.getKey().startsWith(MqConstants.MQ_ATTR_PREFIX)) {
                 buf.append(kv.getKey()).append("='").append(kv.getValue()).append("',");
             }
         }
 
-        buf.setLength(buf.length()-1);
+        buf.setLength(buf.length() - 1);
         buf.append("}");
 
         return buf.toString();

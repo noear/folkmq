@@ -23,7 +23,7 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
     private final transient Message source;
     private final transient Session session;
 
-    private String sender;
+    private final String sender;
     private final String tid;
     private final String topic;
     private final String consumerGroup;
@@ -44,9 +44,6 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
         MqResolver mr = MqUtils.getOf(source);
 
         this.sender = mr.getSender(source);
-        if (StrUtils.isEmpty(sender)) {
-            this.sender = source.atName();
-        }
 
         this.tid = mr.getTid(source);
         this.topic = mr.getTopic(source);

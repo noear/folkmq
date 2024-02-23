@@ -45,6 +45,6 @@ public class TestCase25_rpc extends BaseTestCase {
         //检验客户端
         assert rst.contains("hello");
         assert rst.contains("me to");
-        assert rst.contains("demoapp");
+        assert rst.contains(client2.name());
     }
 }

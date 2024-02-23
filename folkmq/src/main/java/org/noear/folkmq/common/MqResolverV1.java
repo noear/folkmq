@@ -119,6 +119,9 @@ public class MqResolverV1 implements MqResolver {
 
         if (message.isTransaction()) {
             entity.metaPut(MqMetasV2.MQ_META_TRANSACTION, "1");
+        }
+
+        if(StrUtils.isNotEmpty(message.getSender())){
             entity.metaPut(MqMetasV2.MQ_META_SENDER, message.getSender());
         }
 

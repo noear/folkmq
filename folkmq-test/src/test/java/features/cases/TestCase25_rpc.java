@@ -26,14 +26,14 @@ public class TestCase25_rpc extends BaseTestCase {
         client = new MqClientDefault("folkmq://127.0.0.1:" + getPort())
                 .nameAs("demoapp")
                 .response(new MqResponseRouter().doOn("test.hello", m -> {
-                    m.acknowledge(true, new StringEntity("demoapp: me to! rev: " + m.getContent()));
+                    m.acknowledge(true, new StringEntity(m.getSender() + ": me to! rev: " + m.getContent()));
                 }))
                 .connect();
 
         MqClient client2 = new MqClientDefault("folkmq://127.0.0.1:" + getPort())
                 .nameAs("testapp")
                 .response(m -> {
-                    m.acknowledge(true, new StringEntity("testapp: me to!"));
+                    m.acknowledge(true, new StringEntity(m.getSender() + ": me to!"));
                 })
                 .connect();
 

@@ -61,7 +61,7 @@
 |----------|---------------------------------------------------------------------------------------------|
 | Producer | Publish messages, timed messages, sequential messages, expireable messages, transactional messages. Send Request (rpc) Qos0 and Qos1 are supported                      |     
 |          |                                                                                             |       
-| Consumer | Subscribe, unsubscribe. Consumption -ACK (automatic, manual). Request and response          |      
+| Consumer | Subscribe, unsubscribe. Consumption -ACK (automatic, manual). Responding to a request          |      
 |          |                                                                                             |     
 | Server   | Publish -Confirm, subscribe -Confirm, unsubscribe -Confirm, dispatch -Retry, dispatch -delay | 
 | Server   | Single thread, run in memory, snapshot persistence (automatic, down, manual), Broker mode clustering, cluster hot scaling                    |   

@@ -10,6 +10,11 @@ import java.util.Date;
  */
 public interface IMqMessage {
     /**
+     * 发送人
+     * */
+    String getSender();
+
+    /**
      * 事务ID
      */
     String getTid();

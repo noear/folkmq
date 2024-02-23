@@ -15,12 +15,12 @@ import java.util.Map;
  * @since 1.0
  */
 public class MqMessage implements IMqMessage {
+    private String sender;
     private String tid;
     private String content;
     private Date scheduled;
     private Date expiration;
     private boolean sequence;
-    private String sender;
     private int qos = 1;
     protected Map<String, String> attrMap = new HashMap<>();
 
@@ -29,6 +29,14 @@ public class MqMessage implements IMqMessage {
     public MqMessage(String content) {
         this.tid = StrUtils.guid();
         this.content = content;
+    }
+
+    /**
+     * 发送者
+     * */
+    @Override
+    public String getSender() {
+        return sender;
     }
 
     /**
@@ -60,13 +68,6 @@ public class MqMessage implements IMqMessage {
     @Override
     public Date getExpiration() {
         return expiration;
-    }
-
-    /**
-     * 发送者
-     * */
-    public String getSender() {
-        return sender;
     }
 
     /**

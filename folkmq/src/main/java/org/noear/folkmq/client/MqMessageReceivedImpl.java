@@ -6,6 +6,7 @@ import org.noear.folkmq.common.MqUtils;
 import org.noear.socketd.transport.core.Entity;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
+import org.noear.socketd.utils.StrUtils;
 
 import java.io.IOException;
 import java.util.Date;
@@ -22,7 +23,7 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
     private final transient Message source;
     private final transient Session session;
 
-    private final String sender;
+    private String sender;
     private final String tid;
     private final String topic;
     private final String consumerGroup;
@@ -43,6 +44,10 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
         MqResolver mr = MqUtils.getOf(source);
 
         this.sender = mr.getSender(source);
+        if (StrUtils.isEmpty(sender)) {
+            this.sender = source.atName();
+        }
+
         this.tid = mr.getTid(source);
         this.topic = mr.getTopic(source);
         this.consumerGroup = mr.getConsumerGroup(source);

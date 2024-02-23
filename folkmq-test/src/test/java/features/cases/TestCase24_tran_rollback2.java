@@ -34,6 +34,7 @@ public class TestCase24_tran_rollback2 extends BaseTestCase {
                 .nameAs("demoapp")
                 .config(c -> c.metaPut("ak", "").metaPut("sk", ""))
                 .response(m -> {
+                    System.out.println("来请求消息了：" + m);
                     if (m.isTransaction()) {
                         m.acknowledge(false);
                     }
@@ -46,10 +47,10 @@ public class TestCase24_tran_rollback2 extends BaseTestCase {
         }));
 
 
-        MqTransaction tran = client.beginTransaction();
+        MqTransaction tran = client.newTransaction();
         try {
-            client.publish("demo", new MqMessage("demo1"));
-            client.publish("demo", new MqMessage("demo2"));
+            client.publish("demo", new MqMessage("demo1").transaction(tran));
+            client.publish("demo", new MqMessage("demo2").transaction(tran));
         } catch (Throwable e) {
             tran.rollback();
         }

@@ -120,12 +120,7 @@ public interface MqClient extends Closeable {
     MqClient response(MqResponder responder);
 
     /**
-     * 开始事务
+     * 创建事务
      */
-    MqTransaction beginTransaction();
-
-    /**
-     * 清理事务
-     */
-    void clearTransaction();
+    MqTransaction newTransaction();
 }

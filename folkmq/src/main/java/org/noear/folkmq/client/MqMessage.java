@@ -20,10 +20,11 @@ public class MqMessage implements IMqMessage {
     private Date scheduled;
     private Date expiration;
     private boolean sequence;
-    private boolean transaction;
     private String sender;
     private int qos = 1;
     protected Map<String, String> attrMap = new HashMap<>();
+
+    protected MqTransaction transaction;
 
     public MqMessage(String content) {
         this.tid = StrUtils.guid();
@@ -61,19 +62,22 @@ public class MqMessage implements IMqMessage {
         return expiration;
     }
 
+    /**
+     * 发送者
+     * */
     public String getSender() {
         return sender;
     }
 
     /**
-     * 是否事务
+     * 是否有事务
      */
     public boolean isTransaction() {
-        return transaction;
+        return transaction != null;
     }
 
     /**
-     * 是否顺序
+     * 是否为顺序
      */
     @Override
     public boolean isSequence() {
@@ -106,9 +110,18 @@ public class MqMessage implements IMqMessage {
     /**
      * 是否事务（内部接口）
      */
-    protected MqMessage internalTransaction(boolean transaction) {
+    public MqMessage transaction(MqTransaction transaction) {
         this.transaction = transaction;
+        transaction.binding(this);
         return this;
+    }
+
+    protected String tmid() {
+        if (transaction == null) {
+            return null;
+        } else {
+            return transaction.tmid();
+        }
     }
 
     protected MqMessage internalSender(String sender) {

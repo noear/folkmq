@@ -15,6 +15,11 @@ public interface MqTransaction {
     String tmid();
 
     /**
+     * 事务绑定
+     * */
+    void binding(MqMessage message);
+
+    /**
      * 事务提交
      */
     void commit() throws IOException;

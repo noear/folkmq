@@ -46,10 +46,10 @@ public class TestCase23_tran_rollback extends BaseTestCase {
         }));
 
 
-        MqTransaction tran = client.beginTransaction();
+        MqTransaction tran = client.newTransaction();
         try {
-            client.publish("demo", new MqMessage("demo1"));
-            client.publish("demo", new MqMessage("demo2"));
+            client.publish("demo", new MqMessage("demo1").transaction(tran));
+            client.publish("demo", new MqMessage("demo2").transaction(tran));
 
             tran.rollback();
         } catch (Throwable e) {

@@ -39,8 +39,6 @@ public class MqClientDefault implements MqClientInternal {
     protected MqResponder responder;
     //处理执行器
     protected ExecutorService handleExecutor;
-    //事务状态
-    private final ThreadLocal<MqTransactionImpl> tranThreadLocal = new ThreadLocal<>();
     //服务端地址
     private final String[] urls;
     //客户端会话
@@ -242,34 +240,30 @@ public class MqClientDefault implements MqClientInternal {
 
     @Override
     public void publish2(String tmid, List<String> tidAry, boolean isRollback) throws IOException {
-        try {
-            if (tidAry == null || tidAry.size() == 0) {
-                return;
-            }
+        if (tidAry == null || tidAry.size() == 0) {
+            return;
+        }
 
-            if (clientSession == null) {
-                throw new SocketDConnectionException("Not connected!");
-            }
+        if (clientSession == null) {
+            throw new SocketDConnectionException("Not connected!");
+        }
 
-            ClientSession session = clientSession.getSessionAny(tmid);
-            if (session == null || session.isValid() == false) {
-                throw new SocketDException("No session is available!");
-            }
+        ClientSession session = clientSession.getSessionAny(tmid);
+        if (session == null || session.isValid() == false) {
+            throw new SocketDException("No session is available!");
+        }
 
-            Entity entity = new StringEntity(String.join(",", tidAry))
-                    .metaPut(MqConstants.MQ_META_ROLLBACK, (isRollback ? "1" : "0"))
-                    .at(MqConstants.BROKER_AT_SERVER_HASH); //事务走哈希
+        Entity entity = new StringEntity(String.join(",", tidAry))
+                .metaPut(MqConstants.MQ_META_ROLLBACK, (isRollback ? "1" : "0"))
+                .at(MqConstants.BROKER_AT_SERVER_HASH); //事务走哈希
 
-            //::Qos1
-            Entity resp = session.sendAndRequest(MqConstants.MQ_EVENT_PUBLISH2, entity).await();
+        //::Qos1
+        Entity resp = session.sendAndRequest(MqConstants.MQ_EVENT_PUBLISH2, entity).await();
 
-            int confirm = Integer.parseInt(resp.metaOrDefault(MqConstants.MQ_META_CONFIRM, "0"));
-            if (confirm != 1) {
-                String messsage = "Client message publish2 confirm failed: " + resp.dataAsString();
-                throw new FolkmqException(messsage);
-            }
-        } finally {
-            clearTransaction();
+        int confirm = Integer.parseInt(resp.metaOrDefault(MqConstants.MQ_META_CONFIRM, "0"));
+        if (confirm != 1) {
+            String messsage = "Client message publish2 confirm failed: " + resp.dataAsString();
+            throw new FolkmqException(messsage);
         }
     }
 
@@ -282,11 +276,6 @@ public class MqClientDefault implements MqClientInternal {
 
         if (clientSession == null) {
             throw new SocketDConnectionException("Not connected!");
-        }
-
-        //事务支持
-        if (tranThreadLocal.get() != null) {
-            tranThreadLocal.get().begin(message);
         }
 
         ClientSession session = clientSession.getSessionAny(diversionOrNull(topic, message));
@@ -326,11 +315,6 @@ public class MqClientDefault implements MqClientInternal {
 
         if (clientSession == null) {
             throw new SocketDConnectionException("Not connected!");
-        }
-
-        //事务支持
-        if (tranThreadLocal.get() != null) {
-            tranThreadLocal.get().begin(message);
         }
 
         ClientSession session = clientSession.getSessionAny(diversionOrNull(topic, message));
@@ -480,7 +464,7 @@ public class MqClientDefault implements MqClientInternal {
     }
 
     @Override
-    public MqTransaction beginTransaction() {
+    public MqTransaction newTransaction() {
         //检查必要条件
         if (StrUtils.isEmpty(name)) {
             throw new IllegalArgumentException("Client 'name' can't be empty");
@@ -490,21 +474,8 @@ public class MqClientDefault implements MqClientInternal {
             throw new IllegalArgumentException("Client 'responder' can't be null");
         }
 
-        //开始事务管理
-        MqTransactionImpl tmp = tranThreadLocal.get();
-        if (tmp == null) {
-            tmp = new MqTransactionImpl(this);
-            tranThreadLocal.set(tmp);
-        }
-
-        return tmp;
+        return new MqTransactionImpl(this);
     }
-
-    @Override
-    public void clearTransaction() {
-        tranThreadLocal.set(null);
-    }
-
 
     /**
      * 消费回执
@@ -529,7 +500,7 @@ public class MqClientDefault implements MqClientInternal {
 
     protected String diversionOrNull(String topic, MqMessage message) {
         if (message.isTransaction()) {
-            return tranThreadLocal.get().tmid();
+            return message.tmid();
         } else if (message.isSequence()) {
             return topic;
         } else {

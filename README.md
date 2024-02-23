@@ -57,16 +57,16 @@
 * based on [Socket.D Network Application protocol](https://socketd.noear.org/) Development. New design, independent architecture!
 
 
+
 | role     | function                                                                                    | 
 |----------|---------------------------------------------------------------------------------------------|
-| Producer | Publish messages, timed messages, sequential messages, expireable messages, transactional messages. Send Request (rpc) Qos0 and Qos1 are supported                          |     
+| Producer | Publish messages, timed messages, sequential messages, expireable messages, transactional messages. Send Request (rpc) Qos0 and Qos1 are supported                      |     
 |          |                                                                                             |       
-| Consumer | Subscribe, unsubscribe. Responding to a request                                                                 |        
-| Consumer | Consume-ACK (automatic, manual)                                                             |      
+| Consumer | Subscribe, unsubscribe. Consumption -ACK (automatic, manual). Request and response          |      
 |          |                                                                                             |     
-| Server   | Publish-Confirm, Subscribe-Confirm, Unsubscribe-Confirm, Distribute-Retry, Distribute-Delay | 
-| Server   | In-memory running, snapshot persistence (automatic, offline, manual)                        |   
-| Server   | Cluster hot scaling                                                       |        
+| Server   | Publish -Confirm, subscribe -Confirm, unsubscribe -Confirm, dispatch -Retry, dispatch -delay | 
+| Server   | Single thread, run in memory, snapshot persistence (automatic, down, manual), Broker mode clustering, cluster hot scaling                    |   
+
 
 
 

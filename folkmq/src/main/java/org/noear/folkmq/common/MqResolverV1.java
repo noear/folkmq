@@ -19,6 +19,11 @@ import java.util.Map;
  */
 public class MqResolverV1 implements MqResolver {
     @Override
+    public int version() {
+        return 1;
+    }
+
+    @Override
     public String getSender(Entity m) {
         return m.metaOrDefault(MqMetasV2.MQ_META_SENDER, "");
     }

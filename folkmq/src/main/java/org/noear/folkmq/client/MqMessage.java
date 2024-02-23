@@ -111,8 +111,11 @@ public class MqMessage implements IMqMessage {
      * 是否事务（内部接口）
      */
     public MqMessage transaction(MqTransaction transaction) {
-        this.transaction = transaction;
-        transaction.binding(this);
+        if (transaction != null) {
+            this.transaction = transaction;
+            transaction.binding(this);
+        }
+
         return this;
     }
 

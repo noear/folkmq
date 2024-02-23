@@ -13,29 +13,29 @@ public class MqUtils {
     private static MqResolver v1 = new MqResolverV1();
     private static MqResolver v2 = new MqResolverV2();
 
-    public static MqResolver getV2(){
+    public static MqResolver getV2() {
         return v2;
     }
 
     public static MqResolver getOf(Session s) {
-        String ver = s.handshake().param(MqConstants.FOLKMQ_VERSION);
-        if ("2".equals(ver)) {
-            return v2;
-        } else {
+        String ver = s.handshake().paramOrDefault(MqConstants.FOLKMQ_VERSION, "1");
+        if ("1".equals(ver)) {
             return v1;
+        } else {
+            return v2;
         }
     }
 
     public static MqResolver getOf(Message m) {
-        if(m == null){
+        if (m == null) {
             return v2;
         }
 
-        String ver = m.meta(MqMetasV2.MQ_META_VID);
-        if ("2".equals(ver)) {
-            return v2;
-        } else {
+        String ver = m.metaOrDefault(MqMetasV2.MQ_META_VID, "1");
+        if ("1".equals(ver)) {
             return v1;
+        } else {
+            return v2;
         }
     }
 }

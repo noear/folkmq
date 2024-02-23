@@ -19,6 +19,10 @@ import java.util.Map;
  * @see 1.2
  */
 public class MqResolverV2 implements MqResolver {
+    @Override
+    public int version() {
+        return 2;
+    }
 
     @Override
     public String getSender(Entity m) {

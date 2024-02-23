@@ -59,7 +59,7 @@
 
 | role     | function                                                                                    | 
 |----------|---------------------------------------------------------------------------------------------|
-| Producer | Publish messages, timed messages, sequential messages, expireable messages, transactional messages, send requests. Qos0 and Qos1 are supported                          |     
+| Producer | Publish messages, timed messages, sequential messages, expireable messages, transactional messages. Send Request (rpc) Qos0 and Qos1 are supported                         |     
 |          |                                                                                             |       
 | Consumer | Subscribe, unsubscribe                                                                      |        
 | Consumer | Consume-ACK (automatic, manual)                                                             |      

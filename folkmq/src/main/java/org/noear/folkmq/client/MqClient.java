@@ -68,12 +68,27 @@ public interface MqClient extends Closeable {
     void subscribe(String topic, String consumerGroup, MqConsumeHandler consumerHandler) throws IOException;
 
     /**
+     * 订阅主题
+     *
+     * @param topic           主题
+     * @param consumerHandler 消费处理
+     */
+    void subscribe(String topic, MqConsumeHandler consumerHandler) throws IOException;
+
+    /**
      * 取消订阅主题
      *
      * @param topic         主题
      * @param consumerGroup 消费者组
      */
     void unsubscribe(String topic, String consumerGroup) throws IOException;
+
+    /**
+     * 取消订阅主题
+     *
+     * @param topic         主题
+     */
+    void unsubscribe(String topic) throws IOException;
 
 
     /**

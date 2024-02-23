@@ -61,7 +61,7 @@
 |----------|---------------------------------------------------------------------------------------------|
 | Producer | Publish messages, timed messages, sequential messages, expireable messages, transactional messages. Send Request (rpc) Qos0 and Qos1 are supported                          |     
 |          |                                                                                             |       
-| Consumer | Subscribe, unsubscribe                                                                      |        
+| Consumer | Subscribe, unsubscribe. Responding to a request                                                                 |        
 | Consumer | Consume-ACK (automatic, manual)                                                             |      
 |          |                                                                                             |     
 | Server   | Publish-Confirm, Subscribe-Confirm, Unsubscribe-Confirm, Distribute-Retry, Distribute-Delay | 

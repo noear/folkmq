@@ -2,6 +2,7 @@ package org.noear.folkmq.client;
 
 import org.noear.socketd.transport.client.ClientConfigHandler;
 import org.noear.socketd.transport.stream.RequestStream;
+import org.noear.socketd.utils.StrUtils;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -22,7 +23,7 @@ public interface MqClient extends Closeable {
 
     /**
      * 名字取为
-     * */
+     */
     MqClient nameAs(String name);
 
     /**
@@ -73,7 +74,14 @@ public interface MqClient extends Closeable {
      * @param topic           主题
      * @param consumerHandler 消费处理
      */
-    void subscribe(String topic, MqConsumeHandler consumerHandler) throws IOException;
+    default void subscribe(String topic, MqConsumeHandler consumerHandler) throws IOException {
+        //检查必要条件
+        if (StrUtils.isEmpty(name())) {
+            throw new IllegalArgumentException("Client 'name' can't be empty");
+        }
+
+        subscribe(topic, name(), consumerHandler);
+    }
 
     /**
      * 取消订阅主题
@@ -86,9 +94,16 @@ public interface MqClient extends Closeable {
     /**
      * 取消订阅主题
      *
-     * @param topic         主题
+     * @param topic 主题
      */
-    void unsubscribe(String topic) throws IOException;
+    default void unsubscribe(String topic) throws IOException {
+        //检查必要条件
+        if (StrUtils.isEmpty(name())) {
+            throw new IllegalArgumentException("Client 'name' can't be empty");
+        }
+
+        unsubscribe(topic, name());
+    }
 
 
     /**

@@ -212,16 +212,6 @@ public class MqClientDefault implements MqClientInternal {
     }
 
     @Override
-    public void subscribe(String topic, MqConsumeHandler consumerHandler) throws IOException {
-        //检查必要条件
-        if (StrUtils.isEmpty(name)) {
-            throw new IllegalArgumentException("Client 'name' can't be empty");
-        }
-
-        subscribe(topic, name(), consumerHandler);
-    }
-
-    @Override
     public void unsubscribe(String topic, String consumerGroup) throws IOException {
         Objects.requireNonNull(topic, "Param 'topic' can't be null");
         Objects.requireNonNull(consumerGroup, "Param 'consumerGroup' can't be null");
@@ -246,16 +236,6 @@ public class MqClientDefault implements MqClientInternal {
                 log.info("Client unsubscribe successfully: {}#{}， sessionId={}", topic, consumerGroup, session.sessionId());
             }
         }
-    }
-
-    @Override
-    public void unsubscribe(String topic) throws IOException {
-        //检查必要条件
-        if (StrUtils.isEmpty(name)) {
-            throw new IllegalArgumentException("Client 'name' can't be empty");
-        }
-
-        unsubscribe(topic, name());
     }
 
     @Override

@@ -428,7 +428,7 @@ public class MqClientDefault implements MqClientInternal {
     }
 
     @Override
-    public RequestStream send(MqMessage message, String toName) throws IOException {
+    public RequestStream send(MqMessage message, String toName, long timeout) throws IOException {
         //检查必要条件
         if (StrUtils.isEmpty(name)) {
             throw new IllegalArgumentException("Client 'name' can't be empty");
@@ -456,7 +456,7 @@ public class MqClientDefault implements MqClientInternal {
 
         if (message.getQos() > 0) {
             //::Qos1
-            return session.sendAndRequest(MqConstants.MQ_EVENT_REQUEST, entity);
+            return session.sendAndRequest(MqConstants.MQ_EVENT_REQUEST, entity, timeout);
         } else {
             //::Qos0
             session.send(MqConstants.MQ_EVENT_REQUEST, entity);

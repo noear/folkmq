@@ -161,17 +161,24 @@ public interface MqClient extends Closeable {
      * 监听
      *
      * @param consumerHandler 消费处理
-     * */
+     */
     void listen(MqConsumeHandler consumerHandler) throws IOException;
 
     /**
      * 发送
      */
-    RequestStream send(MqMessage message, String toName) throws IOException;
+    RequestStream send(MqMessage message, String toName, long timeout) throws IOException;
+
+    /**
+     * 发送
+     */
+    default RequestStream send(MqMessage message, String toName) throws IOException {
+        return send(message, toName, 0L);
+    }
 
     /**
      * 事务监听器
-     * */
+     */
     MqClient transactionListenser(MqConsumeHandler transactionListenser);
 
     /**

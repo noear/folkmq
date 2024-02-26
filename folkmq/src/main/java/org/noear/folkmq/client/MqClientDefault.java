@@ -424,6 +424,11 @@ public class MqClientDefault implements MqClientInternal {
 
     @Override
     public void listen(MqConsumeHandler listenHandler) throws IOException {
+        //检查必要条件
+        if (StrUtils.isEmpty(name)) {
+            throw new IllegalArgumentException("Client 'name' can't be empty");
+        }
+
         this.listenHandler = listenHandler;
     }
 
@@ -466,7 +471,10 @@ public class MqClientDefault implements MqClientInternal {
 
     @Override
     public MqClient transactionListenser(MqConsumeHandler transactionListenser) {
-        this.transactionListenser = transactionListenser;
+        if (transactionListenser != null) {
+            this.transactionListenser = transactionListenser;
+        }
+
         return this;
     }
 
@@ -475,10 +483,6 @@ public class MqClientDefault implements MqClientInternal {
         //检查必要条件
         if (StrUtils.isEmpty(name)) {
             throw new IllegalArgumentException("Client 'name' can't be empty");
-        }
-
-        if (transactionListenser == null) {
-            throw new IllegalArgumentException("Client 'transactionListenser' can't be null");
         }
 
         return new MqTransactionImpl(this);

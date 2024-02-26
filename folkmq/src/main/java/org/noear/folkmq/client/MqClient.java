@@ -169,6 +169,11 @@ public interface MqClient extends Closeable {
     MqClient response(MqResponder responder);
 
     /**
+     * 事务监听器
+     * */
+    MqClient transactionListenser(MqConsumeHandler transactionListenser);
+
+    /**
      * 创建事务
      */
     MqTransaction newTransaction();

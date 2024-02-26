@@ -35,6 +35,7 @@ import java.util.concurrent.ExecutorService;
 public class MqClientDefault implements MqClientInternal {
     private static final Logger log = LoggerFactory.getLogger(MqClientDefault.class);
 
+    protected MqConsumeHandler transactionListenser;
     //请求响应器
     protected MqResponder responder;
     //处理执行器
@@ -465,14 +466,20 @@ public class MqClientDefault implements MqClientInternal {
     }
 
     @Override
+    public MqClient transactionListenser(MqConsumeHandler transactionListenser) {
+        this.transactionListenser = transactionListenser;
+        return this;
+    }
+
+    @Override
     public MqTransaction newTransaction() {
         //检查必要条件
         if (StrUtils.isEmpty(name)) {
             throw new IllegalArgumentException("Client 'name' can't be empty");
         }
 
-        if (responder == null) {
-            throw new IllegalArgumentException("Client 'responder' can't be null");
+        if (transactionListenser == null) {
+            throw new IllegalArgumentException("Client 'transactionListenser' can't be null");
         }
 
         return new MqTransactionImpl(this);

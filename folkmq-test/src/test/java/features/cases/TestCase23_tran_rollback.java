@@ -33,7 +33,7 @@ public class TestCase23_tran_rollback extends BaseTestCase {
         client = new MqClientDefault("folkmq://127.0.0.1:" + getPort())
                 .nameAs("demoapp")
                 .config(c -> c.metaPut("ak", "").metaPut("sk", ""))
-                .response(m -> {
+                .transactionListenser(m -> {
                     if (m.isTransaction()) {
                         m.acknowledge(true);
                     }

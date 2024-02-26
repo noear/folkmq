@@ -33,7 +33,7 @@ public class TestCase21_tran_commit extends BaseTestCase {
         client = new MqClientDefault("folkmq://127.0.0.1:" + getPort())
                 .nameAs("demoapp")
                 .config(c -> c.metaPut("ak", "").metaPut("sk", ""))
-                .response(m -> {
+                .transactionListenser(m -> {
                     if (m.isTransaction()) {
                         m.acknowledge(true);
                     }

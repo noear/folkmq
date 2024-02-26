@@ -1,5 +1,6 @@
 package features.cases;
 
+import org.noear.folkmq.FolkMQ;
 import org.noear.folkmq.client.MqClientDefault;
 import org.noear.folkmq.client.MqMessage;
 import org.noear.folkmq.server.MqServer;
@@ -33,7 +34,7 @@ public class TestCase16_ack_retry_multi_server extends BaseTestCase {
         //客户端
         CountDownLatch countDownLatch = new CountDownLatch(4);
 
-        client = new MqClientDefault(
+        client = FolkMQ.createClient(
                 "folkmq://127.0.0.1:" + getPort(),
                 "folkmq://127.0.0.1:" + (10000+getPort()))
                 .autoAcknowledge(false)

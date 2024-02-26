@@ -1,5 +1,6 @@
 package demo;
 
+import org.noear.folkmq.FolkMQ;
 import org.noear.folkmq.client.MqClient;
 import org.noear.folkmq.client.MqClientDefault;
 import org.noear.folkmq.client.MqMessage;
@@ -13,7 +14,7 @@ import java.util.Date;
 public class ClientDemo1 {
     public static void main(String[] args) throws Exception {
         //客户端
-        MqClient client = new MqClientDefault("folkmq://127.0.0.1:18602?ak=folkmq&sk=YapLHTx19RlsEE16")
+        MqClient client = FolkMQ.createClient("folkmq://127.0.0.1:18602?ak=folkmq&sk=YapLHTx19RlsEE16")
                 .connect();
 
         //订阅

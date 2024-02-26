@@ -1,5 +1,6 @@
 package features.cases;
 
+import org.noear.folkmq.FolkMQ;
 import org.noear.folkmq.client.*;
 import org.noear.folkmq.server.MqServerDefault;
 import org.noear.socketd.transport.core.Reply;
@@ -23,7 +24,7 @@ public class TestCase25_rpc extends BaseTestCase {
                 .start(getPort());
 
         //客户端
-        client = new MqClientDefault("folkmq://127.0.0.1:" + getPort())
+        client = FolkMQ.createClient("folkmq://127.0.0.1:" + getPort())
                 .nameAs("demoapp")
                 .connect();
 
@@ -34,7 +35,7 @@ public class TestCase25_rpc extends BaseTestCase {
         }));
 
 
-        MqClient client2 = new MqClientDefault("folkmq://127.0.0.1:" + getPort())
+        MqClient client2 = FolkMQ.createClient("folkmq://127.0.0.1:" + getPort())
                 .nameAs("testapp")
                 .connect();
 

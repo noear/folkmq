@@ -1,5 +1,6 @@
 package features.cases;
 
+import org.noear.folkmq.FolkMQ;
 import org.noear.folkmq.client.MqClientDefault;
 import org.noear.folkmq.client.MqMessage;
 import org.noear.folkmq.server.MqQueue;
@@ -29,7 +30,7 @@ public class TestCase17_unpublish extends BaseTestCase {
 
         //客户端
 
-        client = new MqClientDefault("folkmq://127.0.0.1:" + getPort())
+        client = FolkMQ.createClient("folkmq://127.0.0.1:" + getPort())
                 .connect();
 
         client.subscribe("demo", "a", ((message) -> {

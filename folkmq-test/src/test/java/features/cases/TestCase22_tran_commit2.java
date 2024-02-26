@@ -1,5 +1,6 @@
 package features.cases;
 
+import org.noear.folkmq.FolkMQ;
 import org.noear.folkmq.client.MqClientDefault;
 import org.noear.folkmq.client.MqMessage;
 import org.noear.folkmq.client.MqTransaction;
@@ -30,7 +31,7 @@ public class TestCase22_tran_commit2 extends BaseTestCase {
         //客户端
         CountDownLatch countDownLatch = new CountDownLatch(2);
 
-        client = new MqClientDefault("folkmq://127.0.0.1:" + getPort())
+        client = FolkMQ.createClient("folkmq://127.0.0.1:" + getPort())
                 .nameAs("demoapp")
                 .config(c -> c.metaPut("ak", "").metaPut("sk", ""))
                 .transactionListenser(m -> {

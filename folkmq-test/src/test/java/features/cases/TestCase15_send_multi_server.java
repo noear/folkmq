@@ -1,5 +1,6 @@
 package features.cases;
 
+import org.noear.folkmq.FolkMQ;
 import org.noear.folkmq.client.MqClientDefault;
 import org.noear.folkmq.client.MqMessage;
 import org.noear.folkmq.server.MqServer;
@@ -33,7 +34,7 @@ public class TestCase15_send_multi_server extends BaseTestCase {
         //客户端
         CountDownLatch countDownLatch = new CountDownLatch(4);
 
-        client = new MqClientDefault("folkmq://127.0.0.1:" + getPort() +",folkmq://127.0.0.1:" + (10000+getPort()))
+        client = FolkMQ.createClient("folkmq://127.0.0.1:" + getPort() +",folkmq://127.0.0.1:" + (10000+getPort()))
                 .connect();
 
         client.subscribe("demo", "a", ((message) -> {

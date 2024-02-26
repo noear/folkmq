@@ -2,8 +2,8 @@ package features;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.noear.folkmq.FolkMQ;
 import org.noear.folkmq.client.MqClient;
-import org.noear.folkmq.client.MqClientDefault;
 import org.noear.folkmq.common.MqApis;
 import org.noear.snack.ONode;
 
@@ -19,7 +19,7 @@ public class CallTest {
 
     @BeforeAll
     public static void init() throws IOException {
-        client = new MqClientDefault("folkmq://127.0.0.1:18602")
+        client = FolkMQ.createClient("folkmq://127.0.0.1:18602")
                 .config(c -> c.metaPut("ak", "").metaPut("sk", ""))
                 .connect();
     }

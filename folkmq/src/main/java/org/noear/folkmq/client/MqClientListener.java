@@ -76,20 +76,33 @@ public class MqClientListener extends EventListener {
     }
 
     private void onDistribute(Session s, Message m, MqMessageReceivedImpl message) {
+        MqSubscription subscription = client.getSubscription(message.getTopic(), message.getConsumerGroup());
+
         try {
-            MqSubscription subscription = client.getSubscription(message.getTopic(), message.getConsumerGroup());
-
             if (subscription != null) {
+                //有订阅
                 subscription.consume(message);
-            }
 
-            //是否自动回执
-            if (client.autoAcknowledge) {
-                client.acknowledge(s, m, message, true,null);
+                //是否自动回执
+                if (subscription.isAutoAck()) {
+                    client.acknowledge(s, m, message, true, null);
+                }
+            } else {
+                //没有订阅
+                client.acknowledge(s, m, message, false, null);
             }
         } catch (Throwable e) {
             try {
-                client.acknowledge(s, m, message, false, null);
+                if (subscription != null) {
+                    //有订阅
+                    if (subscription.isAutoAck()) {
+                        client.acknowledge(s, m, message, false, null);
+                    }
+                } else {
+                    //没有订阅
+                    client.acknowledge(s, m, message, false, null);
+                }
+
                 log.warn("Client consume handle error, tid={}", message.getTid(), e);
             } catch (Throwable err) {
                 log.warn("Client consume handle error, tid={}", message.getTid(), e);

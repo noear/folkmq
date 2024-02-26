@@ -12,6 +12,7 @@ public class MqSubscription implements MqConsumeHandler {
     private final String topic;
     private final String consumerGroup;
     private final String queueName;
+    private final boolean autoAck;
     private final MqConsumeHandler consumeHandler;
 
 
@@ -27,6 +28,13 @@ public class MqSubscription implements MqConsumeHandler {
      */
     public String getConsumerGroup() {
         return consumerGroup;
+    }
+
+    /**
+     * 是否自动回执
+     */
+    public boolean isAutoAck() {
+        return autoAck;
     }
 
     /**
@@ -48,9 +56,10 @@ public class MqSubscription implements MqConsumeHandler {
      * @param consumerGroup  消费者组
      * @param consumeHandler 消费处理器
      */
-    public MqSubscription(String topic, String consumerGroup, MqConsumeHandler consumeHandler) {
+    public MqSubscription(String topic, String consumerGroup, boolean autoAck, MqConsumeHandler consumeHandler) {
         this.topic = topic;
         this.consumerGroup = consumerGroup;
+        this.autoAck = autoAck;
         this.queueName = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP + consumerGroup;
         this.consumeHandler = consumeHandler;
     }

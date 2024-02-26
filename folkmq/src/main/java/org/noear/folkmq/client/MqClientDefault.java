@@ -144,6 +144,11 @@ public class MqClientDefault implements MqClientInternal {
     }
 
     @Override
+    public boolean autoAcknowledge() {
+        return autoAcknowledge;
+    }
+
+    @Override
     public CompletableFuture<String> call(String apiName, String apiToken, String topic, String consumerGroup) throws IOException {
         Objects.requireNonNull(apiName, "Param 'apiName' can't be null");
         Objects.requireNonNull(apiToken, "Param 'apiToken' can't be null");
@@ -183,7 +188,7 @@ public class MqClientDefault implements MqClientInternal {
      * @param consumerHandler 消费处理
      */
     @Override
-    public void subscribe(String topic, String consumerGroup, MqConsumeHandler consumerHandler) throws IOException {
+    public void subscribe(String topic, String consumerGroup, boolean autoAck, MqConsumeHandler consumerHandler) throws IOException {
         Objects.requireNonNull(topic, "Param 'topic' can't be null");
         Objects.requireNonNull(consumerGroup, "Param 'consumerGroup' can't be null");
         Objects.requireNonNull(consumerHandler, "Param 'consumerHandler' can't be null");
@@ -191,7 +196,7 @@ public class MqClientDefault implements MqClientInternal {
         MqAssert.assertMeta(topic, "topic");
         MqAssert.assertMeta(consumerGroup, "consumerGroup");
 
-        MqSubscription subscription = new MqSubscription(topic, consumerGroup, consumerHandler);
+        MqSubscription subscription = new MqSubscription(topic, consumerGroup, autoAck, consumerHandler);
 
         subscriptionMap.put(subscription.getQueueName(), subscription);
 

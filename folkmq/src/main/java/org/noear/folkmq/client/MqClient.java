@@ -55,6 +55,11 @@ public interface MqClient extends Closeable {
     MqClient autoAcknowledge(boolean auto);
 
     /**
+     * 自动回执
+     */
+    boolean autoAcknowledge();
+
+    /**
      * 接口调用
      */
     CompletableFuture<String> call(String apiName, String apiToken, String topic, String consumerGroup) throws IOException;
@@ -64,9 +69,23 @@ public interface MqClient extends Closeable {
      *
      * @param topic           主题
      * @param consumerGroup   消费者组
+     * @param autoAck         是否自动回执
      * @param consumerHandler 消费处理
      */
-    void subscribe(String topic, String consumerGroup, MqConsumeHandler consumerHandler) throws IOException;
+    void subscribe(String topic, String consumerGroup, boolean autoAck, MqConsumeHandler consumerHandler) throws IOException;
+
+
+    /**
+     * 订阅主题
+     *
+     * @param topic           主题
+     * @param consumerGroup   消费者组
+     * @param consumerHandler 消费处理
+     */
+    default void subscribe(String topic, String consumerGroup, MqConsumeHandler consumerHandler) throws IOException {
+        subscribe(topic, consumerGroup, autoAcknowledge(), consumerHandler);
+    }
+
 
     /**
      * 订阅主题
@@ -80,7 +99,7 @@ public interface MqClient extends Closeable {
             throw new IllegalArgumentException("Client 'name' can't be empty");
         }
 
-        subscribe(topic, name(), consumerHandler);
+        subscribe(topic, name(), autoAcknowledge(), consumerHandler);
     }
 
     /**

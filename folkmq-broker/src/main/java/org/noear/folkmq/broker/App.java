@@ -1,7 +1,5 @@
 package org.noear.folkmq.broker;
 
-import org.noear.folkmq.broker.admin.dso.LicenceUtils;
-import org.noear.socketd.utils.RunUtils;
 import org.noear.solon.Solon;
 import org.noear.solon.validation.ValidatorException;
 
@@ -27,8 +25,5 @@ public class App {
                 }
             }));
         });
-
-        //授权自动检测
-        RunUtils.runAndTry(LicenceUtils::auth);
     }
 }

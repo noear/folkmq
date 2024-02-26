@@ -1,104 +1,114 @@
 package org.noear.folkmq.broker.admin.dso;
 
-import org.noear.folkmq.FolkMQ;
 import org.noear.folkmq.broker.common.ConfigNames;
-import org.noear.snack.ONode;
 import org.noear.solon.Solon;
 import org.noear.solon.Utils;
-import org.noear.solon.cloud.utils.http.HttpUtils;
-import org.noear.solon.core.handle.Result;
 
 /**
  * @author noear
  * @since 1.0
  */
 public class LicenceUtils {
-    private static String licence = null;
-    private static int isAuthorized = 0;
-    private static String subscribeDate;
-    private static int subscribeMonths;
-    private static String consumer;
 
-    public static String getLicence() {
-        if (licence == null) {
-            licence = Solon.cfg().get(ConfigNames.folkmq_licence, "");
+    private static LicenceUtils global = new LicenceUtils();
+
+    public static LicenceUtils getGlobal() {
+        return global;
+    }
+
+    private static final String publicKey = "MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAI6+FX3DPmY0/dLXOOiVJwBhllQ6a34+8/WKS77L7BB9Ch3oyqXA41zqO3vQM2COIZDTxKSgPuRkOlFaKptoG0cCAwEAAQ==";
+
+    private String sn;
+    private int edition;
+    private String subscribe;
+    private int months;
+    private String version;
+    private String consumer;
+
+    private boolean isValid;
+    private String description;
+
+    public String getSn() {
+        return sn;
+    }
+
+    public int getEdition() {
+        return edition;
+    }
+
+    public String getSubscribe() {
+        return subscribe;
+    }
+
+    public int getMonths() {
+        return months;
+    }
+
+    public String getMonthsStr(){
+        if(months >= 36){
+            return "永久";
+        }else{
+            return months +"月";
         }
-
-        return licence;
     }
 
-    public static String getLicence2() {
-        StringBuilder buf = new StringBuilder();
-        String[] ary = getLicence().split("-");
-        for (String s : ary) {
-            if (s.length() > 8) {
-                buf.append(s.substring(0, s.length() - 6) + "******");
-            } else if (s.length() > 6) {
-                buf.append(s.substring(0, s.length() - 4) + "****");
-            } else {
-                buf.append(s.substring(0, s.length() - 2) + "**");
-            }
-            buf.append("-");
-        }
-        buf.setLength(buf.length() - 1);
-        return buf.toString();
+    public String getVersion() {
+        return version;
     }
 
-    public static boolean isValid() {
-        if (Utils.isEmpty(getLicence()) || getLicence().length() != 36) {
-            return false;
-        } else {
-            return true;
-        }
-    }
-
-    public static int isAuthorized() {
-        return isAuthorized;
-    }
-
-    public static int getSubscribeMonths() {
-        return subscribeMonths;
-    }
-
-    public static String getSubscribeDate() {
-        return subscribeDate;
-    }
-
-    public static String getConsumer() {
+    public String getConsumer() {
         return consumer;
     }
 
-    public static Result auth() {
-        try {
-            String json = HttpUtils.http("https://folkmq.noear.org/licence/auth")
-                    .data("licence", LicenceUtils.getLicence())
-                    .data("version", FolkMQ.versionName())
-                    .post();
+    public boolean isValid() {
+        return isValid;
+    }
 
-            ONode oNode = ONode.loadStr(json);
-            int code = oNode.get("code").getInt();
-            String description = oNode.get("description").getString();
+    public String getDescription() {
+        if (description == null) {
+            try {
+                String appLicence = Solon.cfg().get(ConfigNames.folkmq_licence, "");
 
-            if (code == 200) {
-                isAuthorized = 1;
-                subscribeDate = oNode.get("data").get("subscribe_date").getString();
-                subscribeMonths = oNode.get("data").get("subscribe_months").getInt();
-                consumer = oNode.get("data").get("consumer").getString();
+                if (Utils.isNotEmpty(appLicence)) {
+                    String licenceStr = LicenceHelper.licenceDecode(appLicence, publicKey);
+                    String[] licence = licenceStr.split(",");
 
-                return Result.succeed(description);
-            } else {
-                if (code == 401) {
-                    isAuthorized = -1;
-                } else {
-                    isAuthorized = 0;
+                    if (licence.length >= 6) {
+                        sn = licence[0];
+                        edition = Integer.parseInt(licence[1]);
+                        subscribe = licence[2];
+                        months = Integer.parseInt(licence[3]);
+                        version = licence[4];
+                        consumer = licence[5];
+
+                        if (edition == 1 || edition == 2) {
+                            //sn,e,t,m,v,c  //e=0 Community Edition, 1 Professional Edition, 2 Enterprise Edition
+
+                            StringBuilder buf = new StringBuilder();
+                            buf.append("Licence (for FolkMQ): ");
+                            buf.append("SN=").append(licence[0]).append(", ");
+                            if (edition == 2) {
+                                buf.append("E=Enterprise Edition, ");
+                            } else {
+                                buf.append("E=Professional Edition, ");
+                            }
+                            buf.append("S=").append(licence[2]).append(", ");
+                            buf.append("M=").append(licence[3]);
+
+                            isValid = true;
+                            description = buf.toString();
+                        }
+                    }
                 }
+            } catch (Throwable e) {
 
-
-                return Result.failure(code, description);
             }
-        } catch (Exception e) {
-            isAuthorized = 0;
-            return Result.failure(400, "检测出错：" + e.getMessage());
+
+            if (description == null) {
+                description = "Licence (for FolkMQ): Unauthorized (with legal risks)";
+            }
         }
+
+        return description;
     }
 }

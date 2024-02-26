@@ -6,7 +6,7 @@ import {MqConstants} from "../common/MqConstants";
 
 export interface IMqMessage {
     /**
-     * 事务ID
+     * 跟踪ID
      */
     getTid(): string;
 
@@ -144,7 +144,7 @@ export class MqMessageReceivedImpl implements MqMessageReceived {
     }
 
     /**
-     * 事务ID
+     * 跟踪ID
      */
     getTid(): string {
         return this._tid;

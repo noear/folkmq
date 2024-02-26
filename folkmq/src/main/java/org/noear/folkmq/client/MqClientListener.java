@@ -52,9 +52,9 @@ public class MqClientListener extends EventListener {
                 MqMessageReceivedImpl message = new MqMessageReceivedImpl(client, s, m);
 
                 if (client.handleExecutor == null) {
-                    RunUtils.async(() -> onListen(s, m, message));
+                    RunUtils.async(() -> onDistribute(s, m, message));
                 } else {
-                    client.handleExecutor.submit(() -> onListen(s, m, message));
+                    client.handleExecutor.submit(() -> onDistribute(s, m, message));
                 }
             } catch (Throwable e) {
                 log.warn("Client consume handle error, sid={}", m.sid(), e);
@@ -62,54 +62,50 @@ public class MqClientListener extends EventListener {
         });
     }
 
-    private void onListen(Session s, Message m, MqMessageReceivedImpl message) {
-        try {
-            if (message.isTransaction()) {
-                client.transactionListenser.consume(message);
-            } else {
-                client.responder.onRequest(message);
-            }
-        } catch (Throwable e) {
-            try {
-                s.sendAlarm(m, "Request handle error:" + e.getMessage());
-                log.warn("Client request handle error, tid={}", message.getTid(), e);
-            } catch (Throwable err) {
-                log.warn("Client request handle error, tid={}", message.getTid(), e);
-            }
-        }
-    }
-
     private void onDistribute(Session s, Message m, MqMessageReceivedImpl message) {
-        MqSubscription subscription = client.getSubscription(message.getTopic(), message.getConsumerGroup());
-
-        try {
-            if (subscription != null) {
-                //有订阅
-                subscription.consume(message);
-
-                //是否自动回执
-                if (subscription.isAutoAck()) {
-                    client.acknowledge(s, m, message, true, null);
+        if (message.isTransaction()) {
+            try {
+                client.transactionListenser.consume(message);
+            } catch (Throwable e) {
+                try {
+                    s.sendAlarm(m, "Request handle error:" + e.getMessage());
+                    log.warn("Client request handle error, tid={}", message.getTid(), e);
+                } catch (Throwable err) {
+                    log.warn("Client request handle error, tid={}", message.getTid(), e);
                 }
-            } else {
-                //没有订阅
-                client.acknowledge(s, m, message, false, null);
             }
-        } catch (Throwable e) {
+        } else {
+            MqSubscription subscription = client.getSubscription(message.getTopic(), message.getConsumerGroup());
+
             try {
                 if (subscription != null) {
                     //有订阅
+                    subscription.consume(message);
+
+                    //是否自动回执
                     if (subscription.isAutoAck()) {
-                        client.acknowledge(s, m, message, false, null);
+                        client.acknowledge(s, m, message, true, null);
                     }
                 } else {
                     //没有订阅
                     client.acknowledge(s, m, message, false, null);
                 }
+            } catch (Throwable e) {
+                try {
+                    if (subscription != null) {
+                        //有订阅
+                        if (subscription.isAutoAck()) {
+                            client.acknowledge(s, m, message, false, null);
+                        }
+                    } else {
+                        //没有订阅
+                        client.acknowledge(s, m, message, false, null);
+                    }
 
-                log.warn("Client consume handle error, tid={}", message.getTid(), e);
-            } catch (Throwable err) {
-                log.warn("Client consume handle error, tid={}", message.getTid(), e);
+                    log.warn("Client consume handle error, tid={}", message.getTid(), e);
+                } catch (Throwable err) {
+                    log.warn("Client consume handle error, tid={}", message.getTid(), e);
+                }
             }
         }
     }

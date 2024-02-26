@@ -126,6 +126,12 @@ public interface MqClient extends Closeable {
 
 
     /**
+     * 发送
+     */
+    RequestStream send(String topic, MqMessage message, String toName) throws IOException;
+
+
+    /**
      * 同步发布消息
      *
      * @param topic   主题
@@ -157,16 +163,6 @@ public interface MqClient extends Closeable {
      */
     CompletableFuture<Boolean> unpublishAsync(String topic, String tid) throws IOException;
 
-
-    /**
-     * 请求
-     */
-    RequestStream request(String atName, String topic, MqMessage message) throws IOException;
-
-    /**
-     * 响应
-     */
-    MqClient response(MqResponder responder);
 
     /**
      * 事务监听器

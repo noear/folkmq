@@ -15,9 +15,14 @@ public interface IMqMessage {
     String getSender();
 
     /**
-     * 事务ID
+     * 跟踪ID
      */
     String getTid();
+
+    /**
+     * 标签
+     * */
+    String getTag();
 
     /**
      * 内容

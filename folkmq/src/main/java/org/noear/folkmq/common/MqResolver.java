@@ -28,6 +28,11 @@ public interface MqResolver {
     String getTid(Entity m);
 
     /**
+     * 获取标签
+     * */
+    String getTag(Entity m);
+
+    /**
      * 获取主题
      */
     String getTopic(Entity m);

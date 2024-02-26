@@ -24,22 +24,22 @@ public class RpcTest {
 
         MqClient client1 = FolkMQ.createClient("folkmq://127.0.0.1:18602?ak=folkmq&sk=YapLHTx19RlsEE16")
                 .nameAs("demo-app1")
-                .response(r->{
-                    r.acknowledge(true);
-                    countDownLatch.countDown();
-                })
                 .connect();
 
         MqClient client2 = FolkMQ.createClient("folkmq://127.0.0.1:18602?ak=folkmq&sk=YapLHTx19RlsEE16")
                 .nameAs("demo-app2")
-                .response(r->{})
                 .connect();
+
+        client1.subscribe("test", (m)->{
+            m.acknowledge(true);
+            countDownLatch.countDown();
+        });
 
 
         //发布测试
         long start_time = System.currentTimeMillis();
         for (int i = 0; i < count; i++) {
-            client2.request("demo-app1","test", new MqMessage("test-" + i));
+            client2.send("test", new MqMessage("test-" + i), "demo-app1");
         }
         long sendTime = System.currentTimeMillis() - start_time;
 

@@ -3,6 +3,7 @@ package org.noear.folkmq.client;
 import org.noear.folkmq.FolkMQ;
 import org.noear.folkmq.common.MqAssert;
 import org.noear.folkmq.common.MqConstants;
+import org.noear.folkmq.common.MqMetasV2;
 import org.noear.folkmq.common.MqUtils;
 import org.noear.folkmq.exception.FolkmqException;
 import org.noear.socketd.SocketD;
@@ -36,8 +37,6 @@ public class MqClientDefault implements MqClientInternal {
     private static final Logger log = LoggerFactory.getLogger(MqClientDefault.class);
 
     protected MqConsumeHandler transactionListenser;
-    //请求响应器
-    protected MqResponder responder;
     //处理执行器
     protected ExecutorService handleExecutor;
     //服务端地址
@@ -421,19 +420,19 @@ public class MqClientDefault implements MqClientInternal {
     }
 
     @Override
-    public RequestStream request(String atName, String topic, MqMessage message) throws IOException {
+    public RequestStream send(String topic, MqMessage message, String toName) throws IOException {
         //检查必要条件
         if (StrUtils.isEmpty(name)) {
             throw new IllegalArgumentException("Client 'name' can't be empty");
         }
 
         //检查参数
-        Objects.requireNonNull(atName, "Param 'atName' can't be null");
+        Objects.requireNonNull(toName, "Param 'toName' can't be null");
         Objects.requireNonNull(topic, "Param 'topic' can't be null");
         Objects.requireNonNull(message, "Param 'message' can't be null");
 
         MqAssert.assertMeta(topic, "topic");
-        MqAssert.assertMeta(atName, "atName");
+        MqAssert.assertMeta(toName, "toName");
 
         if (clientSession == null) {
             throw new SocketDConnectionException("Not connected!");
@@ -446,7 +445,8 @@ public class MqClientDefault implements MqClientInternal {
 
         message.internalSender(name());
         StringEntity entity = MqUtils.getOf((Session) session).publishEntityBuild(topic, message);
-        entity.at(atName);
+        entity.putMeta(MqMetasV2.MQ_META_CONSUMER_GROUP, toName);
+        entity.at(toName);
 
         if (message.getQos() > 0) {
             //::Qos1
@@ -456,13 +456,6 @@ public class MqClientDefault implements MqClientInternal {
             session.send(MqConstants.MQ_EVENT_REQUEST, entity);
             return null;
         }
-    }
-
-
-    @Override
-    public MqClient response(MqResponder responder) {
-        this.responder = responder;
-        return this;
     }
 
     @Override

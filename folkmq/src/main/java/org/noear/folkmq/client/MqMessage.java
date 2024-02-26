@@ -17,6 +17,7 @@ import java.util.Map;
 public class MqMessage implements IMqMessage {
     private String sender;
     private String tid;
+    private String tag;
     private String content;
     private Date scheduled;
     private Date expiration;
@@ -40,11 +41,19 @@ public class MqMessage implements IMqMessage {
     }
 
     /**
-     * 事务ID
+     * 跟踪ID
      */
     @Override
     public String getTid() {
         return tid;
+    }
+
+    /**
+     * 标签
+     * */
+    @Override
+    public String getTag() {
+        return tag;
     }
 
     /**
@@ -90,6 +99,11 @@ public class MqMessage implements IMqMessage {
      */
     public int getQos() {
         return qos;
+    }
+
+    public MqMessage tag(String tag) {
+        this.tag = tag;
+        return this;
     }
 
     /**

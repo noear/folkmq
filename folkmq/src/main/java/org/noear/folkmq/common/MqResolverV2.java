@@ -35,6 +35,11 @@ public class MqResolverV2 implements MqResolver {
     }
 
     @Override
+    public String getTag(Entity m) {
+        return m.metaOrDefault(MqMetasV2.MQ_META_TAG, "");
+    }
+
+    @Override
     public String getTopic(Entity m) {
         return m.metaOrDefault(MqMetasV2.MQ_META_TOPIC, "");
     }
@@ -119,6 +124,11 @@ public class MqResolverV2 implements MqResolver {
         entity.metaPut(MqMetasV2.MQ_META_TOPIC, topic);
         entity.metaPut(MqMetasV2.MQ_META_QOS, (message.getQos() == 0 ? "0" : "1"));
 
+        //标签
+        if (StrUtils.isNotEmpty(message.getTag())) {
+            entity.metaPut(MqMetasV2.MQ_META_TAG, message.getTag());
+        }
+
         //定时派发
         if (message.getScheduled() == null) {
             entity.metaPut(MqMetasV2.MQ_META_SCHEDULED, "0");
@@ -135,7 +145,7 @@ public class MqResolverV2 implements MqResolver {
             entity.metaPut(MqMetasV2.MQ_META_TRANSACTION, "1");
         }
 
-        if(StrUtils.isNotEmpty(message.getSender())){
+        if (StrUtils.isNotEmpty(message.getSender())) {
             entity.metaPut(MqMetasV2.MQ_META_SENDER, message.getSender());
         }
 

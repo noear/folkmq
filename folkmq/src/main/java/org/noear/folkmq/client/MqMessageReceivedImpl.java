@@ -6,7 +6,6 @@ import org.noear.folkmq.common.MqUtils;
 import org.noear.socketd.transport.core.Entity;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
-import org.noear.socketd.utils.StrUtils;
 
 import java.io.IOException;
 import java.util.Date;
@@ -25,6 +24,7 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
 
     private final String sender;
     private final String tid;
+    private final String tag;
     private final String topic;
     private final String consumerGroup;
     private final String content;
@@ -46,6 +46,7 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
         this.sender = mr.getSender(source);
 
         this.tid = mr.getTid(source);
+        this.tag = mr.getTag(source);
         this.topic = mr.getTopic(source);
         this.consumerGroup = mr.getConsumerGroup(source);
 
@@ -78,11 +79,19 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
     }
 
     /**
-     * 事务ID
+     * 跟踪ID
      */
     @Override
     public String getTid() {
         return tid;
+    }
+
+    /**
+     * 标签
+     * */
+    @Override
+    public String getTag() {
+        return tag;
     }
 
     /**
@@ -165,6 +174,7 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
         StringBuilder buf = new StringBuilder();
         buf.append("MqMessageReceived{");
         buf.append("tid='").append(tid).append("',");
+        buf.append("tag='").append(tag).append("',");
         buf.append("topic='").append(topic).append("',");
         buf.append("content='").append(content).append("',");
 

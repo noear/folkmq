@@ -73,7 +73,7 @@ public interface MqClient {
  */
 public interface IMqMessage {
     /**
-     * 事务ID
+     * 跟踪ID
      */
     String getTid();
 

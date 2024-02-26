@@ -58,4 +58,8 @@ public interface MqMetasV2 {
      * 元信息：派发次数
      */
     String MQ_META_TIMES = "t2";
+    /**
+     * 元信息：标签
+     */
+    String MQ_META_TAG = "t5";
 }

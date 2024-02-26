@@ -30,16 +30,18 @@ public class RpcTest {
                 .nameAs("demo-app2")
                 .connect();
 
-        client1.subscribe("test", (m)->{
-            m.acknowledge(true);
-            countDownLatch.countDown();
+        client1.listen(m->{
+            if("tag".equals(m.getTag())) {
+                m.acknowledge(true);
+                countDownLatch.countDown();
+            }
         });
 
 
         //发布测试
         long start_time = System.currentTimeMillis();
         for (int i = 0; i < count; i++) {
-            client2.send("test", new MqMessage("test-" + i), "demo-app1");
+            client2.send( new MqMessage("test-" + i).tag("test"), "demo-app1");
         }
         long sendTime = System.currentTimeMillis() - start_time;
 

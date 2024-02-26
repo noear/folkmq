@@ -34,12 +34,12 @@ public class MqClientListener extends EventListener {
                 MqMessageReceivedImpl message = new MqMessageReceivedImpl(client, s, m);
 
                 if (message.isSequence()) {
-                    RunUtils.single(() -> onDistribute(s, m, message));
+                    RunUtils.single(() -> onReceive(s, m, message, false));
                 } else {
                     if (client.handleExecutor == null) {
-                        RunUtils.async(() -> onDistribute(s, m, message));
+                        RunUtils.async(() -> onReceive(s, m, message, false));
                     } else {
-                        client.handleExecutor.submit(() -> onDistribute(s, m, message));
+                        client.handleExecutor.submit(() -> onReceive(s, m, message, false));
                     }
                 }
             } catch (Throwable e) {
@@ -52,9 +52,9 @@ public class MqClientListener extends EventListener {
                 MqMessageReceivedImpl message = new MqMessageReceivedImpl(client, s, m);
 
                 if (client.handleExecutor == null) {
-                    RunUtils.async(() -> onDistribute(s, m, message));
+                    RunUtils.async(() -> onReceive(s, m, message, true));
                 } else {
-                    client.handleExecutor.submit(() -> onDistribute(s, m, message));
+                    client.handleExecutor.submit(() -> onReceive(s, m, message, true));
                 }
             } catch (Throwable e) {
                 log.warn("Client consume handle error, sid={}", m.sid(), e);
@@ -62,10 +62,14 @@ public class MqClientListener extends EventListener {
         });
     }
 
-    private void onDistribute(Session s, Message m, MqMessageReceivedImpl message) {
-        if (message.isTransaction()) {
+    private void onReceive(Session s, Message m, MqMessageReceivedImpl message, boolean isRequest) {
+        if (isRequest) {
             try {
-                client.transactionListenser.consume(message);
+                if (message.isTransaction()) {
+                    client.transactionListenser.consume(message);
+                } else {
+                    client.listenHandler.consume(message);
+                }
             } catch (Throwable e) {
                 try {
                     s.sendAlarm(m, "Request handle error:" + e.getMessage());

@@ -36,7 +36,10 @@ import java.util.concurrent.ExecutorService;
 public class MqClientDefault implements MqClientInternal {
     private static final Logger log = LoggerFactory.getLogger(MqClientDefault.class);
 
+    //事务监听器
     protected MqConsumeHandler transactionListenser;
+    //发送处理
+    protected MqConsumeHandler listenHandler;
     //处理执行器
     protected ExecutorService handleExecutor;
     //服务端地址
@@ -420,7 +423,12 @@ public class MqClientDefault implements MqClientInternal {
     }
 
     @Override
-    public RequestStream send(String topic, MqMessage message, String toName) throws IOException {
+    public void listen(MqConsumeHandler listenHandler) throws IOException {
+        this.listenHandler = listenHandler;
+    }
+
+    @Override
+    public RequestStream send(MqMessage message, String toName) throws IOException {
         //检查必要条件
         if (StrUtils.isEmpty(name)) {
             throw new IllegalArgumentException("Client 'name' can't be empty");
@@ -428,10 +436,8 @@ public class MqClientDefault implements MqClientInternal {
 
         //检查参数
         Objects.requireNonNull(toName, "Param 'toName' can't be null");
-        Objects.requireNonNull(topic, "Param 'topic' can't be null");
         Objects.requireNonNull(message, "Param 'message' can't be null");
 
-        MqAssert.assertMeta(topic, "topic");
         MqAssert.assertMeta(toName, "toName");
 
         if (clientSession == null) {
@@ -444,7 +450,7 @@ public class MqClientDefault implements MqClientInternal {
         }
 
         message.internalSender(name());
-        StringEntity entity = MqUtils.getOf((Session) session).publishEntityBuild(topic, message);
+        StringEntity entity = MqUtils.getOf((Session) session).publishEntityBuild("", message);
         entity.putMeta(MqMetasV2.MQ_META_CONSUMER_GROUP, toName);
         entity.at(toName);
 

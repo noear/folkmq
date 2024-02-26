@@ -130,6 +130,7 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
         return source.meta(MqConstants.MQ_ATTR_PREFIX + name);
     }
 
+
     /**
      * 过期时间
      */

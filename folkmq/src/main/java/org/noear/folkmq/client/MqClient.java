@@ -124,13 +124,6 @@ public interface MqClient extends Closeable {
         unsubscribe(topic, name());
     }
 
-
-    /**
-     * 发送
-     */
-    RequestStream send(String topic, MqMessage message, String toName) throws IOException;
-
-
     /**
      * 同步发布消息
      *
@@ -163,6 +156,18 @@ public interface MqClient extends Closeable {
      */
     CompletableFuture<Boolean> unpublishAsync(String topic, String tid) throws IOException;
 
+
+    /**
+     * 监听
+     *
+     * @param consumerHandler 消费处理
+     * */
+    void listen(MqConsumeHandler consumerHandler) throws IOException;
+
+    /**
+     * 发送
+     */
+    RequestStream send(MqMessage message, String toName) throws IOException;
 
     /**
      * 事务监听器

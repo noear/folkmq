@@ -38,4 +38,11 @@ public interface MqMessageReceived extends IMqMessage {
      * 回执
      */
     void acknowledge(boolean isOk, Entity reply) throws IOException;
+
+    /**
+     * 回执
+     */
+    default void acknowledge(Entity reply) throws IOException {
+        acknowledge(true, reply);
+    }
 }

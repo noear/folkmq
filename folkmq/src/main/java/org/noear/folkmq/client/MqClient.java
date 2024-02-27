@@ -162,7 +162,7 @@ public interface MqClient extends Closeable {
      *
      * @param consumerHandler 消费处理
      */
-    void listen(MqConsumeHandler consumerHandler) throws IOException;
+    void listen(MqConsumeHandler consumerHandler);
 
     /**
      * 发送

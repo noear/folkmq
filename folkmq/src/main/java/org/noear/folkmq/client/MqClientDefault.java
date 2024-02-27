@@ -429,7 +429,7 @@ public class MqClientDefault implements MqClientInternal {
     }
 
     @Override
-    public void listen(MqConsumeHandler listenHandler) throws IOException {
+    public void listen(MqConsumeHandler listenHandler) {
         //检查必要条件
         if (StrUtils.isEmpty(name)) {
             throw new IllegalArgumentException("Client 'name' can't be empty");

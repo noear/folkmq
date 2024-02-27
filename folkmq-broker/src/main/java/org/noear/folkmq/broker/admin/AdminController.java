@@ -53,7 +53,11 @@ public class AdminController extends BaseController {
         vm.put("isValid", LicenceUtils.getGlobal().isValid());
 
         if (LicenceUtils.getGlobal().isValid()) {
-            vm.put("licenceBtn", "正版授权");
+            if(LicenceUtils.getGlobal().isExpired()){
+                vm.put("licenceBtn", "过期授权");
+            }else{
+                vm.put("licenceBtn", "正版授权");
+            }
         } else {
             vm.put("licenceBtn", "非法授权");
         }
@@ -70,7 +74,13 @@ public class AdminController extends BaseController {
 
             vm.put("isAuthorized", false);
         } else {
-            vm.put("sn", LicenceUtils.getGlobal().getSn());
+            if (LicenceUtils.getGlobal().isExpired()) {
+                String hint = "（已过期，请重新购买授权：<a href='https://folkmq.noear.org' target='_blank'>https://folkmq.noear.org</a>）";
+                vm.put("sn", LicenceUtils.getGlobal().getSn() + hint);
+            } else {
+                vm.put("sn", LicenceUtils.getGlobal().getSn());
+            }
+
 
             vm.put("isAuthorized", true);
             vm.put("subscribeDate", LicenceUtils.getGlobal().getSubscribe());

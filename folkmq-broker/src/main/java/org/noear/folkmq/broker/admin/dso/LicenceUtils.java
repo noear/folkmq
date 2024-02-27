@@ -1,8 +1,13 @@
 package org.noear.folkmq.broker.admin.dso;
 
 import org.noear.folkmq.broker.common.ConfigNames;
+import org.noear.snack.core.utils.DateUtil;
 import org.noear.solon.Solon;
 import org.noear.solon.Utils;
+
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
 
 /**
  * @author noear
@@ -44,11 +49,11 @@ public class LicenceUtils {
         return months;
     }
 
-    public String getMonthsStr(){
-        if(months >= 36){
+    public String getMonthsStr() {
+        if (months >= 36) {
             return "永久";
-        }else{
-            return months +"月";
+        } else {
+            return months + "个月";
         }
     }
 
@@ -62,6 +67,22 @@ public class LicenceUtils {
 
     public boolean isValid() {
         return isValid;
+    }
+
+    public boolean isExpired() {
+        if (months >= 36) {
+            return false;
+        }
+
+        try {
+            LocalDate subscribeDate = DateUtil.parse(subscribe).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
+            LocalDate tmp = subscribeDate.plusMonths(months);
+            //当前时间大于授权时间
+            return LocalDate.now().compareTo(tmp) > 0;
+        } catch (Throwable e) {
+            return true;
+        }
     }
 
     public String getDescription() {

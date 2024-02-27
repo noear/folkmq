@@ -68,15 +68,21 @@ public class MqClientListener extends EventListener {
                 if (message.isTransaction()) {
                     if (client.transactionCheckback != null) {
                         client.transactionCheckback.check(message);
+                    } else {
+                        s.sendAlarm(m, "Client no checkback handler!");
                     }
                 } else {
                     if (client.listenHandler != null) {
                         client.listenHandler.consume(message);
+                    } else {
+                        s.sendAlarm(m, "Client no request handler!");
                     }
                 }
             } catch (Throwable e) {
                 try {
-                    s.sendAlarm(m, "Request handle error:" + e.getMessage());
+                    if (s.isValid()) {
+                        s.sendAlarm(m, "Client request handle error:" + e.getMessage());
+                    }
                     log.warn("Client request handle error, tid={}", message.getTid(), e);
                 } catch (Throwable err) {
                     log.warn("Client request handle error, tid={}", message.getTid(), e);

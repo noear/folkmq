@@ -396,6 +396,8 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
             s1.sendAndRequest(MqConstants.MQ_EVENT_DISTRIBUTE, messageHolder.getContent(), -1).thenReply(r -> {
                 int ack = Integer.parseInt(r.metaOrDefault(MqConstants.MQ_META_ACK, "0"));
                 acknowledgeDo(messageHolder, ack, true);
+            }).thenError(err->{
+                acknowledgeDo(messageHolder, 0, true);
             });
 
             //2.添加保险延时任务：如果没有回执就重发

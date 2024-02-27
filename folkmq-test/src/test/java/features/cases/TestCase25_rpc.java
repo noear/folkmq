@@ -25,23 +25,23 @@ public class TestCase25_rpc extends BaseTestCase {
 
         //客户端
         client = FolkMQ.createClient("folkmq://127.0.0.1:" + getPort())
-                .nameAs("demoapp")
+                .nameAs("app1")
                 .connect();
 
-        client.listen(new MqRouter(m -> m.getTag()).onConsume(m -> {
+        client.listen(new MqRouter(m -> m.getTag()).doOnConsume(m -> {
 
-        }).on("test.hello", m -> {
+        }).doOn("test.hello", m -> {
             m.acknowledge(new StringEntity(m.getSender() + ": me to! rev: " + m.getContent()));
         }));
 
 
         MqClient client2 = FolkMQ.createClient("folkmq://127.0.0.1:" + getPort())
-                .nameAs("testapp")
+                .nameAs("app2")
                 .connect();
 
 
         //开始 rpc 请求
-        Reply reply = client2.send(new MqMessage("hello").tag("test.hello"), "demoapp").await();
+        Reply reply = client2.send(new MqMessage("hello").tag("test.hello"), client.name()).await();
         String rst = reply.dataAsString();
 
         //检验客户端

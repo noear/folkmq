@@ -19,12 +19,12 @@ public class MqRouter implements MqConsumeHandler {
         this.mappingHandler = mappingHandler;
     }
 
-    public MqRouter on(String mapping, MqConsumeHandler consumeHandler) {
+    public MqRouter doOn(String mapping, MqConsumeHandler consumeHandler) {
         mappingMap.put(mapping, consumeHandler);
         return this;
     }
 
-    public MqRouter onConsume(MqConsumeHandler consumeHandler) {
+    public MqRouter doOnConsume(MqConsumeHandler consumeHandler) {
         this.consumeHandler = consumeHandler;
         return this;
     }

@@ -1,3 +1,11 @@
+### 1.2.2
+* 调整 response 拆分为：transactionCheckback 和 listen
+* 调整 request 改为 send
+* 添加 transactionCheckback 用于响应服务端的事务回查
+* 添加 listen 和 send 配套接口
+* 添加 后台图标
+* 完善 许可证本地处理机制
+
 ### 1.2.1
 * 添加 协议版本的握手传递
 * 添加 消息事务支持（即二段式提交），支持反向事务确认

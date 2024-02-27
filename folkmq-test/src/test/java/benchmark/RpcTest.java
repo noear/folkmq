@@ -26,17 +26,16 @@ public class RpcTest {
                 .nameAs("demo-app1")
                 .connect();
 
-        MqClient client2 = FolkMQ.createClient("folkmq://127.0.0.1:18602?ak=folkmq&sk=YapLHTx19RlsEE16")
-                .nameAs("demo-app2")
-                .connect();
-
         client1.listen(m->{
-            if("tag".equals(m.getTag())) {
+            if("test".equals(m.getTag())) {
                 m.acknowledge(true);
                 countDownLatch.countDown();
             }
         });
 
+        MqClient client2 = FolkMQ.createClient("folkmq://127.0.0.1:18602?ak=folkmq&sk=YapLHTx19RlsEE16")
+                .nameAs("demo-app2")
+                .connect();
 
         //发布测试
         long start_time = System.currentTimeMillis();

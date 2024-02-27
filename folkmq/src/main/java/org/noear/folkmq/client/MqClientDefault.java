@@ -343,6 +343,9 @@ public class MqClientDefault implements MqClientInternal {
                     String messsage = "Client message publish confirm failed: " + r.dataAsString();
                     future.completeExceptionally(new FolkmqException(messsage));
                 }
+            }).thenError(err -> {
+                String messsage = "Client message publish confirm failed: " + err.getMessage();
+                future.completeExceptionally(new FolkmqException(messsage));
             });
         } else {
             //::Qos0
@@ -417,6 +420,9 @@ public class MqClientDefault implements MqClientInternal {
                 String messsage = "Client message unpublish confirm failed: " + r.dataAsString();
                 future.completeExceptionally(new FolkmqException(messsage));
             }
+        }).thenError(err -> {
+            String messsage = "Client message unpublish confirm failed: " + err.getMessage();
+            future.completeExceptionally(new FolkmqException(messsage));
         });
 
         return future;

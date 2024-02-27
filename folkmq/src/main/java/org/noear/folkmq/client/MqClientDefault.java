@@ -36,9 +36,9 @@ import java.util.concurrent.ExecutorService;
 public class MqClientDefault implements MqClientInternal {
     private static final Logger log = LoggerFactory.getLogger(MqClientDefault.class);
 
-    //事务监听器
-    protected MqConsumeHandler transactionListenser;
-    //发送处理
+    //事务回查
+    protected MqTransactionCheckback transactionCheckback;
+    //监听处理
     protected MqConsumeHandler listenHandler;
     //处理执行器
     protected ExecutorService handleExecutor;
@@ -470,9 +470,9 @@ public class MqClientDefault implements MqClientInternal {
     }
 
     @Override
-    public MqClient transactionListenser(MqConsumeHandler transactionListenser) {
-        if (transactionListenser != null) {
-            this.transactionListenser = transactionListenser;
+    public MqClient transactionCheckback(MqTransactionCheckback transactionCheckback) {
+        if (transactionCheckback != null) {
+            this.transactionCheckback = transactionCheckback;
         }
 
         return this;

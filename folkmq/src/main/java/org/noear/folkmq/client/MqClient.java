@@ -177,9 +177,9 @@ public interface MqClient extends Closeable {
     }
 
     /**
-     * 事务监听器
+     * 事务反向检查
      */
-    MqClient transactionListenser(MqConsumeHandler transactionListenser);
+    MqClient transactionCheckback(MqTransactionCheckback transactionCheckback);
 
     /**
      * 创建事务

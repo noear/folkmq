@@ -11,12 +11,12 @@ import java.util.function.Function;
  * @since 1.3
  */
 public class MqRouter implements MqConsumeHandler {
-    private final Function<MqMessageReceived, String> routeHandler;
-    private MqConsumeHandler consumeHandler;
+    private final Function<MqMessageReceived, String> mappingHandler;
     private Map<String, MqConsumeHandler> mappingMap = new HashMap<>();
+    private MqConsumeHandler consumeHandler;
 
-    public MqRouter(Function<MqMessageReceived, String> routeHandler) {
-        this.routeHandler = routeHandler;
+    public MqRouter(Function<MqMessageReceived, String> mappingHandler) {
+        this.mappingHandler = mappingHandler;
     }
 
     public MqRouter on(String mapping, MqConsumeHandler consumeHandler) {
@@ -35,7 +35,7 @@ public class MqRouter implements MqConsumeHandler {
             consumeHandler.consume(message);
         }
 
-        String mapping = routeHandler.apply(message);
+        String mapping = mappingHandler.apply(message);
         MqConsumeHandler handler = mappingMap.get(mapping);
         if (handler != null) {
             handler.consume(message);

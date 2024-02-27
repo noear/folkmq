@@ -1,7 +1,6 @@
 package features.cases;
 
 import org.noear.folkmq.FolkMQ;
-import org.noear.folkmq.client.MqClientDefault;
 import org.noear.folkmq.client.MqMessage;
 import org.noear.folkmq.client.MqTransaction;
 import org.noear.folkmq.common.MqConstants;
@@ -34,11 +33,6 @@ public class TestCase21_tran_commit extends BaseTestCase {
         client = FolkMQ.createClient("folkmq://127.0.0.1:" + getPort())
                 .nameAs("demoapp")
                 .config(c -> c.metaPut("ak", "").metaPut("sk", ""))
-                .transactionListenser(m -> {
-                    if (m.isTransaction()) {
-                        m.acknowledge(true);
-                    }
-                })
                 .connect();
 
         client.subscribe("demo", "a", ((message) -> {

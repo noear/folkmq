@@ -66,8 +66,8 @@ public class MqClientListener extends EventListener {
         if (isRequest) {
             try {
                 if (message.isTransaction()) {
-                    if (client.transactionListenser != null) {
-                        client.transactionListenser.consume(message);
+                    if (client.transactionCheckback != null) {
+                        client.transactionCheckback.check(message);
                     }
                 } else {
                     if (client.listenHandler != null) {

@@ -16,7 +16,7 @@ public class DemoApp {
 
 
         client.send(new MqMessage("{code:1}").tag("/test/hello").asJson(), "app1").thenReply(resp -> {
-
+            System.out.println(resp.dataAsString());
         });
     }
 }

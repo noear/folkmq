@@ -9,7 +9,7 @@ import org.noear.folkmq.server.MqServerDefault;
 import java.util.concurrent.CountDownLatch;
 
 //单连接单线程发
-public class RpcTest {
+public class RpcTest3 {
     public static void main(String[] args) throws Exception {
         //服务端
         MqServer server = new MqServerDefault()
@@ -20,7 +20,8 @@ public class RpcTest {
 
         //客户端
         int count = 100_000;
-        CountDownLatch consumeDownLatch = new CountDownLatch(count);
+        CountDownLatch consumeDownLatch = new CountDownLatch(count * 3);
+        CountDownLatch sendDownLatch = new CountDownLatch(3);
 
         MqClient client1 = FolkMQ.createClient("folkmq://127.0.0.1:18602?ak=folkmq&sk=YapLHTx19RlsEE16")
                 .nameAs("demo-app1")
@@ -44,17 +45,57 @@ public class RpcTest {
 
         //发布测试
         long start_time = System.currentTimeMillis();
-        for (int i = 0; i < count; i++) {
-            client2.send( new MqMessage("test-" + i).tag("test"), "demo-app1");
-        }
+        Thread thread1 = new Thread(()->{
+            try {
+                for (int i = 0; i < count; i++) {
+                    client2.send( new MqMessage("test-" + i).tag("test"), "demo-app1");
+                }
+
+                sendDownLatch.countDown();
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        });
+
+        Thread thread2 = new Thread(()->{
+            try {
+                for (int i = 0; i < count; i++) {
+                    client2.send( new MqMessage("test-" + i).tag("test"), "demo-app1");
+                }
+
+                sendDownLatch.countDown();
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        });
+
+        Thread thread3 = new Thread(()->{
+            try {
+                for (int i = 0; i < count; i++) {
+                    client2.send( new MqMessage("test-" + i).tag("test"), "demo-app1");
+                }
+
+                sendDownLatch.countDown();
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        });
+
+        thread1.start();
+        thread2.start();
+        thread3.start();
+
+        sendDownLatch.await();
+
         long sendTime = System.currentTimeMillis() - start_time;
 
         System.out.println("sendTime: " + sendTime + "ms");
+
         consumeDownLatch.await();
 
         long consumeTime = System.currentTimeMillis() - start_time;
 
         System.out.println("sendTime: " + sendTime + "ms");
-        System.out.println("consumeTime: " + consumeTime + "ms, count: " + (count - consumeDownLatch.getCount()));
+        System.out.println("consumeTime: " + consumeTime + "ms, count: " + (count*3 - consumeDownLatch.getCount()));
     }
 }

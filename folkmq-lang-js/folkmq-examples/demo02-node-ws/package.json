@@ -1,0 +1,10 @@
+{
+  "name": "demo02-node-ws",
+  "description": "FolkMQ Node Test Project",
+  "author": "noear",
+  "dependencies": {
+    "@noear/socket.d": "2.4.5",
+    "@noear/folkmq": "1.2.2",
+    "ws": "^8.16.0"
+  }
+}

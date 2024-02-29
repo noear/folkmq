@@ -7,10 +7,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 转到 Handler 接口协议的 Listener（服务端、客户端，都可用）
+ * 转到 Handler 接口协议的 Listener
  *
  * @author noear
- * @since 2.0
+ * @since 1.2
  */
 public class MqSolonListener implements MqConsumeListener {
     private static final Logger log = LoggerFactory.getLogger(MqSolonListener.class);
@@ -31,14 +31,14 @@ public class MqSolonListener implements MqConsumeListener {
             if (ctx.getHandled() || ctx.status() != 404) {
                 ctx.commit();
             } else {
-                message.response(new MqAlarm("No event handler was found! like code=404"));
+                message.response(new MqAlarm("No message handler found! like code=404"));
             }
         } catch (Throwable e) {
             //context 初始化时，可能会出错
             //
             log.warn(e.getMessage(), e);
 
-            message.response(new MqAlarm("No event handler was found! like code=404"));
+            message.response(new MqAlarm("Message handler error: " + e.getMessage()));
         }
     }
 }

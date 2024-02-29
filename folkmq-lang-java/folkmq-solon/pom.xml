@@ -11,18 +11,19 @@
         <relativePath>../folkmq-parent/pom.xml</relativePath>
     </parent>
 
-    <artifactId>folkmq</artifactId>
+    <artifactId>folkmq-solon</artifactId>
     <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
             <groupId>org.noear</groupId>
-            <artifactId>socketd</artifactId>
+            <artifactId>folkmq</artifactId>
         </dependency>
 
         <dependency>
             <groupId>org.noear</groupId>
-            <artifactId>snack3</artifactId>
+            <artifactId>solon</artifactId>
+            <version>2.7.0</version>
         </dependency>
     </dependencies>
 </project>

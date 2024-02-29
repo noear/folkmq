@@ -19,7 +19,7 @@ import java.util.Map;
 
 /**
  * @author noear
- * @since 2.7
+ * @since 1.2
  */
 public class MqSolonContext extends ContextEmpty {
     private MqMessageReceivedImpl _request;

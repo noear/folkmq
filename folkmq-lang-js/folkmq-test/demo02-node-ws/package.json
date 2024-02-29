@@ -4,7 +4,7 @@
   "author": "noear",
   "dependencies": {
     "@noear/socket.d": "2.4.5",
-    "@noear/folkmq": "1.2.2",
+    "@noear/folkmq": "1.2.3",
     "ws": "^8.16.0"
   }
 }

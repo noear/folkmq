@@ -9,7 +9,7 @@ import org.noear.socketd.transport.core.entity.StringEntity;
  * @since 1.2
  */
 public class MqAlarm extends StringEntity {
-    public MqAlarm(String message){
-        super(message);
+    public MqAlarm(String data){
+        super(data);
     }
 }

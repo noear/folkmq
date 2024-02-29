@@ -4,6 +4,7 @@ import {MqClientDefault} from "./client/MqClientDefault";
 import {MqRouter} from "./client/MqRouter";
 import {IoFunction} from "@noear/socket.d/transport/core/Typealias";
 import {MqMessageReceived} from "./client/MqMessageReceived";
+import {MqAlarm} from "./client/MqAlarm";
 
 export class FolkMQ {
 
@@ -22,7 +23,7 @@ export class FolkMQ {
      * 获取版本
      */
     static versionName(): string {
-        return "1.2.2";
+        return "1.2.3";
     }
 
     /**
@@ -38,5 +39,9 @@ export class FolkMQ {
 
     static newMessage(content: string): MqMessage {
         return new MqMessage(content);
+    }
+
+    static newAlarm(content: string): MqAlarm {
+        return new MqAlarm(content);
     }
 }

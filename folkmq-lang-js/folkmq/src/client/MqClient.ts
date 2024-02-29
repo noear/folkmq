@@ -55,7 +55,7 @@ export interface MqClient {
      * @param consumerGroup   消费者组
      * @param consumerHandler 消费处理
      */
-    subscribe(topic: string, consumerGroup: string | null, autoAck: boolean, consumerHandler: IoConsumer<MqMessageReceived>);
+    subscribe(topic: string, consumerGroup: string | null, autoAck: boolean | null, consumerHandler: IoConsumer<MqMessageReceived>);
 
     /**
      * 取消订阅主题

@@ -132,9 +132,13 @@ export class MqClientDefault implements MqClientInternal {
      * @param consumerGroup   消费者组
      * @param consumerHandler 消费处理
      */
-    subscribe(topic: string, consumerGroup: string | null, autoAck: boolean, consumerHandler: IoConsumer<MqMessageReceived>) {
+    subscribe(topic: string, consumerGroup: string | null, autoAck: boolean | null, consumerHandler: IoConsumer<MqMessageReceived>) {
         if (consumerGroup == null) {
             consumerGroup = this.name();
+        }
+
+        if(autoAck == null){
+            autoAck = this._autoAcknowledge;
         }
 
         MqAssert.requireNonNull(topic, "Param 'topic' can't be null");

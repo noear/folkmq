@@ -5,6 +5,8 @@ import {MqRouter} from "./client/MqRouter";
 import {IoFunction} from "@noear/socket.d/transport/core/Typealias";
 import {MqMessageReceived} from "./client/MqMessageReceived";
 import {MqAlarm} from "./client/MqAlarm";
+import {Entity} from "@noear/socket.d/transport/core/Entity";
+import {SocketD} from "@noear/socket.d";
 
 export class FolkMQ {
 
@@ -43,5 +45,9 @@ export class FolkMQ {
 
     static newAlarm(content: string): MqAlarm {
         return new MqAlarm(content);
+    }
+
+    static newEntity(data?: String | Blob | ArrayBuffer): Entity {
+        return SocketD.newEntity(data);
     }
 }

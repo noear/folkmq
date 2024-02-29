@@ -81,7 +81,7 @@ public class MqMessage implements MqMessageBase {
     }
 
     /**
-     * 是否有事务
+     * 是否事务
      */
     public boolean isTransaction() {
         return transaction != null;
@@ -129,7 +129,7 @@ public class MqMessage implements MqMessageBase {
     }
 
     /**
-     * 是否事务（内部接口）
+     * 是否事务
      */
     public MqMessage transaction(MqTransaction transaction) {
         if (transaction != null) {

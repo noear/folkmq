@@ -6,7 +6,7 @@ export class MqConstants {
     static readonly FOLKMQ_VERSION = "folkmq-version";
 
     /**
-     * 元信息：消息事务Id
+     * 元信息：消息跟踪Id
      */
     static readonly MQ_META_TID = "mq.tid";
 

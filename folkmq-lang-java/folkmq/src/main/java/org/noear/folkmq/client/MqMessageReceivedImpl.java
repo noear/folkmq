@@ -140,7 +140,7 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
     }
 
     /**
-     * 是否为事务
+     * 是否事务
      */
     @Override
     public boolean isTransaction() {
@@ -148,7 +148,7 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
     }
 
     /**
-     * 是否为有序
+     * 是否有序
      */
     @Override
     public boolean isSequence() {

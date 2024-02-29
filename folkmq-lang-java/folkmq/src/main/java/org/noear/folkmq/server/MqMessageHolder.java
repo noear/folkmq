@@ -20,7 +20,7 @@ public class MqMessageHolder implements Delayed {
     private final String sender;
     //消息内容
     private final EntityDefault content;
-    //事务Id
+    //跟踪Id
     private final String tid;
     //投放目标
     private final String atName;
@@ -28,9 +28,9 @@ public class MqMessageHolder implements Delayed {
     private final int qos;
     //过期时间
     private final long expiration;
-    //是否为有序
+    //是否有序
     private final boolean sequence;
-    //是否为事务
+    //是否事务
     private boolean transaction;
 
     //派发时间
@@ -115,7 +115,7 @@ public class MqMessageHolder implements Delayed {
     }
 
     /**
-     * 是否有事务
+     * 是否事务
      * */
     public boolean isTransaction(){
         return transaction;
@@ -136,7 +136,7 @@ public class MqMessageHolder implements Delayed {
     }
 
     /**
-     * 是否为有序
+     * 是否有序
      */
     public boolean isSequence() {
         return sequence;

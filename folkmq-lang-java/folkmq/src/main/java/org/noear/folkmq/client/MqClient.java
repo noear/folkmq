@@ -145,7 +145,7 @@ public interface MqClient extends Closeable {
      * 取消发布
      *
      * @param topic 主题
-     * @param tid   事务id
+     * @param tid   跟踪id
      */
     void unpublish(String topic, String tid) throws IOException;
 
@@ -153,7 +153,7 @@ public interface MqClient extends Closeable {
      * 取消发布
      *
      * @param topic 主题
-     * @param tid   事务id
+     * @param tid   跟踪id
      */
     CompletableFuture<Boolean> unpublishAsync(String topic, String tid) throws IOException;
 
@@ -167,23 +167,32 @@ public interface MqClient extends Closeable {
 
     /**
      * 发送
+     *
+     * @param message 消息
+     * @param toName  发送目标名字
+     * @param timeout 超时（单位毫秒）
      */
     RequestStream send(MqMessage message, String toName, long timeout) throws IOException;
 
     /**
      * 发送
+     *
+     * @param message 消息
+     * @param toName  发送目标名字
      */
     default RequestStream send(MqMessage message, String toName) throws IOException {
         return send(message, toName, 0L);
     }
 
     /**
-     * 事务反向检查
+     * 事务回查
+     *
+     * @param transactionCheckback 事务回查处理
      */
     MqClient transactionCheckback(MqTransactionCheckback transactionCheckback);
 
     /**
-     * 创建事务
+     * 新建事务
      */
     MqTransaction newTransaction();
 }

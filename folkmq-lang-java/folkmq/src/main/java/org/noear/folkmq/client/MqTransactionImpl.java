@@ -29,7 +29,7 @@ public class MqTransactionImpl implements MqTransaction {
     }
 
     /**
-     * 事务开始
+     * 事务绑定
      */
     @Override
     public void binding(MqMessage message) {

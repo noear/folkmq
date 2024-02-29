@@ -28,12 +28,12 @@ export interface MqMessageBase {
     getExpiration(): Date | null;
 
     /**
-     * 是否为事务
+     * 是否事务
      */
     isTransaction(): boolean;
 
     /**
-     * 是否为有序
+     * 是否有序
      */
     isSequence(): boolean;
 

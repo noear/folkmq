@@ -20,7 +20,7 @@ export interface MqMetasResolver {
     getSender(m: Entity): string;
 
     /**
-     * 获取事务id
+     * 获取跟踪id
      */
     getTid(m: Entity): string;
 
@@ -80,12 +80,12 @@ export interface MqMetasResolver {
     setScheduled(m: Entity, scheduled: number);
 
     /**
-     * 是否为有序
+     * 是否有序
      */
     isSequence(m: Entity): boolean;
 
     /**
-     * 是否为事务
+     * 是否事务
      */
     isTransaction(m: Entity): boolean;
 

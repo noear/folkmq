@@ -35,12 +35,12 @@ public interface MqMessageBase {
     Date getExpiration();
 
     /**
-     * 是否为事务
+     * 是否事务
      */
     boolean isTransaction();
 
     /**
-     * 是否为有序
+     * 是否有序
      */
     boolean isSequence();
 

@@ -23,7 +23,7 @@ public interface MqMetasResolver {
     String getSender(Entity m);
 
     /**
-     * 获取事务id
+     * 获取跟踪id
      */
     String getTid(Entity m);
 
@@ -83,12 +83,12 @@ public interface MqMetasResolver {
     void setScheduled(Entity m, long scheduled);
 
     /**
-     * 是否为有序
+     * 是否有序
      */
     boolean isSequence(Entity m);
 
     /**
-     * 是否为事务
+     * 是否事务
      */
     boolean isTransaction(Entity m);
 

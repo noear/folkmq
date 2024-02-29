@@ -76,11 +76,11 @@ public interface MqServiceInternal {
      *
      * @param queue       队列
      * @param message     消息
-     * @param tid         事务Id
+     * @param tid         跟踪Id
      * @param qos         质量等级
      * @param sequence    是否为顺序
      * @param expiration  过期时间
-     * @param transaction 是否为事务
+     * @param transaction 是否事务
      * @param times       派发次数
      * @param scheduled   计划时间
      */

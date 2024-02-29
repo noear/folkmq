@@ -77,7 +77,7 @@ export interface MqClient {
      * 取消发布
      *
      * @param topic 主题
-     * @param tid   事务id
+     * @param tid   跟踪id
      */
     unpublish(topic: string, tid: string);
 
@@ -94,7 +94,7 @@ export interface MqClient {
     send(message: MqMessage, toName: string, timeout?: number): RequestStream | null;
 
     /**
-     * 事务反向检查
+     * 事务回查
      */
     transactionCheckback(transactionCheckback: IoConsumer<MqMessageReceived>);
 

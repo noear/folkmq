@@ -13,7 +13,7 @@ public interface MqConstants {
     String FOLKMQ_VERSION = "folkmq-version";
 
     /**
-     * 元信息：消息事务Id
+     * 元信息：消息跟踪Id
      */
     String MQ_META_TID = "mq.tid";
 

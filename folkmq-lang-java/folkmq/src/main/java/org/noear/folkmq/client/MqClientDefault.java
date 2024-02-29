@@ -448,7 +448,7 @@ public class MqClientDefault implements MqClientInternal {
     }
 
     /**
-     * 事务反向检查
+     * 事务回查
      */
     @Override
     public MqClient transactionCheckback(MqTransactionCheckback transactionCheckback) {

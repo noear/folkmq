@@ -144,14 +144,14 @@ export class MqMessageReceivedImpl implements MqMessageReceived {
     }
 
     /**
-     * 是否为事务
+     * 是否事务
      */
     isTransaction(): boolean {
         return this._transaction;
     }
 
     /**
-     * 是否为有序
+     * 是否有序
      */
     isSequence(): boolean {
         return this._sequence;

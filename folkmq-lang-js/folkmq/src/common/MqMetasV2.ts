@@ -6,7 +6,7 @@
  */
 export class MqMetasV2{
     /**
-     * 元信息：消息事务Id
+     * 元信息：消息跟踪Id
      */
     static readonly MQ_META_TID = "t0";
     /**

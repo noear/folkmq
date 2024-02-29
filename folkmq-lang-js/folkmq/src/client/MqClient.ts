@@ -90,16 +90,22 @@ export interface MqClient {
 
     /**
      * 发送
+     *
+     * @param message 消息
+     * @param toName  发送目标名字
+     * @param timeout 超时（单位毫秒）
      */
     send(message: MqMessage, toName: string, timeout?: number): RequestStream | null;
 
     /**
      * 事务回查
+     *
+     * @param transactionCheckback 事务回查处理
      */
     transactionCheckback(transactionCheckback: IoConsumer<MqMessageReceived>);
 
     /**
-     * 创建事务
+     * 新建事务
      */
     newTransaction();
 }

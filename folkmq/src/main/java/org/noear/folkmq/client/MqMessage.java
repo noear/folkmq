@@ -106,6 +106,11 @@ public class MqMessage implements IMqMessage {
         return this;
     }
 
+    public MqMessage asJson(){
+        attr("Content-Type", "application/json");
+        return this;
+    }
+
     /**
      * 定时派发
      */

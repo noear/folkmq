@@ -508,9 +508,13 @@ public class MqClientDefault implements MqClientInternal {
                 if (reply == null) {
                     reply = new EntityDefault();
                 }
-                reply.putMeta(MqConstants.MQ_META_ACK, isOk ? "1" : "0");
 
-                session.replyEnd(from, reply);
+                if (reply instanceof MqAlarm) {
+                    session.sendAlarm(from, reply.dataAsString());
+                } else {
+                    reply.putMeta(MqConstants.MQ_META_ACK, isOk ? "1" : "0");
+                    session.replyEnd(from, reply);
+                }
             }
         }
     }

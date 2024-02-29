@@ -7,17 +7,18 @@ import org.noear.socketd.transport.core.Session;
  * 消息工具类
  *
  * @author noear
- * @see 1.0
+ * @since 1.0
+ * @since 1.2
  */
 public class MqUtils {
-    private static MqResolver v1 = new MqResolverV1();
-    private static MqResolver v2 = new MqResolverV2();
+    private static MqMetasResolver v1 = new MqMetasResolverV1();
+    private static MqMetasResolver v2 = new MqMetasResolverV2();
 
-    public static MqResolver getV2() {
+    public static MqMetasResolver getV2() {
         return v2;
     }
 
-    public static MqResolver getOf(Session s) {
+    public static MqMetasResolver getOf(Session s) {
         String ver = s.handshake().paramOrDefault(MqConstants.FOLKMQ_VERSION, "1");
         if ("1".equals(ver)) {
             return v1;
@@ -26,7 +27,7 @@ public class MqUtils {
         }
     }
 
-    public static MqResolver getOf(Message m) {
+    public static MqMetasResolver getOf(Message m) {
         if (m == null) {
             return v2;
         }

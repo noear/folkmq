@@ -15,9 +15,9 @@ import java.util.Map;
  * 消息元信息分析器 v1
  *
  * @author noear
- * @see 1.2
+ * @since 1.2
  */
-public class MqResolverV1 implements MqResolver {
+public class MqMetasResolverV1 implements MqMetasResolver {
     @Override
     public int version() {
         return 1;
@@ -61,32 +61,36 @@ public class MqResolverV1 implements MqResolver {
         m.putMeta(MqMetasV1.MQ_META_TIMES, String.valueOf(times));
     }
 
+    @Override
+    public long getExpiration(Entity m) {
+        return Long.parseLong(m.metaOrDefault(MqMetasV1.MQ_META_EXPIRATION, "0"));
+    }
 
     @Override
     public void setExpiration(Entity m, Long expiration) {
         if (expiration == null) {
-            m.putMeta(MqMetasV1.MQ_META_EXPIRATION, null);
+            m.delMeta(MqMetasV1.MQ_META_EXPIRATION);
         } else {
             m.putMeta(MqMetasV1.MQ_META_EXPIRATION, expiration.toString());
         }
     }
 
-    public long getExpiration(Entity m) {
-        return Long.parseLong(m.metaOrDefault(MqMetasV1.MQ_META_EXPIRATION, "0"));
-    }
-
+    @Override
     public long getScheduled(Entity m) {
         return Long.parseLong(m.metaOrDefault(MqMetasV1.MQ_META_SCHEDULED, "0"));
     }
 
+    @Override
     public void setScheduled(Entity m, long scheduled){
         m.putMeta(MqMetasV1.MQ_META_SCHEDULED, String.valueOf(scheduled));
     }
 
+    @Override
     public boolean isSequence(Entity m) {
-        return Integer.parseInt(m.metaOrDefault(MqMetasV1.MQ_META_SEQUENCE, "0")) == 1;
+        return "1".equals(m.metaOrDefault(MqMetasV1.MQ_META_SEQUENCE, "0"));
     }
 
+    @Override
     public boolean isTransaction(Entity m) {
         return "1".equals(m.meta(MqMetasV2.MQ_META_TRANSACTION));
     }
@@ -106,6 +110,7 @@ public class MqResolverV1 implements MqResolver {
     public StringEntity publishEntityBuild(String topic, MqMessage message) {
         //构建消息实体
         StringEntity entity = new StringEntity(message.getContent());
+
         entity.metaPut(MqMetasV1.MQ_META_TID, message.getTid());
         entity.metaPut(MqMetasV1.MQ_META_TOPIC, topic);
         entity.metaPut(MqMetasV1.MQ_META_QOS, (message.getQos() == 0 ? "0" : "1"));

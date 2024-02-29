@@ -11,7 +11,7 @@ import org.noear.socketd.transport.core.entity.StringEntity;
  * @author noear
  * @since 1.2
  */
-public interface MqResolver {
+public interface MqMetasResolver {
     /**
      * 版本号
      * */

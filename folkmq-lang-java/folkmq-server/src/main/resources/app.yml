@@ -30,6 +30,7 @@ solon.logging.logger:
 
 folkmq:
   admin: admin
+  schema: ""
   maxConsumeWaiting: "180s"
   snapshot:
     enable: true

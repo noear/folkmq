@@ -39,6 +39,15 @@ public class FolkMQ {
     }
 
     /**
+     * 创建服务端
+     *
+     * @param schema 指定架构
+     */
+    public static MqServer createServer(String schema) {
+        return new MqServerDefault(schema);
+    }
+
+    /**
      * 创建客户端
      */
     public static MqClient createClient(String... serverUrls) {

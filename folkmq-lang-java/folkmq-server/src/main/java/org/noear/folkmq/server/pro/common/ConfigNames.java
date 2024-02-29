@@ -7,6 +7,8 @@ package org.noear.folkmq.server.pro.common;
 public interface ConfigNames {
     //管理密码
     String folkmq_admin = "folkmq.admin";
+    //通讯架构
+    String folkmq_schema = "folkmq.schema";
     //经纪人地址
     String folkmq_broker = "folkmq.broker";
     //io线程数

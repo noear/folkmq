@@ -85,8 +85,11 @@ public class FolkmqLifecycleBean implements LifecycleBean {
 
 
     private void startLocalServerMode(MqWatcherSnapshotPlus snapshotPlus) throws Exception {
+        //通讯架构
+        String schema = Solon.cfg().get(ConfigNames.folkmq_schema);
+
         //服务端（鉴权为可选。不添加则不鉴权）
-        localServer = FolkMQ.createServer()
+        localServer = FolkMQ.createServer(schema)
                 .config(c -> c.sequenceSend(true)
                         .ioThreads(MqServerConfig.ioThreads)
                         .codecThreads(MqServerConfig.codecThreads)

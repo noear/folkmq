@@ -3,6 +3,8 @@ package org.noear.folkmq.server;
 import org.noear.socketd.SocketD;
 import org.noear.socketd.transport.server.Server;
 import org.noear.socketd.transport.server.ServerConfigHandler;
+import org.noear.socketd.utils.StrUtils;
+
 import java.util.*;
 
 /**
@@ -15,14 +17,25 @@ public class MqServerDefault implements MqServer {
     //服务端监听器
     private final MqServiceListener serverListener;
 
+    //服务端架构
+    private final String serverSchema;
     //服务端
     private Server server;
     //服务端配置处理
     private ServerConfigHandler serverConfigHandler;
 
 
-    public MqServerDefault() {
+    public MqServerDefault(String schema) {
+        if(StrUtils.isEmpty(schema)){
+            schema = "sd:tcp";
+        }
+
+        serverSchema = schema;
         serverListener = new MqServiceListener(false);
+    }
+
+    public MqServerDefault() {
+        this(null);
     }
 
     /**
@@ -74,7 +87,7 @@ public class MqServerDefault implements MqServer {
     public MqServer start(int port) throws Exception {
 
         //创建 SocketD 服务并配置（使用 tpc 通讯）
-        server = SocketD.createServer("sd:tcp");
+        server = SocketD.createServer(serverSchema);
 
         server.config(c -> c.sequenceSend(true)
                 .ioThreads(1)

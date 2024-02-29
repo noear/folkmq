@@ -35,18 +35,30 @@ export class FolkMQ {
         return new MqClientDefault(serverUrls);
     }
 
+    /**
+     * 新建路由
+     * */
     static newRouter(mappingHandler: IoFunction<MqMessageReceived, string>): MqRouter {
         return new MqRouter(mappingHandler);
     }
 
+    /**
+     * 新建消息
+     * */
     static newMessage(content: string): MqMessage {
         return new MqMessage(content);
     }
 
+    /**
+     * 新建告警
+     * */
     static newAlarm(content: string): MqAlarm {
         return new MqAlarm(content);
     }
 
+    /**
+     * 新建实体
+     * */
     static newEntity(data?: String | Blob | ArrayBuffer): Entity {
         return SocketD.newEntity(data);
     }

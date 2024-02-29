@@ -8,7 +8,7 @@ async function main() {
         .connect();
 
     const router = FolkMQ.newRouter(m=>m.getTag()).doOn("/test/hello",req=>{
-        req.response(SocketD.newEntity("me to!"));
+        req.response(FolkMQ.newEntity("me to!"));
     });
     //客户端1监听
     client1.listen(router.consume.bind(router));

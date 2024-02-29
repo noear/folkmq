@@ -1,0 +1,7 @@
+import {StringEntity} from "@noear/socket.d/transport/core/Entity";
+
+export class MqAlarm extends StringEntity {
+    constructor(message: string) {
+        super(message);
+    }
+}

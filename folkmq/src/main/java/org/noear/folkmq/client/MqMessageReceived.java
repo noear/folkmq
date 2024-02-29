@@ -10,7 +10,7 @@ import java.io.IOException;
  * @author noear
  * @since 1.0
  */
-public interface MqMessageReceived extends IMqMessage {
+public interface MqMessageReceived extends MqMessageBase {
     /**
      * 主题
      */
@@ -26,23 +26,31 @@ public interface MqMessageReceived extends IMqMessage {
      */
     int getTimes();
 
-
     /**
      * 回执
      */
-    default void acknowledge(boolean isOk) throws IOException {
-        acknowledge(isOk, null);
-    }
+    void acknowledge(boolean isOk) throws IOException;
+
+    /**
+     * 响应
+     */
+    void response(Entity entity) throws IOException;
 
     /**
      * 回执
+     *
+     * @deprecated 1.2
      */
-    void acknowledge(boolean isOk, Entity reply) throws IOException;
-
-    /**
-     * 回执
-     */
+    @Deprecated
     default void acknowledge(Entity reply) throws IOException {
         acknowledge(true, reply);
     }
+
+    /**
+     * 回执
+     *
+     * @deprecated 1.2
+     */
+    @Deprecated
+    void acknowledge(boolean isOk, Entity reply) throws IOException;
 }

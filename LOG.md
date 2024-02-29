@@ -1,3 +1,7 @@
+### 1.2.3
+* 添加 rpc 异常传导机制
+* sokcet.d 升为 2.4.5
+
 ### 1.2.2
 * 调整 response 拆分为：transactionCheckback 和 listen
 * 调整 request 改为 send
@@ -5,6 +9,7 @@
 * 添加 listen 和 send 配套接口
 * 添加 后台图标
 * 完善 许可证本地处理机制
+* sokcet.d 升为 2.4.4
 
 ### 1.2.1
 * 添加 协议版本的握手传递

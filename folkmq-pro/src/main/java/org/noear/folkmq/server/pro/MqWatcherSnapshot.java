@@ -1,7 +1,7 @@
 package org.noear.folkmq.server.pro;
 
 import org.noear.folkmq.common.MqConstants;
-import org.noear.folkmq.common.MqResolver;
+import org.noear.folkmq.common.MqMetasResolver;
 import org.noear.folkmq.common.MqUtils;
 import org.noear.folkmq.server.*;
 import org.noear.folkmq.server.pro.utils.IoUtils;
@@ -242,7 +242,7 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
                             .build();
 
 
-                    MqResolver mr = MqUtils.getOf(message);
+                    MqMetasResolver mr = MqUtils.getOf(message);
 
                     String sender = mr.getSender(message);
                     String tid = mr.getTid(message);

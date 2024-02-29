@@ -8,7 +8,7 @@ import java.util.Date;
  * @author noear
  * @since 1.0
  */
-public interface IMqMessage {
+public interface MqMessageBase {
     /**
      * 发送人
      * */

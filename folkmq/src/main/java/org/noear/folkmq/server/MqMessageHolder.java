@@ -1,6 +1,6 @@
 package org.noear.folkmq.server;
 
-import org.noear.folkmq.common.MqResolver;
+import org.noear.folkmq.common.MqMetasResolver;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.entity.EntityDefault;
 
@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @since 1.0
  */
 public class MqMessageHolder implements Delayed {
-    protected final MqResolver mr;
+    protected final MqMetasResolver mr;
     //发送人
     private final String sender;
     //消息内容
@@ -42,7 +42,7 @@ public class MqMessageHolder implements Delayed {
     //是否完成
     private AtomicBoolean isDone;
 
-    public MqMessageHolder(MqResolver mr, String queueName, String consumerGroup, Message from, String tid, int qos, boolean sequence, long expiration, boolean transaction, String sender, int distributeCount, long distributeTime) {
+    public MqMessageHolder(MqMetasResolver mr, String queueName, String consumerGroup, Message from, String tid, int qos, boolean sequence, long expiration, boolean transaction, String sender, int distributeCount, long distributeTime) {
         this.mr = mr;
         this.atName = from.atName();
         this.sender = sender;

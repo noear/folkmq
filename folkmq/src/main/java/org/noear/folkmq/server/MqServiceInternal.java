@@ -1,6 +1,6 @@
 package org.noear.folkmq.server;
 
-import org.noear.folkmq.common.MqResolver;
+import org.noear.folkmq.common.MqMetasResolver;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
 import org.noear.socketd.transport.core.listener.MessageHandler;
@@ -69,7 +69,7 @@ public interface MqServiceInternal {
      *
      * @param message 消息
      */
-    void routingDo(MqResolver mr, Message message);
+    void routingDo(MqMetasResolver mr, Message message);
 
     /**
      * 执行路由
@@ -84,7 +84,7 @@ public interface MqServiceInternal {
      * @param times       派发次数
      * @param scheduled   计划时间
      */
-    void routingToQueueDo(MqResolver mr, MqQueue queue, Message message, String tid, int qos, boolean sequence, long expiration, boolean transaction, String sender, int times, long scheduled);
+    void routingToQueueDo(MqMetasResolver mr, MqQueue queue, Message message, String tid, int qos, boolean sequence, long expiration, boolean transaction, String sender, int times, long scheduled);
 
     /**
      * 添加事件扩展

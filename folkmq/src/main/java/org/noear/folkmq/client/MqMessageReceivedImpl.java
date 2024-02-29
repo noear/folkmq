@@ -1,7 +1,7 @@
 package org.noear.folkmq.client;
 
 import org.noear.folkmq.common.MqConstants;
-import org.noear.folkmq.common.MqResolver;
+import org.noear.folkmq.common.MqMetasResolver;
 import org.noear.folkmq.common.MqUtils;
 import org.noear.socketd.transport.core.Entity;
 import org.noear.socketd.transport.core.Message;
@@ -41,7 +41,7 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
 
         this.content = source.dataAsString();
 
-        MqResolver mr = MqUtils.getOf(source);
+        MqMetasResolver mr = MqUtils.getOf(source);
 
         this.sender = mr.getSender(source);
 
@@ -88,7 +88,7 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
 
     /**
      * 标签
-     * */
+     */
     @Override
     public String getTag() {
         return tag;
@@ -164,10 +164,21 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
     }
 
 
+    @Deprecated
     @Override
     public void acknowledge(boolean isOk, Entity reply) throws IOException {
         //发送“回执”，向服务端反馈消费情况
-        clientInternal.acknowledge(session, source, this, isOk, reply);
+        clientInternal.reply(session, source, this, isOk, reply);
+    }
+
+    @Override
+    public void acknowledge(boolean isOk) throws IOException {
+        clientInternal.reply(session, source, this, isOk, null);
+    }
+
+    @Override
+    public void response(Entity entity) throws IOException {
+        clientInternal.reply(session, source, this, true, entity);
     }
 
     @Override

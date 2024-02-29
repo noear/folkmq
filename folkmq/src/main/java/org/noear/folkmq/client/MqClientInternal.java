@@ -24,12 +24,13 @@ public interface MqClientInternal extends MqClient {
     void publish2(String tmid, List<String> tidAry, boolean isRollback) throws IOException;
 
     /**
-     * 消费回执
+     * 消费答复
      *
      * @param session 会话
      * @param from    来源消息
      * @param message 收到的消息
      * @param isOk    回执
+     * @param entity  实体
      */
-    void acknowledge(Session session, Message from, MqMessageReceivedImpl message, boolean isOk, Entity reply) throws IOException;
+    void reply(Session session, Message from, MqMessageReceivedImpl message, boolean isOk, Entity entity) throws IOException;
 }

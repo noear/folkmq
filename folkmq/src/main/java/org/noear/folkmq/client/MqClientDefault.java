@@ -32,6 +32,7 @@ import java.util.concurrent.ExecutorService;
  *
  * @author noear
  * @since 1.0
+ * @since 1.2
  */
 public class MqClientDefault implements MqClientInternal {
     private static final Logger log = LoggerFactory.getLogger(MqClientDefault.class);
@@ -40,8 +41,8 @@ public class MqClientDefault implements MqClientInternal {
     protected MqTransactionCheckback transactionCheckback;
     //监听处理
     protected MqConsumeHandler listenHandler;
-    //处理执行器
-    protected ExecutorService handleExecutor;
+    //消费执行器
+    protected ExecutorService consumeExecutor;
     //服务端地址
     private final String[] urls;
     //客户端会话
@@ -71,7 +72,7 @@ public class MqClientDefault implements MqClientInternal {
 
     @Override
     public MqClient nameAs(String name) {
-        Objects.requireNonNull(name, "Param 'name' can't be null");
+        MqAssert.requireNonNull(name, "Param 'name' can't be null");
         MqAssert.assertMeta(name, "name");
 
         this.name = name;
@@ -132,8 +133,8 @@ public class MqClientDefault implements MqClientInternal {
     }
 
     @Override
-    public MqClient handleExecutor(ExecutorService handleExecutor) {
-        this.handleExecutor = handleExecutor;
+    public MqClient consumeExecutor(ExecutorService consumeExecutor) {
+        this.consumeExecutor = consumeExecutor;
         return this;
     }
 
@@ -153,10 +154,10 @@ public class MqClientDefault implements MqClientInternal {
 
     @Override
     public CompletableFuture<String> call(String apiName, String apiToken, String topic, String consumerGroup) throws IOException {
-        Objects.requireNonNull(apiName, "Param 'apiName' can't be null");
-        Objects.requireNonNull(apiToken, "Param 'apiToken' can't be null");
-        Objects.requireNonNull(topic, "Param 'topic' can't be null");
-        Objects.requireNonNull(consumerGroup, "Param 'consumerGroup' can't be null");
+        MqAssert.requireNonNull(apiName, "Param 'apiName' can't be null");
+        MqAssert.requireNonNull(apiToken, "Param 'apiToken' can't be null");
+        MqAssert.requireNonNull(topic, "Param 'topic' can't be null");
+        MqAssert.requireNonNull(consumerGroup, "Param 'consumerGroup' can't be null");
 
         MqAssert.assertMeta(apiName, "apiName");
         MqAssert.assertMeta(apiToken, "apiToken");
@@ -192,9 +193,9 @@ public class MqClientDefault implements MqClientInternal {
      */
     @Override
     public void subscribe(String topic, String consumerGroup, boolean autoAck, MqConsumeHandler consumerHandler) throws IOException {
-        Objects.requireNonNull(topic, "Param 'topic' can't be null");
-        Objects.requireNonNull(consumerGroup, "Param 'consumerGroup' can't be null");
-        Objects.requireNonNull(consumerHandler, "Param 'consumerHandler' can't be null");
+        MqAssert.requireNonNull(topic, "Param 'topic' can't be null");
+        MqAssert.requireNonNull(consumerGroup, "Param 'consumerGroup' can't be null");
+        MqAssert.requireNonNull(consumerHandler, "Param 'consumerHandler' can't be null");
 
         MqAssert.assertMeta(topic, "topic");
         MqAssert.assertMeta(consumerGroup, "consumerGroup");
@@ -221,8 +222,8 @@ public class MqClientDefault implements MqClientInternal {
 
     @Override
     public void unsubscribe(String topic, String consumerGroup) throws IOException {
-        Objects.requireNonNull(topic, "Param 'topic' can't be null");
-        Objects.requireNonNull(consumerGroup, "Param 'consumerGroup' can't be null");
+        MqAssert.requireNonNull(topic, "Param 'topic' can't be null");
+        MqAssert.requireNonNull(consumerGroup, "Param 'consumerGroup' can't be null");
 
         MqAssert.assertMeta(topic, "topic");
         MqAssert.assertMeta(consumerGroup, "consumerGroup");
@@ -277,8 +278,8 @@ public class MqClientDefault implements MqClientInternal {
 
     @Override
     public void publish(String topic, MqMessage message) throws IOException {
-        Objects.requireNonNull(topic, "Param 'topic' can't be null");
-        Objects.requireNonNull(message, "Param 'message' can't be null");
+        MqAssert.requireNonNull(topic, "Param 'topic' can't be null");
+        MqAssert.requireNonNull(message, "Param 'message' can't be null");
 
         MqAssert.assertMeta(topic, "topic");
 
@@ -316,8 +317,8 @@ public class MqClientDefault implements MqClientInternal {
      */
     @Override
     public CompletableFuture<Boolean> publishAsync(String topic, MqMessage message) throws IOException {
-        Objects.requireNonNull(topic, "Param 'topic' can't be null");
-        Objects.requireNonNull(message, "Param 'message' can't be null");
+        MqAssert.requireNonNull(topic, "Param 'topic' can't be null");
+        MqAssert.requireNonNull(message, "Param 'message' can't be null");
 
         MqAssert.assertMeta(topic, "topic");
 
@@ -358,8 +359,8 @@ public class MqClientDefault implements MqClientInternal {
 
     @Override
     public void unpublish(String topic, String tid) throws IOException {
-        Objects.requireNonNull(topic, "Param 'topic' can't be null");
-        Objects.requireNonNull(tid, "Param 'tid' can't be null");
+        MqAssert.requireNonNull(topic, "Param 'topic' can't be null");
+        MqAssert.requireNonNull(tid, "Param 'tid' can't be null");
 
         MqAssert.assertMeta(topic, "topic");
         MqAssert.assertMeta(tid, "tid");
@@ -390,8 +391,8 @@ public class MqClientDefault implements MqClientInternal {
 
     @Override
     public CompletableFuture<Boolean> unpublishAsync(String topic, String tid) throws IOException {
-        Objects.requireNonNull(topic, "Param 'topic' can't be null");
-        Objects.requireNonNull(tid, "Param 'tid' can't be null");
+        MqAssert.requireNonNull(topic, "Param 'topic' can't be null");
+        MqAssert.requireNonNull(tid, "Param 'tid' can't be null");
 
         MqAssert.assertMeta(topic, "topic");
         MqAssert.assertMeta(tid, "tid");
@@ -446,8 +447,8 @@ public class MqClientDefault implements MqClientInternal {
         }
 
         //检查参数
-        Objects.requireNonNull(toName, "Param 'toName' can't be null");
-        Objects.requireNonNull(message, "Param 'message' can't be null");
+        MqAssert.requireNonNull(toName, "Param 'toName' can't be null");
+        MqAssert.requireNonNull(message, "Param 'message' can't be null");
 
         MqAssert.assertMeta(toName, "toName");
 
@@ -495,25 +496,28 @@ public class MqClientDefault implements MqClientInternal {
     }
 
     /**
-     * 消费回执
+     * 消费答复
      *
+     * @param session 会话
+     * @param from    来源消息
      * @param message 收到的消息
      * @param isOk    回执
+     * @param entity  实体
      */
     @Override
-    public void acknowledge(Session session, Message from, MqMessageReceivedImpl message, boolean isOk, Entity reply) throws IOException {
+    public void reply(Session session, Message from, MqMessageReceivedImpl message, boolean isOk, Entity entity) throws IOException {
         //发送“回执”，向服务端反馈消费情况
         if (message.getQos() > 0) {
             if (session.isValid()) {
-                if (reply == null) {
-                    reply = new EntityDefault();
+                if (entity == null) {
+                    entity = new EntityDefault();
                 }
 
-                if (reply instanceof MqAlarm) {
-                    session.sendAlarm(from, reply.dataAsString());
+                if (entity instanceof MqAlarm) {
+                    session.sendAlarm(from, entity.dataAsString());
                 } else {
-                    reply.putMeta(MqConstants.MQ_META_ACK, isOk ? "1" : "0");
-                    session.replyEnd(from, reply);
+                    entity.putMeta(MqConstants.MQ_META_ACK, isOk ? "1" : "0");
+                    session.replyEnd(from, entity);
                 }
             }
         }
@@ -521,7 +525,7 @@ public class MqClientDefault implements MqClientInternal {
 
     protected String diversionOrNull(String topic, MqMessage message) {
         if (message.isTransaction()) {
-            return message.tmid();
+            return message.getTmid();
         } else if (message.isSequence()) {
             return topic;
         } else {

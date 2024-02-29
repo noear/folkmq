@@ -7,8 +7,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * 事务实现
+ *
  * @author noear
- * @since 1.1
+ * @since 1.2
  */
 public class MqTransactionImpl implements MqTransaction {
     private final MqClientInternal client;
@@ -21,21 +23,19 @@ public class MqTransactionImpl implements MqTransaction {
         this.tmid = StrUtils.guid();
     }
 
-
-    /**
-     * 事务开始
-     */
-    public void binding(MqMessage message) {
-        tidAry.add(message.getTid());
-        message.internalSender(client.name());
-    }
-
-
     @Override
     public String tmid() {
         return tmid;
     }
 
+    /**
+     * 事务开始
+     */
+    @Override
+    public void binding(MqMessage message) {
+        tidAry.add(message.getTid());
+        message.internalSender(client.name());
+    }
 
     /**
      * 事务提交

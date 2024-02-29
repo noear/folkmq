@@ -45,13 +45,6 @@ public class MqSubscription implements MqConsumeHandler {
     }
 
     /**
-     * 消费处理器
-     */
-    public MqConsumeHandler getConsumeHandler() {
-        return consumeHandler;
-    }
-
-    /**
      * @param topic          主题
      * @param consumerGroup  消费者组
      * @param consumeHandler 消费处理器

@@ -36,10 +36,10 @@ public class MqClientListener extends EventListener {
                 if (message.isSequence()) {
                     RunUtils.single(() -> onReceive(s, m, message, false));
                 } else {
-                    if (client.handleExecutor == null) {
+                    if (client.consumeExecutor == null) {
                         RunUtils.async(() -> onReceive(s, m, message, false));
                     } else {
-                        client.handleExecutor.submit(() -> onReceive(s, m, message, false));
+                        client.consumeExecutor.submit(() -> onReceive(s, m, message, false));
                     }
                 }
             } catch (Throwable e) {
@@ -51,10 +51,10 @@ public class MqClientListener extends EventListener {
             try {
                 MqMessageReceivedImpl message = new MqMessageReceivedImpl(client, s, m);
 
-                if (client.handleExecutor == null) {
+                if (client.consumeExecutor == null) {
                     RunUtils.async(() -> onReceive(s, m, message, true));
                 } else {
-                    client.handleExecutor.submit(() -> onReceive(s, m, message, true));
+                    client.consumeExecutor.submit(() -> onReceive(s, m, message, true));
                 }
             } catch (Throwable e) {
                 log.warn("Client consume handle error, sid={}", m.sid(), e);
@@ -98,22 +98,22 @@ public class MqClientListener extends EventListener {
 
                     //是否自动回执
                     if (subscription.isAutoAck()) {
-                        client.acknowledge(s, m, message, true, null);
+                        client.reply(s, m, message, true, null);
                     }
                 } else {
                     //没有订阅
-                    client.acknowledge(s, m, message, false, null);
+                    client.reply(s, m, message, false, null);
                 }
             } catch (Throwable e) {
                 try {
                     if (subscription != null) {
                         //有订阅
                         if (subscription.isAutoAck()) {
-                            client.acknowledge(s, m, message, false, null);
+                            client.reply(s, m, message, false, null);
                         }
                     } else {
                         //没有订阅
-                        client.acknowledge(s, m, message, false, null);
+                        client.reply(s, m, message, false, null);
                     }
 
                     log.warn("Client consume handle error, tid={}", message.getTid(), e);

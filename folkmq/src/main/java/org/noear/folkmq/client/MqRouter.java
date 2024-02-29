@@ -12,23 +12,32 @@ import java.util.function.Function;
  */
 public class MqRouter implements MqConsumeHandler {
     private final Function<MqMessageReceived, String> mappingHandler;
-    private Map<String, MqConsumeHandler> mappingMap = new HashMap<>();
+    private final Map<String, MqConsumeHandler> mappingMap = new HashMap<>();
     private MqConsumeHandler consumeHandler;
 
     public MqRouter(Function<MqMessageReceived, String> mappingHandler) {
         this.mappingHandler = mappingHandler;
     }
 
+    /**
+     * 添加映射处理
+     */
     public MqRouter doOn(String mapping, MqConsumeHandler consumeHandler) {
         mappingMap.put(mapping, consumeHandler);
         return this;
     }
 
+    /**
+     * 添加消费处理
+     */
     public MqRouter doOnConsume(MqConsumeHandler consumeHandler) {
         this.consumeHandler = consumeHandler;
         return this;
     }
 
+    /**
+     * 消费
+     */
     @Override
     public void consume(MqMessageReceived message) throws Exception {
         if (consumeHandler != null) {

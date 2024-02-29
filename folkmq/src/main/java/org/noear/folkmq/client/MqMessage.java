@@ -14,16 +14,17 @@ import java.util.Map;
  * @author noear
  * @since 1.0
  */
-public class MqMessage implements IMqMessage {
+public class MqMessage implements MqMessageBase {
+    private final String tid;
+    private final String content;
+
     private String sender;
-    private String tid;
     private String tag;
-    private String content;
     private Date scheduled;
     private Date expiration;
     private boolean sequence;
     private int qos = 1;
-    protected Map<String, String> attrMap = new HashMap<>();
+    private Map<String, String> attrMap = new HashMap<>();
 
     protected MqTransaction transaction;
 
@@ -139,7 +140,7 @@ public class MqMessage implements IMqMessage {
         return this;
     }
 
-    protected String tmid() {
+    protected String getTmid() {
         if (transaction == null) {
             return null;
         } else {

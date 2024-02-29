@@ -46,7 +46,7 @@ public class MqServiceListener extends MqServiceListenerBase implements MqServic
         });
 
         doOn(MqConstants.MQ_EVENT_PUBLISH, (s, m) -> {
-            MqResolver mr = MqUtils.getOf(m);
+            MqMetasResolver mr = MqUtils.getOf(m);
             //接收发布指令
             boolean isTrans = mr.isTransaction(m);
 
@@ -343,7 +343,7 @@ public class MqServiceListener extends MqServiceListenerBase implements MqServic
         unsubscribeDo(topic, consumerGroup, s);
     }
 
-    private void onPublish(Session s, Message m, MqResolver mr) throws IOException {
+    private void onPublish(Session s, Message m, MqMetasResolver mr) throws IOException {
         if (m == null) {
             return;
         }

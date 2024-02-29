@@ -14,6 +14,7 @@ import java.util.concurrent.ExecutorService;
  *
  * @author noear
  * @since 1.0
+ * @since 1.2
  */
 public interface MqClient extends Closeable {
     /**
@@ -43,9 +44,9 @@ public interface MqClient extends Closeable {
 
 
     /**
-     * 消息处理执行器
+     * 消费执行器
      */
-    MqClient handleExecutor(ExecutorService handleExecutor);
+    MqClient consumeExecutor(ExecutorService consumeExecutor);
 
     /**
      * 自动回执
@@ -160,9 +161,9 @@ public interface MqClient extends Closeable {
     /**
      * 监听
      *
-     * @param consumerHandler 消费处理
+     * @param listenHandler 监听处理
      */
-    void listen(MqConsumeHandler consumerHandler);
+    void listen(MqConsumeHandler listenHandler);
 
     /**
      * 发送

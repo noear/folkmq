@@ -1,6 +1,8 @@
 package org.noear.folkmq.exception;
 
 /**
+ * 异常
+ *
  * @author noear
  * @since 1.0
  */

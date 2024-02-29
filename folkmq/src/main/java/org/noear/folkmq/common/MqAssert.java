@@ -7,6 +7,12 @@ package org.noear.folkmq.common;
  * @since 1.2
  */
 public class MqAssert {
+    public static Object requireNonNull(Object obj, String message){
+        if (obj == null)
+            throw new NullPointerException(message);
+
+        return obj;
+    }
     /**
      * 断言元信息相关的名字与值
      */

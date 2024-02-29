@@ -1,7 +1,7 @@
 package org.noear.folkmq.server;
 
 import org.noear.folkmq.common.MqConstants;
-import org.noear.folkmq.common.MqResolver;
+import org.noear.folkmq.common.MqMetasResolver;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
 import org.noear.socketd.transport.core.listener.EventListener;
@@ -168,7 +168,7 @@ public abstract class MqServiceListenerBase extends EventListener implements MqS
      * 执行路由
      */
     @Override
-    public void routingDo(MqResolver mr, Message message) {
+    public void routingDo(MqMetasResolver mr, Message message) {
         //复用解析
         String sender = mr.getSender(message);
         String tid = mr.getTid(message);
@@ -204,7 +204,7 @@ public abstract class MqServiceListenerBase extends EventListener implements MqS
         }
     }
 
-    protected void routingToQueueName(MqResolver mr, Message message, String queueName) {
+    protected void routingToQueueName(MqMetasResolver mr, Message message, String queueName) {
         //复用解析
         String sender = mr.getSender(message);
         String tid = mr.getTid(message);
@@ -229,7 +229,7 @@ public abstract class MqServiceListenerBase extends EventListener implements MqS
     /**
      * 执行路由
      */
-    public void routingToQueueDo(MqResolver mr, MqQueue queue, Message message, String tid, int qos, boolean sequence, long expiration, boolean transaction, String sender, int times, long scheduled) {
+    public void routingToQueueDo(MqMetasResolver mr, MqQueue queue, Message message, String tid, int qos, boolean sequence, long expiration, boolean transaction, String sender, int times, long scheduled) {
         if (queue != null) {
             MqMessageHolder messageHolder = new MqMessageHolder(mr, queue.getQueueName(), queue.getConsumerGroup(), message, tid, qos, sequence, expiration, transaction, sender, times, scheduled);
             queue.add(messageHolder);

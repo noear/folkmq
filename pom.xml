@@ -23,9 +23,9 @@
     </properties>
 
     <modules>
-        <module>folkmq-parent</module>
-        <module>folkmq-broker</module>
-        <module>folkmq-server</module>
-        <module>folkmq-test</module>
+        <module>folkmq-lang-java/folkmq-parent</module>
+        <module>folkmq-lang-java/folkmq-broker</module>
+        <module>folkmq-lang-java/folkmq-server</module>
+        <module>folkmq-lang-java/folkmq-test</module>
     </modules>
 </project>

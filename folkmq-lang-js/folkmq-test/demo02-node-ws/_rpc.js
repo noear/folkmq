@@ -1,5 +1,4 @@
 const {FolkMQ} = require("@noear/folkmq");
-const {SocketD} = require("@noear/socket.d");
 
 async function main() {
     //客户端1

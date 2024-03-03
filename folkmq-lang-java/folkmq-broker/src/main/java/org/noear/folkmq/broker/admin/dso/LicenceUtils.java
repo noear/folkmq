@@ -24,10 +24,10 @@ public class LicenceUtils {
     private static final String publicKey = "MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAI6+FX3DPmY0/dLXOOiVJwBhllQ6a34+8/WKS77L7BB9Ch3oyqXA41zqO3vQM2COIZDTxKSgPuRkOlFaKptoG0cCAwEAAQ==";
 
     private String sn;
+    private String version;
     private int edition;
     private String subscribe;
     private int months;
-    private String version;
     private String consumer;
 
     private boolean isValid;
@@ -39,6 +39,20 @@ public class LicenceUtils {
 
     public int getEdition() {
         return edition;
+    }
+
+    public String getEditionName() {
+        if (edition == 23) {
+            return "Enterprise Ultimate Edition";
+        } else if (edition == 22) {
+            return "Enterprise Premium Edition";
+        } else if (edition == 21) {
+            return "Enterprise Standard edition";
+        } else if (edition > 0) {
+            return "Unknown Edition";
+        } else {
+            return "Community Edition";
+        }
     }
 
     public String getSubscribe() {
@@ -95,26 +109,23 @@ public class LicenceUtils {
                     String[] licence = licenceStr.split(",");
 
                     if (licence.length >= 6) {
+                        // 0:sn,1:e,2:v,3:t,4:m,5:c
                         sn = licence[0];
                         edition = Integer.parseInt(licence[1]);
-                        subscribe = licence[2];
-                        months = Integer.parseInt(licence[3]);
-                        version = licence[4];
+                        version = licence[2];
+                        subscribe = licence[3];
+                        months = Integer.parseInt(licence[4]);
                         consumer = licence[5];
 
-                        if (edition == 1 || edition == 2) {
+                        if (edition > 0) {
                             //sn,e,t,m,v,c  //e=0 Community Edition, 1 Professional Edition, 2 Enterprise Edition
 
                             StringBuilder buf = new StringBuilder();
                             buf.append("Licence (for FolkMQ): ");
-                            buf.append("SN=").append(licence[0]).append(", ");
-                            if (edition == 2) {
-                                buf.append("E=Enterprise Edition, ");
-                            } else {
-                                buf.append("E=Professional Edition, ");
-                            }
-                            buf.append("S=").append(licence[2]).append(", ");
-                            buf.append("M=").append(licence[3]);
+                            buf.append("SN=").append(getSn()).append(", ");
+                            buf.append("E=").append(getEditionName()).append(", ");
+                            buf.append("T=").append(getSubscribe()).append(", ");
+                            buf.append("M=").append(getMonths());
 
                             isValid = true;
                             description = buf.toString();

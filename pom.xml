@@ -24,8 +24,8 @@
 
     <modules>
         <module>folkmq-lang-java/folkmq-parent</module>
-        <module>folkmq-lang-java/folkmq-broker</module>
         <module>folkmq-lang-java/folkmq-server</module>
+        <module>folkmq-lang-java/folkmq-server-broker</module>
         <module>folkmq-lang-java/folkmq-test</module>
     </modules>
 </project>

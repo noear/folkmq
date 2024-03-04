@@ -11,7 +11,7 @@
         <relativePath>../folkmq-parent/pom.xml</relativePath>
     </parent>
 
-    <artifactId>folkmq-broker</artifactId>
+    <artifactId>folkmq-server-broker</artifactId>
     <packaging>jar</packaging>
 
     <dependencies>

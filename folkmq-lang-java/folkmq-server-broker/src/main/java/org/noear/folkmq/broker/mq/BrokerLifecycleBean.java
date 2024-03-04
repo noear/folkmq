@@ -69,7 +69,7 @@ public class BrokerLifecycleBean implements LifecycleBean {
 
         appContext.wrapAndPut(BrokerListenerFolkmq.class, brokerListener);
 
-        log.info("Server:main: folkmq-broker: Started (SOCKET.D/{}-{}, folkmq/{})",
+        log.info("Server:main: folkmq-server-broker: Started (SOCKET.D/{}-{}, folkmq/{})",
                 SocketD.protocolVersion(),
                 SocketD.version(),
                 FolkMQ.versionName());

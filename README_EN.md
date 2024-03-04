@@ -48,7 +48,7 @@
 <hr />
 
 
-## The future is simple
+## Simplicity is the future
 
 Source code is simple! Simple architecture! Easy to deploy! Easy to use!
 

@@ -2,7 +2,7 @@
   FolkMQ
 </h1>
 <p align="center">
-	<strong>一个新的消息中间件（支持快照持久化、Broker 集群）</strong>
+	<strong>一个全新架构的消息中间件（支持快照持久化、Broker 集群）</strong>
 </p>
 
 <p align="center">

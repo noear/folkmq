@@ -2,7 +2,7 @@
   FolkMQ
 </h1>
 <p align="center">
-	<strong>A new messaging middleware (supports snapshot persistence, Broker clustering)</strong>
+	<strong>A new architecture of message-oriented middleware (support snapshot persistence, Broker cluster)</strong>
 </p>
 
 <p align="center">

@@ -81,7 +81,7 @@ FolkMQ is a commercial open source software that:
 
 * High throughput, low latency
 
-FolkMQ runs purely in memory and can process hundreds of thousands of messages per second with minimum latency of less than a millisecond.
+The cluster mode can handle millions of messages per second with minimum latency of less than 1 millisecond.
 
 * Extensibility
 

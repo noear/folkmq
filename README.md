@@ -2,7 +2,7 @@
   FolkMQ
 </h1>
 <p align="center">
-	<strong>An in-memory messaging middleware (support for snapshot persistence, Broker clustering)</strong>
+	<strong>A new messaging middleware (supports snapshot persistence, Broker clustering)</strong>
 </p>
 
 <p align="center">
@@ -57,7 +57,6 @@
 * based on [Socket.D Network Application protocol](https://socketd.noear.org/) Development. New design, independent architecture!
 
 
-
 | role     | function                                                                                    | 
 |----------|---------------------------------------------------------------------------------------------|
 | Producer | Publish messages, timed messages, sequential messages, expireable messages, transactional messages. Send Request (rpc) Qos0 and Qos1 are supported                      |     
@@ -66,7 +65,6 @@
 |          |                                                                                             |     
 | Server   | Publish -Confirm, subscribe -Confirm, unsubscribe -Confirm, dispatch -Retry, dispatch -delay | 
 | Server   | Single thread, run in memory, snapshot persistence (automatic, down, manual), Broker mode clustering, cluster hot scaling                    |   
-
 
 
 

@@ -47,14 +47,7 @@
 ##### Language: English | [中文](README_CN.md)
 <hr />
 
-## Introduction
-
-* Run in Memory + snapshot persistence + Broker cluster mode (optional)
-* based on [Socket. D development] (https://socketd.noear.org/), it features full support), especially the single connection "multiplex"! Protocols such as udp can also be added
-
-
-* Use "multiplexing" + "running in memory" + "snapshot persistence" + "Broker cluster mode "(optional)
-* based on [Socket.D Network Application protocol](https://socketd.noear.org/) Development. New design, independent architecture!
+## Function Introduction
 
 
 | role     | function                                                                                    | 
@@ -64,7 +57,7 @@
 | Consumer | Subscribe, unsubscribe. Consumption -ACK (automatic, manual). Listening (rpc)          |      
 |          |                                                                                             |     
 | Server   | Publish -Confirm, subscribe -Confirm, unsubscribe -Confirm, dispatch -Retry, dispatch -delay | 
-| Server   | Single thread, run in memory, snapshot persistence (automatic, down, manual), Broker mode clustering, cluster hot scaling                    |   
+| Server   | Single-threaded architecture, support for snapshot persistence (automatic, downtime, manual), Broker mode clustering, cluster hot-scaling                    |   
 
 
 
@@ -113,7 +106,6 @@ Messages are snapshot persisted (similar to redis) to local disk, and data backu
 ## Video recording of development process
 
 * Development process video： [《DEV-RECORD.md》](DEV-RECORD.md)
-* Presentation of results：[《[FolkMQ] 一个新的内存型消息队列（快，特别的快）》](https://www.bilibili.com/video/BV1mc411D7pY/)
 * Quick start：[《FolkMQ - Helloworld 入门》](https://www.bilibili.com/video/BV1Yj411L7fB/)
 
 ### Official website

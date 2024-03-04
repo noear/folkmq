@@ -2,7 +2,7 @@
   FolkMQ
 </h1>
 <p align="center">
-	<strong>A new architecture of the message middleware, facing the future</strong>
+	<strong>A new architecture of the message middleware. For simplicity, for the future!</strong>
 </p>
 
 <p align="center">

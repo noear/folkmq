@@ -2,7 +2,7 @@
   FolkMQ
 </h1>
 <p align="center">
-	<strong>一个全新架构的消息中间件，面向未来</strong>
+	<strong>一个全新架构的消息中间件。面向简单，面向未来！</strong>
 </p>
 
 <p align="center">

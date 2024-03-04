@@ -2,7 +2,7 @@
   FolkMQ
 </h1>
 <p align="center">
-	<strong>一个全新架构的消息中间件（单机可达 180K TPS）</strong>
+	<strong>一个全新架构的消息中间件，面向未来</strong>
 </p>
 
 <p align="center">
@@ -47,6 +47,10 @@
 ##### 语言： 中文 | [English](README.md)
 
 <hr />
+
+## 未来是简单的
+
+源码简单！架构简单！部署简单！使用简单！
 
 ## 功能简介
 

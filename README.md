@@ -2,7 +2,7 @@
   FolkMQ
 </h1>
 <p align="center">
-	<strong>A new architecture of message middleware (up to 180K TPS)</strong>
+	<strong>A new architecture of the message middleware, facing the future</strong>
 </p>
 
 <p align="center">
@@ -46,6 +46,12 @@
 
 ##### Language: English | [中文](README_CN.md)
 <hr />
+
+
+## The future is simple
+
+Source code is simple! Simple architecture! Easy to deploy! Easy to use!
+
 
 ## Function Introduction
 

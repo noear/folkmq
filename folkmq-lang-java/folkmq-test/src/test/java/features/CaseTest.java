@@ -164,4 +164,11 @@ public class CaseTest {
         testCase.start();
         testCase.stop();
     }
+
+    @Test
+    public void TestCase27_sequence_err() throws Exception {
+        BaseTestCase testCase = new TestCase27_sequence_err(2027);
+        testCase.start();
+        testCase.stop();
+    }
 }

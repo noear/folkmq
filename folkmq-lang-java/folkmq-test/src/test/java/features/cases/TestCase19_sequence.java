@@ -28,7 +28,7 @@ public class TestCase19_sequence extends BaseTestCase {
                 .start(getPort());
 
         //客户端
-        int count = 10000;
+        int count = 100000;
         CountDownLatch countDownLatch = new CountDownLatch(count);
 
         client = FolkMQ.createClient("folkmq://127.0.0.1:" + getPort())
@@ -44,12 +44,14 @@ public class TestCase19_sequence extends BaseTestCase {
             client.publish("demo", new MqMessage(String.valueOf(i)).sequence(true));
         }
 
+        countDownLatch.await(2, TimeUnit.SECONDS);
+
         //检验客户端
         if(countDownLatch.getCount() > 0) {
             System.out.println("还有未收：" + countDownLatch.getCount());
         }
 
-        countDownLatch.await(2, TimeUnit.SECONDS);
+
 
         //检验客户端
         assert countDownLatch.getCount() == 0;

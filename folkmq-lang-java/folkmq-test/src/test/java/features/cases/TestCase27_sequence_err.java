@@ -1,22 +1,20 @@
 package features.cases;
 
 import org.noear.folkmq.FolkMQ;
-import org.noear.folkmq.client.MqClientDefault;
 import org.noear.folkmq.client.MqMessage;
 import org.noear.folkmq.server.MqServerDefault;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 /**
  * @author noear
- * @since 1.0
+ * @since 1.3
  */
-public class TestCase20_sequence_async extends BaseTestCase {
-    public TestCase20_sequence_async(int port) {
+public class TestCase27_sequence_err extends BaseTestCase {
+    public TestCase27_sequence_err(int port) {
         super(port);
     }
 
@@ -29,7 +27,7 @@ public class TestCase20_sequence_async extends BaseTestCase {
                 .start(getPort());
 
         //客户端
-        int count = 100000;
+        int count = 10;
         CountDownLatch countDownLatch = new CountDownLatch(count);
 
         client = FolkMQ.createClient("folkmq://127.0.0.1:" + getPort())
@@ -37,24 +35,29 @@ public class TestCase20_sequence_async extends BaseTestCase {
 
         List<Integer> msgList = new ArrayList<>();
         client.subscribe("demo", "a", ((message) -> {
-            msgList.add(Integer.parseInt(message.getContent()));
-            countDownLatch.countDown();
+            int id = Integer.parseInt(message.getContent());
+            if (message.getTimes() > 0 || id % 2 == 0) {
+                msgList.add(id);
+                countDownLatch.countDown();
+                message.acknowledge(true);
+            } else {
+                message.acknowledge(false);
+            }
         }));
 
         for (int i = 0; i < count; i++) {
-            client.publishAsync("demo", new MqMessage(String.valueOf(i)).sequence(true));
+            client.publish("demo", new MqMessage(String.valueOf(i)).sequence(true));
         }
 
-        countDownLatch.await(20, TimeUnit.SECONDS);
+        countDownLatch.await(52, TimeUnit.SECONDS);
 
         //检验客户端
         if(countDownLatch.getCount() > 0) {
             System.out.println("还有未收：" + countDownLatch.getCount());
         }
 
+        //检验客户端
         assert countDownLatch.getCount() == 0;
-
-        System.out.println("收集数量：" + msgList.size());
 
         int val = 0;
         for (Integer v1 : msgList) {

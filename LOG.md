@@ -1,5 +1,5 @@
 ### 1.3.1
-* 调整 docker 基础镜像改为：adoptopenjdk/openjdk11-openj9
+* 调整 docker 基础镜像改为：adoptopenjdk/openjdk11-openj9 （内存节约 1/2 左右）
 * 优化 顺序消息的消费逻辑（改为串行消费），更适合数据库有序同步之类的场景
 
 ### 1.3.0

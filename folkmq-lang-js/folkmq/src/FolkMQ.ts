@@ -25,7 +25,7 @@ export class FolkMQ {
      * 获取版本
      */
     static versionName(): string {
-        return "1.3.0";
+        return "1.3.1";
     }
 
     /**

@@ -421,7 +421,7 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
                 acknowledgeDo(messageHolder, 0, true);
             });
 
-            //2.添加保险延时任务：如果没有回执就重发
+            //2.添加保险延时任务：如果没有回执就重发 //重新入队列，是避免重启时数据丢失
             messageHolder.setDistributeTime(System.currentTimeMillis() + MqNextTime.maxConsumeMillis());
             internalAdd(messageHolder);
         } else {
@@ -432,10 +432,10 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
     }
 
     private void acknowledgeDo(MqMessageHolder messageHolder, int ack, boolean removeQueue) {
-        //观察者::回执时
-        watcher.onAcknowledge(topic, consumerGroup, messageHolder, ack > 0);
-
         try {
+            //观察者::回执时
+            watcher.onAcknowledge(topic, consumerGroup, messageHolder, ack > 0);
+
             if (ack > 0) {
                 //ok
                 messageMap.remove(messageHolder.getTid());

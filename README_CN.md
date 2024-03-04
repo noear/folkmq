@@ -2,7 +2,7 @@
   FolkMQ
 </h1>
 <p align="center">
-	<strong>一个全新架构的消息中间件（支持快照持久化、Broker 集群）</strong>
+	<strong>一个全新架构的消息中间件（单机可达 180K TPS）</strong>
 </p>
 
 <p align="center">
@@ -85,7 +85,7 @@ FolkMQ Broker 集群<mark>支持 folkmq-server 节点热扩展</mark>。流量�
 消息被快照持久化（类似于 redis）到本地磁盘，并且支持数据备份防止数据丢失
 
 
-* 快（单机版，大约 180K TPS）。有点像 Redis 之于 MySql。
+* 快（单机版，大约 180K TPS）
 
 <img src="DEV-TEST.png" width="600" />
 

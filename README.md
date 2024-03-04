@@ -2,7 +2,7 @@
   FolkMQ
 </h1>
 <p align="center">
-	<strong>A new architecture of message-oriented middleware (support snapshot persistence, Broker cluster)</strong>
+	<strong>A new architecture of message middleware (up to 180K TPS)</strong>
 </p>
 
 <p align="center">
@@ -86,7 +86,7 @@ FolkMQ Broker cluster <mark> supports FolkMQ-Server node hot extension </mark>. 
 Messages are snapshot persisted (similar to redis) to local disk, and data backup is supported to prevent data loss
 
 
-* Fast (standalone, ~ 180K TPS). A bit like Redis is to MySql.
+* Fast (standalone, ~ 180K TPS)
 
 
 <img src="DEV-TEST.png" width="600" />

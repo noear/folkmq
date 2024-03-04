@@ -289,7 +289,7 @@ public abstract class MqServiceListenerBase extends EventListener implements MqS
 
                 if (count == 0) {
                     //一点消息都没有，就修复下
-                    Thread.sleep(100);
+                    Thread.sleep(10);
                 }
             } catch (Throwable e) {
                 if (e instanceof InterruptedException == false) {

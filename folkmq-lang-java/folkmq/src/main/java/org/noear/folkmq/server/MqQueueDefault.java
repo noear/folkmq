@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * 队列默认实现
@@ -24,6 +25,7 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
 
     //是否为事务缓存队列
     private final boolean transaction;
+    private final AtomicReference<Boolean> sequenceLock = new AtomicReference<>(false);
     //主题
     private final String topic;
     //消费者组
@@ -115,6 +117,11 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
      */
     @Override
     public boolean distribute() {
+        if (sequenceLock.get()) {
+            //如果有顺序锁，暂停派送
+            return true;
+        }
+
         MqMessageHolder messageHolder = messageQueue.poll();
 
         if (messageHolder != null) {
@@ -340,6 +347,17 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
             return;
         }
 
+        if (messageHolder.isSequence()) {
+            if(messageHolder.getDistributeTimeRef() > System.currentTimeMillis()){
+                //如果未到，提前结束
+                internalAdd(messageHolder);
+                return;
+            }
+
+            //如果是顺序消息
+            sequenceLock.set(true);
+        }
+
         //如果有会话
         if (sessionCount() > 0) {
             //获取一个会话（轮询负载均衡）
@@ -350,6 +368,7 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
                 if (s1 == null) {
                     //进入延后队列
                     internalAdd(messageHolder.delayed());
+                    sequenceLock.set(false);
                 } else {
                     distributeDo(s1, messageHolder);
                 }
@@ -361,6 +380,7 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
 
                 //进入延后队列
                 internalAdd(messageHolder.delayed());
+                sequenceLock.set(false);
 
                 //记日志
                 if (log.isWarnEnabled()) {
@@ -371,6 +391,7 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
         } else {
             //::进入延后队列
             internalAdd(messageHolder.delayed());
+            sequenceLock.set(false);
 
             //记日志
             if (log.isDebugEnabled()) {
@@ -396,7 +417,7 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
             s1.sendAndRequest(MqConstants.MQ_EVENT_DISTRIBUTE, messageHolder.getContent(), -1).thenReply(r -> {
                 int ack = Integer.parseInt(r.metaOrDefault(MqConstants.MQ_META_ACK, "0"));
                 acknowledgeDo(messageHolder, ack, true);
-            }).thenError(err->{
+            }).thenError(err -> {
                 acknowledgeDo(messageHolder, 0, true);
             });
 
@@ -414,18 +435,22 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
         //观察者::回执时
         watcher.onAcknowledge(topic, consumerGroup, messageHolder, ack > 0);
 
-        if (ack > 0) {
-            //ok
-            messageMap.remove(messageHolder.getTid());
-            if (removeQueue) {
+        try {
+            if (ack > 0) {
+                //ok
+                messageMap.remove(messageHolder.getTid());
+                if (removeQueue) {
+                    internalRemove(messageHolder);
+                }
+                //移除前，不要改移性
+                messageHolder.setDone(true);
+            } else {
+                //no （尝试移除，再添加）//否则排序可能不会触发
                 internalRemove(messageHolder);
+                internalAdd(messageHolder.delayed());
             }
-            //移除前，不要改移性
-            messageHolder.setDone(true);
-        } else {
-            //no （尝试移除，再添加）//否则排序可能不会触发
-            internalRemove(messageHolder);
-            internalAdd(messageHolder.delayed());
+        } finally {
+            sequenceLock.set(false);
         }
     }
 }

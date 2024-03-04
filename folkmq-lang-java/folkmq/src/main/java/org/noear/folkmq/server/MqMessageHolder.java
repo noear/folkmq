@@ -35,6 +35,7 @@ public class MqMessageHolder implements Delayed {
 
     //派发时间
     private volatile long distributeTime;
+    private volatile long distributeTimeRef;
     //派发次数
     private volatile int distributeCount;
     //派发顺序
@@ -59,7 +60,8 @@ public class MqMessageHolder implements Delayed {
         this.sequence = sequence;
         this.transaction = transaction;
         this.distributeCount = distributeCount;
-        this.distributeTime = distributeTime;
+        this.distributeTimeRef = distributeTime;
+        this.distributeTime = distributeTimeRef;
 
         if (sequence) {
             this.content.at(queueName);
@@ -124,7 +126,8 @@ public class MqMessageHolder implements Delayed {
     public MqMessageHolder noTransaction() {
         transaction = false;
         distributeCount = 0;
-        distributeTime = System.currentTimeMillis();
+        distributeTimeRef = System.currentTimeMillis();
+        distributeTime = distributeTimeRef;
 
         //设置新的派发次数和下次时间
         mr.setTimes(content, distributeCount);
@@ -146,7 +149,11 @@ public class MqMessageHolder implements Delayed {
      * 设置派发时间
      */
     public void setDistributeTime(long distributeTime) {
-        this.distributeTime = distributeTime;
+        this.distributeTimeRef = distributeTime;
+
+        if (isSequence() == false) {
+            this.distributeTime = distributeTimeRef;
+        }
     }
 
     /**
@@ -161,6 +168,10 @@ public class MqMessageHolder implements Delayed {
      */
     public long getDistributeTime() {
         return distributeTime;
+    }
+
+    public long getDistributeTimeRef() {
+        return distributeTimeRef;
     }
 
     /**
@@ -184,11 +195,16 @@ public class MqMessageHolder implements Delayed {
      */
     public MqMessageHolder delayed() {
         distributeCount++;
-        distributeTime = MqNextTime.getNextTime(this);
+        distributeTimeRef = MqNextTime.getNextTime(this);
 
         //设置新的派发次数和下次时间
         mr.setTimes(content, distributeCount);
-        mr.setScheduled(content, distributeTime);
+
+        if (isSequence() == false) {
+            //如果不是顺序消息，调整队列里的派发时间；否则走外部了的时间控制
+            distributeTime = distributeTimeRef;
+            mr.setScheduled(content, distributeTimeRef);
+        }
 
         return this;
     }

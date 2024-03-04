@@ -85,7 +85,7 @@ The cluster mode can handle millions of messages per second with minimum latency
 
 * Extensibility
 
-FolkMQ Broker cluster <mark> supports FolkMQ-Server node hot extension </mark>. When the flow is high, it can be added at any time, and the flow can be reduced when it is low
+Cluster mode <mark> support hot expansion of service nodes </mark>. When the flow is high, it can be added at any time, and the flow can be reduced when it is low
 
 * Durability, reliability
 

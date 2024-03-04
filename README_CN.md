@@ -82,7 +82,7 @@ FolkMQ 为商业开源软件，其中：
 
 * 可扩展性
 
-FolkMQ Broker 集群<mark>支持 folkmq-server 节点热扩展</mark>。流量高时随时加，流量低时可减
+集群模式<mark>支持服务节点热扩展</mark>。流量高时随时加，流量低时可减
 
 * 持久性、可靠性
 

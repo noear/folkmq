@@ -66,15 +66,6 @@ Source code is simple! Simple architecture! Easy to deploy! Easy to use!
 | Server   | Single-threaded architecture, support for snapshot persistence (automatic, downtime, manual), Broker mode clustering, cluster hot-scaling                    |   
 
 
-
-## License to Use Software
-
-FolkMQ is a commercial open source software that:
-
-* Standalone deployment, Community Edition features (free for licensed use)
-* Cluster deployment edition, for Professional edition, Enterprise edition features (paid license use)。详见：[《Product planning》](https://folkmq.noear.org/article/edition)
-
-
 ## Features
 
 

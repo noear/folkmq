@@ -124,8 +124,8 @@
                         <imageTag>${project.version}</imageTag>
                         <imageTag>latest</imageTag>
                     </imageTags>
-                    <!--镜像的FROM，使用java官方镜像-->
-                    <baseImage>adoptopenjdk/openjdk11</baseImage>
+                    <!--镜像的FROM，使用java官方镜像：https://hub.docker.com/r/adoptopenjdk/openjdk11-openj9 -->
+                    <baseImage>adoptopenjdk/openjdk11-openj9</baseImage>
                     <!--该镜像的容器启动后，直接运行spring boot工程-->
                     <entryPoint>["java", "-jar", "/${project.build.finalName}.jar", "--server.port=8602","--drift=1"]</entryPoint>
                     <!--构建镜像的配置信息-->

@@ -2,7 +2,7 @@
   FolkMQ
 </h1>
 <p align="center">
-	<strong>最简单的消息中间件。面向简单，面向未来！</strong>
+	<strong>作一个最简单的消息中间件。面向简单，面向未来！</strong>
 </p>
 
 <p align="center">

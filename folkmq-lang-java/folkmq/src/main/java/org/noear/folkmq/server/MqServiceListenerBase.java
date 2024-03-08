@@ -36,8 +36,8 @@ public abstract class MqServiceListenerBase extends EventListener implements MqS
     protected final Map<String, Set<String>> subscribeMap = new ConcurrentHashMap<>();
     //队列字典(queueName=>Queue)
     protected final Map<String, MqQueue> queueMap = new ConcurrentHashMap<>();
-    //预备消息
-    protected final Map<String, String> readyMessageMap = new ConcurrentHashMap<>();
+    //事务消息
+    protected final Map<String, String> transactionMessageMap = new ConcurrentHashMap<>();
 
     //派发线程
     protected Thread distributeThread;

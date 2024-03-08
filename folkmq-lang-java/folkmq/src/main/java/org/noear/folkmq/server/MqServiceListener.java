@@ -61,7 +61,7 @@ public class MqServiceListener extends MqServiceListenerBase implements MqServic
                 String topic = mr.getTopic(m);
                 String queueName = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP + MqConstants.MQ_TRAN_CONSUMER_GROUP;
 
-                readyMessageMap.put(tid, topic);
+                transactionMessageMap.put(tid, topic);
                 queueGetOrInit(topic, MqConstants.MQ_TRAN_CONSUMER_GROUP, queueName);
                 routingToQueueName(mr, m, queueName);
             } else {
@@ -75,19 +75,38 @@ public class MqServiceListener extends MqServiceListenerBase implements MqServic
             //接收二段发布指令
             boolean isRollback = "1".equals(m.meta(MqConstants.MQ_META_ROLLBACK));
             String[] tidAry = m.dataAsString().split(",");
+            boolean confirmIsOk = true;
+            String confirmHint = "";
 
-            for (String tid : tidAry) {
-                String topic = readyMessageMap.remove(tid);
-                if (topic != null) {
-                    String queueName = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP + MqConstants.MQ_TRAN_CONSUMER_GROUP;
-                    MqQueue queue = getQueue(queueName);
-                    if (queue != null) {
-                        queue.affirmAt(tid, isRollback);
+            if (isRollback == false) {
+                //如果不是回滚，则先做检测（是否提交的 tid 都在）
+                for (String tid : tidAry) {
+                    if (transactionMessageMap.containsKey(tid) == false) {
+                        confirmIsOk = false;
+
+                        if (confirmHint.length() > 0) {
+                            confirmHint += "," + tid;
+                        } else {
+                            confirmHint = "Transaction messages have failed to be published: " + tid;
+                        }
                     }
                 }
             }
 
-            confirmDo(s, m);
+            if (confirmIsOk) {
+                for (String tid : tidAry) {
+                    String topic = transactionMessageMap.remove(tid);
+                    if (topic != null) {
+                        String queueName = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP + MqConstants.MQ_TRAN_CONSUMER_GROUP;
+                        MqQueue queue = getQueue(queueName);
+                        if (queue != null) {
+                            queue.affirmAt(tid, isRollback);
+                        }
+                    }
+                }
+            }
+
+            confirmDo(s, m, confirmIsOk, confirmHint);
         });
 
         doOn(MqConstants.MQ_EVENT_UNPUBLISH, (s, m) -> {
@@ -364,12 +383,16 @@ public class MqServiceListener extends MqServiceListenerBase implements MqServic
     }
 
     private void confirmDo(Session s, Message m) throws IOException {
+        confirmDo(s, m, true, "");
+    }
+
+    private void confirmDo(Session s, Message m, boolean isOk, String hint) throws IOException {
         //答复（以支持同步的原子性需求。同步或异步，由用户按需控制）
         if (m.isRequest() || m.isSubscribe()) {
             //发送“确认”，表示服务端收到了
             if (s.isValid()) {
                 //如果会话仍有效，则答复（有可能会半路关掉）
-                s.replyEnd(m, new StringEntity("").metaPut(MqConstants.MQ_META_CONFIRM, "1"));
+                s.replyEnd(m, new StringEntity(hint).metaPut(MqConstants.MQ_META_CONFIRM, (isOk ? "1" : "0")));
             }
         }
     }

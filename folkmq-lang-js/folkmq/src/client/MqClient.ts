@@ -6,6 +6,7 @@ import {MqMessageReceived, MqMessageReceivedImpl} from "./MqMessageReceived";
 import {MqMessage} from "./MqMessage";
 import {Entity} from "@noear/socket.d/transport/core/Entity";
 import {RequestStream} from "@noear/socket.d/transport/stream/Stream";
+import {MqTransaction} from "./MqTransaction";
 
 
 /**
@@ -107,7 +108,7 @@ export interface MqClient {
     /**
      * 新建事务
      */
-    newTransaction();
+    newTransaction(): MqTransaction;
 }
 
 export interface MqClientInternal extends MqClient {

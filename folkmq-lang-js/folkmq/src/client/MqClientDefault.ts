@@ -17,7 +17,7 @@ import {FolkmqException} from "../exception/FolkmqException";
 import {MqAssert} from "../common/MqAssert";
 import {RequestStream} from "@noear/socket.d/transport/stream/Stream";
 import {MqMetasV2} from "../common/MqMetasV2";
-import {MqTransactionImpl} from "./MqTransaction";
+import {MqTransaction, MqTransactionImpl} from "./MqTransaction";
 import {Entity} from "@noear/socket.d/transport/core/Entity";
 import {MqAlarm} from "./MqAlarm";
 
@@ -137,7 +137,7 @@ export class MqClientDefault implements MqClientInternal {
             consumerGroup = this.name();
         }
 
-        if(autoAck == null){
+        if (autoAck == null) {
             autoAck = this._autoAcknowledge;
         }
 
@@ -317,7 +317,7 @@ export class MqClientDefault implements MqClientInternal {
 
     }
 
-    newTransaction() {
+    newTransaction(): MqTransaction {
         //检查必要条件
         //检查必要条件
         if (!this._name) {

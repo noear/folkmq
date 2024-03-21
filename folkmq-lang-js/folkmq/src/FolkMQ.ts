@@ -17,6 +17,9 @@ export class FolkMQ {
         return 2;
     }
 
+    /**
+     * 获取版本代号字符串形式
+     */
     static versionCodeAsString(): string {
         return FolkMQ.versionCode().toString();
     }

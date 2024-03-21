@@ -171,4 +171,11 @@ public class CaseTest {
         testCase.start();
         testCase.stop();
     }
+
+    @Test
+    public void TestCase28_packaging_loop() throws Exception {
+        BaseTestCase testCase = new TestCase28_packaging_loop(2028);
+        testCase.start();
+        testCase.stop();
+    }
 }

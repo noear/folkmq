@@ -9,5 +9,5 @@ import java.util.List;
  * @since 1.3
  */
 public interface PackagingWorkHandler<Event> {
-    void onEvents(List<Event> list) throws Exception;
+    void doWork(List<Event> list) throws Exception;
 }

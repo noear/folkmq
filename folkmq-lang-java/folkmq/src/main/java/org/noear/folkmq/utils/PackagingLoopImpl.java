@@ -26,7 +26,7 @@ public class PackagingLoopImpl<Event> implements PackagingLoop<Event>, Closeable
      * 包装合大小
      * */
     private int packetSize = 150; //必须大于等于150
-    private final int packetSize_min = 150;
+    private final int packetSize_min = 1;
 
     private Thread workThread;
 
@@ -140,7 +140,7 @@ public class PackagingLoopImpl<Event> implements PackagingLoop<Event>, Closeable
             collectDo(list);
 
             if (list.size() > 0) {
-                workHandler.onEvents(list);
+                workHandler.doWork(list);
             } else {
                 break;
             }

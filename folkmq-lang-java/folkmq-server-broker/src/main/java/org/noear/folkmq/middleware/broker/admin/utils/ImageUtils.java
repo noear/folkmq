@@ -1,4 +1,4 @@
-package org.noear.folkmq.broker.admin.utils;
+package org.noear.folkmq.middleware.broker.admin.utils;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;

@@ -1,4 +1,4 @@
-package org.noear.folkmq.broker.common;
+package org.noear.folkmq.middleware.broker.common;
 
 import org.noear.socketd.utils.StrUtils;
 import org.noear.solon.Solon;

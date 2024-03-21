@@ -1,4 +1,4 @@
-package org.noear.folkmq.broker.common;
+package org.noear.folkmq.middleware.broker.common;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.binder.jvm.JvmMemoryMetrics;

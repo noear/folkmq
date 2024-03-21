@@ -1,9 +1,9 @@
-package org.noear.folkmq.server.pro.admin.dso;
+package org.noear.folkmq.middleware.server.admin.dso;
 
 import org.noear.folkmq.server.MqServiceInternal;
 import org.noear.folkmq.server.MqQueue;
 import org.noear.folkmq.server.MqQueueDefault;
-import org.noear.folkmq.server.pro.admin.model.QueueVo;
+import org.noear.folkmq.middleware.server.admin.model.QueueVo;
 import org.noear.socketd.transport.core.Session;
 
 import java.io.IOException;

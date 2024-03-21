@@ -1,6 +1,6 @@
-package org.noear.folkmq.broker.admin.dso;
+package org.noear.folkmq.middleware.broker.admin.dso;
 
-import org.noear.folkmq.broker.common.ConfigNames;
+import org.noear.folkmq.middleware.broker.common.ConfigNames;
 import org.noear.snack.core.utils.DateUtil;
 import org.noear.solon.Solon;
 import org.noear.solon.Utils;

@@ -1,4 +1,4 @@
-package org.noear.folkmq.broker.admin.model;
+package org.noear.folkmq.middleware.broker.admin.model;
 
 /**
  * @author noear

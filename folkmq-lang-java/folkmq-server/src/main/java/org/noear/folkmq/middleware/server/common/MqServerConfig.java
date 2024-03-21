@@ -1,4 +1,4 @@
-package org.noear.folkmq.server.pro.common;
+package org.noear.folkmq.middleware.server.common;
 
 import org.noear.socketd.utils.StrUtils;
 import org.noear.solon.Solon;

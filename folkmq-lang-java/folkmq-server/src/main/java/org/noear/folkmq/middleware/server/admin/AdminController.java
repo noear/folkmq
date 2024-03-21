@@ -1,10 +1,10 @@
-package org.noear.folkmq.server.pro.admin;
+package org.noear.folkmq.middleware.server.admin;
 
 import org.noear.folkmq.client.MqMessage;
 import org.noear.folkmq.common.MqUtils;
 import org.noear.folkmq.server.MqServiceInternal;
 import org.noear.folkmq.server.pro.MqWatcherSnapshotPlus;
-import org.noear.folkmq.server.pro.admin.model.TopicVo;
+import org.noear.folkmq.middleware.server.admin.model.TopicVo;
 import org.noear.snack.core.utils.DateUtil;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.utils.RunUtils;

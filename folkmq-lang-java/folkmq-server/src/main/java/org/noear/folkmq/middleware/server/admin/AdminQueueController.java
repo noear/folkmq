@@ -1,13 +1,13 @@
-package org.noear.folkmq.server.pro.admin;
+package org.noear.folkmq.middleware.server.admin;
 
 import org.noear.folkmq.common.MqConstants;
 import org.noear.folkmq.server.MqQueue;
 import org.noear.folkmq.server.MqServiceInternal;
-import org.noear.folkmq.server.pro.common.MetricsConfig;
+import org.noear.folkmq.middleware.server.common.MetricsConfig;
 import org.noear.folkmq.server.pro.MqWatcherSnapshotPlus;
-import org.noear.folkmq.server.pro.admin.dso.QueueForceService;
-import org.noear.folkmq.server.pro.admin.dso.ViewUtils;
-import org.noear.folkmq.server.pro.admin.model.QueueVo;
+import org.noear.folkmq.middleware.server.admin.dso.QueueForceService;
+import org.noear.folkmq.middleware.server.admin.dso.ViewUtils;
+import org.noear.folkmq.middleware.server.admin.model.QueueVo;
 import org.noear.socketd.transport.core.Session;
 import org.noear.solon.annotation.Controller;
 import org.noear.solon.annotation.Inject;

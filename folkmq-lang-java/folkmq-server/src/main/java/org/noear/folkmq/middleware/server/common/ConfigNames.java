@@ -1,4 +1,4 @@
-package org.noear.folkmq.server.pro.common;
+package org.noear.folkmq.middleware.server.common;
 
 /**
  * @author noear

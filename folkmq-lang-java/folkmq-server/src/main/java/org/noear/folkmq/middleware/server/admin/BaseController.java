@@ -1,4 +1,4 @@
-package org.noear.folkmq.server.pro.admin;
+package org.noear.folkmq.middleware.server.admin;
 
 import org.noear.folkmq.FolkMQ;
 import org.noear.solon.core.handle.ModelAndView;

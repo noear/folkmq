@@ -1,8 +1,8 @@
-package org.noear.folkmq.server.pro.admin;
+package org.noear.folkmq.middleware.server.admin;
 
-import org.noear.folkmq.server.pro.admin.utils.ImageUtils;
-import org.noear.folkmq.server.pro.admin.utils.RandomUtils;
-import org.noear.folkmq.server.pro.common.ConfigNames;
+import org.noear.folkmq.middleware.server.admin.utils.ImageUtils;
+import org.noear.folkmq.middleware.server.admin.utils.RandomUtils;
+import org.noear.folkmq.middleware.server.common.ConfigNames;
 import org.noear.solon.Solon;
 import org.noear.solon.Utils;
 import org.noear.solon.annotation.Controller;

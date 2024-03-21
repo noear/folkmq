@@ -1,8 +1,8 @@
-package org.noear.folkmq.broker.admin.dso;
+package org.noear.folkmq.middleware.broker.admin.dso;
 
-import org.noear.folkmq.broker.admin.model.QueueVo;
-import org.noear.folkmq.broker.common.ConfigNames;
-import org.noear.folkmq.broker.mq.BrokerListenerFolkmq;
+import org.noear.folkmq.middleware.broker.admin.model.QueueVo;
+import org.noear.folkmq.middleware.broker.common.ConfigNames;
+import org.noear.folkmq.middleware.broker.mq.BrokerListenerFolkmq;
 import org.noear.folkmq.common.MqConstants;
 import org.noear.snack.ONode;
 import org.noear.socketd.transport.core.Session;

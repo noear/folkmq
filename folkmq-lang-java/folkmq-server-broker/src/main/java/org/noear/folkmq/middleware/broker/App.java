@@ -1,6 +1,6 @@
 package org.noear.folkmq.middleware.broker;
 
-import org.noear.folkmq.broker.admin.dso.LicenceUtils;
+import org.noear.folkmq.middleware.broker.admin.dso.LicenceUtils;
 import org.noear.socketd.SocketD;
 import org.noear.socketd.transport.java_websocket.WsNioProvider;
 import org.noear.socketd.transport.netty.tcp.TcpNioProvider;

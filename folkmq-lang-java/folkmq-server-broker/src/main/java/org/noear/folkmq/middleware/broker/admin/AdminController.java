@@ -1,10 +1,10 @@
-package org.noear.folkmq.broker.admin;
+package org.noear.folkmq.middleware.broker.admin;
 
-import org.noear.folkmq.broker.admin.dso.LicenceUtils;
-import org.noear.folkmq.broker.admin.dso.ViewQueueService;
-import org.noear.folkmq.broker.admin.model.ServerVo;
-import org.noear.folkmq.broker.admin.model.TopicVo;
-import org.noear.folkmq.broker.mq.BrokerListenerFolkmq;
+import org.noear.folkmq.middleware.broker.admin.dso.LicenceUtils;
+import org.noear.folkmq.middleware.broker.admin.dso.ViewQueueService;
+import org.noear.folkmq.middleware.broker.admin.model.ServerVo;
+import org.noear.folkmq.middleware.broker.admin.model.TopicVo;
+import org.noear.folkmq.middleware.broker.mq.BrokerListenerFolkmq;
 import org.noear.folkmq.client.MqMessage;
 import org.noear.folkmq.common.MqConstants;
 import org.noear.folkmq.common.MqUtils;

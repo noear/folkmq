@@ -1,4 +1,4 @@
-package org.noear.folkmq.broker.common;
+package org.noear.folkmq.middleware.broker.common;
 
 /**
  * @author noear

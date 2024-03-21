@@ -1,4 +1,4 @@
-package org.noear.folkmq.server.pro.admin.utils;
+package org.noear.folkmq.middleware.server.admin.utils;
 
 import java.util.Random;
 

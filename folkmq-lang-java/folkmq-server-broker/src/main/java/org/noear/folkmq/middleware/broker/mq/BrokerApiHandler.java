@@ -1,9 +1,9 @@
-package org.noear.folkmq.broker.mq;
+package org.noear.folkmq.middleware.broker.mq;
 
-import org.noear.folkmq.broker.admin.dso.QueueForceService;
-import org.noear.folkmq.broker.admin.dso.ViewQueueService;
-import org.noear.folkmq.broker.admin.model.QueueVo;
-import org.noear.folkmq.broker.common.MqBrokerConfig;
+import org.noear.folkmq.middleware.broker.admin.dso.QueueForceService;
+import org.noear.folkmq.middleware.broker.admin.dso.ViewQueueService;
+import org.noear.folkmq.middleware.broker.admin.model.QueueVo;
+import org.noear.folkmq.middleware.broker.common.MqBrokerConfig;
 import org.noear.folkmq.common.MqApis;
 import org.noear.folkmq.common.MqConstants;
 import org.noear.folkmq.common.MqMetasV1;

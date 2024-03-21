@@ -1,8 +1,8 @@
-package org.noear.folkmq.broker.admin;
+package org.noear.folkmq.middleware.broker.admin;
 
-import org.noear.folkmq.broker.common.ConfigNames;
-import org.noear.folkmq.broker.admin.utils.ImageUtils;
-import org.noear.folkmq.broker.admin.utils.RandomUtils;
+import org.noear.folkmq.middleware.broker.common.ConfigNames;
+import org.noear.folkmq.middleware.broker.admin.utils.ImageUtils;
+import org.noear.folkmq.middleware.broker.admin.utils.RandomUtils;
 import org.noear.solon.Solon;
 import org.noear.solon.Utils;
 import org.noear.solon.annotation.Controller;

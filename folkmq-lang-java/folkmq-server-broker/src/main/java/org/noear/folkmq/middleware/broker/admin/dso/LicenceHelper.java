@@ -1,4 +1,4 @@
-package org.noear.folkmq.broker.admin.dso;
+package org.noear.folkmq.middleware.broker.admin.dso;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;

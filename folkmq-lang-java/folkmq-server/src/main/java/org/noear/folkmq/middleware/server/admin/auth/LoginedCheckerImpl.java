@@ -1,4 +1,4 @@
-package org.noear.folkmq.server.pro.admin.auth;
+package org.noear.folkmq.middleware.server.admin.auth;
 
 import org.noear.solon.annotation.Configuration;
 import org.noear.solon.core.handle.Context;

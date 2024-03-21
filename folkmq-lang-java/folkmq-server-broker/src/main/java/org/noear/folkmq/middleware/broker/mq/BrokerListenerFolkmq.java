@@ -1,4 +1,4 @@
-package org.noear.folkmq.broker.mq;
+package org.noear.folkmq.middleware.broker.mq;
 
 import org.noear.folkmq.FolkMQ;
 import org.noear.folkmq.common.MqConstants;

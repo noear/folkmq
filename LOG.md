@@ -1,3 +1,8 @@
+### 1.3.2
+* 调整 控制台发布消息后保持在原界面
+* 调整 添加流转批小工具
+* sokcet.d 升为 2.4.7
+
 ### 1.3.1
 * 调整 docker 基础镜像改为：adoptopenjdk/openjdk11-openj9 （内存节约 1/2 左右）
 * 调整 folkmq-broker 更名为：folkmq-server-broker （相互兼容，体验不变）

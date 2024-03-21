@@ -69,16 +69,8 @@ public class TestCase28_packaging_loop extends BaseTestCase {
 
     private class MqConsumeHandlerImpl implements MqConsumeHandler, PackagingWorkHandler<MqMessageReceived> {
 
-        private PackagingLoop<MqMessageReceived> packagingLoop = new PackagingLoopImpl<>();
+        private PackagingLoop<MqMessageReceived> packagingLoop = new PackagingLoopImpl<>(100,3,this);
 
-        public MqConsumeHandlerImpl() {
-            //设置处理
-            packagingLoop.setWorkHandler(this);
-            //空闲间隔
-            packagingLoop.setIdleInterval(100);
-            //包大小
-            packagingLoop.setPacketSize(3);
-        }
 
         @Override
         public void consume(MqMessageReceived message) throws Exception {

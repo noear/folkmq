@@ -18,13 +18,13 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class PackagingLoopImpl<Event> implements PackagingLoop<Event>, Closeable {
     /**
      * 休息时间
-     * */
+     */
     private long idleInterval = 500; //必须大于等于min
     private final long idleInterval_min = 10;
 
     /**
      * 包装合大小
-     * */
+     */
     private int packetSize = 150; //必须大于等于150
     private final int packetSize_min = 1;
 
@@ -40,6 +40,13 @@ public class PackagingLoopImpl<Event> implements PackagingLoop<Event>, Closeable
         workThread.start();
     }
 
+    public PackagingLoopImpl(long idleInterval, int packetSize, PackagingWorkHandler<Event> workHandler) {
+        this();
+
+        setIdleInterval(idleInterval);
+        setPacketSize(packetSize);
+        setWorkHandler(workHandler);
+    }
 
 
     public void setWorkHandler(PackagingWorkHandler<Event> workHandler) {
@@ -73,14 +80,14 @@ public class PackagingLoopImpl<Event> implements PackagingLoop<Event>, Closeable
 
     /**
      * 空闲休息时间
-     * */
+     */
     public long getIdleInterval() {
         return idleInterval;
     }
 
     /**
      * 设置空闲休息时间
-     * */
+     */
     public void setIdleInterval(long idleInterval) {
         if (idleInterval >= idleInterval_min) {
             this.idleInterval = idleInterval;
@@ -89,7 +96,7 @@ public class PackagingLoopImpl<Event> implements PackagingLoop<Event>, Closeable
 
     /**
      * 设置包装合大小
-     * */
+     */
     public void setPacketSize(int packetSize) {
         if (packetSize >= packetSize_min) {
             this.packetSize = packetSize;
@@ -102,7 +109,7 @@ public class PackagingLoopImpl<Event> implements PackagingLoop<Event>, Closeable
 
     private void workStartDo() {
         while (true) {
-            if(isStopped){
+            if (isStopped) {
                 return;
             }
 
@@ -131,7 +138,7 @@ public class PackagingLoopImpl<Event> implements PackagingLoop<Event>, Closeable
         }
 
         while (true) {
-            if(isStopped){
+            if (isStopped) {
                 return;
             }
 
@@ -152,7 +159,7 @@ public class PackagingLoopImpl<Event> implements PackagingLoop<Event>, Closeable
         //
         int count = 0;
         while (true) {
-            if(isStopped){
+            if (isStopped) {
                 return;
             }
 
@@ -171,7 +178,7 @@ public class PackagingLoopImpl<Event> implements PackagingLoop<Event>, Closeable
         }
     }
 
-    private  boolean isStopped = false;
+    private boolean isStopped = false;
 
     @Override
     public void close() throws IOException {

@@ -1,4 +1,4 @@
-package org.noear.folkmq.broker;
+package org.noear.folkmq.middleware.broker;
 
 import org.noear.folkmq.broker.admin.dso.LicenceUtils;
 import org.noear.socketd.SocketD;

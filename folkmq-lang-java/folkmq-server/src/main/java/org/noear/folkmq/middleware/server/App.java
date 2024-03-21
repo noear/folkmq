@@ -1,4 +1,4 @@
-package org.noear.folkmq.server.pro;
+package org.noear.folkmq.middleware.server;
 
 import org.noear.socketd.SocketD;
 import org.noear.socketd.transport.java_websocket.WsNioProvider;

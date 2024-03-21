@@ -1,4 +1,4 @@
-
+n
 ### 1、打包流程
 
 * 完成 ts 编译（多个文件）
@@ -39,7 +39,7 @@ npm publish
 ```javascript
 
 /*!
- * FolkMQ v1.3.1
+ * FolkMQ v1.3.2
  * (c) 2023-2024 noear.org
  * Released under the LGPL-2.1 License.
  */

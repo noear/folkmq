@@ -27,9 +27,6 @@
             $.post('/admin/publish/ajax/post', data, rst => {
                 if (rst.code == 200) {
                     top.layer.msg('操作成功')
-                    setTimeout(function () {
-                        top.location.reload();
-                    }, 800);
                 } else {
                     top.layer.msg(rst.description);
                 }

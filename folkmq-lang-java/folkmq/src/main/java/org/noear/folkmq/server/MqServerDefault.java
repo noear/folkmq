@@ -89,7 +89,7 @@ public class MqServerDefault implements MqServer {
         //创建 SocketD 服务并配置（使用 tpc 通讯）
         server = SocketD.createServer(serverSchema);
 
-        server.config(c -> c.sequenceSend(true)
+        server.config(c -> c.serialSend(true)
                 .ioThreads(1)
                 .codecThreads(1)
                 .exchangeThreads(1));

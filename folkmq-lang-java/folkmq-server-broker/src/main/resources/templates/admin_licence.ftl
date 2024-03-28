@@ -35,7 +35,7 @@
                     <td>${subscribeMonths!}</td>
                 </tr>
                 <tr>
-                    <td>授权对象</td>
+                    <td>授予对象</td>
                     <td>${consumer!}</td>
                 </tr>
 

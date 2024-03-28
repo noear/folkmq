@@ -1,4 +1,5 @@
 version: '3.5'
+
 services:
   folkmq-server-broker:
     image: noearorg/folkmq-server-broker:1.4.0

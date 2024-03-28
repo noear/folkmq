@@ -18,13 +18,7 @@
 </toolbar>
 <detail>
     <form id="form">
-        <table>
-            <tbody>
-            <tr>
-                <td>${sn!}</td>
-            </tr>
-            </tbody>
-        </table>
+        <div>${sn!}</div>
     </form>
 </detail>
 

@@ -5,7 +5,6 @@ import {MqConstants} from "../common/MqConstants";
 import {Entity} from "@noear/socket.d/transport/core/Entity";
 import {MqUtils} from "../common/MqUtils";
 import {MqMessageBase} from "./MqMessage";
-import {Buffer} from "@noear/socket.d/transport/core/Buffer";
 
 export interface MqMessageReceived extends MqMessageBase{
     /**
@@ -132,8 +131,8 @@ export class MqMessageReceivedImpl implements MqMessageReceived {
         return this.getBodyAsString();
     }
 
-    getBody(): Buffer {
-        return this._source.data();
+    getBody(): ArrayBuffer {
+        return this._source.data().getArray()!;
     }
 
     /**

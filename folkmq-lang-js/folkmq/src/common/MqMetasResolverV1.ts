@@ -84,7 +84,7 @@ export class MqMetasResolverV1 implements MqMetasResolver {
 
     publishEntityBuild(topic: string, message: MqMessage): EntityDefault {
         //构建消息实体
-        const entity = SocketD.newEntity(message.getBody().getArray()!);
+        const entity = SocketD.newEntity(message.getBody());
 
         entity.metaPut(MqMetasV1.MQ_META_TID, message.getTid());
         entity.metaPut(MqMetasV1.MQ_META_TOPIC, topic);

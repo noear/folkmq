@@ -1,6 +1,7 @@
 package org.noear.folkmq.server;
 
 import org.noear.folkmq.common.MqMetasResolver;
+import org.noear.socketd.transport.core.EntityMetas;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.entity.EntityDefault;
 
@@ -30,6 +31,7 @@ public class MqMessageHolder implements Delayed {
     private final long expiration;
     //是否有序
     private final boolean sequence;
+    private final String sequenceSharding;
     //是否事务
     private boolean transaction;
 
@@ -58,6 +60,7 @@ public class MqMessageHolder implements Delayed {
         this.qos = qos;
         this.expiration = expiration;
         this.sequence = sequence;
+        this.sequenceSharding = from.meta(EntityMetas.META_X_Hash);
         this.transaction = transaction;
         this.distributeCount = distributeCount;
         this.distributeTimeRef = distributeTime;
@@ -139,10 +142,17 @@ public class MqMessageHolder implements Delayed {
     }
 
     /**
-     * 是否有序
+     * 是否顺序
      */
     public boolean isSequence() {
         return sequence;
+    }
+
+    /**
+     * 获取顺序分片
+     * */
+    public String getSequenceSharding() {
+        return sequenceSharding;
     }
 
     /**

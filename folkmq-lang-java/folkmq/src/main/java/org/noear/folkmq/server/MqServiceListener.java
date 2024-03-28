@@ -127,7 +127,7 @@ public class MqServiceListener extends MqServiceListenerBase implements MqServic
             String atName = m.atName();
 
             //单发模式（给同名的某个玩家，轮询负截均衡）
-            Session responder = brokerListener.getPlayerAny(atName, s);
+            Session responder = brokerListener.getPlayerAny(atName, s, m);
             if (responder != null && responder.isValid()) {
                 //转发消息
                 try {

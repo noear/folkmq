@@ -130,7 +130,7 @@ public class BrokerListenerFolkmq extends BrokerListener {
             String atName = message.atName();
 
             //单发模式（给同名的某个玩家，轮询负截均衡）
-            Session responder = getPlayerAny(atName, requester);
+            Session responder = getPlayerAny(atName, requester, message);
             if (responder != null && responder.isValid()) {
                 //转发消息
                 try {
@@ -168,7 +168,7 @@ public class BrokerListenerFolkmq extends BrokerListener {
             String atName = message.atName();
 
             //单发模式（给同名的某个玩家，轮询负截均衡）
-            Session responder = getPlayerAny(atName, requester);
+            Session responder = getPlayerAny(atName, requester, message);
             if (responder != null && responder.isValid()) {
                 //转发消息
                 try {
@@ -235,7 +235,7 @@ public class BrokerListenerFolkmq extends BrokerListener {
     }
 
     public boolean publishDo(Message routingMessage, int qos) throws IOException {
-        Session responder = this.getPlayerAny(MqConstants.BROKER_AT_SERVER, null);
+        Session responder = this.getPlayerAny(MqConstants.BROKER_AT_SERVER, null, null);
 
         if (responder != null) {
             if (qos > 0) {

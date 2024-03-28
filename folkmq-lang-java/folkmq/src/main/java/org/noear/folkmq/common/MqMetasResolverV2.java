@@ -2,10 +2,7 @@ package org.noear.folkmq.common;
 
 import org.noear.folkmq.FolkMQ;
 import org.noear.folkmq.client.MqMessage;
-import org.noear.socketd.transport.core.Entity;
-import org.noear.socketd.transport.core.Flags;
-import org.noear.socketd.transport.core.Message;
-import org.noear.socketd.transport.core.MessageInternal;
+import org.noear.socketd.transport.core.*;
 import org.noear.socketd.transport.core.entity.MessageBuilder;
 import org.noear.socketd.transport.core.entity.StringEntity;
 import org.noear.socketd.utils.StrUtils;
@@ -155,6 +152,11 @@ public class MqMetasResolverV2 implements MqMetasResolver {
 
             if (message.isSequence()) {
                 entity.metaPut(MqMetasV2.MQ_META_SEQUENCE, "1");
+
+                if(message.isTransaction() == false && StrUtils.isNotEmpty(message.getSequenceSharding())){
+                    //不是事务，并且有顺序分片
+                    entity.metaPut(EntityMetas.META_X_Hash, message.getSequenceSharding());
+                }
             }
         } else {
             entity.at(MqConstants.BROKER_AT_SERVER);

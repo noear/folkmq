@@ -2,6 +2,7 @@ package org.noear.folkmq.server;
 
 import org.noear.socketd.cluster.LoadBalancer;
 import org.noear.socketd.transport.core.Session;
+import org.noear.socketd.utils.StrUtils;
 
 import java.util.Collection;
 import java.util.List;
@@ -119,7 +120,11 @@ public abstract class MqQueueBase implements MqQueue {
      */
     protected Session getSessionOne(MqMessageHolder messageHolder) {
         if (messageHolder.isSequence()) {
-            return LoadBalancer.getAnyByHash(consumerSessions, getTopic());
+            if (StrUtils.isEmpty(messageHolder.getSequenceSharding())) {
+                return LoadBalancer.getAnyByHash(consumerSessions, getTopic());
+            } else {
+                return LoadBalancer.getAnyByHash(consumerSessions, messageHolder.getSequenceSharding());
+            }
         } else {
             return LoadBalancer.getAnyByPoll(consumerSessions);
         }

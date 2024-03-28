@@ -23,6 +23,7 @@ public class MqMessage implements MqMessageBase {
     private Date scheduled;
     private Date expiration;
     private boolean sequence;
+    private String sequenceSharding;
     private int qos = 1;
     private Map<String, String> attrMap = new HashMap<>();
 
@@ -95,6 +96,10 @@ public class MqMessage implements MqMessageBase {
         return sequence;
     }
 
+    public String getSequenceSharding() {
+        return sequenceSharding;
+    }
+
     /**
      * 质量等级（0 或 1）
      */
@@ -158,6 +163,17 @@ public class MqMessage implements MqMessageBase {
      */
     public MqMessage sequence(boolean sequence) {
         this.sequence = sequence;
+        return this;
+    }
+
+    /**
+     * 是否顺序
+     *
+     * @param sharding 虚拟分片（分片内顺序）
+     */
+    public MqMessage sequence(boolean sequence, String sharding) {
+        this.sequence = sequence;
+        this.sequenceSharding = (sequence ? sharding : null);
         return this;
     }
 

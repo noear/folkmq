@@ -540,7 +540,11 @@ public class MqClientDefault implements MqClientInternal {
         if (message.isTransaction()) {
             return message.getTmid();
         } else if (message.isSequence()) {
-            return topic;
+            if (StrUtils.isEmpty(message.getSequenceSharding())) {
+                return topic;
+            } else {
+                return message.getSequenceSharding();
+            }
         } else {
             return null;
         }

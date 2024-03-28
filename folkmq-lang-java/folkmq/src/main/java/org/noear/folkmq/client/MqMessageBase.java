@@ -25,9 +25,9 @@ public interface MqMessageBase {
     String getTag();
 
     /**
-     * 内容
+     * 数据
      */
-    String getContent();
+    byte[] getBody();
 
     /**
      * 过期时间

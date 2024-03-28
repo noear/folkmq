@@ -17,6 +17,21 @@ public interface MqMessageReceived extends MqMessageBase {
     String getTopic();
 
     /**
+     * 内容
+     *
+     * @deprecated 1.4
+     */
+    @Deprecated
+    default String getContent(){
+        return getBodyAsString();
+    }
+
+    /**
+     * 数据
+     */
+    String getBodyAsString();
+
+    /**
      * 消费者组
      */
     String getConsumerGroup();

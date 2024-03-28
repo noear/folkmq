@@ -433,7 +433,7 @@ public class MqClientDefault implements MqClientInternal {
         }
 
         message.internalSender(name());
-        StringEntity entity = MqUtils.getOf((Session) session).publishEntityBuild("", message);
+        EntityDefault entity = MqUtils.getOf((Session) session).publishEntityBuild("", message);
         entity.putMeta(MqMetasV2.MQ_META_CONSUMER_GROUP, toName);
         entity.at(toName);
 

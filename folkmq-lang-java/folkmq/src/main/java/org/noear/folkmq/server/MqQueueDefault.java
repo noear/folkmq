@@ -171,7 +171,7 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
             messageHolder.noTransaction();
             Message message = new MessageBuilder()
                     .sid(messageHolder.getTid())
-                    .entity(messageHolder.getContent()).build();
+                    .entity(messageHolder.getEntity()).build();
             serviceListener.routingDo(messageHolder.mr, message);
         }
     }
@@ -269,7 +269,7 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
         if (s1 != null) {
             try {
                 //开始请求确认
-                s1.sendAndRequest(MqConstants.MQ_EVENT_REQUEST, messageHolder.getContent()).thenReply(r -> {
+                s1.sendAndRequest(MqConstants.MQ_EVENT_REQUEST, messageHolder.getEntity()).thenReply(r -> {
                     //进入正常队列
                     int ack = Integer.parseInt(r.metaOrDefault(MqConstants.MQ_META_ACK, "0"));
                     if (ack == 1) {
@@ -417,7 +417,7 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
             //::Qos1
 
             //1.给会话发送消息 //如果有异步，上面会加入队列
-            s1.sendAndRequest(MqConstants.MQ_EVENT_DISTRIBUTE, messageHolder.getContent(), -1).thenReply(r -> {
+            s1.sendAndRequest(MqConstants.MQ_EVENT_DISTRIBUTE, messageHolder.getEntity(), -1).thenReply(r -> {
                 int ack = Integer.parseInt(r.metaOrDefault(MqConstants.MQ_META_ACK, "0"));
                 acknowledgeDo(messageHolder, ack, true);
             }).thenError(err -> {
@@ -429,7 +429,7 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
             internalAdd(messageHolder);
         } else {
             //::Qos0
-            s1.send(MqConstants.MQ_EVENT_DISTRIBUTE, messageHolder.getContent());
+            s1.send(MqConstants.MQ_EVENT_DISTRIBUTE, messageHolder.getEntity());
             acknowledgeDo(messageHolder, 1, false);
         }
     }

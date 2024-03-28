@@ -33,7 +33,7 @@ public class MqSolonContext extends ContextEmpty {
         _method = MethodType.SOCKET;
 
         //传递 message meta
-        if (Utils.isNotEmpty(message.getContent())) {
+        if (Utils.isNotEmpty(message.getBodyAsString())) {
             for (Map.Entry<String, String> kv : message.getSource().metaMap().entrySet()) {
                 if (kv.getKey().startsWith(MqConstants.MQ_ATTR_PREFIX)) {
                     headerMap().put(kv.getKey().substring(1), kv.getValue());

@@ -3,6 +3,7 @@ package org.noear.folkmq.client;
 import org.noear.folkmq.common.MqAssert;
 import org.noear.socketd.utils.StrUtils;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -16,7 +17,7 @@ import java.util.Map;
  */
 public class MqMessage implements MqMessageBase {
     private final String tid;
-    private final String content;
+    private final byte[] body;
 
     private String sender;
     private String tag;
@@ -29,9 +30,13 @@ public class MqMessage implements MqMessageBase {
 
     protected MqTransaction transaction;
 
-    public MqMessage(String content) {
+    public MqMessage(String body) {
+        this(body.getBytes(StandardCharsets.UTF_8));
+    }
+
+    public MqMessage(byte[] body) {
         this.tid = StrUtils.guid();
-        this.content = content;
+        this.body = body;
     }
 
     /**
@@ -58,12 +63,9 @@ public class MqMessage implements MqMessageBase {
         return tag;
     }
 
-    /**
-     * 内容
-     */
     @Override
-    public String getContent() {
-        return content;
+    public byte[] getBody() {
+        return body;
     }
 
     /**

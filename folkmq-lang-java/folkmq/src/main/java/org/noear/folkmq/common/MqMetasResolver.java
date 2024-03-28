@@ -3,6 +3,7 @@ package org.noear.folkmq.common;
 import org.noear.folkmq.client.MqMessage;
 import org.noear.socketd.transport.core.Entity;
 import org.noear.socketd.transport.core.Message;
+import org.noear.socketd.transport.core.entity.EntityDefault;
 import org.noear.socketd.transport.core.entity.StringEntity;
 
 /**
@@ -103,7 +104,7 @@ public interface MqMetasResolver {
      * @param topic   主题
      * @param message 消息
      */
-    StringEntity publishEntityBuild(String topic, MqMessage message);
+    EntityDefault publishEntityBuild(String topic, MqMessage message);
 
     /**
      * 路由消息构建

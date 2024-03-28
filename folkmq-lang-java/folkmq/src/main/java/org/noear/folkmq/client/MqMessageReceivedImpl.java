@@ -27,7 +27,6 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
     private final String tag;
     private final String topic;
     private final String consumerGroup;
-    private final String content;
     private final Date expiration;
     private final boolean sequence;
     private final boolean transaction;
@@ -38,8 +37,6 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
         this.clientInternal = clientInternal;
         this.session = session;
         this.source = source;
-
-        this.content = source.dataAsString();
 
         MqMetasResolver mr = MqUtils.getOf(source);
 
@@ -109,12 +106,14 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
         return consumerGroup;
     }
 
-    /**
-     * 内容
-     */
     @Override
-    public String getContent() {
-        return content;
+    public byte[] getBody() {
+        return source.dataAsBytes();
+    }
+
+    @Override
+    public String getBodyAsString() {
+        return source.dataAsString();
     }
 
     /**
@@ -188,7 +187,7 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
         buf.append("tid='").append(tid).append("',");
         buf.append("tag='").append(tag).append("',");
         buf.append("topic='").append(topic).append("',");
-        buf.append("content='").append(content).append("',");
+        buf.append("body='").append(getBodyAsString()).append("',");
 
         for (Map.Entry<String, String> kv : source.metaMap().entrySet()) {
             if (kv.getKey().startsWith(MqConstants.MQ_ATTR_PREFIX)) {

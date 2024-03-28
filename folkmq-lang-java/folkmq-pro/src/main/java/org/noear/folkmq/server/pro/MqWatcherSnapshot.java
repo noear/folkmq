@@ -11,6 +11,7 @@ import org.noear.snack.core.Options;
 import org.noear.socketd.transport.core.Entity;
 import org.noear.socketd.transport.core.Flags;
 import org.noear.socketd.transport.core.Message;
+import org.noear.socketd.transport.core.entity.EntityDefault;
 import org.noear.socketd.transport.core.entity.StringEntity;
 import org.noear.socketd.transport.core.entity.MessageBuilder;
 import org.noear.socketd.utils.StrUtils;
@@ -226,6 +227,7 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
                 if (messageJsonStr.endsWith("}")) {
                     ONode messageJson = ONode.loadStr(messageJsonStr, Feature.DisThreadLocal);
 
+                    int ver = messageJson.get("v").getInt();
                     String metaString = messageJson.get("meta").getString();
                     String data = messageJson.get("data").getString();
 
@@ -234,7 +236,15 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
                         continue;
                     }
 
-                    Entity entity = new StringEntity(data).metaStringSet(metaString);
+                    EntityDefault entity = new EntityDefault();
+                    if (ver < 2) {
+                        //旧版用 string
+                        entity.dataSet(data.getBytes(StandardCharsets.UTF_8));
+                    } else {
+                        //新版用 base64 支持二进制
+                        entity.dataSet(Base64.getDecoder().decode(data));
+                    }
+                    entity.metaStringSet(metaString);
                     Message message = new MessageBuilder()
                             .sid(StrUtils.guid())
                             .flag(Flags.Message)
@@ -418,10 +428,11 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
                     }
 
                     try {
-                        Entity entity = messageHolder.getContent();
+                        Entity entity = messageHolder.getEntity();
                         ONode entityJson = new ONode(Options.def().add(Feature.DisThreadLocal));
+                        entityJson.set("v",2); //ver
                         entityJson.set("meta", entity.metaString());
-                        entityJson.set("data", entity.dataAsString());
+                        entityJson.set("data", Base64.getEncoder().encodeToString(entity.dataAsBytes()));
 
                         //一条写一行（大 json 容易坏掉）//也比较省内存
                         writer.write(entityJson.toJson());

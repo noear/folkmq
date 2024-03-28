@@ -19,8 +19,8 @@ public class MqMessageHolder implements Delayed {
     protected final MqMetasResolver mr;
     //发送人
     private final String sender;
-    //消息内容
-    private final EntityDefault content;
+    //消息实体
+    private final EntityDefault entity;
     //跟踪Id
     private final String tid;
     //投放目标
@@ -49,9 +49,9 @@ public class MqMessageHolder implements Delayed {
         this.mr = mr;
         this.atName = from.atName();
         this.sender = sender;
-        this.content = new EntityDefault().dataSet(from.data()).metaMapPut(from.metaMap());
+        this.entity = new EntityDefault().dataSet(from.data()).metaMapPut(from.metaMap());
 
-        mr.setConsumerGroup(content, consumerGroup);
+        mr.setConsumerGroup(entity, consumerGroup);
 
 
         this.isDone = new AtomicBoolean();
@@ -67,13 +67,13 @@ public class MqMessageHolder implements Delayed {
         this.distributeTime = distributeTimeRef;
 
         if (sequence) {
-            this.content.at(queueName);
+            this.entity.at(queueName);
         } else {
-            this.content.at(queueName + "!");
+            this.entity.at(queueName + "!");
         }
 
         if (transaction) {
-            this.content.at(sender);
+            this.entity.at(sender);
         }
     }
 
@@ -101,8 +101,8 @@ public class MqMessageHolder implements Delayed {
     /**
      * 获取消息内容
      */
-    public EntityDefault getContent() {
-        return content;
+    public EntityDefault getEntity() {
+        return entity;
     }
 
     /**
@@ -133,10 +133,10 @@ public class MqMessageHolder implements Delayed {
         distributeTime = distributeTimeRef;
 
         //设置新的派发次数和下次时间
-        mr.setTimes(content, distributeCount);
-        mr.setScheduled(content, distributeTime);
-        mr.setExpiration(content, null);
-        mr.setTransaction(content, false);
+        mr.setTimes(entity, distributeCount);
+        mr.setScheduled(entity, distributeTime);
+        mr.setExpiration(entity, null);
+        mr.setTransaction(entity, false);
 
         return this;
     }
@@ -208,12 +208,12 @@ public class MqMessageHolder implements Delayed {
         distributeTimeRef = MqNextTime.getNextTime(this);
 
         //设置新的派发次数和下次时间
-        mr.setTimes(content, distributeCount);
+        mr.setTimes(entity, distributeCount);
 
         if (isSequence() == false) {
             //如果不是顺序消息，调整队列里的派发时间；否则走外部了的时间控制
             distributeTime = distributeTimeRef;
-            mr.setScheduled(content, distributeTimeRef);
+            mr.setScheduled(entity, distributeTimeRef);
         }
 
         return this;

@@ -5,8 +5,8 @@ import org.noear.socketd.transport.core.Entity;
 import org.noear.socketd.transport.core.Flags;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.MessageInternal;
+import org.noear.socketd.transport.core.entity.EntityDefault;
 import org.noear.socketd.transport.core.entity.MessageBuilder;
-import org.noear.socketd.transport.core.entity.StringEntity;
 import org.noear.socketd.utils.StrUtils;
 
 import java.util.Map;
@@ -107,9 +107,9 @@ public class MqMetasResolverV1 implements MqMetasResolver {
      * @param topic   主题
      * @param message 消息
      */
-    public StringEntity publishEntityBuild(String topic, MqMessage message) {
+    public EntityDefault publishEntityBuild(String topic, MqMessage message) {
         //构建消息实体
-        StringEntity entity = new StringEntity(message.getContent());
+        EntityDefault entity = new EntityDefault().dataSet(message.getBody());
 
         entity.metaPut(MqMetasV1.MQ_META_TID, message.getTid());
         entity.metaPut(MqMetasV1.MQ_META_TOPIC, topic);

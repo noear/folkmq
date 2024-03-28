@@ -3,8 +3,8 @@ package org.noear.folkmq.common;
 import org.noear.folkmq.FolkMQ;
 import org.noear.folkmq.client.MqMessage;
 import org.noear.socketd.transport.core.*;
+import org.noear.socketd.transport.core.entity.EntityDefault;
 import org.noear.socketd.transport.core.entity.MessageBuilder;
-import org.noear.socketd.transport.core.entity.StringEntity;
 import org.noear.socketd.utils.StrUtils;
 
 import java.util.Map;
@@ -113,9 +113,9 @@ public class MqMetasResolverV2 implements MqMetasResolver {
      * @param message 消息
      */
     @Override
-    public StringEntity publishEntityBuild(String topic, MqMessage message) {
+    public EntityDefault publishEntityBuild(String topic, MqMessage message) {
         //构建消息实体
-        StringEntity entity = new StringEntity(message.getContent());
+        EntityDefault entity = new EntityDefault().dataSet(message.getBody());
 
         entity.metaPut(MqMetasV2.MQ_META_TID, message.getTid());
         entity.metaPut(MqMetasV2.MQ_META_TOPIC, topic);

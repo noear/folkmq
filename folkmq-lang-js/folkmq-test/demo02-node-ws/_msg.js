@@ -7,7 +7,7 @@ async function main() {
 
     //订阅
     client.subscribe("test", null, true, message => {
-        console.log(message.getContent());
+        console.log(message.getBodyAsString());
     });
 
     //发布

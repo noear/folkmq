@@ -6,13 +6,13 @@ async function main() {
         .connect();
 
     client.transactionCheckback(m=>{
-        console.info("check: " + m.getContent());
+        console.info("check: " + m.getBodyAsString());
         m.acknowledge(true);
     })
 
     //订阅
     client.subscribe("test", null, true, message => {
-        console.log(message.getContent());
+        console.log(message.getBodyAsString());
     });
 
     //发布

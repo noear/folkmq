@@ -393,7 +393,11 @@ export class MqClientDefault implements MqClientInternal {
         if (message.isTransaction()) {
             return message.getTmid();
         } else if (message.isSequence()) {
-            return topic;
+            if (message.getSequenceSharding()) {
+                return message.getSequenceSharding();
+            } else {
+                return topic;
+            }
         } else {
             return null;
         }

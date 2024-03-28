@@ -57,6 +57,7 @@ export class MqMessage implements MqMessageBase {
     private _scheduled: Date | null = null;
     private _expiration: Date | null = null;
     private _sequence: boolean = false;
+    private _sequenceSharding: string | null = null;
     private _qos: number = 1;
 
     protected _attrMap = new Map<string, string>;
@@ -99,6 +100,10 @@ export class MqMessage implements MqMessageBase {
         return this._sequence;
     }
 
+    getSequenceSharding(): string | null {
+        return this._sequenceSharding;
+    }
+
     getQos(): number {
         return this._qos;
     }
@@ -124,8 +129,11 @@ export class MqMessage implements MqMessageBase {
         return this;
     }
 
-    sequence(sequence: boolean): MqMessage {
+    sequence(sequence: boolean, sharding?: string): MqMessage {
         this._sequence = sequence;
+        if (sharding) {
+            this._sequenceSharding = (sequence ? sharding : null);
+        }
         return this;
     }
 

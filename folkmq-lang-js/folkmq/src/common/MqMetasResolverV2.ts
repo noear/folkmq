@@ -4,10 +4,11 @@ import { MqMessage } from "../client/MqMessage";
 import {MqMetasResolver} from "./MqMetasResolver";
 import {SocketD} from "@noear/socket.d";
 import {MqConstants} from "./MqConstants";
-import {Flags} from "@noear/socket.d/transport/core/Constants";
+import {Flags} from "@noear/socket.d/transport/core/Flags";
 import {StrUtils} from "@noear/socket.d/utils/StrUtils";
 import {MqMetasV2} from "./MqMetasV2";
 import {FolkMQ} from "../FolkMQ";
+import {EntityMetas} from "@noear/socket.d/transport/core/EntityMetas";
 
 export class MqMetasResolverV2 implements MqMetasResolver {
     version(): number {
@@ -121,6 +122,11 @@ export class MqMetasResolverV2 implements MqMetasResolver {
 
             if (message.isSequence()) {
                 entity.metaPut(MqMetasV2.MQ_META_SEQUENCE, "1");
+
+                if(message.isTransaction() == false && message.getSequenceSharding()){
+                    //不是事务，并且有顺序分片
+                    entity.metaPut(EntityMetas.META_X_Hash, message.getSequenceSharding());
+                }
             }
         } else {
             entity.at(MqConstants.BROKER_AT_SERVER);

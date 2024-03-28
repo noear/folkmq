@@ -4,7 +4,7 @@ import { MqMessage } from "../client/MqMessage";
 import {MqMetasResolver} from "./MqMetasResolver";
 import {SocketD} from "@noear/socket.d";
 import {MqConstants} from "./MqConstants";
-import {Flags} from "@noear/socket.d/transport/core/Constants";
+import {Flags} from "@noear/socket.d/transport/core/Flags";
 import {StrUtils} from "@noear/socket.d/utils/StrUtils";
 import {MqMetasV2} from "./MqMetasV2";
 import {MqMetasV1} from "./MqMetasV1";

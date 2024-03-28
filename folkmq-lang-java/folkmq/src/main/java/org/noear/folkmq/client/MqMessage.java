@@ -35,6 +35,8 @@ public class MqMessage implements MqMessageBase {
     }
 
     public MqMessage(byte[] body) {
+        MqAssert.requireNonNull(body, "Param 'body' can't be null");
+
         this.tid = StrUtils.guid();
         this.body = body;
     }

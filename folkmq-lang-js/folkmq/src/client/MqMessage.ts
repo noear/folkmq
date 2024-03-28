@@ -1,5 +1,6 @@
 import {StrUtils} from "@noear/socket.d/utils/StrUtils";
 import {MqTransaction} from "./MqTransaction";
+import {Buffer, ByteBuffer} from "@noear/socket.d/transport/core/Buffer";
 
 export interface MqMessageBase {
     /**
@@ -19,8 +20,8 @@ export interface MqMessageBase {
 
     /**
      * 内容
-     */
-    getContent(): string;
+     * */
+    getBody(): Buffer;
 
     /**
      * 过期时间 //::long
@@ -50,7 +51,7 @@ export interface MqMessageBase {
 
 export class MqMessage implements MqMessageBase {
     private readonly _tid: string;
-    private readonly _content: string;
+    private readonly _body: ByteBuffer;
 
     private _sender: string | null = null;
     private _tag: string | null = null;
@@ -63,9 +64,13 @@ export class MqMessage implements MqMessageBase {
     protected _attrMap = new Map<string, string>;
     protected _transaction: MqTransaction;
 
-    constructor(content: string) {
+    constructor(body: string | ArrayBuffer) {
         this._tid = StrUtils.guid();
-        this._content = content;
+        if (body instanceof ArrayBuffer) {
+            this._body = new ByteBuffer(body);
+        } else {
+            this._body = new ByteBuffer(StrUtils.strToBuf(body));
+        }
     }
 
     getSender(): string | null {
@@ -80,8 +85,8 @@ export class MqMessage implements MqMessageBase {
         return this._tag;
     }
 
-    getContent(): string {
-        return this._content;
+    getBody(): Buffer {
+        return this._body;
     }
 
     getScheduled(): Date | null {

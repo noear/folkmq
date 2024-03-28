@@ -1,4 +1,4 @@
-import {Entity, StringEntity} from "@noear/socket.d/transport/core/Entity";
+import {Entity, EntityDefault, StringEntity} from "@noear/socket.d/transport/core/Entity";
 import {MqMessage} from "../client/MqMessage";
 import {Message} from "@noear/socket.d/transport/core/Message";
 
@@ -100,7 +100,7 @@ export interface MqMetasResolver {
      * @param topic   主题
      * @param message 消息
      */
-    publishEntityBuild(topic: string, message: MqMessage): StringEntity;
+    publishEntityBuild(topic: string, message: MqMessage): EntityDefault;
 
     /**
      * 路由消息构建

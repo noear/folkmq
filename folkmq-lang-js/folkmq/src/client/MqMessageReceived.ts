@@ -5,12 +5,25 @@ import {MqConstants} from "../common/MqConstants";
 import {Entity} from "@noear/socket.d/transport/core/Entity";
 import {MqUtils} from "../common/MqUtils";
 import {MqMessageBase} from "./MqMessage";
+import {Buffer} from "@noear/socket.d/transport/core/Buffer";
 
 export interface MqMessageReceived extends MqMessageBase{
     /**
      * 主题
      */
     getTopic(): string;
+
+    /**
+     * 内容
+     *
+     * @deprecated 1.4
+     * */
+    getContent(): string;
+
+    /**
+     * 内容
+     */
+    getBodyAsString(): string;
 
     /**
      * 消费者组
@@ -43,7 +56,6 @@ export class MqMessageReceivedImpl implements MqMessageReceived {
     private readonly _tag: string;
     private readonly _topic: string;
     private readonly _consumerGroup: string;
-    private readonly _content: string;
     private readonly _expiration: Date | null;
     private readonly _sequence: boolean;
     private readonly _transaction: boolean;
@@ -54,8 +66,6 @@ export class MqMessageReceivedImpl implements MqMessageReceived {
         this._clientInternal = clientInternal;
         this._session = session;
         this._source = source;
-
-        this._content = source.dataAsString();
 
         let mr = MqUtils.getOf(source);
 
@@ -118,11 +128,19 @@ export class MqMessageReceivedImpl implements MqMessageReceived {
         return this._consumerGroup;
     }
 
+    getContent(): string {
+        return this.getBodyAsString();
+    }
+
+    getBody(): Buffer {
+        return this._source.data();
+    }
+
     /**
      * 内容
      */
-    getContent(): string {
-        return this._content;
+    getBodyAsString(): string {
+        return this._source.dataAsString();
     }
 
     /**
@@ -180,7 +198,7 @@ export class MqMessageReceivedImpl implements MqMessageReceived {
             "tid='" + this._tid + '\'' +
             ", tag='" + this._tag + '\'' +
             ", topic='" + this._topic + '\'' +
-            ", content='" + this._content + '\'' +
+            ", body='" + this.getBodyAsString() + '\'' +
             '}';
     }
 }

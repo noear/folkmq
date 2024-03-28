@@ -1,4 +1,4 @@
-import { Entity, StringEntity } from "@noear/socket.d/transport/core/Entity";
+import {Entity, EntityDefault, StringEntity} from "@noear/socket.d/transport/core/Entity";
 import {Message, MessageBuilder} from "@noear/socket.d/transport/core/Message";
 import { MqMessage } from "../client/MqMessage";
 import {MqMetasResolver} from "./MqMetasResolver";
@@ -83,9 +83,9 @@ export class MqMetasResolverV2 implements MqMetasResolver {
         m.putMeta(MqMetasV2.MQ_META_TRANSACTION, (isTransaction ? "1" : "0"));
     }
 
-    publishEntityBuild(topic: string, message: MqMessage): StringEntity {
+    publishEntityBuild(topic: string, message: MqMessage): EntityDefault {
         //构建消息实体
-        const entity = SocketD.newEntity(message.getContent());
+        const entity = SocketD.newEntity(message.getBody().getArray()!);
 
         entity.metaPut(MqMetasV2.MQ_META_TID, message.getTid());
         entity.metaPut(MqMetasV2.MQ_META_TOPIC, topic);

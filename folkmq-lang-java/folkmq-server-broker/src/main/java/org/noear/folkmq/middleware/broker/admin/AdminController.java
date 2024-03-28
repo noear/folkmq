@@ -69,7 +69,7 @@ public class AdminController extends BaseController {
             //无效许可证
             ModelAndView vm = view("admin_licence_invalid");
 
-            vm.put("sn", "非法授权（请获取正版授权：<a href='https://folkmq.noear.org' target='_blank'>https://folkmq.noear.org</a>）");
+            vm.put("sn", "非法授权（请获取企业版授权：<a href='https://folkmq.noear.org' target='_blank'>https://folkmq.noear.org</a>）");
 
             vm.put("isAuthorized", false);
             return vm;
@@ -81,7 +81,7 @@ public class AdminController extends BaseController {
         ModelAndView vm = view("admin_licence");
 
         if (LicenceUtils.getGlobal().isValid() == false) {
-            vm.put("sn", "非法授权（请获取正版授权：<a href='https://folkmq.noear.org' target='_blank'>https://folkmq.noear.org</a>）");
+            vm.put("sn", "非法授权（请获取企业版授权：<a href='https://folkmq.noear.org' target='_blank'>https://folkmq.noear.org</a>）");
 
             vm.put("isAuthorized", false);
             vm.view("admin_licence_invalid");

@@ -31,7 +31,8 @@ public class App {
             //加载环境变量
             app.cfg().loadEnv("folkmq.");
 
-            //打印语可证
+            //打印许可证
+            LicenceUtils.getGlobal().load();
             app.onEvent(AppLoadEndEvent.class, Integer.MAX_VALUE, e -> {
                 LogUtil.global().info(LicenceUtils.getGlobal().getDescription());
             });

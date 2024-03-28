@@ -32,14 +32,23 @@ public class LicenceUtils {
     private boolean isValid;
     private String description;
 
+    /**
+     * 串号
+     */
     public String getSn() {
         return sn;
     }
 
+    /**
+     * 产品版本
+     */
     public int getEdition() {
         return edition;
     }
 
+    /**
+     * 产品版本名字
+     */
     public String getEditionName() {
         if (edition == 23) {
             return "Enterprise Ultimate Edition";
@@ -54,14 +63,23 @@ public class LicenceUtils {
         }
     }
 
+    /**
+     * 订阅者
+     */
     public String getSubscribe() {
         return subscribe;
     }
 
+    /**
+     * 订阅月数
+     */
     public int getMonths() {
         return months;
     }
 
+    /**
+     * 订阅月数字符串模式
+     */
     public String getMonthsStr() {
         if (months >= 36) {
             return "永久";
@@ -70,18 +88,30 @@ public class LicenceUtils {
         }
     }
 
+    /**
+     * 版本号
+     */
     public String getVersion() {
         return version;
     }
 
+    /**
+     * 客户
+     */
     public String getConsumer() {
         return consumer;
     }
 
+    /**
+     * 是否有效
+     */
     public boolean isValid() {
         return isValid;
     }
 
+    /**
+     * 是否过期
+     */
     public boolean isExpired() {
         if (months >= 36) {
             return false;
@@ -98,6 +128,9 @@ public class LicenceUtils {
         }
     }
 
+    /**
+     * 描述
+     */
     public String getDescription() {
         if (description == null) {
             try {
@@ -141,5 +174,13 @@ public class LicenceUtils {
         }
 
         return description;
+    }
+
+
+    /**
+     * 加载（解析）
+     */
+    public void load() {
+        getDescription();
     }
 }

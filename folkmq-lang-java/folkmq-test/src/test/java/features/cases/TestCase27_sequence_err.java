@@ -35,7 +35,7 @@ public class TestCase27_sequence_err extends BaseTestCase {
 
         List<Integer> msgList = new ArrayList<>();
         client.subscribe("demo", "a", ((message) -> {
-            int id = Integer.parseInt(message.getContent());
+            int id = Integer.parseInt(message.getBodyAsString());
             if (message.getTimes() > 0 || id % 2 == 0) {
                 msgList.add(id);
                 countDownLatch.countDown();

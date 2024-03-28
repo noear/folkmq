@@ -28,7 +28,7 @@ public class PublishTest {
 
         List<Integer> msgList = new ArrayList<>();
         client.subscribe("demo", "a", ((message) -> {
-            msgList.add(Integer.parseInt(message.getContent()));
+            msgList.add(Integer.parseInt(message.getBodyAsString()));
             countDownLatch.countDown();
         }));
 

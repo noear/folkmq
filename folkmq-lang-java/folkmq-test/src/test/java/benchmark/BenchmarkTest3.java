@@ -29,11 +29,11 @@ public class BenchmarkTest3 {
 
         //订阅
         client.subscribe("hot", "demo", message -> {
-            //System.out.println("::" +  message.getContent());
+            //System.out.println("::" +  message.getBodyAsString());
         });
 
         client.subscribe("test", "test", message -> {
-            //System.out.println("::" +  message.getContent());
+            //System.out.println("::" +  message.getBodyAsString());
             consumeDownLatch.countDown();
         });
 

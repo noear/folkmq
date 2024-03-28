@@ -1,13 +1,11 @@
 package features.cases;
 
 import org.noear.folkmq.FolkMQ;
-import org.noear.folkmq.client.MqClientDefault;
 import org.noear.folkmq.client.MqMessage;
 import org.noear.folkmq.server.MqServerDefault;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -37,7 +35,7 @@ public class TestCase20_sequence_async extends BaseTestCase {
 
         List<Integer> msgList = new ArrayList<>();
         client.subscribe("demo", "a", ((message) -> {
-            msgList.add(Integer.parseInt(message.getContent()));
+            msgList.add(Integer.parseInt(message.getBodyAsString()));
             countDownLatch.countDown();
         }));
 

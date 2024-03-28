@@ -29,7 +29,7 @@ public class SendTest {
 
         List<Integer> msgList = new ArrayList<>();
         client.listen( ((message) -> {
-            msgList.add(Integer.parseInt(message.getContent()));
+            msgList.add(Integer.parseInt(message.getBodyAsString()));
             countDownLatch.countDown();
         }));
 

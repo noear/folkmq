@@ -1,7 +1,6 @@
 package features.cases;
 
 import org.noear.folkmq.FolkMQ;
-import org.noear.folkmq.client.MqClientDefault;
 import org.noear.folkmq.client.MqMessage;
 import org.noear.folkmq.server.MqServerDefault;
 
@@ -36,7 +35,7 @@ public class TestCase19_sequence extends BaseTestCase {
 
         List<Integer> msgList = new ArrayList<>();
         client.subscribe("demo", "a", ((message) -> {
-            msgList.add(Integer.parseInt(message.getContent()));
+            msgList.add(Integer.parseInt(message.getBodyAsString()));
             countDownLatch.countDown();
         }));
 

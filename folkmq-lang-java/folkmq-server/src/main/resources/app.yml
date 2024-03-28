@@ -10,6 +10,8 @@ solon.app:
 solon:
   stop:
     delay: "4s"
+  config:
+    add: "./data/app.yml"
 
 solon.logging.appender:
   console:

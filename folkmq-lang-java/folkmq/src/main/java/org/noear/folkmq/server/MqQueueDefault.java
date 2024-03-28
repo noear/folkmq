@@ -127,12 +127,11 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
         if (messageHolder != null) {
             if (messageHolder.isTransaction()) {
                 //转发
-                transpond0(messageHolder);
+                return transpond0(messageHolder);
             } else {
                 //派发
-                distribute0(messageHolder);
+                return distribute0(messageHolder);
             }
-            return true;
         } else {
             return false;
         }
@@ -237,13 +236,13 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
     /**
      * 执行转发
      */
-    protected void transpond0(MqMessageHolder messageHolder) {
+    protected boolean transpond0(MqMessageHolder messageHolder) {
         messageCountSub(messageHolder);
 
         if (messageHolder.isDone()) {
             //已完成
             messageMap.remove(messageHolder.getTid());
-            return;
+            return true;
         }
 
         if (messageHolder.getExpiration() > 0 && messageHolder.getExpiration() < System.currentTimeMillis()) {
@@ -253,7 +252,7 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
             if (log.isWarnEnabled()) {
                 log.warn("MqMessage have expired, tid={}", messageHolder.getTid());
             }
-            return;
+            return true;
         }
 
 
@@ -323,18 +322,20 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
                 }
             }
         }
+
+        return true;
     }
 
     /**
      * 执行派发
      */
-    protected void distribute0(MqMessageHolder messageHolder) {
+    protected boolean distribute0(MqMessageHolder messageHolder) {
         messageCountSub(messageHolder);
 
         if (messageHolder.isDone()) {
             //已完成
             messageMap.remove(messageHolder.getTid());
-            return;
+            return true;
         }
 
         if (messageHolder.getExpiration() > 0 && messageHolder.getExpiration() < System.currentTimeMillis()) {
@@ -344,14 +345,14 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
             if (log.isWarnEnabled()) {
                 log.warn("MqMessage have expired, tid={}", messageHolder.getTid());
             }
-            return;
+            return true;
         }
 
         if (messageHolder.isSequence()) {
             if(messageHolder.getDistributeTimeRef() > System.currentTimeMillis()){
                 //如果未到，提前结束
                 internalAdd(messageHolder);
-                return;
+                return false;
             }
 
             //如果是顺序消息
@@ -401,6 +402,8 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
                         messageHolder.getTid());
             }
         }
+
+        return true;
     }
 
     /**

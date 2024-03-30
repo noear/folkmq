@@ -48,7 +48,7 @@ export class FolkMQ {
     /**
      * 新建消息
      * */
-    static newMessage(content: string): MqMessage {
+    static newMessage(content: string | ArrayBuffer): MqMessage {
         return new MqMessage(content);
     }
 
@@ -62,7 +62,7 @@ export class FolkMQ {
     /**
      * 新建实体
      * */
-    static newEntity(data?: String | Blob | ArrayBuffer): Entity {
+    static newEntity(data?: string | Blob | ArrayBuffer): Entity {
         return SocketD.newEntity(data);
     }
 }

@@ -24,5 +24,11 @@
             <groupId>org.noear</groupId>
             <artifactId>snack3</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-core</artifactId>
+            <version>${micrometer.version}</version>
+        </dependency>
     </dependencies>
 </project>

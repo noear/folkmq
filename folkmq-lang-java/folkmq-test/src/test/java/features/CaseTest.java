@@ -178,4 +178,11 @@ public class CaseTest {
         testCase.start();
         testCase.stop();
     }
+
+    @Test
+    public void TestCase29_expiration2() throws Exception {
+        BaseTestCase testCase = new TestCase29_expiration2(2029);
+        testCase.start();
+        testCase.stop();
+    }
 }

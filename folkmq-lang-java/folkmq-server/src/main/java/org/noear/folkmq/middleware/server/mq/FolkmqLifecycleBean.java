@@ -14,10 +14,7 @@ import org.noear.folkmq.middleware.server.common.MqServerConfig;
 import org.noear.snack.ONode;
 import org.noear.socketd.SocketD;
 import org.noear.socketd.cluster.ClusterClientSession;
-import org.noear.socketd.transport.client.ClientSession;
-import org.noear.socketd.transport.core.Session;
 import org.noear.socketd.transport.core.entity.StringEntity;
-import org.noear.socketd.utils.RunUtils;
 import org.noear.solon.Solon;
 import org.noear.solon.Utils;
 import org.noear.solon.annotation.Component;
@@ -201,15 +198,17 @@ public class FolkmqLifecycleBean implements LifecycleBean {
     @Override
     public void prestop() throws Throwable {
         if (localServer != null) {
-            for (Session s1 : localServer.getServerInternal().getSessionAll()) {
-                RunUtils.runAndTry(s1::closeStarting);
-            }
+            localServer.prestop();
+//            for (Session s1 : localServer.getServerInternal().getSessionAll()) {
+//                RunUtils.runAndTry(s1::closeStarting);
+//            }
         }
 
         if (brokerSession != null) {
-            for (ClientSession s1 : brokerSession.getSessionAll()) {
-                RunUtils.runAndTry(s1::closeStarting);
-            }
+            brokerSession.preclose();
+//            for (ClientSession s1 : brokerSession.getSessionAll()) {
+//                RunUtils.runAndTry(s1::closeStarting);
+//            }
         }
 
 

@@ -42,6 +42,11 @@ public interface MqServer {
     MqServer start(int port) throws Exception;
 
     /**
+     * 预停止
+     * */
+    void prestop();
+
+    /**
      * 停止
      */
     void stop();

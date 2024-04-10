@@ -110,6 +110,11 @@ public class MqServerDefault implements MqServer {
         return this;
     }
 
+    @Override
+    public void prestop() {
+        server.prestop();
+    }
+
     /**
      * 停止
      */

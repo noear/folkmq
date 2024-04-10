@@ -17,7 +17,7 @@
     <dependencies>
         <dependency>
             <groupId>org.noear</groupId>
-            <artifactId>folkmq-pro</artifactId>
+            <artifactId>folkmq-watcher</artifactId>
         </dependency>
 
         <dependency>

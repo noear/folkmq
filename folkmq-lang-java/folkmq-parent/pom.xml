@@ -21,7 +21,7 @@
         <folkmq.version>1.4.1</folkmq.version>
         <socketd.version>2.4.10</socketd.version>
         <snack3.version>3.2.92</snack3.version>
-        <solon.version>2.7.3</solon.version>
+        <solon.version>2.7.4</solon.version>
 
         <micrometer.version>1.11.1</micrometer.version>
         <slf4j.version>2.0.12</slf4j.version>
@@ -35,7 +35,7 @@
 
     <modules>
         <module>../folkmq</module>
-        <module>../folkmq-pro</module>
+        <module>../folkmq-watcher</module>
         <module>../folkmq-solon</module>
         <module>../folkmq-transport-java-tcp</module>
         <module>../folkmq-transport-java-websocket</module>
@@ -53,7 +53,7 @@
 
             <dependency>
                 <groupId>org.noear</groupId>
-                <artifactId>folkmq-pro</artifactId>
+                <artifactId>folkmq-watcher</artifactId>
                 <version>${folkmq.version}</version>
             </dependency>
 

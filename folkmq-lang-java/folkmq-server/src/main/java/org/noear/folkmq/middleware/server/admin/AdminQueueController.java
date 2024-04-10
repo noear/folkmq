@@ -4,7 +4,7 @@ import org.noear.folkmq.common.MqConstants;
 import org.noear.folkmq.server.MqQueue;
 import org.noear.folkmq.server.MqServiceInternal;
 import org.noear.folkmq.middleware.server.common.MetricsConfig;
-import org.noear.folkmq.server.pro.MqWatcherSnapshotPlus;
+import org.noear.folkmq.server.watcher.MqWatcherSnapshotPlus;
 import org.noear.folkmq.middleware.server.admin.dso.QueueForceService;
 import org.noear.folkmq.middleware.server.admin.dso.ViewUtils;
 import org.noear.folkmq.middleware.server.admin.model.QueueVo;

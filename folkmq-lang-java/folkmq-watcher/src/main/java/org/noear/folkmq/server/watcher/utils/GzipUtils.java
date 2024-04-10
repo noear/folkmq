@@ -1,4 +1,4 @@
-package org.noear.folkmq.server.pro.utils;
+package org.noear.folkmq.server.watcher.utils;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

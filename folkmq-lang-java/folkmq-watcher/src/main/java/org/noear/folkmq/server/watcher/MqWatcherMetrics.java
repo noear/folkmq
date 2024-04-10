@@ -1,4 +1,4 @@
-package org.noear.folkmq.server.pro;
+package org.noear.folkmq.server.watcher;
 
 import io.micrometer.core.instrument.Metrics;
 import org.noear.folkmq.server.MqMessageHolder;

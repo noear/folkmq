@@ -1,10 +1,10 @@
-package org.noear.folkmq.server.pro;
+package org.noear.folkmq.server.watcher;
 
 import org.noear.folkmq.common.MqConstants;
 import org.noear.folkmq.common.MqMetasResolver;
 import org.noear.folkmq.common.MqUtils;
 import org.noear.folkmq.server.*;
-import org.noear.folkmq.server.pro.utils.IoUtils;
+import org.noear.folkmq.server.watcher.utils.IoUtils;
 import org.noear.snack.ONode;
 import org.noear.snack.core.Feature;
 import org.noear.snack.core.Options;
@@ -12,7 +12,6 @@ import org.noear.socketd.transport.core.Entity;
 import org.noear.socketd.transport.core.Flags;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.entity.EntityDefault;
-import org.noear.socketd.transport.core.entity.StringEntity;
 import org.noear.socketd.transport.core.entity.MessageBuilder;
 import org.noear.socketd.utils.StrUtils;
 import org.slf4j.Logger;

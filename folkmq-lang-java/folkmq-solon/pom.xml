@@ -23,7 +23,7 @@
         <dependency>
             <groupId>org.noear</groupId>
             <artifactId>solon</artifactId>
-            <version>2.7.0</version>
+            <version>${solon.version}</version>
         </dependency>
     </dependencies>
 </project>

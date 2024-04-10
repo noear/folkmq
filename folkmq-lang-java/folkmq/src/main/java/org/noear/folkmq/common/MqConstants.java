@@ -156,7 +156,7 @@ public interface MqConstants {
     String MQ_TRAN_CONSUMER_GROUP = "!";
 
     /**
-     * 事件缓存队列消息费者
+     * 消息属性前缀
      * */
     String MQ_ATTR_PREFIX = "!";
 

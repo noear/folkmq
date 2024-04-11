@@ -31,19 +31,32 @@ public class MqMessage implements MqMessageBase {
     protected MqTransaction transaction;
 
     public MqMessage(String body) {
-        this(body.getBytes(StandardCharsets.UTF_8));
+        this(body, null);
     }
 
     public MqMessage(byte[] body) {
+        this(body, null);
+    }
+
+    public MqMessage(String body, String tid) {
+        this(body.getBytes(StandardCharsets.UTF_8), tid);
+    }
+
+    public MqMessage(byte[] body, String tid) {
         MqAssert.requireNonNull(body, "Param 'body' can't be null");
 
-        this.tid = StrUtils.guid();
+        if (StrUtils.isEmpty(tid)) {
+            this.tid = StrUtils.guid();
+        } else {
+            this.tid = tid;
+        }
+
         this.body = body;
     }
 
     /**
      * 发送者
-     * */
+     */
     @Override
     public String getSender() {
         return sender;
@@ -59,7 +72,7 @@ public class MqMessage implements MqMessageBase {
 
     /**
      * 标签
-     * */
+     */
     @Override
     public String getTag() {
         return tag;
@@ -116,7 +129,7 @@ public class MqMessage implements MqMessageBase {
         return this;
     }
 
-    public MqMessage asJson(){
+    public MqMessage asJson() {
         attr("Content-Type", "application/json");
         return this;
     }

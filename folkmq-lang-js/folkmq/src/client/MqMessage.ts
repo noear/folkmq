@@ -63,8 +63,13 @@ export class MqMessage implements MqMessageBase {
     protected _attrMap = new Map<string, string>;
     protected _transaction: MqTransaction;
 
-    constructor(body: string | ArrayBuffer) {
-        this._tid = StrUtils.guid();
+    constructor(body: string | ArrayBuffer, tid?: string) {
+        if (tid) {
+            this._tid = tid;
+        } else {
+            this._tid = StrUtils.guid();
+        }
+
         if (body instanceof ArrayBuffer) {
             this._body = body;
         } else {

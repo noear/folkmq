@@ -22,7 +22,7 @@ public class SequenceTest {
                 .connect();
 
         //客户端
-        int count = 100;
+        int count = 1_000;
         CountDownLatch countDownLatch = new CountDownLatch(count);
 
 
@@ -32,9 +32,9 @@ public class SequenceTest {
             countDownLatch.countDown();
         }));
 
-//        for (int i = 0; i < count; i++) {
-//            client.publishAsync("demo", new MqMessage(String.valueOf(i)).sequence(true));
-//        }
+        for (int i = 0; i < count; i++) {
+            client.publishAsync("demo", new MqMessage(String.valueOf(i)).sequence(true));
+        }
 
         countDownLatch.await(200, TimeUnit.SECONDS);
 

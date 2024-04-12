@@ -162,14 +162,6 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
         return times;
     }
 
-
-    @Deprecated
-    @Override
-    public void acknowledge(boolean isOk, Entity reply) throws IOException {
-        //发送“回执”，向服务端反馈消费情况
-        clientInternal.reply(session, source, this, isOk, reply);
-    }
-
     @Override
     public void acknowledge(boolean isOk) throws IOException {
         clientInternal.reply(session, source, this, isOk, null);

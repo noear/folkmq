@@ -31,7 +31,7 @@ public class TestCase25_rpc extends BaseTestCase {
         client.listen(new MqRouter(m -> m.getTag()).doOnConsume(m -> {
 
         }).doOn("test.hello", m -> {
-            m.acknowledge(new StringEntity(m.getSender() + ": me to! rev: " + m.getBodyAsString()));
+            m.response(new StringEntity(m.getSender() + ": me to! rev: " + m.getBodyAsString()));
         }));
 
 

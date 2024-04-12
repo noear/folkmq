@@ -50,22 +50,4 @@ public interface MqMessageReceived extends MqMessageBase {
      * 响应
      */
     void response(Entity entity) throws IOException;
-
-    /**
-     * 回执
-     *
-     * @deprecated 1.2
-     */
-    @Deprecated
-    default void acknowledge(Entity reply) throws IOException {
-        acknowledge(true, reply);
-    }
-
-    /**
-     * 回执
-     *
-     * @deprecated 1.2
-     */
-    @Deprecated
-    void acknowledge(boolean isOk, Entity reply) throws IOException;
 }

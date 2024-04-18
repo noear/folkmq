@@ -24,14 +24,20 @@ public class MqServerDefault implements MqServer {
     //服务端配置处理
     private ServerConfigHandler serverConfigHandler;
 
-
-    public MqServerDefault(String schema) {
+    public MqServerDefault(String schema, MqServiceListener serverListener) {
         if(StrUtils.isEmpty(schema)){
             schema = "sd:tcp";
         }
-
         serverSchema = schema;
-        serverListener = new MqServiceListener(false);
+        if(serverListener == null){
+            this.serverListener = new MqServiceListener(false);
+        }else{
+            this.serverListener = serverListener;
+        }
+    }
+
+    public MqServerDefault(String schema) {
+        this(schema, null);
     }
 
     public MqServerDefault() {

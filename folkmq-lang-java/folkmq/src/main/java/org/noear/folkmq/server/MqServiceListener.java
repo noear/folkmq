@@ -320,7 +320,7 @@ public class MqServiceListener extends MqServiceListenerBase implements MqServic
         doOn(event, handler);
     }
 
-    private void onSubscribe(Session s, Message m) throws IOException {
+    protected void onSubscribe(Session s, Message m) throws IOException {
         String is_batch = m.meta(MqConstants.MQ_META_BATCH);
 
         if ("1".equals(is_batch)) {
@@ -351,7 +351,7 @@ public class MqServiceListener extends MqServiceListenerBase implements MqServic
         }
     }
 
-    private void onUnsubscribe(Session s, Message m) throws IOException {
+    protected void onUnsubscribe(Session s, Message m) throws IOException {
         String topic = m.meta(MqConstants.MQ_META_TOPIC);
         String consumerGroup = m.meta(MqConstants.MQ_META_CONSUMER_GROUP);
 

@@ -22,7 +22,7 @@ public class MqMessageHolder implements Delayed {
     //消息实体
     private final EntityDefault entity;
     //跟踪Id
-    private final String tid;
+    private final String key;
     //投放目标
     private final String atName;
     //质量等级（0 或 1）
@@ -45,7 +45,7 @@ public class MqMessageHolder implements Delayed {
     //是否完成
     private AtomicBoolean isDone;
 
-    public MqMessageHolder(MqMetasResolver mr, String queueName, String consumerGroup, Message from, String tid, int qos, boolean sequence, long expiration, boolean transaction, String sender, int distributeCount, long distributeTime) {
+    public MqMessageHolder(MqMetasResolver mr, String queueName, String consumerGroup, Message from, String key, int qos, boolean sequence, long expiration, boolean transaction, String sender, int distributeCount, long distributeTime) {
         this.mr = mr;
         this.atName = from.atName();
         this.sender = sender;
@@ -56,7 +56,7 @@ public class MqMessageHolder implements Delayed {
 
         this.isDone = new AtomicBoolean();
 
-        this.tid = tid;
+        this.key = key;
         this.qos = qos;
         this.expiration = expiration;
         this.sequence = sequence;
@@ -85,17 +85,17 @@ public class MqMessageHolder implements Delayed {
     }
 
     /**
-     * 获取事务Id
-     */
-    public String getTid() {
-        return tid;
-    }
-
-    /**
      * 获取投放目标
      */
     public String getAtName() {
         return atName;
+    }
+
+    /**
+     * 获取消息主键
+     */
+    public String getKey() {
+        return key;
     }
 
     /**

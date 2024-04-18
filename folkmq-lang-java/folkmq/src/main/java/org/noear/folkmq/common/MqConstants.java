@@ -11,11 +11,15 @@ public interface MqConstants {
      * 版本号
      */
     String FOLKMQ_VERSION = "folkmq-version";
+    /**
+     * 命名空间
+     */
+    String FOLKMQ_NAMESPACE = "folkmq-namespace";
 
     /**
-     * 元信息：消息跟踪Id
+     * 元信息：消息主键
      */
-    String MQ_META_TID = "mq.tid";
+    String MQ_META_KEY = "mq.tid";
 
     /**
      * 元信息：消息主题

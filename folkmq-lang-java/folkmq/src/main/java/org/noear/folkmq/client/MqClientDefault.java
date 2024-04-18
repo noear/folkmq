@@ -120,6 +120,10 @@ public class MqClientDefault implements MqClientInternal {
                             .codecThreads(1)
                             .exchangeThreads(1);
 
+                    if (StrUtils.isNotEmpty(namespace)) {
+                        c.metaPut(MqConstants.FOLKMQ_NAMESPACE, namespace);
+                    }
+
                     if (clientConfigHandler != null) {
                         clientConfigHandler.clientConfig(c);
                     }
@@ -374,7 +378,7 @@ public class MqClientDefault implements MqClientInternal {
 
         Entity entity = new StringEntity("")
                 .metaPut(MqConstants.MQ_META_TOPIC, topic)
-                .metaPut(MqConstants.MQ_META_TID, key)
+                .metaPut(MqConstants.MQ_META_KEY, key)
                 .at(MqConstants.BROKER_AT_SERVER_ALL);
 
         //::Qos1
@@ -410,7 +414,7 @@ public class MqClientDefault implements MqClientInternal {
         CompletableFuture<Boolean> future = new CompletableFuture<>();
         Entity entity = new StringEntity("")
                 .metaPut(MqConstants.MQ_META_TOPIC, topic)
-                .metaPut(MqConstants.MQ_META_TID, key)
+                .metaPut(MqConstants.MQ_META_KEY, key)
                 .at(MqConstants.BROKER_AT_SERVER_ALL);
 
         //::Qos1

@@ -76,7 +76,7 @@ public interface MqServiceInternal {
      *
      * @param queue       队列
      * @param message     消息
-     * @param tid         跟踪Id
+     * @param key         主键
      * @param qos         质量等级
      * @param sequence    是否为顺序
      * @param expiration  过期时间
@@ -84,7 +84,7 @@ public interface MqServiceInternal {
      * @param times       派发次数
      * @param scheduled   计划时间
      */
-    void routingToQueueDo(MqMetasResolver mr, MqQueue queue, Message message, String tid, int qos, boolean sequence, long expiration, boolean transaction, String sender, int times, long scheduled);
+    void routingToQueueDo(MqMetasResolver mr, MqQueue queue, Message message, String key, int qos, boolean sequence, long expiration, boolean transaction, String sender, int times, long scheduled);
 
     /**
      * 添加事件扩展

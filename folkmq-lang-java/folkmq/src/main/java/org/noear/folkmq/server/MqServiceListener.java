@@ -57,11 +57,11 @@ public class MqServiceListener extends MqServiceListenerBase implements MqServic
                 mr.setScheduled(m, System.currentTimeMillis() + MqNextTime.TIME_1M);
 
                 //预备存储
-                String tid = mr.getKey(m);
+                String key = mr.getKey(m);
                 String topic = mr.getTopic(m);
                 String queueName = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP + MqConstants.MQ_TRAN_CONSUMER_GROUP;
 
-                transactionMessageMap.put(tid, topic);
+                transactionMessageMap.put(key, topic);
                 queueGetOrInit(topic, MqConstants.MQ_TRAN_CONSUMER_GROUP, queueName);
                 routingToQueueName(mr, m, queueName);
             } else {
@@ -74,33 +74,33 @@ public class MqServiceListener extends MqServiceListenerBase implements MqServic
         doOn(MqConstants.MQ_EVENT_PUBLISH2, (s, m) -> {
             //接收二段发布指令
             boolean isRollback = "1".equals(m.meta(MqConstants.MQ_META_ROLLBACK));
-            String[] tidAry = m.dataAsString().split(",");
+            String[] keyAry = m.dataAsString().split(",");
             boolean confirmIsOk = true;
             String confirmHint = "";
 
             if (isRollback == false) {
-                //如果不是回滚，则先做检测（是否提交的 tid 都在）
-                for (String tid : tidAry) {
-                    if (transactionMessageMap.containsKey(tid) == false) {
+                //如果不是回滚，则先做检测（是否提交的 key 都在）
+                for (String key : keyAry) {
+                    if (transactionMessageMap.containsKey(key) == false) {
                         confirmIsOk = false;
 
                         if (confirmHint.length() > 0) {
-                            confirmHint += "," + tid;
+                            confirmHint += "," + key;
                         } else {
-                            confirmHint = "Transaction messages have failed to be published: " + tid;
+                            confirmHint = "Transaction messages have failed to be published: " + key;
                         }
                     }
                 }
             }
 
             if (confirmIsOk) {
-                for (String tid : tidAry) {
-                    String topic = transactionMessageMap.remove(tid);
+                for (String key : keyAry) {
+                    String topic = transactionMessageMap.remove(key);
                     if (topic != null) {
                         String queueName = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP + MqConstants.MQ_TRAN_CONSUMER_GROUP;
                         MqQueue queue = getQueue(queueName);
                         if (queue != null) {
-                            queue.affirmAt(tid, isRollback);
+                            queue.affirmAt(key, isRollback);
                         }
                     }
                 }

@@ -16,7 +16,7 @@ import java.util.Map;
  * @since 1.0
  */
 public class MqMessage implements MqMessageBase {
-    private final String tid;
+    private final String key;
     private final byte[] body;
 
     private String sender;
@@ -38,17 +38,17 @@ public class MqMessage implements MqMessageBase {
         this(body, null);
     }
 
-    public MqMessage(String body, String tid) {
-        this(body.getBytes(StandardCharsets.UTF_8), tid);
+    public MqMessage(String body, String key) {
+        this(body.getBytes(StandardCharsets.UTF_8), key);
     }
 
-    public MqMessage(byte[] body, String tid) {
+    public MqMessage(byte[] body, String key) {
         MqAssert.requireNonNull(body, "Param 'body' can't be null");
 
-        if (StrUtils.isEmpty(tid)) {
-            this.tid = StrUtils.guid();
+        if (StrUtils.isEmpty(key)) {
+            this.key = StrUtils.guid();
         } else {
-            this.tid = tid;
+            this.key = key;
         }
 
         this.body = body;
@@ -67,7 +67,7 @@ public class MqMessage implements MqMessageBase {
      */
     @Override
     public String getKey() {
-        return tid;
+        return key;
     }
 
     /**

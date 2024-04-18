@@ -171,7 +171,7 @@ public abstract class MqServiceListenerBase extends EventListener implements MqS
     public void routingDo(MqMetasResolver mr, Message message) {
         //复用解析
         String sender = mr.getSender(message);
-        String tid = mr.getKey(message);
+        String key = mr.getKey(message);
         String topic = mr.getTopic(message);
         int qos = mr.getQos(message);
         int times = mr.getTimes(message);
@@ -199,7 +199,7 @@ public abstract class MqServiceListenerBase extends EventListener implements MqS
                     continue;
                 }
 
-                routingToQueueDo(mr, queue, message, tid, qos, sequence, expiration, transaction, sender, times, scheduled);
+                routingToQueueDo(mr, queue, message, key, qos, sequence, expiration, transaction, sender, times, scheduled);
             }
         }
     }
@@ -207,7 +207,7 @@ public abstract class MqServiceListenerBase extends EventListener implements MqS
     protected void routingToQueueName(MqMetasResolver mr, Message message, String queueName) {
         //复用解析
         String sender = mr.getSender(message);
-        String tid = mr.getKey(message);
+        String key = mr.getKey(message);
         int qos = mr.getQos(message);
         int times = mr.getTimes(message);
         long expiration = mr.getExpiration(message);
@@ -223,15 +223,15 @@ public abstract class MqServiceListenerBase extends EventListener implements MqS
         //取出所有订阅的主题消费者
         MqQueue queue = queueMap.get(queueName);
 
-        routingToQueueDo(mr, queue, message, tid, qos, sequence, expiration, transaction, sender, times, scheduled);
+        routingToQueueDo(mr, queue, message, key, qos, sequence, expiration, transaction, sender, times, scheduled);
     }
 
     /**
      * 执行路由
      */
-    public void routingToQueueDo(MqMetasResolver mr, MqQueue queue, Message message, String tid, int qos, boolean sequence, long expiration, boolean transaction, String sender, int times, long scheduled) {
+    public void routingToQueueDo(MqMetasResolver mr, MqQueue queue, Message message, String key, int qos, boolean sequence, long expiration, boolean transaction, String sender, int times, long scheduled) {
         if (queue != null) {
-            MqMessageHolder messageHolder = new MqMessageHolder(mr, queue.getQueueName(), queue.getConsumerGroup(), message, tid, qos, sequence, expiration, transaction, sender, times, scheduled);
+            MqMessageHolder messageHolder = new MqMessageHolder(mr, queue.getQueueName(), queue.getConsumerGroup(), message, key, qos, sequence, expiration, transaction, sender, times, scheduled);
             queue.add(messageHolder);
         }
     }
@@ -240,10 +240,10 @@ public abstract class MqServiceListenerBase extends EventListener implements MqS
      * 执行取消路由
      */
     public void unRoutingDo(Message message) {
-        String tid = message.meta(MqConstants.MQ_META_TID);
+        String key = message.meta(MqConstants.MQ_META_KEY);
         //可能是非法消息
-        if (StrUtils.isEmpty(tid)) {
-            log.warn("The tid cannot be null, sid={}", message.sid());
+        if (StrUtils.isEmpty(key)) {
+            log.warn("The key cannot be null, sid={}", message.sid());
             return;
         }
 
@@ -259,7 +259,7 @@ public abstract class MqServiceListenerBase extends EventListener implements MqS
 
             for (String topicConsumer : topicConsumerList) {
                 MqQueue queue = queueMap.get(topicConsumer);
-                queue.removeAt(tid);
+                queue.removeAt(key);
             }
         }
     }

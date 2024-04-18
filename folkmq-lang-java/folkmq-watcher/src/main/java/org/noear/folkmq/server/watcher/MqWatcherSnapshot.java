@@ -254,7 +254,7 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
                     MqMetasResolver mr = MqUtils.getOf(message);
 
                     String sender = mr.getSender(message);
-                    String tid = mr.getKey(message);
+                    String key = mr.getKey(message);
                     int qos = mr.getQos(message);
                     int times = mr.getTimes(message);
                     long expiration = mr.getExpiration(message);
@@ -269,7 +269,7 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
                     }
 
                     MqQueue queue = serverRef.getQueue(queueName);
-                    serverRef.routingToQueueDo(mr, queue, message, tid, qos, sequence, expiration, transaction, sender, times, scheduled);
+                    serverRef.routingToQueueDo(mr, queue, message, key, qos, sequence, expiration, transaction, sender, times, scheduled);
                 }
             }
         }
@@ -437,7 +437,7 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
                         writer.write(entityJson.toJson());
                         writer.newLine();
                     } catch (Exception e) {
-                        log.warn("Server persistent message failed, tid={}", messageHolder.getTid(), e);
+                        log.warn("Server persistent message failed, tid={}", messageHolder.getKey(), e);
                     }
                 }
             }

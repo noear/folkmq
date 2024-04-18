@@ -103,7 +103,7 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
 
             messageHolder.setDistributeIdx(messageIndexer.incrementAndGet());
 
-            messageMap.put(messageHolder.getTid(), messageHolder);
+            messageMap.put(messageHolder.getKey(), messageHolder);
             messageQueue.add(messageHolder);
 
             messageCountAdd(messageHolder);
@@ -165,12 +165,12 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
      * 事务确认处理
      */
     protected void affirmAtDo(MqMessageHolder messageHolder, boolean isRollback) {
-        messageMap.remove(messageHolder.getTid());
+        messageMap.remove(messageHolder.getKey());
 
         if (isRollback == false) {
             messageHolder.noTransaction();
             Message message = new MessageBuilder()
-                    .sid(messageHolder.getTid())
+                    .sid(messageHolder.getKey())
                     .entity(messageHolder.getEntity()).build();
             serviceListener.routingDo(messageHolder.mr, message);
         }
@@ -241,16 +241,16 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
 
         if (messageHolder.isDone()) {
             //已完成
-            messageMap.remove(messageHolder.getTid());
+            messageMap.remove(messageHolder.getKey());
             return true;
         }
 
         if (messageHolder.getExpiration() > 0 && messageHolder.getExpiration() < System.currentTimeMillis()) {
             //已过期
-            messageMap.remove(messageHolder.getTid());
+            messageMap.remove(messageHolder.getKey());
 
             if (log.isWarnEnabled()) {
-                log.warn("MqMessage have expired, tid={}", messageHolder.getTid());
+                log.warn("MqMessage have expired, tid={}", messageHolder.getKey());
             }
             return true;
         }
@@ -285,7 +285,7 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
 
                     if (log.isDebugEnabled()) {
                         log.debug("MqQueue request then error, tid={}",
-                                messageHolder.getTid(), err);
+                                messageHolder.getKey(), err);
                     }
                 });
             } catch (Throwable e) {
@@ -301,7 +301,7 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
 
                 if (log.isWarnEnabled()) {
                     log.warn("MqQueue request error, tid={}",
-                            messageHolder.getTid(), e);
+                            messageHolder.getKey(), e);
                 }
             }
         } else {
@@ -313,12 +313,12 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
                 if (serviceListener.brokerMode) {
                     log.debug("MqQueue request: broker no sessions, times={}, tid={}",
                             messageHolder.getDistributeCount(),
-                            messageHolder.getTid());
+                            messageHolder.getKey());
                 } else {
                     log.debug("MqQueue request: @{} no sessions, times={}, tid={}",
                             messageHolder.getSender(),
                             messageHolder.getDistributeCount(),
-                            messageHolder.getTid());
+                            messageHolder.getKey());
                 }
             }
         }
@@ -334,16 +334,16 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
 
         if (messageHolder.isDone()) {
             //已完成
-            messageMap.remove(messageHolder.getTid());
+            messageMap.remove(messageHolder.getKey());
             return true;
         }
 
         if (messageHolder.getExpiration() > 0 && messageHolder.getExpiration() < System.currentTimeMillis()) {
             //已过期
-            messageMap.remove(messageHolder.getTid());
+            messageMap.remove(messageHolder.getKey());
 
             if (log.isWarnEnabled()) {
-                log.warn("MqMessage have expired, tid={}", messageHolder.getTid());
+                log.warn("MqMessage have expired, tid={}", messageHolder.getKey());
             }
             return true;
         }
@@ -386,7 +386,7 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
                 //记日志
                 if (log.isWarnEnabled()) {
                     log.warn("MqQueue distribute error, tid={}",
-                            messageHolder.getTid(), e);
+                            messageHolder.getKey(), e);
                 }
             }
         } else {
@@ -399,7 +399,7 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
                 log.debug("MqQueue distribute: @{} no sessions, times={}, tid={}",
                         consumerGroup,
                         messageHolder.getDistributeCount(),
-                        messageHolder.getTid());
+                        messageHolder.getKey());
             }
         }
 
@@ -441,7 +441,7 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
 
             if (ack > 0) {
                 //ok
-                messageMap.remove(messageHolder.getTid());
+                messageMap.remove(messageHolder.getKey());
                 if (removeQueue) {
                     internalRemove(messageHolder);
                 }

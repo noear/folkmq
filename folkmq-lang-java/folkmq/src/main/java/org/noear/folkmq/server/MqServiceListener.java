@@ -248,22 +248,11 @@ public class MqServiceListener extends MqServiceListenerBase implements MqServic
 
             log.info("Broker channel opened, sessionId={}", session.sessionId());
         } else {
-            if (serverAccessMap.size() > 0) {
-                //如果有 ak/sk 配置，则进行鉴权
-                String accessKey = session.param(MqConstants.PARAM_ACCESS_KEY);
-                String accessSecretKey = session.param(MqConstants.PARAM_ACCESS_SECRET_KEY);
-
-                if (accessKey == null || accessSecretKey == null) {
-                    session.close();
-                    return;
-                }
-
-                if (accessSecretKey.equals(serverAccessMap.get(accessKey)) == false) {
-                    session.close();
-                    return;
-                }
+            //鉴权
+            if(this.auth(session) == Boolean.FALSE){
+                session.close();
+                return;
             }
-
             log.info("Client channel opened, sessionId={}", session.sessionId());
         }
 
@@ -272,6 +261,23 @@ public class MqServiceListener extends MqServiceListenerBase implements MqServic
 
         //增加经理人支持
         brokerListener.onOpen(session);
+    }
+
+    /**
+     * 鉴权失败返回false
+     * @param session
+     * @return
+     */
+    protected boolean auth(Session session){
+        if (serverAccessMap.size() > 0) {
+            //如果有 ak/sk 配置，则进行鉴权
+            String accessKey = session.param(MqConstants.PARAM_ACCESS_KEY);
+            String accessSecretKey = session.param(MqConstants.PARAM_ACCESS_SECRET_KEY);
+            if (accessKey == null || accessSecretKey == null || accessSecretKey.equals(serverAccessMap.get(accessKey)) == false) {
+                return Boolean.FALSE;
+            }
+        }
+        return Boolean.TRUE;
     }
 
     /**

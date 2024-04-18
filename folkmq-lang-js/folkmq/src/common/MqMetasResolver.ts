@@ -20,9 +20,9 @@ export interface MqMetasResolver {
     getSender(m: Entity): string;
 
     /**
-     * 获取跟踪id
+     * 获取主建
      */
-    getTid(m: Entity): string;
+    getKey(m: Entity): string;
 
     /**
      * 获取标签

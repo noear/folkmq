@@ -8,9 +8,9 @@ export interface MqMessageBase {
     getSender(): string | null;
 
     /**
-     * 跟踪ID
+     * 主建
      */
-    getTid(): string;
+    getKey(): string;
 
     /**
      * 标签
@@ -49,7 +49,7 @@ export interface MqMessageBase {
 }
 
 export class MqMessage implements MqMessageBase {
-    private readonly _tid: string;
+    private readonly _key: string;
     private readonly _body: ArrayBuffer;
 
     private _sender: string | null = null;
@@ -63,11 +63,11 @@ export class MqMessage implements MqMessageBase {
     protected _attrMap = new Map<string, string>;
     protected _transaction: MqTransaction;
 
-    constructor(body: string | ArrayBuffer, tid?: string) {
-        if (tid) {
-            this._tid = tid;
+    constructor(body: string | ArrayBuffer, key?: string) {
+        if (key) {
+            this._key = key;
         } else {
-            this._tid = StrUtils.guid();
+            this._key = StrUtils.guid();
         }
 
         if (body instanceof ArrayBuffer) {
@@ -81,8 +81,8 @@ export class MqMessage implements MqMessageBase {
         return this._sender;
     }
 
-    getTid(): string {
-        return this._tid;
+    getKey(): string {
+        return this._key;
     }
 
     getTag(): string | null {

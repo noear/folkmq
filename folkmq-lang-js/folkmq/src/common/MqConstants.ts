@@ -3,12 +3,16 @@ export class MqConstants {
     /**
      * 版本号
      */
-    static readonly FOLKMQ_VERSION = "folkmq-version";
+    static readonly FOLKMQ_VERSION: string = "folkmq-version";
+    /**
+     * 命名空间
+     */
+    static readonly FOLKMQ_NAMESPACE: string = "folkmq-namespace";
 
     /**
-     * 元信息：消息跟踪Id
+     * 元信息：消息主建
      */
-    static readonly MQ_META_TID = "mq.tid";
+    static readonly MQ_META_KEY = "mq.tid";
 
     /**
      * 元信息：消息主题

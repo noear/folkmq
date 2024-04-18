@@ -48,8 +48,8 @@ export class FolkMQ {
     /**
      * 新建消息
      * */
-    static newMessage(content: string | ArrayBuffer, tid?: string): MqMessage {
-        return new MqMessage(content, tid);
+    static newMessage(content: string | ArrayBuffer, key?: string): MqMessage {
+        return new MqMessage(content, key);
     }
 
     /**

@@ -38,12 +38,12 @@ export interface MqTransaction {
  */
 export class MqTransactionImpl implements MqTransaction {
     private readonly _client: MqClientInternal;
-    private readonly _tidAry;
+    private readonly _keyAry;
     private readonly _tmid: string;
 
     constructor(client: MqClientInternal) {
         this._client = client;
-        this._tidAry = new Array<string>();
+        this._keyAry = new Array<string>();
         this._tmid = StrUtils.guid();
     }
 
@@ -52,15 +52,15 @@ export class MqTransactionImpl implements MqTransaction {
     }
 
     binding(message: MqMessage) {
-        this._tidAry.push(message.getTid());
+        this._keyAry.push(message.getKey());
         message.internalSender(this._client.name());
     }
 
     commit() {
-        this._client.publish2(this._tmid, this._tidAry, false);
+        this._client.publish2(this._tmid, this._keyAry, false);
     }
 
     rollback() {
-        this._client.publish2(this._tmid, this._tidAry, true);
+        this._client.publish2(this._tmid, this._keyAry, true);
     }
 }

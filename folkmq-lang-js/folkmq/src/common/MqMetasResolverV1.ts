@@ -18,8 +18,8 @@ export class MqMetasResolverV1 implements MqMetasResolver {
         return m.metaOrDefault(MqMetasV2.MQ_META_SENDER, "");
     }
 
-    getTid(m: Entity): string {
-        return m.metaOrDefault(MqMetasV1.MQ_META_TID, "");
+    getKey(m: Entity): string {
+        return m.metaOrDefault(MqMetasV1.MQ_META_KEY, "");
     }
 
     getTag(m: Entity): string {
@@ -86,7 +86,7 @@ export class MqMetasResolverV1 implements MqMetasResolver {
         //构建消息实体
         const entity = SocketD.newEntity(message.getBody());
 
-        entity.metaPut(MqMetasV1.MQ_META_TID, message.getTid());
+        entity.metaPut(MqMetasV1.MQ_META_KEY, message.getKey());
         entity.metaPut(MqMetasV1.MQ_META_TOPIC, topic);
         entity.metaPut(MqMetasV1.MQ_META_QOS, (message.getQos() == 0 ? "0" : "1"));
 

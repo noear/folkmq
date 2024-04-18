@@ -29,9 +29,14 @@ export interface MqClient {
 
     /**
      * 命名空间
+     */
+    namespace(): string;
+
+    /**
+     * 命名空间
      * @since 1.4
      */
-    namespace(namespace: string): MqClient;
+    namespaceAs(namespace: string): MqClient;
 
     /**
      * 连接
@@ -84,9 +89,9 @@ export interface MqClient {
      * 取消发布
      *
      * @param topic 主题
-     * @param tid   跟踪id
+     * @param key   主建
      */
-    unpublish(topic: string, tid: string);
+    unpublish(topic: string, key: string);
 
     /**
      * 监听
@@ -122,10 +127,10 @@ export interface MqClientInternal extends MqClient {
      * 发布二次提交
      *
      * @param tmid       事务管理id
-     * @param tidAry     事务跟踪id集合
+     * @param keyAry     消息主键集合
      * @param isRollback 是否回滚
      */
-    publish2(tmid: string, tidAry: string[], isRollback: boolean);
+    publish2(tmid: string, keyAry: string[], isRollback: boolean);
 
     /**
      * 消费答复

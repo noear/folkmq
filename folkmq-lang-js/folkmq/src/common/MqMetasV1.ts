@@ -6,9 +6,9 @@
  */
 export class MqMetasV1 {
     /**
-     * 元信息：消息跟踪Id
+     * 元信息：消息主建
      */
-    static readonly MQ_META_TID = "mq.tid";
+    static readonly MQ_META_KEY = "mq.tid";
 
     /**
      * 元信息：消息主题

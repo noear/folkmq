@@ -249,7 +249,7 @@ public class MqServiceListener extends MqServiceListenerBase implements MqServic
             log.info("Broker channel opened, sessionId={}", session.sessionId());
         } else {
             //鉴权
-            if(this.auth(session)){
+            if(this.auth(session) == Boolean.FALSE){
                 session.close();
                 return;
             }
@@ -264,7 +264,7 @@ public class MqServiceListener extends MqServiceListenerBase implements MqServic
     }
 
     /**
-     * 鉴权失败返回true
+     * 鉴权失败返回false
      * @param session
      * @return
      */
@@ -274,12 +274,10 @@ public class MqServiceListener extends MqServiceListenerBase implements MqServic
             String accessKey = session.param(MqConstants.PARAM_ACCESS_KEY);
             String accessSecretKey = session.param(MqConstants.PARAM_ACCESS_SECRET_KEY);
             if (accessKey == null || accessSecretKey == null || accessSecretKey.equals(serverAccessMap.get(accessKey)) == false) {
-                return Boolean.TRUE;
-            }else{
                 return Boolean.FALSE;
             }
         }
-        return Boolean.FALSE;
+        return Boolean.TRUE;
     }
 
     /**

@@ -19,7 +19,7 @@ public class MqSolonListener implements MqConsumeListener {
     @Override
     public void consume(MqMessageReceived message) throws Exception {
         if (Utils.isEmpty(message.getTag())) {
-            log.warn("This message is missing route, tid={}", message.getKey());
+            log.warn("This message is missing route, key={}", message.getKey());
             return;
         }
 

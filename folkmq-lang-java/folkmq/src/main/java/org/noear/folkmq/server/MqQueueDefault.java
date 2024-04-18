@@ -141,8 +141,8 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
      * 移除消息
      */
     @Override
-    public void removeAt(String tid) {
-        MqMessageHolder messageHolder = messageMap.remove(tid);
+    public void removeAt(String key) {
+        MqMessageHolder messageHolder = messageMap.remove(key);
         if (messageHolder != null) {
             internalRemove(messageHolder);
         }
@@ -152,8 +152,8 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
      * 事务确认
      */
     @Override
-    public void affirmAt(String tid, boolean isRollback) {
-        MqMessageHolder messageHolder = messageMap.get(tid);
+    public void affirmAt(String key, boolean isRollback) {
+        MqMessageHolder messageHolder = messageMap.get(key);
 
         if (messageHolder != null) {
             internalRemove(messageHolder);
@@ -250,7 +250,7 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
             messageMap.remove(messageHolder.getKey());
 
             if (log.isWarnEnabled()) {
-                log.warn("MqMessage have expired, tid={}", messageHolder.getKey());
+                log.warn("MqMessage have expired, key={}", messageHolder.getKey());
             }
             return true;
         }
@@ -284,7 +284,7 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
                     internalAdd(messageHolder.delayed());
 
                     if (log.isDebugEnabled()) {
-                        log.debug("MqQueue request then error, tid={}",
+                        log.debug("MqQueue request then error, key={}",
                                 messageHolder.getKey(), err);
                     }
                 });
@@ -300,7 +300,7 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
                 internalAdd(messageHolder.delayed());
 
                 if (log.isWarnEnabled()) {
-                    log.warn("MqQueue request error, tid={}",
+                    log.warn("MqQueue request error, key={}",
                             messageHolder.getKey(), e);
                 }
             }
@@ -311,11 +311,11 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
             //记日志
             if (log.isDebugEnabled()) {
                 if (serviceListener.brokerMode) {
-                    log.debug("MqQueue request: broker no sessions, times={}, tid={}",
+                    log.debug("MqQueue request: broker no sessions, times={}, key={}",
                             messageHolder.getDistributeCount(),
                             messageHolder.getKey());
                 } else {
-                    log.debug("MqQueue request: @{} no sessions, times={}, tid={}",
+                    log.debug("MqQueue request: @{} no sessions, times={}, key={}",
                             messageHolder.getSender(),
                             messageHolder.getDistributeCount(),
                             messageHolder.getKey());
@@ -343,7 +343,7 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
             messageMap.remove(messageHolder.getKey());
 
             if (log.isWarnEnabled()) {
-                log.warn("MqMessage have expired, tid={}", messageHolder.getKey());
+                log.warn("MqMessage have expired, key={}", messageHolder.getKey());
             }
             return true;
         }
@@ -385,7 +385,7 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
 
                 //记日志
                 if (log.isWarnEnabled()) {
-                    log.warn("MqQueue distribute error, tid={}",
+                    log.warn("MqQueue distribute error, key={}",
                             messageHolder.getKey(), e);
                 }
             }
@@ -396,7 +396,7 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
 
             //记日志
             if (log.isDebugEnabled()) {
-                log.debug("MqQueue distribute: @{} no sessions, times={}, tid={}",
+                log.debug("MqQueue distribute: @{} no sessions, times={}, key={}",
                         consumerGroup,
                         messageHolder.getDistributeCount(),
                         messageHolder.getKey());

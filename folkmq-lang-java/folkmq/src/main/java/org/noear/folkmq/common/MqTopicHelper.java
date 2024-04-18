@@ -1,4 +1,4 @@
-package org.noear.folkmq.utils;
+package org.noear.folkmq.common;
 
 import org.noear.socketd.utils.StrUtils;
 
@@ -6,7 +6,7 @@ import org.noear.socketd.utils.StrUtils;
  * @author noear
  * @since 1.4
  */
-public class TopicUtils {
+public class MqTopicHelper {
     /**
      * 获取完整主题
      */

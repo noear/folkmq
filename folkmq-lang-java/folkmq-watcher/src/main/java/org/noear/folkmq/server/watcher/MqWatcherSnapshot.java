@@ -437,7 +437,7 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
                         writer.write(entityJson.toJson());
                         writer.newLine();
                     } catch (Exception e) {
-                        log.warn("Server persistent message failed, tid={}", messageHolder.getKey(), e);
+                        log.warn("Server persistent message failed, key={}", messageHolder.getKey(), e);
                     }
                 }
             }

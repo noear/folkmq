@@ -3,7 +3,7 @@ package org.noear.folkmq.client;
 import org.noear.folkmq.common.MqConstants;
 import org.noear.folkmq.common.MqMetasResolver;
 import org.noear.folkmq.common.MqUtils;
-import org.noear.folkmq.utils.TopicUtils;
+import org.noear.folkmq.common.MqTopicHelper;
 import org.noear.socketd.transport.core.Entity;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
@@ -47,7 +47,7 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
         this.key = mr.getKey(source);
         this.tag = mr.getTag(source);
         this.fullTopic = mr.getTopic(source);
-        this.topic = TopicUtils.getTopic(fullTopic);
+        this.topic = MqTopicHelper.getTopic(fullTopic);
         this.consumerGroup = mr.getConsumerGroup(source);
 
         this.qos = mr.getQos(source);
@@ -188,7 +188,7 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
         buf.append("MqMessageReceived{");
         buf.append("key='").append(key).append("',");
         buf.append("tag='").append(tag).append("',");
-        buf.append("topic='").append(fullTopic).append("',");
+        buf.append("topic='").append(topic).append("',");
         buf.append("body='").append(getBodyAsString()).append("',");
 
         for (Map.Entry<String, String> kv : source.metaMap().entrySet()) {

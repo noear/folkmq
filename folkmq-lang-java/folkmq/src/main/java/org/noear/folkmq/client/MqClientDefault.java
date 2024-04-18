@@ -6,7 +6,7 @@ import org.noear.folkmq.common.MqConstants;
 import org.noear.folkmq.common.MqMetasV2;
 import org.noear.folkmq.common.MqUtils;
 import org.noear.folkmq.exception.FolkmqException;
-import org.noear.folkmq.utils.TopicUtils;
+import org.noear.folkmq.common.MqTopicHelper;
 import org.noear.socketd.SocketD;
 import org.noear.socketd.cluster.ClusterClientSession;
 import org.noear.socketd.exception.SocketDConnectionException;
@@ -183,7 +183,7 @@ public class MqClientDefault implements MqClientInternal {
         MqAssert.assertMeta(consumerGroup, "consumerGroup");
 
         //支持命名空间
-        topic = TopicUtils.getFullTopic(namespace, topic);
+        topic = MqTopicHelper.getFullTopic(namespace, topic);
 
         if (clientSession != null) {
             Entity entity = new StringEntity("")
@@ -222,7 +222,7 @@ public class MqClientDefault implements MqClientInternal {
         MqAssert.assertMeta(consumerGroup, "consumerGroup");
 
         //支持命名空间
-        topic = TopicUtils.getFullTopic(namespace, topic);
+        topic = MqTopicHelper.getFullTopic(namespace, topic);
 
         MqSubscription subscription = new MqSubscription(topic, consumerGroup, autoAck, consumerHandler);
 
@@ -253,7 +253,7 @@ public class MqClientDefault implements MqClientInternal {
         MqAssert.assertMeta(consumerGroup, "consumerGroup");
 
         //支持命名空间
-        topic = TopicUtils.getFullTopic(namespace, topic);
+        topic = MqTopicHelper.getFullTopic(namespace, topic);
 
         String queueName = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP + consumerGroup;
         subscriptionMap.remove(queueName);
@@ -286,7 +286,7 @@ public class MqClientDefault implements MqClientInternal {
         }
 
         //支持命名空间
-        topic = TopicUtils.getFullTopic(namespace, topic);
+        topic = MqTopicHelper.getFullTopic(namespace, topic);
 
         ClientSession session = clientSession.getSessionAny(diversionOrNull(topic, message));
         if (session == null || session.isValid() == false) {
@@ -328,7 +328,7 @@ public class MqClientDefault implements MqClientInternal {
         }
 
         //支持命名空间
-        topic = TopicUtils.getFullTopic(namespace, topic);
+        topic = MqTopicHelper.getFullTopic(namespace, topic);
 
         ClientSession session = clientSession.getSessionAny(diversionOrNull(topic, message));
         if (session == null || session.isValid() == false) {
@@ -374,7 +374,7 @@ public class MqClientDefault implements MqClientInternal {
         }
 
         //支持命名空间
-        topic = TopicUtils.getFullTopic(namespace, topic);
+        topic = MqTopicHelper.getFullTopic(namespace, topic);
 
         ClientSession session = clientSession.getSessionAny(null);
         if (session == null || session.isValid() == false) {
@@ -409,7 +409,7 @@ public class MqClientDefault implements MqClientInternal {
         }
 
         //支持命名空间
-        topic = TopicUtils.getFullTopic(namespace, topic);
+        topic = MqTopicHelper.getFullTopic(namespace, topic);
 
         ClientSession session = clientSession.getSessionAny(null);
         if (session == null || session.isValid() == false) {

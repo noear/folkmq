@@ -83,9 +83,9 @@ public class MqClientListener extends EventListener {
                     if (s.isValid()) {
                         s.sendAlarm(m, "Client request handle error:" + e.getMessage());
                     }
-                    log.warn("Client request handle error, tid={}", message.getKey(), e);
+                    log.warn("Client request handle error, key={}", message.getKey(), e);
                 } catch (Throwable err) {
-                    log.warn("Client request handle error, tid={}", message.getKey(), e);
+                    log.warn("Client request handle error, key={}", message.getKey(), e);
                 }
             }
         } else {
@@ -116,9 +116,9 @@ public class MqClientListener extends EventListener {
                         client.reply(s, m, message, false, null);
                     }
 
-                    log.warn("Client consume handle error, tid={}", message.getKey(), e);
+                    log.warn("Client consume handle error, key={}", message.getKey(), e);
                 } catch (Throwable err) {
-                    log.warn("Client consume handle error, tid={}", message.getKey(), e);
+                    log.warn("Client consume handle error, key={}", message.getKey(), e);
                 }
             }
         }

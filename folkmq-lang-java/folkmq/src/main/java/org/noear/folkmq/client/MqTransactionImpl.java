@@ -14,12 +14,12 @@ import java.util.List;
  */
 public class MqTransactionImpl implements MqTransaction {
     private final MqClientInternal client;
-    private final List<String> tidAry;
+    private final List<String> keyAry;
     private final String tmid;
 
     public MqTransactionImpl(MqClientInternal client) {
         this.client = client;
-        this.tidAry = new ArrayList<>();
+        this.keyAry = new ArrayList<>();
         this.tmid = StrUtils.guid();
     }
 
@@ -33,7 +33,7 @@ public class MqTransactionImpl implements MqTransaction {
      */
     @Override
     public void binding(MqMessage message) {
-        tidAry.add(message.getKey());
+        keyAry.add(message.getKey());
         message.internalSender(client.name());
     }
 
@@ -42,7 +42,7 @@ public class MqTransactionImpl implements MqTransaction {
      */
     @Override
     public void commit() throws IOException {
-        client.publish2(tmid, tidAry, false);
+        client.publish2(tmid, keyAry, false);
     }
 
     /**
@@ -50,6 +50,6 @@ public class MqTransactionImpl implements MqTransaction {
      */
     @Override
     public void rollback() throws IOException {
-        client.publish2(tmid, tidAry, true);
+        client.publish2(tmid, keyAry, true);
     }
 }

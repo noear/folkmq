@@ -18,10 +18,10 @@ public interface MqClientInternal extends MqClient {
      * 发布二次提交
      *
      * @param tmid       事务管理id
-     * @param tidAry     事务跟踪id集合
+     * @param keyAry     消息主键集合
      * @param isRollback 是否回滚
      */
-    void publish2(String tmid, List<String> tidAry, boolean isRollback) throws IOException;
+    void publish2(String tmid, List<String> keyAry, boolean isRollback) throws IOException;
 
     /**
      * 消息答复

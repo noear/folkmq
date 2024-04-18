@@ -20,6 +20,7 @@ import {MqMetasV2} from "../common/MqMetasV2";
 import {MqTransaction, MqTransactionImpl} from "./MqTransaction";
 import {Entity} from "@noear/socket.d/transport/core/Entity";
 import {MqAlarm} from "./MqAlarm";
+import {MqTopicHelper} from "../common/MqTopicHelper";
 
 /**
  * 消息客户端默认实现
@@ -46,6 +47,8 @@ export class MqClientDefault implements MqClientInternal {
     private _subscriptionMap: Map<String, MqSubscription> = new Map<String, MqSubscription>();
     //客户端名字
     private _name: string;
+    //命名空间
+    private _namespace: string;
 
     //自动回执
     private _autoAcknowledge: boolean = true;
@@ -66,6 +69,15 @@ export class MqClientDefault implements MqClientInternal {
 
     nameAs(name: string): MqClient {
         this._name = name;
+        return this;
+    }
+
+    namespace(): string {
+        return this._namespace;
+    }
+
+    namespaceAs(namespace: string): MqClient {
+        this._namespace = namespace;
         return this;
     }
 
@@ -97,6 +109,10 @@ export class MqClientDefault implements MqClientInternal {
                     .ioThreads(1)
                     .codecThreads(1)
                     .exchangeThreads(1);
+
+                if(this._namespace){
+                    c.metaPut(MqConstants.FOLKMQ_NAMESPACE, this._namespace)
+                }
 
                 if (this._clientConfigHandler) {
                     this._clientConfigHandler(c);
@@ -148,6 +164,9 @@ export class MqClientDefault implements MqClientInternal {
         MqAssert.assertMeta(topic, "topic");
         MqAssert.assertMeta(consumerGroup, "consumerGroup");
 
+        //支持命名空间
+        topic = MqTopicHelper.getFullTopic(this._namespace, topic);
+
 
         let subscription = new MqSubscription(topic, consumerGroup, autoAck, consumerHandler);
 
@@ -180,6 +199,9 @@ export class MqClientDefault implements MqClientInternal {
         MqAssert.assertMeta(topic, "topic");
         MqAssert.assertMeta(consumerGroup, "consumerGroup");
 
+        //支持命名空间
+        topic = MqTopicHelper.getFullTopic(this._namespace, topic);
+
 
         let queueName = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP + consumerGroup;
         this._subscriptionMap.delete(queueName);
@@ -210,6 +232,9 @@ export class MqClientDefault implements MqClientInternal {
             throw new SocketDConnectionException("Not connected!");
         }
 
+        //支持命名空间
+        topic = MqTopicHelper.getFullTopic(this._namespace, topic);
+
         let session = this._clientSession.getSessionAny(this.diversionOrNull(topic, message));
         if (session == null || session.isValid() == false) {
             throw new SocketDException("No session is available!");
@@ -232,16 +257,19 @@ export class MqClientDefault implements MqClientInternal {
         }
     }
 
-    async unpublish(topic: string, tid: string) {
+    async unpublish(topic: string, key: string) {
         MqAssert.requireNonNull(topic, "Param 'topic' can't be null");
-        MqAssert.requireNonNull(tid, "Param 'tid' can't be null");
+        MqAssert.requireNonNull(key, "Param 'key' can't be null");
 
         MqAssert.assertMeta(topic, "topic");
-        MqAssert.assertMeta(tid, "tid");
+        MqAssert.assertMeta(key, "key");
 
         if (this._clientSession == null) {
             throw new SocketDConnectionException("Not connected!");
         }
+
+        //支持命名空间
+        topic = MqTopicHelper.getFullTopic(this._namespace, topic);
 
         let session = this._clientSession.getSessionAny(null);
         if (session == null || session.isValid() == false) {
@@ -250,7 +278,7 @@ export class MqClientDefault implements MqClientInternal {
 
         let entity = SocketD.newEntity("")
             .metaPut(MqConstants.MQ_META_TOPIC, topic)
-            .metaPut(MqConstants.MQ_META_TID, tid)
+            .metaPut(MqConstants.MQ_META_KEY, key)
             .at(MqConstants.BROKER_AT_SERVER_ALL);
 
         //::Qos1
@@ -331,11 +359,11 @@ export class MqClientDefault implements MqClientInternal {
      * 发布二次提交
      *
      * @param tmid       事务管理id
-     * @param tidAry     事务跟踪id集合
+     * @param keyAry     消息主键集合
      * @param isRollback 是否回滚
      */
-    async publish2(tmid: string, tidAry: string[], isRollback: boolean) {
-        if (tidAry == null || tidAry.length == 0) {
+    async publish2(tmid: string, keyAry: string[], isRollback: boolean) {
+        if (keyAry == null || keyAry.length == 0) {
             return;
         }
 
@@ -348,7 +376,7 @@ export class MqClientDefault implements MqClientInternal {
             throw new SocketDException("No session is available!");
         }
 
-        let entity = SocketD.newEntity(tidAry.join(","))
+        let entity = SocketD.newEntity(keyAry.join(","))
             .metaPut(MqConstants.MQ_META_ROLLBACK, (isRollback ? "1" : "0"))
             .at(MqConstants.BROKER_AT_SERVER_HASH); //事务走哈希
 
@@ -389,22 +417,22 @@ export class MqClientDefault implements MqClientInternal {
         }
     }
 
-    protected diversionOrNull(topic: string, message: MqMessage): string | null {
+    protected diversionOrNull(fullTopic: string, message: MqMessage): string | null {
         if (message.isTransaction()) {
             return message.getTmid();
         } else if (message.isSequence()) {
             if (message.getSequenceSharding()) {
                 return message.getSequenceSharding();
             } else {
-                return topic;
+                return fullTopic;
             }
         } else {
             return null;
         }
     }
 
-    public getSubscription(topic: string, consumerGroup: string) {
-        let queueName = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP + consumerGroup;
+    public getSubscription(fullTopic: string, consumerGroup: string) {
+        let queueName = fullTopic + MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP + consumerGroup;
         return this._subscriptionMap.get(queueName);
 
     }

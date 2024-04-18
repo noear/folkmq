@@ -55,13 +55,13 @@ export class MqClientListener extends EventListener {
                     if (s.isValid()) {
                         s.sendAlarm(m, "Client request handle error:" + e);
                     }
-                    console.warn("Client request handle error, tid=" + message.getTid(), e);
+                    console.warn("Client request handle error, key=" + message.getKey(), e);
                 } catch (err) {
-                    console.warn("Client request handle error, tid=" + message.getTid(), e);
+                    console.warn("Client request handle error, key=" + message.getKey(), e);
                 }
             }
         } else {
-            let subscription = this._client.getSubscription(message.getTopic(), message.getConsumerGroup());
+            let subscription = this._client.getSubscription(message.getFullTopic(), message.getConsumerGroup());
 
             try {
                 if (subscription != null) {
@@ -88,9 +88,9 @@ export class MqClientListener extends EventListener {
                         this._client.reply(s, m, message, false, null);
                     }
 
-                    console.warn("Client consume handle error, tid=" + message.getTid(), e);
+                    console.warn("Client consume handle error, key=" + message.getKey(), e);
                 } catch (err) {
-                    console.warn("Client consume handle error, tid=" + message.getTid(), e);
+                    console.warn("Client consume handle error, key=" + message.getKey(), e);
                 }
             }
         }

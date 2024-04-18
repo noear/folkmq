@@ -5,6 +5,7 @@ import {MqConstants} from "../common/MqConstants";
 import {Entity} from "@noear/socket.d/transport/core/Entity";
 import {MqUtils} from "../common/MqUtils";
 import {MqMessageBase} from "./MqMessage";
+import {MqTopicHelper} from "../common/MqTopicHelper";
 
 export interface MqMessageReceived extends MqMessageBase{
     /**
@@ -51,9 +52,10 @@ export class MqMessageReceivedImpl implements MqMessageReceived {
     private _session: Session;
 
     private readonly _sender: string;
-    private readonly _tid: string;
+    private readonly _key: string;
     private readonly _tag: string;
     private readonly _topic: string;
+    private readonly _fullTopic: string;
     private readonly _consumerGroup: string;
     private readonly _expiration: Date | null;
     private readonly _sequence: boolean;
@@ -70,9 +72,10 @@ export class MqMessageReceivedImpl implements MqMessageReceived {
 
         this._sender = mr.getSender(source);
 
-        this._tid = mr.getTid(source);
+        this._key = mr.getKey(source);
         this._tag = mr.getTag(source);
-        this._topic = mr.getTopic(source);
+        this._fullTopic = mr.getTopic(source);
+        this._topic = MqTopicHelper.getTopic(this._fullTopic);
         this._consumerGroup = mr.getConsumerGroup(source);
 
         this._qos = mr.getQos(source);
@@ -100,10 +103,10 @@ export class MqMessageReceivedImpl implements MqMessageReceived {
     }
 
     /**
-     * 跟踪ID
+     * 主建
      */
-    getTid(): string {
-        return this._tid;
+    getKey(): string {
+        return this._key;
     }
 
     /**
@@ -118,6 +121,13 @@ export class MqMessageReceivedImpl implements MqMessageReceived {
      */
     getTopic(): string {
         return this._topic;
+    }
+
+    /**
+     * 全名主题
+     */
+    getFullTopic(): string {
+        return this._fullTopic;
     }
 
     /**
@@ -194,7 +204,7 @@ export class MqMessageReceivedImpl implements MqMessageReceived {
 
     toString(): string {
         return "MqMessageReceived{" +
-            "tid='" + this._tid + '\'' +
+            "key='" + this._key + '\'' +
             ", tag='" + this._tag + '\'' +
             ", topic='" + this._topic + '\'' +
             ", body='" + this.getBodyAsString() + '\'' +

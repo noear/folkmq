@@ -33,7 +33,7 @@ public class AdminController extends BaseController {
     static final Logger log = LoggerFactory.getLogger(AdminController.class);
 
     @Inject
-    MqServiceInternal server;
+    MqServiceInternal serviceInternal;
 
     @Inject
     MqWatcherSnapshotPlus snapshotPlus;
@@ -45,7 +45,7 @@ public class AdminController extends BaseController {
 
     @Mapping("/admin/topic")
     public ModelAndView topic() {
-        Iterator<Map.Entry<String, Set<String>>> iterator = server.getSubscribeMap().entrySet().iterator();
+        Iterator<Map.Entry<String, Set<String>>> iterator = serviceInternal.getSubscribeMap().entrySet().iterator();
 
         List<TopicVo> list = new ArrayList<>();
 
@@ -90,7 +90,7 @@ public class AdminController extends BaseController {
             MqMessage message = new MqMessage(content).qos(qos).scheduled(scheduledDate);
             Message routingMessage = MqUtils.getV2().routingMessageBuild(topic, message);
 
-            server.routingDo(MqUtils.getV2(), routingMessage);
+            serviceInternal.routingDo(MqUtils.getV2(), routingMessage);
 
             return Result.succeed();
         } catch (Exception e) {
@@ -104,7 +104,7 @@ public class AdminController extends BaseController {
             return "save in process";
         } else {
             RunUtils.asyncAndTry(() -> {
-                server.save();
+                serviceInternal.save();
             });
 
             return "A new save processing task begins";

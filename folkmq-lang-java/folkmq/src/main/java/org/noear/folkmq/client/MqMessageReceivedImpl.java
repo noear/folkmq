@@ -44,7 +44,7 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
 
         this.sender = mr.getSender(source);
 
-        this.key = mr.getTid(source);
+        this.key = mr.getKey(source);
         this.tag = mr.getTag(source);
         this.fullTopic = mr.getTopic(source);
         this.topic = TopicUtils.getTopic(fullTopic);

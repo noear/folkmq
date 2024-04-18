@@ -8,9 +8,9 @@ package org.noear.folkmq.common;
  */
 public interface MqMetasV1 {
     /**
-     * 元信息：消息跟踪Id
+     * 元信息：消息主键
      */
-    String MQ_META_TID = "mq.tid";
+    String MQ_META_KEY = "mq.tid";
 
     /**
      * 元信息：消息主题

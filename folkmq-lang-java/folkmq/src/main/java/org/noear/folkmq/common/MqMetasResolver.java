@@ -4,7 +4,6 @@ import org.noear.folkmq.client.MqMessage;
 import org.noear.socketd.transport.core.Entity;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.entity.EntityDefault;
-import org.noear.socketd.transport.core.entity.StringEntity;
 
 /**
  * 消息元信息分析器
@@ -24,9 +23,9 @@ public interface MqMetasResolver {
     String getSender(Entity m);
 
     /**
-     * 获取跟踪id
+     * 获取主键
      */
-    String getTid(Entity m);
+    String getKey(Entity m);
 
     /**
      * 获取标签

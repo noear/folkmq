@@ -57,7 +57,7 @@ public class MqServiceListener extends MqServiceListenerBase implements MqServic
                 mr.setScheduled(m, System.currentTimeMillis() + MqNextTime.TIME_1M);
 
                 //预备存储
-                String tid = mr.getTid(m);
+                String tid = mr.getKey(m);
                 String topic = mr.getTopic(m);
                 String queueName = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP + MqConstants.MQ_TRAN_CONSUMER_GROUP;
 

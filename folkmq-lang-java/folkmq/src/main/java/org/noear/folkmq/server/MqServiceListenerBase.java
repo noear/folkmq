@@ -171,7 +171,7 @@ public abstract class MqServiceListenerBase extends EventListener implements MqS
     public void routingDo(MqMetasResolver mr, Message message) {
         //复用解析
         String sender = mr.getSender(message);
-        String tid = mr.getTid(message);
+        String tid = mr.getKey(message);
         String topic = mr.getTopic(message);
         int qos = mr.getQos(message);
         int times = mr.getTimes(message);
@@ -207,7 +207,7 @@ public abstract class MqServiceListenerBase extends EventListener implements MqS
     protected void routingToQueueName(MqMetasResolver mr, Message message, String queueName) {
         //复用解析
         String sender = mr.getSender(message);
-        String tid = mr.getTid(message);
+        String tid = mr.getKey(message);
         int qos = mr.getQos(message);
         int times = mr.getTimes(message);
         long expiration = mr.getExpiration(message);

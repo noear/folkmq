@@ -254,7 +254,7 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
                     MqMetasResolver mr = MqUtils.getOf(message);
 
                     String sender = mr.getSender(message);
-                    String tid = mr.getTid(message);
+                    String tid = mr.getKey(message);
                     int qos = mr.getQos(message);
                     int times = mr.getTimes(message);
                     long expiration = mr.getExpiration(message);

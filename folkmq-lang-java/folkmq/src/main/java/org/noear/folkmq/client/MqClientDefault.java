@@ -83,7 +83,12 @@ public class MqClientDefault implements MqClientInternal {
     }
 
     @Override
-    public MqClient namespace(String namespace) {
+    public String namespace() {
+        return namespace;
+    }
+
+    @Override
+    public MqClient namespaceAs(String namespace) {
         this.namespace = namespace;
         return this;
     }

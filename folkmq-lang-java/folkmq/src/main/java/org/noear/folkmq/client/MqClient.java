@@ -30,7 +30,12 @@ public interface MqClient extends Closeable {
     /**
      * 命名空间
      */
-    MqClient namespace(String namespace);
+    String namespace();
+
+    /**
+     * 命名空间
+     */
+    MqClient namespaceAs(String namespace);
 
     /**
      * 连接

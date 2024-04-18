@@ -3,6 +3,7 @@ package org.noear.folkmq.client;
 import org.noear.folkmq.common.MqConstants;
 import org.noear.folkmq.common.MqMetasResolver;
 import org.noear.folkmq.common.MqUtils;
+import org.noear.folkmq.utils.TopicUtils;
 import org.noear.socketd.transport.core.Entity;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
@@ -23,9 +24,10 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
     private final transient Session session;
 
     private final String sender;
-    private final String tid;
+    private final String key;
     private final String tag;
     private final String topic;
+    private final String fullTopic;
     private final String consumerGroup;
     private final Date expiration;
     private final boolean sequence;
@@ -42,9 +44,10 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
 
         this.sender = mr.getSender(source);
 
-        this.tid = mr.getTid(source);
+        this.key = mr.getTid(source);
         this.tag = mr.getTag(source);
-        this.topic = mr.getTopic(source);
+        this.fullTopic = mr.getTopic(source);
+        this.topic = TopicUtils.getTopic(fullTopic);
         this.consumerGroup = mr.getConsumerGroup(source);
 
         this.qos = mr.getQos(source);
@@ -79,8 +82,8 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
      * 跟踪ID
      */
     @Override
-    public String getTid() {
-        return tid;
+    public String getKey() {
+        return key;
     }
 
     /**
@@ -97,6 +100,13 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
     @Override
     public String getTopic() {
         return topic;
+    }
+
+    /**
+     * 全名主题
+     */
+    public String getFullTopic() {
+        return fullTopic;
     }
 
     /**
@@ -176,9 +186,9 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
     public String toString() {
         StringBuilder buf = new StringBuilder();
         buf.append("MqMessageReceived{");
-        buf.append("tid='").append(tid).append("',");
+        buf.append("key='").append(key).append("',");
         buf.append("tag='").append(tag).append("',");
-        buf.append("topic='").append(topic).append("',");
+        buf.append("topic='").append(fullTopic).append("',");
         buf.append("body='").append(getBodyAsString()).append("',");
 
         for (Map.Entry<String, String> kv : source.metaMap().entrySet()) {

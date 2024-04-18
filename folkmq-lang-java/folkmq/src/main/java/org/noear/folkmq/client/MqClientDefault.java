@@ -6,6 +6,7 @@ import org.noear.folkmq.common.MqConstants;
 import org.noear.folkmq.common.MqMetasV2;
 import org.noear.folkmq.common.MqUtils;
 import org.noear.folkmq.exception.FolkmqException;
+import org.noear.folkmq.utils.TopicUtils;
 import org.noear.socketd.SocketD;
 import org.noear.socketd.cluster.ClusterClientSession;
 import org.noear.socketd.exception.SocketDConnectionException;
@@ -55,6 +56,8 @@ public class MqClientDefault implements MqClientInternal {
     private Map<String, MqSubscription> subscriptionMap = new HashMap<>();
     //客户端名字
     private String name;
+    //命名空间
+    private String namespace;
 
 
     //自动回执
@@ -76,6 +79,12 @@ public class MqClientDefault implements MqClientInternal {
         MqAssert.assertMeta(name, "name");
 
         this.name = name;
+        return this;
+    }
+
+    @Override
+    public MqClient namespace(String namespace) {
+        this.namespace = namespace;
         return this;
     }
 
@@ -164,6 +173,9 @@ public class MqClientDefault implements MqClientInternal {
         MqAssert.assertMeta(topic, "topic");
         MqAssert.assertMeta(consumerGroup, "consumerGroup");
 
+        //支持命名空间
+        topic = TopicUtils.getFullTopic(namespace, topic);
+
         if (clientSession != null) {
             Entity entity = new StringEntity("")
                     .metaPut(MqConstants.API_NAME, apiName)
@@ -200,6 +212,9 @@ public class MqClientDefault implements MqClientInternal {
         MqAssert.assertMeta(topic, "topic");
         MqAssert.assertMeta(consumerGroup, "consumerGroup");
 
+        //支持命名空间
+        topic = TopicUtils.getFullTopic(namespace, topic);
+
         MqSubscription subscription = new MqSubscription(topic, consumerGroup, autoAck, consumerHandler);
 
         subscriptionMap.put(subscription.getQueueName(), subscription);
@@ -227,6 +242,9 @@ public class MqClientDefault implements MqClientInternal {
 
         MqAssert.assertMeta(topic, "topic");
         MqAssert.assertMeta(consumerGroup, "consumerGroup");
+
+        //支持命名空间
+        topic = TopicUtils.getFullTopic(namespace, topic);
 
         String queueName = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP + consumerGroup;
         subscriptionMap.remove(queueName);
@@ -257,6 +275,9 @@ public class MqClientDefault implements MqClientInternal {
         if (clientSession == null) {
             throw new SocketDConnectionException("Not connected!");
         }
+
+        //支持命名空间
+        topic = TopicUtils.getFullTopic(namespace, topic);
 
         ClientSession session = clientSession.getSessionAny(diversionOrNull(topic, message));
         if (session == null || session.isValid() == false) {
@@ -297,6 +318,9 @@ public class MqClientDefault implements MqClientInternal {
             throw new SocketDConnectionException("Not connected!");
         }
 
+        //支持命名空间
+        topic = TopicUtils.getFullTopic(namespace, topic);
+
         ClientSession session = clientSession.getSessionAny(diversionOrNull(topic, message));
         if (session == null || session.isValid() == false) {
             throw new SocketDException("No session is available!");
@@ -329,16 +353,19 @@ public class MqClientDefault implements MqClientInternal {
     }
 
     @Override
-    public void unpublish(String topic, String tid) throws IOException {
+    public void unpublish(String topic, String key) throws IOException {
         MqAssert.requireNonNull(topic, "Param 'topic' can't be null");
-        MqAssert.requireNonNull(tid, "Param 'tid' can't be null");
+        MqAssert.requireNonNull(key, "Param 'key' can't be null");
 
         MqAssert.assertMeta(topic, "topic");
-        MqAssert.assertMeta(tid, "tid");
+        MqAssert.assertMeta(key, "key");
 
         if (clientSession == null) {
             throw new SocketDConnectionException("Not connected!");
         }
+
+        //支持命名空间
+        topic = TopicUtils.getFullTopic(namespace, topic);
 
         ClientSession session = clientSession.getSessionAny(null);
         if (session == null || session.isValid() == false) {
@@ -347,7 +374,7 @@ public class MqClientDefault implements MqClientInternal {
 
         Entity entity = new StringEntity("")
                 .metaPut(MqConstants.MQ_META_TOPIC, topic)
-                .metaPut(MqConstants.MQ_META_TID, tid)
+                .metaPut(MqConstants.MQ_META_TID, key)
                 .at(MqConstants.BROKER_AT_SERVER_ALL);
 
         //::Qos1
@@ -361,16 +388,19 @@ public class MqClientDefault implements MqClientInternal {
     }
 
     @Override
-    public CompletableFuture<Boolean> unpublishAsync(String topic, String tid) throws IOException {
+    public CompletableFuture<Boolean> unpublishAsync(String topic, String key) throws IOException {
         MqAssert.requireNonNull(topic, "Param 'topic' can't be null");
-        MqAssert.requireNonNull(tid, "Param 'tid' can't be null");
+        MqAssert.requireNonNull(key, "Param 'key' can't be null");
 
         MqAssert.assertMeta(topic, "topic");
-        MqAssert.assertMeta(tid, "tid");
+        MqAssert.assertMeta(key, "key");
 
         if (clientSession == null) {
             throw new SocketDConnectionException("Not connected!");
         }
+
+        //支持命名空间
+        topic = TopicUtils.getFullTopic(namespace, topic);
 
         ClientSession session = clientSession.getSessionAny(null);
         if (session == null || session.isValid() == false) {
@@ -380,7 +410,7 @@ public class MqClientDefault implements MqClientInternal {
         CompletableFuture<Boolean> future = new CompletableFuture<>();
         Entity entity = new StringEntity("")
                 .metaPut(MqConstants.MQ_META_TOPIC, topic)
-                .metaPut(MqConstants.MQ_META_TID, tid)
+                .metaPut(MqConstants.MQ_META_TID, key)
                 .at(MqConstants.BROKER_AT_SERVER_ALL);
 
         //::Qos1
@@ -476,12 +506,12 @@ public class MqClientDefault implements MqClientInternal {
      * 发布二次提交
      *
      * @param tmid       事务管理id
-     * @param tidAry     事务跟踪id集合
+     * @param keyAry     消息主键集合
      * @param isRollback 是否回滚
      */
     @Override
-    public void publish2(String tmid, List<String> tidAry, boolean isRollback) throws IOException {
-        if (tidAry == null || tidAry.size() == 0) {
+    public void publish2(String tmid, List<String> keyAry, boolean isRollback) throws IOException {
+        if (keyAry == null || keyAry.size() == 0) {
             return;
         }
 
@@ -494,7 +524,7 @@ public class MqClientDefault implements MqClientInternal {
             throw new SocketDException("No session is available!");
         }
 
-        Entity entity = new StringEntity(String.join(",", tidAry))
+        Entity entity = new StringEntity(String.join(",", keyAry))
                 .metaPut(MqConstants.MQ_META_ROLLBACK, (isRollback ? "1" : "0"))
                 .at(MqConstants.BROKER_AT_SERVER_HASH); //事务走哈希
 
@@ -536,12 +566,12 @@ public class MqClientDefault implements MqClientInternal {
         }
     }
 
-    protected String diversionOrNull(String topic, MqMessage message) {
+    protected String diversionOrNull(String fullTopic, MqMessage message) {
         if (message.isTransaction()) {
             return message.getTmid();
         } else if (message.isSequence()) {
             if (StrUtils.isEmpty(message.getSequenceSharding())) {
-                return topic;
+                return fullTopic;
             } else {
                 return message.getSequenceSharding();
             }
@@ -550,8 +580,8 @@ public class MqClientDefault implements MqClientInternal {
         }
     }
 
-    protected MqSubscription getSubscription(String topic, String consumerGroup) {
-        String queueName = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP + consumerGroup;
+    protected MqSubscription getSubscription(String fullTopic, String consumerGroup) {
+        String queueName = fullTopic + MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP + consumerGroup;
         return subscriptionMap.get(queueName);
     }
 

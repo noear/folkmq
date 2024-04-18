@@ -18,14 +18,19 @@ import java.util.concurrent.ExecutorService;
  */
 public interface MqClient extends Closeable {
     /**
-     * 名字
+     * 名字（即，默认消费者组）
      */
     String name();
 
     /**
-     * 名字取为
+     * 名字取为（即，默认消费者组）
      */
     MqClient nameAs(String name);
+
+    /**
+     * 命名空间
+     */
+    MqClient namespace(String namespace);
 
     /**
      * 连接
@@ -145,17 +150,17 @@ public interface MqClient extends Closeable {
      * 取消发布
      *
      * @param topic 主题
-     * @param tid   跟踪id
+     * @param key   消息主键
      */
-    void unpublish(String topic, String tid) throws IOException;
+    void unpublish(String topic, String key) throws IOException;
 
     /**
      * 取消发布
      *
      * @param topic 主题
-     * @param tid   跟踪id
+     * @param key   消息主键
      */
-    CompletableFuture<Boolean> unpublishAsync(String topic, String tid) throws IOException;
+    CompletableFuture<Boolean> unpublishAsync(String topic, String key) throws IOException;
 
 
     /**

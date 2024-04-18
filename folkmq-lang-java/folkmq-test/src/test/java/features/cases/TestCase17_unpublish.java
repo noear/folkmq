@@ -1,15 +1,10 @@
 package features.cases;
 
 import org.noear.folkmq.FolkMQ;
-import org.noear.folkmq.client.MqClientDefault;
 import org.noear.folkmq.client.MqMessage;
-import org.noear.folkmq.server.MqQueue;
 import org.noear.folkmq.server.MqServerDefault;
-import org.noear.folkmq.server.MqServiceInternal;
 
 import java.util.Date;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author noear
@@ -50,7 +45,7 @@ public class TestCase17_unpublish extends BaseTestCase {
         assert server.getServerInternal().getQueue("demo#a").messageTotal() == 1;
         assert server.getServerInternal().getQueue("demo#a").messageTotal2() == 1;
 
-        client.unpublish("demo", mqMessage.getTid());
+        client.unpublish("demo", mqMessage.getKey());
 
         Thread.sleep(10);
 

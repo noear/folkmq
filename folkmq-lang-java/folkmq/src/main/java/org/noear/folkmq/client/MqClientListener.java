@@ -83,13 +83,13 @@ public class MqClientListener extends EventListener {
                     if (s.isValid()) {
                         s.sendAlarm(m, "Client request handle error:" + e.getMessage());
                     }
-                    log.warn("Client request handle error, tid={}", message.getTid(), e);
+                    log.warn("Client request handle error, tid={}", message.getKey(), e);
                 } catch (Throwable err) {
-                    log.warn("Client request handle error, tid={}", message.getTid(), e);
+                    log.warn("Client request handle error, tid={}", message.getKey(), e);
                 }
             }
         } else {
-            MqSubscription subscription = client.getSubscription(message.getTopic(), message.getConsumerGroup());
+            MqSubscription subscription = client.getSubscription(message.getFullTopic(), message.getConsumerGroup());
 
             try {
                 if (subscription != null) {
@@ -116,9 +116,9 @@ public class MqClientListener extends EventListener {
                         client.reply(s, m, message, false, null);
                     }
 
-                    log.warn("Client consume handle error, tid={}", message.getTid(), e);
+                    log.warn("Client consume handle error, tid={}", message.getKey(), e);
                 } catch (Throwable err) {
-                    log.warn("Client consume handle error, tid={}", message.getTid(), e);
+                    log.warn("Client consume handle error, tid={}", message.getKey(), e);
                 }
             }
         }

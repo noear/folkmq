@@ -66,7 +66,7 @@ public class MqMessage implements MqMessageBase {
      * 跟踪ID
      */
     @Override
-    public String getTid() {
+    public String getKey() {
         return tid;
     }
 

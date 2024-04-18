@@ -15,9 +15,19 @@ public interface MqMessageBase {
     String getSender();
 
     /**
-     * 跟踪ID
+     * 主键
+     *
+     * @deprecated 1.4
+     * */
+    @Deprecated
+    default String getTid(){
+        return getKey();
+    }
+
+    /**
+     * 主键
      */
-    String getTid();
+    String getKey();
 
     /**
      * 标签

@@ -33,7 +33,7 @@ public class MqTransactionImpl implements MqTransaction {
      */
     @Override
     public void binding(MqMessage message) {
-        tidAry.add(message.getTid());
+        tidAry.add(message.getKey());
         message.internalSender(client.name());
     }
 

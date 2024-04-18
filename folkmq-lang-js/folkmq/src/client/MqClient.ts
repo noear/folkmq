@@ -18,14 +18,20 @@ import {MqTransaction} from "./MqTransaction";
  */
 export interface MqClient {
     /**
-     * 名字
+     * 名字（即，默认消费者组）
      */
     name(): string;
 
     /**
-     * 名字取为
+     * 名字取为（即，默认消费者组）
      */
     nameAs(name: string): MqClient;
+
+    /**
+     * 命名空间
+     * @since 1.4
+     */
+    namespace(namespace: string): MqClient;
 
     /**
      * 连接

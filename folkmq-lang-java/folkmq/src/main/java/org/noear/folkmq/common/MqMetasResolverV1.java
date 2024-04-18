@@ -111,7 +111,7 @@ public class MqMetasResolverV1 implements MqMetasResolver {
         //构建消息实体
         EntityDefault entity = new EntityDefault().dataSet(message.getBody());
 
-        entity.metaPut(MqMetasV1.MQ_META_TID, message.getTid());
+        entity.metaPut(MqMetasV1.MQ_META_TID, message.getKey());
         entity.metaPut(MqMetasV1.MQ_META_TOPIC, topic);
         entity.metaPut(MqMetasV1.MQ_META_QOS, (message.getQos() == 0 ? "0" : "1"));
 

@@ -450,11 +450,4 @@ export class MqClientDefault implements MqClientInternal {
     public getSubscriptionSize(): number {
         return this._subscriptionMap.size;
     }
-
-    /**
-     * 关闭
-     */
-    close() {
-        this._clientSession.close();
-    }
 }

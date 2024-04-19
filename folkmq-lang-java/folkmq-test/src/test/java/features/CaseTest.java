@@ -185,4 +185,11 @@ public class CaseTest {
         testCase.start();
         testCase.stop();
     }
+
+    @Test
+    public void TestCase30_namespace() throws Exception {
+        BaseTestCase testCase = new TestCase30_namespace(2030);
+        testCase.start();
+        testCase.stop();
+    }
 }

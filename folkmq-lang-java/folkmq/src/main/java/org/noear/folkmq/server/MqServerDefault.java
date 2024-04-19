@@ -25,13 +25,15 @@ public class MqServerDefault implements MqServer {
     private ServerConfigHandler serverConfigHandler;
 
     public MqServerDefault(String schema, MqServiceListener serverListener) {
-        if(StrUtils.isEmpty(schema)){
-            schema = "sd:tcp";
+        if (StrUtils.isEmpty(schema)) {
+            this.serverSchema = "sd:tcp";
+        } else {
+            this.serverSchema = schema;
         }
-        serverSchema = schema;
-        if(serverListener == null){
+
+        if (serverListener == null) {
             this.serverListener = new MqServiceListener(false);
-        }else{
+        } else {
             this.serverListener = serverListener;
         }
     }
@@ -41,7 +43,7 @@ public class MqServerDefault implements MqServer {
     }
 
     public MqServerDefault() {
-        this(null);
+        this(null, null);
     }
 
     /**

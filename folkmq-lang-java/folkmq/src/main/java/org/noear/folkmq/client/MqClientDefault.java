@@ -63,9 +63,20 @@ public class MqClientDefault implements MqClientInternal {
     //自动回执
     protected boolean autoAcknowledge = true;
 
-    public MqClientDefault(String... urls) {
+    public MqClientDefault(String[] urls) {
+        this(urls, null);
+    }
+
+    public MqClientDefault(String[] urls, MqClientListener clientListener) {
         this.urls = urls;
-        this.clientListener = new MqClientListener(this);
+
+        if (clientListener == null) {
+            this.clientListener = new MqClientListener();
+        } else {
+            this.clientListener = clientListener;
+        }
+
+        this.clientListener.init(this);
     }
 
     @Override

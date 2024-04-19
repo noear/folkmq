@@ -23,11 +23,13 @@ import java.util.*;
  */
 public class MqClientListener extends EventListener {
     private static final Logger log = LoggerFactory.getLogger(MqClientListener.class);
-    private final MqClientDefault client;
+    private MqClientDefault client;
 
-    public MqClientListener(MqClientDefault client) {
+    /**
+     * 初始化
+     */
+    protected void init(MqClientDefault client) {
         this.client = client;
-
         //接收派发指令
         doOn(MqConstants.MQ_EVENT_DISTRIBUTE, (s, m) -> {
             try {
@@ -62,7 +64,10 @@ public class MqClientListener extends EventListener {
         });
     }
 
-    private void onReceive(Session s, Message m, MqMessageReceivedImpl message, boolean isRequest) {
+    /**
+     * 接收时
+     */
+    protected void onReceive(Session s, Message m, MqMessageReceivedImpl message, boolean isRequest) {
         if (isRequest) {
             try {
                 if (message.isTransaction()) {

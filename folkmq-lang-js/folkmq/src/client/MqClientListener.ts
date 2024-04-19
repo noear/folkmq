@@ -10,8 +10,10 @@ import {Message} from "@noear/socket.d/transport/core/Message";
 export class MqClientListener extends EventListener {
     private _client: MqClientDefault;
 
-    constructor(client: MqClientDefault) {
-        super();
+    /**
+     * 初始化
+     * */
+     init(client: MqClientDefault) {
         this._client = client;
 
         //接收派发指令
@@ -34,6 +36,9 @@ export class MqClientListener extends EventListener {
         });
     }
 
+    /**
+     * 接收时
+     * */
     onReceive(s: Session, m: Message, message: MqMessageReceivedImpl, isRequest: boolean) {
         if (isRequest) {
             try {

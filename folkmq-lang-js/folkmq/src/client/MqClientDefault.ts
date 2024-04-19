@@ -53,14 +53,20 @@ export class MqClientDefault implements MqClientInternal {
     //自动回执
     private _autoAcknowledge: boolean = true;
 
-    constructor(urls: string[] | string) {
+    constructor(urls: string[] | string, clientListener?:MqClientListener) {
         if (urls instanceof Array) {
             this._urls = urls;
         } else {
             this._urls = [urls];
         }
 
-        this._clientListener = new MqClientListener(this);
+        if (clientListener) {
+            this._clientListener = clientListener;
+        } else {
+            this._clientListener = new MqClientListener();
+        }
+
+        this._clientListener.init(this);
     }
 
     name(): string {

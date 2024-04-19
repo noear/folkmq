@@ -612,12 +612,4 @@ public class MqClientDefault implements MqClientInternal {
     protected int getSubscriptionSize() {
         return subscriptionMap.size();
     }
-
-    /**
-     * 关闭
-     */
-    @Override
-    public void close() throws IOException {
-        clientSession.close();
-    }
 }

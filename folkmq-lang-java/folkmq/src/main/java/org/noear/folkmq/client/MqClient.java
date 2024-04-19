@@ -16,7 +16,7 @@ import java.util.concurrent.ExecutorService;
  * @since 1.0
  * @since 1.2
  */
-public interface MqClient extends Closeable {
+public interface MqClient {
     /**
      * 名字（即，默认消费者组）
      */

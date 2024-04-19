@@ -9,56 +9,56 @@ class MqMetasResolverV2(MqMetasResolver):
     def version(self) -> int:
         return 2
 
-    def getSender(m: Entity) -> str:
+    def getSender(self, m: Entity) -> str:
         pass
 
-    def getKey(m: Entity) -> str:
+    def getKey(self, m: Entity) -> str:
         pass
 
-    def getTag(m: Entity) -> str:
+    def getTag(self, m: Entity) -> str:
         pass
 
-    def getTopic(m: Entity) -> str:
+    def getTopic(self, m: Entity) -> str:
         pass
 
-    def getConsumerGroup(m: Entity) -> str:
+    def getConsumerGroup(self, m: Entity) -> str:
         pass
 
-    def setConsumerGroup(m: Entity, consumerGroup: str):
+    def setConsumerGroup(self, m: Entity, consumerGroup: str):
         pass
 
-    def getQos(m: Entity) -> int:
+    def getQos(self, m: Entity) -> int:
         pass
 
-    def getTimes(m: Entity) -> int:
+    def getTimes(self, m: Entity) -> int:
         pass
 
-    def setTimes(m: Entity, times: int):
+    def setTimes(self, m: Entity, times: int):
         pass
 
-    def getExpiration(m: Entity) -> int:
+    def getExpiration(self, m: Entity) -> int:
         pass
 
-    def setExpiration(m: Entity, expiration: int):
+    def setExpiration(self, m: Entity, expiration: int):
         pass
 
-    def getScheduled(m: Entity) -> int:
+    def getScheduled(self, m: Entity) -> int:
         pass
 
-    def setScheduled(m: Entity, scheduled: int):
+    def setScheduled(self, m: Entity, scheduled: int):
         pass
 
-    def isSequence(m: Entity) -> bool:
+    def isSequence(self, m: Entity) -> bool:
         pass
 
-    def isTransaction(m: Entity) -> bool:
+    def isTransaction(self, m: Entity) -> bool:
         pass
 
-    def setTransaction(m: Entity, isTransaction: bool):
+    def setTransaction(self, m: Entity, isTransaction: bool):
         pass
 
-    def publishEntityBuild(topic: str, message: MqMessage) -> EntityDefault:
+    def publishEntityBuild(self, topic: str, message: MqMessage) -> EntityDefault:
         pass
 
-    def routingMessageBuild(topic: str, message: MqMessage) -> Message:
+    def routingMessageBuild(self, topic: str, message: MqMessage) -> Message:
         pass

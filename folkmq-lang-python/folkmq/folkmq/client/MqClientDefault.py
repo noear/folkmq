@@ -1,42 +1,80 @@
 from asyncio import Future
 from typing import Callable
 
+from socketd import SocketD
+from socketd.cluster.ClusterClientSession import ClusterClientSession
 from socketd.transport.client.ClientConfig import ClientConfig
 from socketd.transport.core import Entity
 from socketd.transport.core.Message import Message
 from socketd.transport.core.Session import Session
 from socketd.transport.stream.RequestStream import RequestStream
 
+from folkmq.FolkMQ import FolkMQ
 from folkmq.client.MqClient import MqClientInternal
+from folkmq.client.MqClientListener import MqClientListener
 from folkmq.client.MqMessage import MqMessage
 from folkmq.client.MqMessageReceived import MqMessageReceived, MqMessageReceivedImpl
 from folkmq.client.MqTransaction import MqTransaction
+from folkmq.common.MqConstants import MqConstants
+
 
 # 消息客户端默认实现
 class MqClientDefault(MqClientInternal):
-    def __init__(self, *urls):
-        ...
+    def __init__(self, *urls, clientListener:MqClientListener):
+        self._urls = urls
+
+        if clientListener:
+            self._clientListener = clientListener
+        else:
+            self._clientListener =  MqClientListener()
+
+        self._clientListener.init(self)
+
+        self._name:str|None = None
+        self._namespace:str|None = None
+        self._clientSession:ClusterClientSession|None = None
 
     def name(self) -> str:
-        pass
+        return self._name
 
     def nameAs(self, name: str) -> 'MqClient':
-        pass
+        self._name = name
+        return self
 
     def namespace(self) -> str:
-        pass
+        return self._namespace
 
     def namespaceAs(self, namespace: str) -> 'MqClient':
-        pass
+        self._namespace = namespace
+        return self
 
-    def connect(self) -> 'MqClient' | Future:
-        pass
+    async def connect(self) -> 'MqClient' | Future:
+        self._clientSession = await (SocketD.create_cluster_client(self._urls)
+            .config(self.__config_handle)
+            .listen(self._clientListener)
+            .open())
+
+        return self
+
+    def __config_handle(self, c:ClientConfig):
+        (c.meta_put(MqConstants.FOLKMQ_VERSION, FolkMQ.versionCodeAsString())
+          .heartbeat_interval(6_000)
+          .io_threads(1)
+          .codec_threads(1)
+          .exchange_threads(1))
+
+        if self._namespace:
+            c.meta_put(MqConstants.FOLKMQ_NAMESPACE, self._namespace)
+
+        if self._clientConfigHandler:
+            self._clientConfigHandler(c)
 
     def disconnect(self):
-        pass
+        self._clientSession.close()
 
     def config(self, configHandler: Callable[[ClientConfig], None]) -> 'MqClient':
-        pass
+        self._clientConfigHandler = configHandler
+        return self
 
     def autoAcknowledge(self, auto: bool) -> 'MqClient':
         pass

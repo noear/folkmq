@@ -12,7 +12,7 @@ from folkmq.common.MqConstants import MqConstants
 
 
 class MqClientListener(EventListener):
-    def __init__(self, client:MqClientDefault):
+    def init(self, client:MqClientDefault):
         self._client = client
 
         self.do_on(MqConstants.MQ_EVENT_DISTRIBUTE, self.doOn_distribute)

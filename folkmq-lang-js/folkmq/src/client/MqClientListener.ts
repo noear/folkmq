@@ -62,7 +62,7 @@ export class MqClientListener extends EventListener {
                     }
                     console.warn("Client request handle error, key=" + message.getKey(), e);
                 } catch (err) {
-                    console.warn("Client request handle error, key=" + message.getKey(), e);
+                    console.warn("Client request handle error, key=" + message.getKey(), err);
                 }
             }
         } else {
@@ -95,7 +95,7 @@ export class MqClientListener extends EventListener {
 
                     console.warn("Client consume handle error, key=" + message.getKey(), e);
                 } catch (err) {
-                    console.warn("Client consume handle error, key=" + message.getKey(), e);
+                    console.warn("Client consume handle error, key=" + message.getKey(), err);
                 }
             }
         }

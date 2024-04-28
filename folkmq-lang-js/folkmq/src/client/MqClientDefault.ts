@@ -342,7 +342,7 @@ export class MqClientDefault implements MqClientInternal {
         }
     }
 
-    transactionCheckback(transactionCheckback: IoConsumer<MqMessageReceived>) {
+    transactionCheckback(transactionCheckback: IoConsumer<MqMessageReceived>) :MqClient {
         if (transactionCheckback != null) {
             this._transactionCheckback = transactionCheckback;
         }

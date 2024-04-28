@@ -114,7 +114,7 @@ export interface MqClient {
      *
      * @param transactionCheckback 事务回查处理
      */
-    transactionCheckback(transactionCheckback: IoConsumer<MqMessageReceived>);
+    transactionCheckback(transactionCheckback: IoConsumer<MqMessageReceived>) : MqClient;
 
     /**
      * 新建事务

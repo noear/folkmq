@@ -72,7 +72,7 @@ class MqMetasResolver:
     # 获取过期时间
     #
     @abc.abstractmethod
-    def getExpiration(self, m: Entity)->int:...
+    def getExpiration(self, m: Entity)->float:...
 
     #
     # 设置过期时间

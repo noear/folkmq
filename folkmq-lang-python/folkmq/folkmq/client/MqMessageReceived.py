@@ -5,7 +5,6 @@ from socketd.transport.core import Entity
 from socketd.transport.core.Message import Message
 from socketd.transport.core.Session import Session
 
-from folkmq.client.MqClient import MqClientInternal
 from folkmq.client.MqMessage import MqMessageBase
 from folkmq.common.MqConstants import MqConstants
 from folkmq.common.MqTopicHelper import MqTopicHelper
@@ -35,40 +34,37 @@ class MqMessageReceived(MqMessageBase):
 
     # 回执
     @abstractmethod
-    async def acknowledge(self, isOk: bool):
+    def acknowledge(self, isOk: bool):
         ...
 
     # 响应
     @abstractmethod
-    async def response(self, entity:Entity | None):
+    def response(self, entity:Entity):
         ...
 
 class MqMessageReceivedImpl(MqMessageReceived):
-    def __init__(self, clientInternal:MqClientInternal, session:Session, source:Message):
+    def __init__(self, clientInternal:'MqClientInternal', session:Session, source:Message):
         self._clientInternal = clientInternal
         self._session = session
         self._source = source
 
         mr  = MqUtils.getOf(source)
 
-        self._sender = mr.getSender(source);
+        self._sender = mr.getSender(source)
 
-        self._key = mr.getKey(source);
-        self._tag = mr.getTag(source);
-        self._fullTopic = mr.getTopic(source);
-        self._topic = MqTopicHelper.getTopic(self._fullTopic);
-        self._consumerGroup = mr.getConsumerGroup(source);
+        self._key = mr.getKey(source)
+        self._tag = mr.getTag(source)
+        self._fullTopic = mr.getTopic(source)
+        self._topic = MqTopicHelper.getTopic(self._fullTopic)
+        self._consumerGroup = mr.getConsumerGroup(source)
 
-        self._qos = mr.getQos(source);
-        self._times = mr.getTimes(source);
-        self._sequence = mr.isSequence(source);
-        self._transaction = mr.isTransaction(source);
+        self._qos = mr.getQos(source)
+        self._times = mr.getTimes(source)
+        self._sequence = mr.isSequence(source)
+        self._transaction = mr.isTransaction(source)
 
-        self._expirationL = mr.getExpiration(source);
-        if self._expirationL == 0:
-            self._expirationL = None
-        else:
-            self._expiration = datetime(self._expirationL)
+        self._expirationL = mr.getExpiration(source)
+        self._expiration = self._expirationL
 
     def getSource(self) -> Message:
         return self._source
@@ -117,7 +113,7 @@ class MqMessageReceivedImpl(MqMessageReceived):
     def acknowledge(self, isOk: bool):
         self._clientInternal.reply(self._session, self._source, self, isOk, None)
 
-    def response(self, entity:Entity | None):
+    def response(self, entity:Entity):
         self._clientInternal.reply(self._session, self._source, self, True, entity)
 
     def __str__(self) ->str:

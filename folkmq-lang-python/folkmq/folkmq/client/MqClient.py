@@ -1,4 +1,4 @@
-from abc import abstractmethod
+from abc import abstractmethod, ABC
 from asyncio import Future
 from typing import Callable
 
@@ -13,149 +13,129 @@ from folkmq.client.MqMessageReceived import MqMessageReceived, MqMessageReceived
 from folkmq.client.MqTransaction import MqTransaction
 
 # 消息客户端
-class MqClient:
-    #
-    # 名字（即，默认消费者组）
-    #
+class MqClient(ABC):
     @abstractmethod
-    def name(self) -> str: ...
+    def name(self) -> str:
+        """名字（即，默认消费者组）"""
+        ...
 
-
-    #
-    # 名字取为（即，默认消费者组）
-    #
     @abstractmethod
-    def nameAs(self, name: str) -> 'MqClient': ...
+    def nameAs(self, name: str) -> 'MqClient':
+        """名字取为（即，默认消费者组）"""
+        ...
 
-
-    #
-    # 命名空间
-    #
     @abstractmethod
-    def namespace(self) -> str: ...
+    def namespace(self) -> str:
+        """命名空间"""
+        ...
 
-
-    #
-    # 命名空间
-    # @since 1.4
-    #
     @abstractmethod
-    def namespaceAs(self, namespace: str) -> 'MqClient': ...
+    def namespaceAs(self, namespace: str) -> 'MqClient':
+        """命名空间"""
+        ...
 
-
-    #
-    # 连接
-    #
     @abstractmethod
-    def connect(self) -> 'MqClient' | Future: ...
+    async def connect(self) -> 'MqClient':
+        """连接"""
+        ...
 
-
-    #
-    # 断开连接
-    #
     @abstractmethod
-    def disconnect(self): ...
+    async def disconnect(self):
+        """断开连接"""
+        ...
 
-
-    #
-    # 客户端配置
-    #
     @abstractmethod
-    def config(self, configHandler: Callable[[ClientConfig], None]) -> 'MqClient': ...
+    def config(self, configHandler: Callable[[ClientConfig], None]) -> 'MqClient':
+        """客户端配置"""
+        ...
 
-
-    #
-    # 自动回执
-    #
-    # @param auto 自动（默认为 true）
-    #
     @abstractmethod
-    def autoAcknowledge(self, auto: bool) -> 'MqClient': ...
+    def autoAcknowledge(self, auto: bool) -> 'MqClient':
+        """
+        自动回执
+        :param auto: 自动（默认为 true）
+        """
+        ...
 
-
-    #
-    # 订阅主题
-    #
-    # @param topic           主题
-    # @param consumerGroup   消费者组
-    # @param consumerHandler 消费处理
-    #
     @abstractmethod
-    def subscribe(self, topic: str, consumerGroup: str | None, autoAck: bool | None,
-                  consumerHandler: Callable[[MqMessageReceived], None]): ...
+    async def subscribe(self, topic: str, consumerGroup: str | None, autoAck: bool | None,
+                  consumerHandler: Callable[[MqMessageReceived], None]):
+        """
+        订阅主题
+        :param topic:           主题
+        :param consumerGroup:   消费者组
+        :param consumerHandler: 消费处理
+        """
+        ...
 
-
-    #
-    # 取消订阅主题
-    #
-    # @param topic         主题
-    # @param consumerGroup 消费者组
-    #
     @abstractmethod
-    def unsubscribe(self, topic: str, consumerGroup: str | None): ...
+    async def unsubscribe(self, topic: str, consumerGroup: str | None):
+        """
+        取消订阅主题
+        param topic:         主题
+        param consumerGroup: 消费者组
+        """
+        ...
 
-
-    #
-    # 同步发布消息
-    #
-    # @param topic   主题
-    # @param message 消息
-    #
     @abstractmethod
-    def publish(self, topic: str, message: MqMessage): ...
+    async def publish(self, topic: str, message: MqMessage):
+        """
+        同步发布消息
+        :param topic:   主题
+        :param message: 消息
+        """
+        ...
 
-
-    #
-    # 取消发布
-    #
-    # @param topic 主题
-    # @param key   主建
-    #
     @abstractmethod
-    def unpublish(self, topic: str, key: str): ...
+    async def unpublish(self, topic: str, key: str):
+        """
+        取消发布
+        :param topic: 主题
+        :param key:   主建
+        """
+        ...
 
 
-    #
-    # 监听
-    #
-    # @param listenHandler 监听处理
-    #
     @abstractmethod
-    def listen(self, listenHandler: Callable[[MqMessageReceived], None]): ...
+    async def listen(self, listenHandler: Callable[[MqMessageReceived], None]):
+        """
+        监听
+        :param listenHandler: 监听处理
+        :return:
+        """
+        ...
 
 
-    #
-    # 发送
-    #
-    # @param message 消息
-    # @param toName  发送目标名字
-    # @param timeout 超时（单位毫秒）
-    #
     @abstractmethod
-    def send(self, message: MqMessage, toName: str, timeout: int | None) -> RequestStream | None: ...
+    def send(self, message: MqMessage, toName: str, timeout: int | None) -> RequestStream | None:
+        """发送
+        :param message:消息
+        :param toName:发送目标名字
+        :param timeout:超时（单位毫秒）
+        """
+        ...
 
-
-    #
-    # 事务回查
-    #
-    # @param transactionCheckback 事务回查处理
-    #
     @abstractmethod
-    def transactionCheckback(self, transactionCheckback: Callable[[MqMessageReceived], None]): ...
+    def transactionCheckback(self, transactionCheckback: Callable[[MqMessageReceived], None]) -> 'MqClient':
+        """事务回查
+        :param transactionCheckback: 事务回查处理
+        """
+        ...
 
 
-    #
-    # 新建事务
-    #
     @abstractmethod
-    def newTransaction(self) -> MqTransaction: ...
+    def newTransaction(self) -> MqTransaction:
+        """新建事务"""
+        ...
 
 
 class MqClientInternal(MqClient):
-    #发布二次提交
     @abstractmethod
-    def publish2(self, tmid: str, *keyAry: str, isRollback: bool):...
+    async def publish2(self, tmid: str, keyAry: [str], isRollback: bool):
+        """发布二次提交"""
+        ...
 
-    #消费答复
     @abstractmethod
-    def reply(self, session: Session, f: Message, message: MqMessageReceivedImpl, isOk: bool, entity: Entity | None):...
+    def reply(self, session: Session, f: Message, message: MqMessageReceivedImpl, isOk: bool, entity: Entity):
+        """消费答复"""
+        ...

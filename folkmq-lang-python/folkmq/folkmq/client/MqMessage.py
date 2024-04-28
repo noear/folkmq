@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from socketd.transport.utils.StrUtils import StrUtils
+from socketd.utils.StrUtils import StrUtils
 
 from folkmq.client.MqTransaction import MqTransaction
 
@@ -44,13 +44,13 @@ class MqMessageBase:
 
 
 class MqMessage(MqMessageBase):
-    def __init__(self, body: str|bytes, key:str|None) :
+    def __init__(self, body: str|bytes, key:str|None = None) :
         if key:
             self.__key = key
         else:
             self.__key = StrUtils.guid()
 
-        if isinstance(str, body):
+        if isinstance(body, str):
             self.__body = body.encode("utf-8")
         else:
             self.__body = body
@@ -107,27 +107,27 @@ class MqMessage(MqMessageBase):
 
 
     def scheduled(self, scheduled: datetime)-> 'MqMessage':
-        self._scheduled = scheduled
+        self.__scheduled = scheduled
         return self
 
 
     def expiration(self,expiration: datetime)-> 'MqMessage':
-        self._expiration = expiration
+        self.__expiration = expiration
         return self
 
     def sequence(self, sequence: bool, sharding: str|None)-> 'MqMessage':
-        self._sequence = sequence
+        self.__sequence = sequence
         if sequence:
             if StrUtils.is_not_empty(sharding):
-                self._sequenceSharding = sharding
+                self.__sequenceSharding = sharding
         else:
-            self._sequenceSharding = None
+            self.__sequenceSharding = None
         return self
 
 
     def transaction(self, transaction: MqTransaction|None)-> 'MqMessage':
         if transaction is not None:
-            self._transaction = transaction
+            self.__transaction = transaction
             transaction.binding(self)
 
         return self
@@ -139,24 +139,24 @@ class MqMessage(MqMessageBase):
             return self.__transaction.tmid()
 
     def internalSender(self, sender: str)-> 'MqMessage':
-        self._sender = sender
+        self.__sender = sender
         return self
 
     def qos(self, qos: int)-> 'MqMessage':
-        self._qos = qos
+        self.__qos = qos
         return self
 
     def getAttr(self, name: str)-> str | None:
-        tmp = self._attrMap.get(name);
+        tmp = self.__attrMap.get(name);
         return tmp;
 
 
     def getAttrMap(self)-> dict[str,str]:
-        return self._attrMap
+        return self.__attrMap
 
 
     def attr(self, name: str, value: str)-> 'MqMessage':
-        self._attrMap.set(name, value)
+        self.__attrMap.set(name, value)
         return self
 
 

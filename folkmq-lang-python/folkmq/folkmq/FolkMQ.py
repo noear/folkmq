@@ -1,5 +1,6 @@
 from folkmq.client.MqClient import MqClient
 from folkmq.client.MqClientDefault import MqClientDefault
+from folkmq.client.MqMessage import MqMessage
 
 
 class FolkMQ:
@@ -17,5 +18,6 @@ class FolkMQ:
 
     @staticmethod
     def createClient(*serverUrls) -> MqClient:
-        return MqClientDefault(*serverUrls)
+        return MqClientDefault(serverUrls)
+
 

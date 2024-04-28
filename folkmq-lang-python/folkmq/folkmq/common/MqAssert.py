@@ -21,5 +21,5 @@ class MqAssert:
 
     @staticmethod
     def assertMetaSymbols(str: str, paramName: str, c:str, cS:str):
-        if str.index(c) >= 0:
+        if str.find(c) >= 0:
             raise Exception("Param '" + paramName + "' can't have symbols: '" + cS + "'");

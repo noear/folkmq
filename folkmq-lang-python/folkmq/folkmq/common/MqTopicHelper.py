@@ -10,7 +10,7 @@ class MqTopicHelper:
     #获取主题
     @staticmethod
     def getTopic(fullTopic:str):
-        idx = fullTopic.index(":")
+        idx = fullTopic.find(":")
         if  idx > 0:
             return fullTopic[idx + 1]
         else:

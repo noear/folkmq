@@ -2,6 +2,7 @@ from socketd.transport.core.Message import Message
 from socketd.transport.core.Session import Session
 from socketd.transport.core.entity.MessageDefault import MessageDefault
 
+from folkmq.common.MqConstants import MqConstants
 from folkmq.common.MqMetasResolver import MqMetasResolver
 from folkmq.common.MqMetasResolverV1 import MqMetasResolverV1
 from folkmq.common.MqMetasResolverV2 import MqMetasResolverV2
@@ -24,7 +25,7 @@ class MqUtils:
                 else:
                     return MqUtils.__v2
             else:
-                ver = t.handshake().param_or_default(MqMetasV2.MQ_META_VID, "1")
+                ver = t.handshake().param_or_default(MqConstants.FOLKMQ_VERSION, "1")
                 if "1" == ver:
                     return MqUtils.__v1
                 else:

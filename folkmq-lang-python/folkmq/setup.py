@@ -8,7 +8,7 @@ setup(
     description='@noear/folkmq python project',
     author='noear',
     url='https://folkmq.noear.org/',
-    packages=find_packages(exclude=['*test*']),   # 包内不需要引用的文件夹
+    packages=find_packages(exclude=['*folkmq-test*']),   # 包内不需要引用的文件夹
     install_requires=[                          # 依赖包
         'socket.d'
     ],

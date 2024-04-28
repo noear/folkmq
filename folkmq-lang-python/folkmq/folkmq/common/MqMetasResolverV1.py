@@ -5,7 +5,7 @@ from socketd.transport.core.Flags import Flags
 from socketd.transport.core.Message import Message
 from socketd.transport.core.entity.EntityDefault import EntityDefault
 from socketd.transport.core.entity.MessageBuilder import MessageBuilder
-from socketd.transport.utils.StrUtils import StrUtils
+from socketd.utils.StrUtils import StrUtils
 
 from folkmq.client.MqMessage import MqMessage
 from folkmq.common.MqConstants import MqConstants
@@ -37,7 +37,7 @@ class MqMetasResolverV1(MqMetasResolver):
         m.put_meta(MqMetasV1.MQ_META_CONSUMER_GROUP, consumerGroup);
 
     def getQos(self, m: Entity) -> int:
-        return "0" == m.meta(MqMetasV1.MQ_META_QOS) ? 0 : 1;
+        return 0 if "0" == m.meta(MqMetasV1.MQ_META_QOS) else 1;
 
     def getTimes(self, m: Entity) -> int:
         return int(m.meta_or_default(MqMetasV1.MQ_META_TIMES, "0"));
@@ -45,8 +45,8 @@ class MqMetasResolverV1(MqMetasResolver):
     def setTimes(self, m: Entity, times: int):
         m.put_meta(MqMetasV1.MQ_META_TIMES, times.toString());
 
-    def getExpiration(self, m: Entity) -> int:
-        return int(m.meta_or_default(MqMetasV1.MQ_META_EXPIRATION, "0"));
+    def getExpiration(self, m: Entity) -> float:
+        return float(m.meta_or_default(MqMetasV1.MQ_META_EXPIRATION, "0"));
 
     def setExpiration(self, m: Entity, expiration: int|None):
         if expiration is None:
@@ -67,38 +67,38 @@ class MqMetasResolverV1(MqMetasResolver):
         return "1" == (m.meta(MqMetasV2.MQ_META_TRANSACTION))
 
     def setTransaction(self, m: Entity, isTransaction: bool):
-        m.put_meta(MqMetasV2.MQ_META_TRANSACTION, (isTransaction ? "1" : "0"))
+        m.put_meta(MqMetasV2.MQ_META_TRANSACTION, ( "1" if isTransaction else "0"))
 
     def publishEntityBuild(self, topic: str, message: MqMessage) -> EntityDefault:
         # 构建消息实体
-        entity = EntityDefault(message.getBody())
+        entity = EntityDefault().data_set(message.getBody())
 
-        entity.metaPut(MqMetasV1.MQ_META_KEY, message.getKey())
-        entity.metaPut(MqMetasV1.MQ_META_TOPIC, topic)
-        entity.metaPut(MqMetasV1.MQ_META_QOS, (message.getQos() == 0 ? "0": "1"))
+        entity.meta_put(MqMetasV1.MQ_META_KEY, message.getKey())
+        entity.meta_put(MqMetasV1.MQ_META_TOPIC, topic)
+        entity.meta_put(MqMetasV1.MQ_META_QOS, ("0" if message.getQos() == 0 else "1"))
 
         # 标签
         if message.getTag():
-            entity.metaPut(MqMetasV2.MQ_META_TAG, message.getTag())
+            entity.meta_put(MqMetasV2.MQ_META_TAG, message.getTag())
 
 
         # 定时派发
         if message.getScheduled():
-            entity.metaPut(MqMetasV1.MQ_META_SCHEDULED, message.getScheduled()!.getTime().toString())
+            entity.meta_put(MqMetasV1.MQ_META_SCHEDULED, str(message.getScheduled().getTime()))
         else:
-            entity.metaPut(MqMetasV1.MQ_META_SCHEDULED, "0")
+            entity.meta_put(MqMetasV1.MQ_META_SCHEDULED, "0")
 
         # 过期时间
         if message.getExpiration() is not None:
-            entity.metaPut(MqMetasV1.MQ_META_EXPIRATION, message.getExpiration()!.getTime().toString())
+            entity.meta_put(MqMetasV1.MQ_META_EXPIRATION, str(message.getExpiration().getTime()))
 
 
         if  message.isTransaction():
-            entity.metaPut(MqMetasV2.MQ_META_TRANSACTION, "1")
+            entity.meta_put(MqMetasV2.MQ_META_TRANSACTION, "1")
 
 
         if message.getSender():
-            entity.metaPut(MqMetasV2.MQ_META_SENDER, message.getSender())
+            entity.meta_put(MqMetasV2.MQ_META_SENDER, message.getSender())
 
 
         # 是否有序
@@ -106,7 +106,7 @@ class MqMetasResolverV1(MqMetasResolver):
             entity.at(MqConstants.BROKER_AT_SERVER_HASH)
 
         if message.isSequence():
-            entity.metaPut(MqMetasV1.MQ_META_SEQUENCE, "1")
+            entity.meta_put(MqMetasV1.MQ_META_SEQUENCE, "1")
         else:
             entity.at(MqConstants.BROKER_AT_SERVER)
 
@@ -118,9 +118,10 @@ class MqMetasResolverV1(MqMetasResolver):
         return entity
 
     def routingMessageBuild(self, topic: str, message: MqMessage) -> Message:
-        ntity = self.publishEntityBuild(topic, message).at(MqConstants.BROKER_AT_SERVER)
+        entity = self.publishEntityBuild(topic, message).at(MqConstants.BROKER_AT_SERVER)
         messageDefault =  MessageBuilder().flag(Flags.Message) \
                                 .sid(StrUtils.guid()) \
                                 .event(MqConstants.MQ_EVENT_PUBLISH) \
                                 .entity(entity) \
                                 .build()
+        return messageDefault

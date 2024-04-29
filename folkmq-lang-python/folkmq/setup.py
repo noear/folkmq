@@ -4,13 +4,15 @@ from setuptools import setup,find_packages
 
 setup(
     name='folkmq',
-    version='1.4.2',
+    version='1.4.3',
     description='@noear/folkmq python project',
     author='noear',
     url='https://folkmq.noear.org/',
     packages=find_packages(exclude=['*folkmq-test*']),   # 包内不需要引用的文件夹
     install_requires=[                          # 依赖包
-        'socket.d>=2.4.14'
+        'loguru>=0.7.2',
+        'websockets>=12.0',
+        'socket.d>=2.4.14.1'
     ],
     classifiers=[
         'Development Status :: 5 - Production/Stable',
@@ -18,9 +20,9 @@ setup(
         'License :: OSI Approved',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 3.12',
+        'Programming Language :: Python :: 3.10',
         'Topic :: Software Development :: Libraries'
     ],
     zip_safe=True,
-    python_requires='>=3.12', # 建议使用3.12及以上
+    python_requires='>=3.10', # 建议使用3.10及以上
 )

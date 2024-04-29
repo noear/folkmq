@@ -2,7 +2,7 @@
   "name": "@noear/folkmq",
   "description": "@noear/folkmq typescript project",
   "author": "noear",
-  "license": "LGPL-2.1",
+  "license": "AGPL-3.0",
   "scripts": {
     "devBuild": "webpack --mode none",
     "prodBuild": "webpack --mode production"

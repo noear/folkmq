@@ -1,4 +1,5 @@
 import json
+import traceback
 
 from socketd.exception.SocketDExecption import SocketDAlarmException
 from socketd.transport.core.Message import Message
@@ -24,14 +25,16 @@ class MqClientListener(EventListener):
             message = MqMessageReceivedImpl(self._client, s, m)
             self.onReceive(s,m,message,False)
         except Exception as e:
-            log.warning(f"Client consume handle error, sid={m.sid()}, error: {e}")
+            e_msg = traceback.format_exc()
+            log.warning(f"Client consume handle error, sid={m.sid()} \n{e_msg}")
 
     def doOn_request(self, s:Session, m:Message):
         try:
             message = MqMessageReceivedImpl(self._client, s, m)
             self.onReceive(s,m,message,True)
         except Exception as e:
-            log.warning(f"Client consume handle error, sid={m.sid()}, error: {e}")
+            e_msg = traceback.format_exc()
+            log.warning(f"Client consume handle error, sid={m.sid()} \n{e_msg}")
 
     def onReceive(self, s: Session, m: Message, message: MqMessageReceivedImpl, isRequest: bool):
         """接收时"""
@@ -49,11 +52,13 @@ class MqClientListener(EventListener):
                         s.send_alarm(m, "Client no request handler!")
             except Exception as e:
                 try:
+                    e_msg = traceback.format_exc()
                     if s.is_valid():
                         s.send_alarm(m, "Client request handle error:" + e)
-                    log.warning(f"Client request handle error, key={message.getKey()}, error: {e}")
+                    log.warning(f"Client request handle error, key={message.getKey()} \n{e_msg}")
                 except Exception as err:
-                    log.warning(f"Client request handle error, key={message.getKey()}, error: {err}")
+                    err_msg = traceback.format_exc()
+                    log.warning(f"Client request handle error, key={message.getKey()} \n{err_msg}")
         else:
             subscription = self._client.getSubscription(message.getFullTopic(), message.getConsumerGroup())
 
@@ -76,9 +81,11 @@ class MqClientListener(EventListener):
                         # 没有订阅
                         self._client.reply(s, m, message, False, None)
 
-                    log.warning(f"Client consume handle error, key={message.getKey()}, error: {e}")
+                    e_msg = traceback.format_exc()
+                    log.warning(f"Client consume handle error, key={message.getKey()} \n{e_msg}")
                 except Exception as err:
-                    log.warning(f"Client consume handle error, key={message.getKey()}, error: {err}")
+                    err_msg = traceback.format_exc()
+                    log.warning(f"Client consume handle error, key={message.getKey()} \n{err_msg}")
 
     async def on_open(self, session:Session):
         """会话打开时"""
@@ -118,6 +125,6 @@ class MqClientListener(EventListener):
         await super().on_error(session, error)
 
         if isinstance(error, SocketDAlarmException):
-            log.warning(f"Client error, sessionId={session.session_id()}, error:{error}")
+            log.warning(f"Client alarm, sessionId={session.session_id()}, alarm:{error}")
         else:
             log.warning(f"Client error, sessionId={session.session_id()}, error:{error}")

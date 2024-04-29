@@ -17,7 +17,7 @@ async def main():
     )
 
     # 发布
-    for i in range(1):
+    for i in range(10):
         await client.publish("test", MqMessage("hot-" + str(i)))
 
     await asyncio.Future()

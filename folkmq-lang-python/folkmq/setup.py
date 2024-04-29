@@ -10,7 +10,7 @@ setup(
     url='https://folkmq.noear.org/',
     packages=find_packages(exclude=['*folkmq-test*']),   # 包内不需要引用的文件夹
     install_requires=[                          # 依赖包
-        'socket.d'
+        'socket.d>=2.4.14'
     ],
     classifiers=[
         'Development Status :: 5 - Production/Stable',

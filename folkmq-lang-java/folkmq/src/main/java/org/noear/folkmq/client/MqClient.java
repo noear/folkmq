@@ -4,7 +4,6 @@ import org.noear.socketd.transport.client.ClientConfigHandler;
 import org.noear.socketd.transport.stream.RequestStream;
 import org.noear.socketd.utils.StrUtils;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;

@@ -22,7 +22,7 @@ async function main() {
         client.publish("test", FolkMQ.newMessage("hot-2").transaction(tran));
         client.publish("test", FolkMQ.newMessage("hot-3").transaction(tran));
 
-        //tran.commit();
+        tran.commit();
     } catch (e) {
         tran.rollback();
         console.error(e);

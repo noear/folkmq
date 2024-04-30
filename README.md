@@ -44,8 +44,6 @@
 	<img src="https://img.shields.io/badge/QQ交流群-870505482-orange"/></a>
 </p>
 
-##### 语言： 中文 | [English](README.md)
-
 <hr />
 
 ## 简单就是未来

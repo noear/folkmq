@@ -19,6 +19,11 @@ target/
 *.bak
 
 
+### Python ###
+*.pyc
+venv/
+*.egg-info/
+
 ### NetBeans ###
 nbproject/private/
 build/

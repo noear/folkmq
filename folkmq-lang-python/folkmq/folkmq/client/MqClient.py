@@ -7,6 +7,7 @@ from socketd.transport.core import Entity
 from socketd.transport.core.Message import Message
 from socketd.transport.core.Session import Session
 from socketd.transport.stream.RequestStream import RequestStream
+from socketd.utils.CompletableFuture import CompletableFuture
 
 from folkmq.client.MqMessage import MqMessage
 from folkmq.client.MqMessageReceived import MqMessageReceived, MqMessageReceivedImpl
@@ -81,6 +82,14 @@ class MqClient(ABC):
     async def publish(self, topic: str, message: MqMessage):
         """
         同步发布消息
+        :param topic:   主题
+        :param message: 消息
+        """
+        ...
+
+    def publishAsync(self, topic: str, message: MqMessage) -> CompletableFuture:
+        """
+        异步发布消息
         :param topic:   主题
         :param message: 消息
         """

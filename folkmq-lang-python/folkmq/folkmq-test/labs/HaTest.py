@@ -7,8 +7,8 @@ from folkmq.client.MqMessage import MqMessage
 
 
 async def main():
-    client = await (FolkMQ.createClient("folkmq://127.0.0.1:18601?ak=ak1&sk=sk1",
-                        "folkmq://127.0.0.1:18602?ak=ak1&sk=sk1")
+    client = await (FolkMQ.createClient("folkmq:ws://127.0.0.1:18603?ak=ak1&sk=sk1",
+                        "folkmq:ws://127.0.0.1:18703?ak=ak1&sk=sk1")
                     .nameAs("demoapp")
                     .connect())
 
@@ -20,7 +20,8 @@ async def main():
     i:int = 0
     # 发布
     while True:
-        await client.publish("demo", MqMessage("test-" + str(i)))
+        i+=1
+        client.publishAsync("demo", MqMessage("test-" + str(i)))
 
     await asyncio.Future()
 

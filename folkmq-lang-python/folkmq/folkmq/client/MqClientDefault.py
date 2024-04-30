@@ -7,9 +7,11 @@ from socketd.transport.client.ClientConfig import ClientConfig
 from socketd.transport.core import Entity
 from socketd.transport.core.Message import Message
 from socketd.transport.core.Session import Session
+from socketd.transport.core.Entity import Reply
 from socketd.transport.core.entity.EntityDefault import EntityDefault
 from socketd.transport.core.entity.StringEntity import StringEntity
 from socketd.transport.stream.RequestStream import RequestStream
+from socketd.utils.CompletableFuture import CompletableFuture
 from socketd.utils.LogConfig import log
 from socketd.utils.RunUtils import RunUtils
 
@@ -39,6 +41,8 @@ class MqClientDefault(MqClientInternal):
             self._clientListener =  MqClientListener()
 
         self._clientListener.init(self)
+
+        self._autoAcknowledge = True
 
         self._name:str|None = None
         self._namespace:str|None = None
@@ -187,13 +191,56 @@ class MqClientDefault(MqClientInternal):
         entity = MqUtils.getOf(session).publishEntityBuild(topic, message)
 
         if message.getQos() > 0:
-            resp = await session.send_and_request(MqConstants.MQ_EVENT_PUBLISH, entity).waiter()
+            resp = await session.send_and_request(MqConstants.MQ_EVENT_PUBLISH, entity, 0).waiter()
             confirm = int(resp.meta_or_default(MqConstants.MQ_META_CONFIRM, "0"))
             if confirm != 1:
                 messsage = "Client message publish confirm failed: " + resp.data_as_string()
                 raise FolkmqException(messsage)
         else:
             session.send(MqConstants.MQ_EVENT_PUBLISH, entity)
+
+    def publishAsync(self, topic: str, message: MqMessage) -> CompletableFuture:
+        MqAssert.requireNonNull(topic, "Param 'topic' can't be null")
+        MqAssert.requireNonNull(message, "Param 'message' can't be null")
+
+        MqAssert.assertMeta(topic, "topic")
+
+        if self._clientSession is None:
+            raise SocketDConnectionException("Not connected!")
+
+        # 支持命名空间
+        topic = MqTopicHelper.getFullTopic(self._namespace, topic)
+        session = self._clientSession.get_session_any(self._diversionOrNull(topic, message))
+
+        if session is None or session.is_valid() == False:
+            raise SocketDException("No session is available!")
+
+        entity = MqUtils.getOf(session).publishEntityBuild(topic, message)
+
+        if message.getQos() > 0:
+            _future :CompletableFuture  = CompletableFuture()
+            def _then_reply_do(resp:Reply):
+                confirm = int(resp.meta_or_default(MqConstants.MQ_META_CONFIRM, "0"))
+                if confirm != 1:
+                    messsage = "Client message publish confirm failed: " + resp.data_as_string()
+                    _future.set_e(FolkmqException(messsage))
+                    _future.accept(False)
+                else:
+                    _future.accept(True)
+
+            def _then_error_do(err:Exception):
+                _future.set_e(err)
+                _future.accept(False)
+
+            (session.send_and_request(MqConstants.MQ_EVENT_PUBLISH, entity, 0)
+             .then_reply(_then_reply_do)
+             .then_error(_then_error_do))
+
+            return _future
+
+        else:
+            session.send(MqConstants.MQ_EVENT_PUBLISH, entity)
+            return None
 
     async def unpublish(self, topic: str, key: str):
         MqAssert.requireNonNull(topic, "Param 'topic' can't be null")

@@ -7,8 +7,8 @@ import org.noear.socketd.utils.StrUtils;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.DelayQueue;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.LongAdder;
@@ -33,7 +33,7 @@ public abstract class MqQueueBase implements MqQueue {
     protected final ReentrantLock messageAddLock = new ReentrantLock(true);
 
     //消费者会话列表
-    private final List<Session> consumerSessions = new Vector<>();
+    private final List<Session> consumerSessions = new CopyOnWriteArrayList<>();
     //消息计数器
     private final LongAdder[] messageCounters = new LongAdder[9];
 

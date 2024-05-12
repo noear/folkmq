@@ -92,6 +92,7 @@ export class MqClientDefault implements MqClientInternal {
 
         for (let url of this._urls) {
             url = url.replace("folkmq:ws://", "sd:ws://");
+            url = url.replace("folkmq:wss://", "sd:wss://");
             url = url.replace("folkmq://", "sd:tcp://");
 
 

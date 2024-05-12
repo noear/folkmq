@@ -110,6 +110,7 @@ public class MqClientDefault implements MqClientInternal {
 
         for (String url : urls) {
             url = url.replaceAll("folkmq:ws://", "sd:ws://");
+            url = url.replaceAll("folkmq:wss://", "sd:wss://");
             url = url.replaceAll("folkmq://", "sd:tcp://");
 
             for (String url1 : url.split(",")) {

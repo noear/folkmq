@@ -74,6 +74,7 @@ class MqClientDefault(MqClientInternal):
 
         for url in self._urls:
             url = url.replace("folkmq:ws://", "sd:ws://")
+            url = url.replace("folkmq:wss://", "sd:wss://")
             url = url.replace("folkmq://", "sd:tcp://")
             serverUrls.append(url)
 

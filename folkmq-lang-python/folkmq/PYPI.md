@@ -4,9 +4,9 @@
 * 安装依赖
 
 ```
-pip install -r reqeusts.txt
+sudo pip install -r reqeusts.txt
 
-pip install -r reqeusts.txt -i https://pypi.tuna.tsinghua.edu.cn/simple/
+sudo pip install -r reqeusts.txt -i https://pypi.tuna.tsinghua.edu.cn/simple/
 
 pip3 install setuptools -i https://pypi.tuna.tsinghua.edu.cn/simple/
 ```

@@ -10,7 +10,7 @@ from folkmq.client.MqRouter import MqRouter
 
 async def main():
     # 客户端1
-    client1 = await (FolkMQ.createClient("folkmq:ws://127.0.0.1:18602")
+    client1 = await (FolkMQ.create_client("folkmq:ws://127.0.0.1:18602")
                     .name_as("app1")
                     .connect())
 
@@ -21,7 +21,7 @@ async def main():
     await client1.listen(router.consume)
 
     # 客户端2
-    client2 = await (FolkMQ.createClient("folkmq:ws://127.0.0.1:18602")
+    client2 = await (FolkMQ.create_client("folkmq:ws://127.0.0.1:18602")
                      .name_as("app2")
                      .connect())
 

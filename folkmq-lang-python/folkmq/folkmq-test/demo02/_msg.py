@@ -7,7 +7,7 @@ from folkmq.client.MqMessage import MqMessage
 
 
 async def main():
-    client = await (FolkMQ.createClient("folkmq:ws://127.0.0.1:18602")
+    client = await (FolkMQ.create_client("folkmq:ws://127.0.0.1:18602")
                     .name_as("demoapp")
                     .connect())
 

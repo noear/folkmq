@@ -89,7 +89,7 @@ class MqClientDefault(MqClientInternal):
     def __config_handle(self, c:ClientConfig):
         from folkmq.FolkMQ import FolkMQ
 
-        (c.meta_put(MqConstants.FOLKMQ_VERSION, FolkMQ.versionCodeAsString())
+        (c.meta_put(MqConstants.FOLKMQ_VERSION, FolkMQ.version_code_as_string())
           .heartbeat_interval(6_000)
           .io_threads(1)
           .codec_threads(1)

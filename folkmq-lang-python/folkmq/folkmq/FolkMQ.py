@@ -5,19 +5,19 @@ from folkmq.client.MqMessage import MqMessage
 
 class FolkMQ:
     @staticmethod
-    def versionCode()->int:
+    def version_code()->int:
         return 2
 
     @staticmethod
-    def versionCodeAsString()->str:
-        return f'{FolkMQ.versionCode()}'
+    def version_code_as_string()->str:
+        return f'{FolkMQ.version_code()}'
 
     @staticmethod
-    def versionName()->str:
+    def version_name()->str:
         return "1.4.5"
 
     @staticmethod
-    def createClient(*serverUrls) -> MqClient:
+    def create_client(*serverUrls) -> MqClient:
         return MqClientDefault(serverUrls)
 
 

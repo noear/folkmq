@@ -110,7 +110,7 @@ class MqMetasResolverV2(MqMetasResolver):
             entity.at(MqConstants.BROKER_AT_SERVER)
 
         from folkmq.FolkMQ import FolkMQ
-        entity.meta_put(MqMetasV2.MQ_META_VID, str(FolkMQ.versionCode()))
+        entity.meta_put(MqMetasV2.MQ_META_VID, str(FolkMQ.version_code()))
 
         #用户属性
         for kv in message.get_attr_map():

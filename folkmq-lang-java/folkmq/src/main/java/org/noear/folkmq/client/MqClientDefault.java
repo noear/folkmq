@@ -133,6 +133,7 @@ public class MqClientDefault implements MqClientInternal {
                 .config(c -> {
                     c.metaPut(MqConstants.FOLKMQ_VERSION, FolkMQ.versionCodeAsString())
                             .heartbeatInterval(6_000)
+                            .maxMemoryRatio(0.8F)
                             .nolockSend(true)
                             .ioThreads(1)
                             .codecThreads(1)

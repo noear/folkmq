@@ -60,7 +60,7 @@ public class MqMessageHolder implements Delayed {
         this.qos = qos;
         this.expiration = expiration;
         this.sequence = sequence;
-        this.sequenceSharding = from.meta(EntityMetas.META_X_Hash);
+        this.sequenceSharding = from.meta(EntityMetas.META_X_HASH);
         this.transaction = transaction;
         this.distributeCount = distributeCount;
         this.distributeTimeRef = distributeTime;

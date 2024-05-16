@@ -155,7 +155,7 @@ public class MqMetasResolverV2 implements MqMetasResolver {
 
                 if(message.isTransaction() == false && StrUtils.isNotEmpty(message.getSequenceSharding())){
                     //不是事务，并且有顺序分片
-                    entity.metaPut(EntityMetas.META_X_Hash, message.getSequenceSharding());
+                    entity.metaPut(EntityMetas.META_X_HASH, message.getSequenceSharding());
                 }
             }
         } else {

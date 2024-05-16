@@ -105,7 +105,7 @@ class MqMetasResolverV2(MqMetasResolver):
 
                 if message.isTransaction() == False and message.getSequenceSharding():
                     # 不是事务，并且有顺序分片
-                    entity.meta_put(EntityMetas.META_X_Hash, message.getSequenceSharding())
+                    entity.meta_put(EntityMetas.META_X_HASH, message.getSequenceSharding())
         else:
             entity.at(MqConstants.BROKER_AT_SERVER)
 

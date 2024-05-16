@@ -11,13 +11,6 @@ import java.util.concurrent.CountDownLatch;
 //单连接单线程发
 public class BenchmarkTest {
     public static void main(String[] args) throws Exception {
-        //服务端
-        MqServer server = new MqServerDefault()
-                .addAccess("folkmq", "YapLHTx19RlsEE16")
-                .start(18602);
-
-        Thread.sleep(1000);
-
         //客户端
         int count = 100_000;
         CountDownLatch countDownLatch = new CountDownLatch(count);
@@ -43,7 +36,11 @@ public class BenchmarkTest {
         //发布测试
         long start_time = System.currentTimeMillis();
         for (int i = 0; i < count; i++) {
-            client.publishAsync("test", new MqMessage("test-" + i));
+            client.publishAsync("test", new MqMessage("test-" + i)).whenComplete((r,e)->{
+                if(e!=null){
+                    e.printStackTrace();
+                }
+            });
         }
         long sendTime = System.currentTimeMillis() - start_time;
 

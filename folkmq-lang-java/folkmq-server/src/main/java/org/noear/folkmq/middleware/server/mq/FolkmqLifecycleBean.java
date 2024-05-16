@@ -88,6 +88,7 @@ public class FolkmqLifecycleBean implements LifecycleBean {
         //服务端（鉴权为可选。不添加则不鉴权）
         localServer = FolkMQ.createServer(schema)
                 .config(c -> c.serialSend(true)
+                        .maxMemoryRatio(0.8F)
                         .ioThreads(MqServerConfig.ioThreads)
                         .codecThreads(MqServerConfig.codecThreads)
                         .exchangeThreads(MqServerConfig.exchangeThreads))
@@ -179,6 +180,7 @@ public class FolkmqLifecycleBean implements LifecycleBean {
                         c.metaPut(MqConstants.FOLKMQ_VERSION, FolkMQ.versionCodeAsString())
                                 .heartbeatInterval(6_000)
                                 .serialSend(true)
+                                .maxMemoryRatio(0.8F)
                                 .ioThreads(MqServerConfig.ioThreads)
                                 .codecThreads(MqServerConfig.codecThreads)
                                 .exchangeThreads(MqServerConfig.exchangeThreads))

@@ -2,6 +2,7 @@ import json
 import traceback
 
 from socketd.exception.SocketDExecption import SocketDAlarmException
+from socketd.transport.core.EntityMetas import EntityMetas
 from socketd.transport.core.Message import Message
 from socketd.transport.core.Session import Session
 from socketd.transport.core.entity.StringEntity import StringEntity
@@ -108,6 +109,7 @@ class MqClientListener(EventListener):
         jsonStr = json.dumps(subscribeData)
         entity = (StringEntity(jsonStr)
                   .meta_put(MqConstants.MQ_META_BATCH, "1")
+                  .meta_put(EntityMetas.META_X_UNLIMITED, "1")
                   .meta_put("@", MqConstants.BROKER_AT_SERVER))
 
         await session.send_and_request(MqConstants.MQ_EVENT_SUBSCRIBE, entity).waiter()

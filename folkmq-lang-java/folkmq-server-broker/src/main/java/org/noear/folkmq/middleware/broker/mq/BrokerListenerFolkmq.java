@@ -5,6 +5,7 @@ import org.noear.folkmq.common.MqConstants;
 import org.noear.snack.ONode;
 import org.noear.socketd.broker.BrokerListener;
 import org.noear.socketd.transport.core.Entity;
+import org.noear.socketd.transport.core.EntityMetas;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
 import org.noear.socketd.transport.core.entity.StringEntity;
@@ -148,7 +149,9 @@ public class BrokerListenerFolkmq extends BrokerListener {
             //同步订阅
             if (subscribeMap.size() > 0) {
                 String json = ONode.stringify(subscribeMap);
-                Entity entity = new StringEntity(json).metaPut(MqConstants.MQ_META_BATCH, "1");
+                Entity entity = new StringEntity(json)
+                        .metaPut(MqConstants.MQ_META_BATCH, "1")
+                        .metaPut(EntityMetas.META_X_UNLIMITED, "1");
                 requester.sendAndRequest(MqConstants.MQ_EVENT_SUBSCRIBE, entity, 30_000).await();
             }
 

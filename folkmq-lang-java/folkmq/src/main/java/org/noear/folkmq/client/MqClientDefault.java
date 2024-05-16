@@ -14,6 +14,7 @@ import org.noear.socketd.exception.SocketDException;
 import org.noear.socketd.transport.client.ClientConfigHandler;
 import org.noear.socketd.transport.client.ClientSession;
 import org.noear.socketd.transport.core.Entity;
+import org.noear.socketd.transport.core.EntityMetas;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
 import org.noear.socketd.transport.core.entity.EntityDefault;
@@ -246,6 +247,7 @@ public class MqClientDefault implements MqClientInternal {
                 Entity entity = new StringEntity("")
                         .metaPut(MqConstants.MQ_META_TOPIC, subscription.getTopic())
                         .metaPut(MqConstants.MQ_META_CONSUMER_GROUP, subscription.getConsumerGroup())
+                        .metaPut(EntityMetas.META_X_UNLIMITED, "1")
                         .at(MqConstants.BROKER_AT_SERVER_ALL);
 
                 //使用 Qos1
@@ -276,6 +278,7 @@ public class MqClientDefault implements MqClientInternal {
                 Entity entity = new StringEntity("")
                         .metaPut(MqConstants.MQ_META_TOPIC, topic)
                         .metaPut(MqConstants.MQ_META_CONSUMER_GROUP, consumerGroup)
+                        .metaPut(EntityMetas.META_X_UNLIMITED, "1")
                         .at(MqConstants.BROKER_AT_SERVER_ALL);
 
                 //使用 Qos1

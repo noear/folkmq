@@ -4,6 +4,7 @@ import org.noear.folkmq.common.MqConstants;
 import org.noear.snack.ONode;
 import org.noear.socketd.exception.SocketDAlarmException;
 import org.noear.socketd.transport.core.Entity;
+import org.noear.socketd.transport.core.EntityMetas;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
 import org.noear.socketd.transport.core.entity.StringEntity;
@@ -152,6 +153,7 @@ public class MqClientListener extends EventListener {
         String json = ONode.stringify(subscribeData);
         Entity entity = new StringEntity(json)
                 .metaPut(MqConstants.MQ_META_BATCH, "1")
+                .metaPut(EntityMetas.META_X_UNLIMITED, "1")
                 .at(MqConstants.BROKER_AT_SERVER);
 
         session.sendAndRequest(MqConstants.MQ_EVENT_SUBSCRIBE, entity, 30_000).await();

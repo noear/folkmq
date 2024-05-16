@@ -5,6 +5,7 @@ from socketd.cluster.ClusterClientSession import ClusterClientSession
 from socketd.exception.SocketDExecption import SocketDConnectionException, SocketDException
 from socketd.transport.client.ClientConfig import ClientConfig
 from socketd.transport.core import Entity
+from socketd.transport.core.EntityMetas import EntityMetas
 from socketd.transport.core.Message import Message
 from socketd.transport.core.Session import Session
 from socketd.transport.core.Entity import Reply
@@ -141,6 +142,7 @@ class MqClientDefault(MqClientInternal):
                 entity = (StringEntity("")
                           .meta_put(MqConstants.MQ_META_TOPIC, subscription.getTopic())
                           .meta_put(MqConstants.MQ_META_CONSUMER_GROUP, subscription.getConsumerGroup())
+                          .meta_put(EntityMetas.META_X_UNLIMITED, "1")
                           .at(MqConstants.BROKER_AT_SERVER_ALL))
                 #使用 Qos1
                 await session.send_and_request(MqConstants.MQ_EVENT_SUBSCRIBE, entity, 30_000).waiter()

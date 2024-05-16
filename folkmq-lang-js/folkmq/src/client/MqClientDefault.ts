@@ -21,6 +21,7 @@ import {MqTransaction, MqTransactionImpl} from "./MqTransaction";
 import {Entity} from "@noear/socket.d/transport/core/Entity";
 import {MqAlarm} from "./MqAlarm";
 import {MqTopicHelper} from "../common/MqTopicHelper";
+import {EntityMetas} from "@noear/socket.d/transport/core/EntityMetas";
 
 /**
  * 消息客户端默认实现
@@ -185,6 +186,7 @@ export class MqClientDefault implements MqClientInternal {
                 let entity = SocketD.newEntity("")
                     .metaPut(MqConstants.MQ_META_TOPIC, subscription.getTopic())
                     .metaPut(MqConstants.MQ_META_CONSUMER_GROUP, subscription.getConsumerGroup())
+                    .metaPut(EntityMetas.META_X_UNLIMITED, "1")
                     .at(MqConstants.BROKER_AT_SERVER_ALL);
 
                 //使用 Qos1

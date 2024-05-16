@@ -6,6 +6,7 @@ import {SocketDAlarmException} from "@noear/socket.d/exception/SocketDException"
 import {MqClientDefault} from "./MqClientDefault";
 import {MqMessageReceivedImpl} from "./MqMessageReceived";
 import {Message} from "@noear/socket.d/transport/core/Message";
+import {EntityMetas} from "@noear/socket.d/transport/core/EntityMetas";
 
 export class MqClientListener extends EventListener {
     private _client: MqClientDefault;
@@ -127,6 +128,7 @@ export class MqClientListener extends EventListener {
         let json = JSON.stringify(subscribeData);
         let entity = SocketD.newEntity(json)
             .metaPut(MqConstants.MQ_META_BATCH, "1")
+            .metaPut(EntityMetas.META_X_UNLIMITED, "1")
             .metaPut("@", MqConstants.BROKER_AT_SERVER);
 
         session.sendAndRequest(MqConstants.MQ_EVENT_SUBSCRIBE, entity).await();

@@ -41,7 +41,7 @@ class MqClientListener(EventListener):
         """接收时"""
         if isRequest:
             try:
-                if message.isTransaction():
+                if message.is_transaction():
                     if self._client._transactionCheckback is not None:
                         self._client._transactionCheckback(message)
                     else:
@@ -56,18 +56,18 @@ class MqClientListener(EventListener):
                     e_msg = traceback.format_exc()
                     if s.is_valid():
                         s.send_alarm(m, "Client request handle error:" + e)
-                    log.warning(f"Client request handle error, key={message.getKey()} \n{e_msg}")
+                    log.warning(f"Client request handle error, key={message.get_key()} \n{e_msg}")
                 except Exception as err:
                     err_msg = traceback.format_exc()
-                    log.warning(f"Client request handle error, key={message.getKey()} \n{err_msg}")
+                    log.warning(f"Client request handle error, key={message.get_key()} \n{err_msg}")
         else:
-            subscription = self._client.getSubscription(message.getFullTopic(), message.getConsumerGroup())
+            subscription = self._client.getSubscription(message.getFullTopic(), message.get_consumer_group())
 
             try:
                 if subscription is not None:
                     # 有订阅
                     subscription.consume(message)
-                    if subscription.isAutoAck():
+                    if subscription.is_auto_ack():
                         self._client.reply(s, m, message, True, None)
                 else:
                     # 没有订阅
@@ -76,17 +76,17 @@ class MqClientListener(EventListener):
                 try:
                     if subscription is not None:
                         # 有订阅
-                        if subscription.isAutoAck():
+                        if subscription.is_auto_ack():
                             self._client.reply(s, m, message, False, None)
                     else:
                         # 没有订阅
                         self._client.reply(s, m, message, False, None)
 
                     e_msg = traceback.format_exc()
-                    log.warning(f"Client consume handle error, key={message.getKey()} \n{e_msg}")
+                    log.warning(f"Client consume handle error, key={message.get_key()} \n{e_msg}")
                 except Exception as err:
                     err_msg = traceback.format_exc()
-                    log.warning(f"Client consume handle error, key={message.getKey()} \n{err_msg}")
+                    log.warning(f"Client consume handle error, key={message.get_key()} \n{err_msg}")
 
     async def on_open(self, session:Session):
         """会话打开时"""
@@ -99,12 +99,12 @@ class MqClientListener(EventListener):
 
         subscribeData:dict[str,str] = {}
         for subscription in self._client.getSubscriptionAll():
-            queueNameSet = subscribeData.get(subscription.getTopic())
+            queueNameSet = subscribeData.get(subscription.get_topic())
             if queueNameSet is None:
                 queueNameSet = set()
-                subscribeData[subscription.getTopic()] = queueNameSet
+                subscribeData[subscription.get_topic()] = queueNameSet
 
-            queueNameSet.add(subscription.getQueueName())
+            queueNameSet.add(subscription.get_queue_name())
 
         jsonStr = json.dumps(subscribeData)
         entity = (StringEntity(jsonStr)

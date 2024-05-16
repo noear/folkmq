@@ -11,12 +11,12 @@ class MqRouter:
         self._consumeHandler:Union[Callable[[MqMessageReceived], None], None] = None
 
     # 添加映射处理
-    def doOn(self, mapping:str, consumeHandler:Callable[[MqMessageReceived], None]) -> 'MqRouter':
+    def do_on(self, mapping:str, consumeHandler:Callable[[MqMessageReceived], None]) -> 'MqRouter':
         self._mappingMap[mapping] = consumeHandler
         return self
 
     # 添加消费处理
-    def doOnConsume(self, consumeHandler:Callable[[MqMessageReceived], None]) -> 'MqRouter':
+    def do_on_consume(self, consumeHandler:Callable[[MqMessageReceived], None]) -> 'MqRouter':
         self._consumeHandler = consumeHandler
         return self
 

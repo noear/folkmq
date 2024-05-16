@@ -1,3 +1,4 @@
+from abc import abstractmethod
 from datetime import datetime
 
 from socketd.utils.StrUtils import StrUtils
@@ -7,40 +8,40 @@ from folkmq.client.MqTransaction import MqTransaction
 
 class MqMessageBase:
     #发送人
-    @staticmethod
-    def getSender(self) -> str | None: ...
+    @abstractmethod
+    def get_sender(self) -> str | None: ...
 
     #主建
-    @staticmethod
-    def getKey(self) -> str: ...
+    @abstractmethod
+    def get_key(self) -> str: ...
 
     #标签
-    @staticmethod
-    def getTag(self) -> str: ...
+    @abstractmethod
+    def get_tag(self) -> str: ...
 
     #内容
-    @staticmethod
-    def getBody(self) -> bytes: ...
+    @abstractmethod
+    def get_body(self) -> bytes: ...
 
     #过期时间
-    @staticmethod
-    def getExpiration(self) -> datetime | None: ...
+    @abstractmethod
+    def get_expiration(self) -> datetime | None: ...
 
     #是否事务
-    @staticmethod
-    def isTransaction(self) -> bool: ...
+    @abstractmethod
+    def is_transaction(self) -> bool: ...
 
     #是否有序
-    @staticmethod
-    def isSequence(self) -> bool: ...
+    @abstractmethod
+    def is_sequence(self) -> bool: ...
 
     #质量等级
-    @staticmethod
-    def getQos(self) -> int: ...
+    @abstractmethod
+    def get_qos(self) -> int: ...
 
     #获取属性
-    @staticmethod
-    def getAttr(self, name: str) -> str | None: ...
+    @abstractmethod
+    def get_attr(self, name: str) -> str | None: ...
 
 
 class MqMessage(MqMessageBase):
@@ -66,41 +67,41 @@ class MqMessage(MqMessageBase):
         self.__attrMap: dict[str, str] = {}
         self.__transaction:MqTransaction = None
 
-    def getSender(self) -> str | None:
+    def get_sender(self) -> str | None:
         return self.__sender
 
-    def getKey(self) -> str:
+    def get_key(self) -> str:
         return self.__key
 
-    def getTag(self) -> str | None:
+    def get_tag(self) -> str | None:
         return self.__tag
 
-    def getBody(self) -> bytes:
+    def get_body(self) -> bytes:
         return self.__body
 
     def getScheduled(self) -> datetime:
         return self.__scheduled
 
-    def getExpiration(self) -> datetime:
+    def get_expiration(self) -> datetime:
         return self.__expiration
 
-    def isTransaction(self) -> bool:
+    def is_transaction(self) -> bool:
         return self.__transaction is not None
 
-    def isSequence(self) -> bool:
+    def is_sequence(self) -> bool:
         return self.__sequence
 
     def getSequenceSharding(self)->str:
         return self.__sequenceSharding
 
-    def getQos(self) -> int:
+    def get_qos(self) -> int:
         return self.__qos
 
     def tag(self, tag: str)->'MqMessage':
         self.__tag = tag
         return self
 
-    def asJson(self)-> 'MqMessage':
+    def as_json(self)-> 'MqMessage':
         self.attr("Content-Type", "application/json")
         return self;
 
@@ -132,13 +133,13 @@ class MqMessage(MqMessageBase):
 
         return self
 
-    def getTmid(self)-> str | None:
+    def get_tmid(self)-> str | None:
         if self.__transaction is None:
             return None
         else:
             return self.__transaction.tmid()
 
-    def internalSender(self, sender: str)-> 'MqMessage':
+    def internal_sender(self, sender: str)-> 'MqMessage':
         self.__sender = sender
         return self
 
@@ -146,12 +147,12 @@ class MqMessage(MqMessageBase):
         self.__qos = qos
         return self
 
-    def getAttr(self, name: str)-> str | None:
+    def get_attr(self, name: str)-> str | None:
         tmp = self.__attrMap.get(name);
         return tmp;
 
 
-    def getAttrMap(self)-> dict[str,str]:
+    def get_attr_map(self)-> dict[str,str]:
         return self.__attrMap
 
 

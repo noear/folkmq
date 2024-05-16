@@ -21,7 +21,7 @@ class MqClient(ABC):
         ...
 
     @abstractmethod
-    def nameAs(self, name: str) -> 'MqClient':
+    def name_as(self, name: str) -> 'MqClient':
         """名字取为（即，默认消费者组）"""
         ...
 
@@ -31,7 +31,7 @@ class MqClient(ABC):
         ...
 
     @abstractmethod
-    def namespaceAs(self, namespace: str) -> 'MqClient':
+    def namespace_as(self, namespace: str) -> 'MqClient':
         """命名空间"""
         ...
 
@@ -51,7 +51,7 @@ class MqClient(ABC):
         ...
 
     @abstractmethod
-    def autoAcknowledge(self, auto: bool) -> 'MqClient':
+    def auto_acknowledge(self, auto: bool) -> 'MqClient':
         """
         自动回执
         :param auto: 自动（默认为 true）
@@ -87,7 +87,7 @@ class MqClient(ABC):
         """
         ...
 
-    def publishAsync(self, topic: str, message: MqMessage) -> CompletableFuture:
+    def publish_async(self, topic: str, message: MqMessage) -> CompletableFuture:
         """
         异步发布消息
         :param topic:   主题
@@ -125,7 +125,7 @@ class MqClient(ABC):
         ...
 
     @abstractmethod
-    def transactionCheckback(self, transactionCheckback: Callable[[MqMessageReceived], None]) -> 'MqClient':
+    def transaction_checkback(self, transactionCheckback: Callable[[MqMessageReceived], None]) -> 'MqClient':
         """事务回查
         :param transactionCheckback: 事务回查处理
         """
@@ -133,7 +133,7 @@ class MqClient(ABC):
 
 
     @abstractmethod
-    def newTransaction(self) -> MqTransaction:
+    def new_transaction(self) -> MqTransaction:
         """新建事务"""
         ...
 

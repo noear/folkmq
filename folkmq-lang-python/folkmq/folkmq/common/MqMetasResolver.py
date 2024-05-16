@@ -18,97 +18,97 @@ class MqMetasResolver:
     # 获取发送人
     #
     @abc.abstractmethod
-    def getSender(self, m: Entity)-> str:...
+    def get_sender(self, m: Entity)-> str:...
 
     #
     # 获取主建
     #
     @abc.abstractmethod
-    def getKey(self, m: Entity)-> str:...
+    def get_key(self, m: Entity)-> str:...
 
     #
     # 获取标签
     #
     @abc.abstractmethod
-    def getTag(self, m: Entity)-> str:...
+    def get_tag(self, m: Entity)-> str:...
 
     #
     # 获取主题
     #
     @abc.abstractmethod
-    def getTopic(self, m: Entity)-> str:...
+    def get_topic(self, m: Entity)-> str:...
 
     #
     # 获取消费者组
     #
     @abc.abstractmethod
-    def getConsumerGroup(self, m: Entity)-> str:...
+    def get_consumer_group(self, m: Entity)-> str:...
 
     #
     # 设置消费者组
     #
     @abc.abstractmethod
-    def setConsumerGroup(self, m: Entity, consumerGroup: str):...
+    def set_consumer_group(self, m: Entity, consumerGroup: str):...
 
     #
     # 获取质量等级（0或1）
     #
     @abc.abstractmethod
-    def getQos(self, m: Entity)-> int:...
+    def get_qos(self, m: Entity)-> int:...
 
     #
     # 获取派发次数
     #
     @abc.abstractmethod
-    def getTimes(self, m: Entity)-> int:...
+    def get_times(self, m: Entity)-> int:...
 
     #
     # 设置派发次数
     #
     @abc.abstractmethod
-    def setTimes(self, m: Entity, times: int):...
+    def set_times(self, m: Entity, times: int):...
 
     #
     # 获取过期时间
     #
     @abc.abstractmethod
-    def getExpiration(self, m: Entity)->float:...
+    def get_expiration(self, m: Entity)->float:...
 
     #
     # 设置过期时间
     #
     @abc.abstractmethod
-    def setExpiration(self, m: Entity, expiration: int):...
+    def set_expiration(self, m: Entity, expiration: int):...
 
     #
     # 获取定时时间
     #
     @abc.abstractmethod
-    def getScheduled(self, m: Entity)-> int:...
+    def get_scheduled(self, m: Entity)-> int:...
 
     #
     # 设置定时时间
     #
     @abc.abstractmethod
-    def setScheduled(self, m: Entity, scheduled: int):...
+    def set_scheduled(self, m: Entity, scheduled: int):...
 
     #
     # 是否有序
     #
     @abc.abstractmethod
-    def isSequence(self, m: Entity)->bool:...
+    def is_sequence(self, m: Entity)->bool:...
 
     #
     # 是否事务
     #
     @abc.abstractmethod
-    def isTransaction(self, m: Entity)->bool:...
+    def is_transaction(self, m: Entity)->bool:...
 
     #
     # 设置事务
     #
     @abc.abstractmethod
-    def setTransaction(self, m: Entity, isTransaction: bool):...
+    def set_transaction(self, m: Entity, isTransaction: bool):...
 
     #
     # 发布实体构建
@@ -117,7 +117,7 @@ class MqMetasResolver:
     # @param message 消息
     #
     @abc.abstractmethod
-    def publishEntityBuild(self, topic: str, message: MqMessage)-> EntityDefault:...
+    def publish_entity_build(self, topic: str, message: MqMessage)-> EntityDefault:...
 
     #
     # 路由消息构建
@@ -126,4 +126,4 @@ class MqMetasResolver:
     # @param message 消息
     #
     @abc.abstractmethod
-    def routingMessageBuild(self, topic: str, message: MqMessage)-> Message:...
+    def routing_message_build(self, topic: str, message: MqMessage)-> Message:...

@@ -8,12 +8,12 @@ from folkmq.client.MqMessage import MqMessage
 
 async def main():
     client = await (FolkMQ.createClient("folkmq:ws://127.0.0.1:18602")
-                    .nameAs("demoapp")
+                    .name_as("demoapp")
                     .connect())
 
     # 订阅
     await client.subscribe("test", None, True, lambda message:
-        log.info(message.getBodyAsString())
+        log.info(message.get_body_as_string())
     )
 
     # 发布

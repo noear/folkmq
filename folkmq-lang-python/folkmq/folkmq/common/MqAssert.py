@@ -1,25 +1,25 @@
 class MqAssert:
     @staticmethod
-    def requireNonNull(obj, message:str):
+    def require_non_null(obj, message:str):
         if obj is None:
             raise Exception(message)
         else:
             return obj
     @staticmethod
-    def assertMeta(str:str, paramName:str):
-        MqAssert.assertMetaSymbols(str, paramName, '?', "?")
-        MqAssert.assertMetaSymbols(str, paramName, '&', "&")
-        MqAssert.assertMetaSymbols(str, paramName, '=', "=")
-        MqAssert.assertMetaSymbols(str, paramName, '!', "!")
+    def assert_meta(str:str, paramName:str):
+        MqAssert.assert_meta_symbols(str, paramName, '?', "?")
+        MqAssert.assert_meta_symbols(str, paramName, '&', "&")
+        MqAssert.assert_meta_symbols(str, paramName, '=', "=")
+        MqAssert.assert_meta_symbols(str, paramName, '!', "!")
 
-        MqAssert.assertMetaSymbols(str, paramName, '@', "@")
-        MqAssert.assertMetaSymbols(str, paramName, '#', "#")
-        MqAssert.assertMetaSymbols(str, paramName, '$', "$")
-        MqAssert.assertMetaSymbols(str, paramName, '%', "%")
-        MqAssert.assertMetaSymbols(str, paramName, '^', "^")
-        MqAssert.assertMetaSymbols(str, paramName, '*', "*")
+        MqAssert.assert_meta_symbols(str, paramName, '@', "@")
+        MqAssert.assert_meta_symbols(str, paramName, '#', "#")
+        MqAssert.assert_meta_symbols(str, paramName, '$', "$")
+        MqAssert.assert_meta_symbols(str, paramName, '%', "%")
+        MqAssert.assert_meta_symbols(str, paramName, '^', "^")
+        MqAssert.assert_meta_symbols(str, paramName, '*', "*")
 
     @staticmethod
-    def assertMetaSymbols(str: str, paramName: str, c:str, cS:str):
+    def assert_meta_symbols(str: str, paramName: str, c:str, cS:str):
         if str.find(c) >= 0:
             raise Exception("Param '" + paramName + "' can't have symbols: '" + cS + "'");

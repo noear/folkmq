@@ -35,8 +35,8 @@ class MqTransactionImpl(MqTransaction):
         return self._tmid
 
     def binding(self, message: 'MqMessage'):
-        self._keyAry.append(message.getKey())
-        message.internalSender(self._client.name())
+        self._keyAry.append(message.get_key())
+        message.internal_sender(self._client.name())
 
     async def commit(self):
         await self._client.publish2(self._tmid, self._keyAry, False)

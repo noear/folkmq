@@ -14,22 +14,22 @@ from folkmq.common.MqUtils import MqUtils
 class MqMessageReceived(MqMessageBase):
     # 主题
     @abstractmethod
-    def getTopic(self) -> str:
+    def get_topic(self) -> str:
         ...
 
     # 内容
     @abstractmethod
-    def getBodyAsString(self) -> str:
+    def get_body_as_string(self) -> str:
         ...
 
     # 消费者组
     @abstractmethod
-    def getConsumerGroup(self) -> str:
+    def get_consumer_group(self) -> str:
         ...
 
     # 已派发次数
     @abstractmethod
-    def getTimes(self) -> int:
+    def get_times(self) -> int:
         ...
 
     # 回执
@@ -48,66 +48,66 @@ class MqMessageReceivedImpl(MqMessageReceived):
         self._session = session
         self._source = source
 
-        mr  = MqUtils.getOf(source)
+        mr  = MqUtils.get_of(source)
 
-        self._sender = mr.getSender(source)
+        self._sender = mr.get_sender(source)
 
-        self._key = mr.getKey(source)
-        self._tag = mr.getTag(source)
-        self._fullTopic = mr.getTopic(source)
-        self._topic = MqTopicHelper.getTopic(self._fullTopic)
-        self._consumerGroup = mr.getConsumerGroup(source)
+        self._key = mr.get_key(source)
+        self._tag = mr.get_tag(source)
+        self._fullTopic = mr.get_topic(source)
+        self._topic = MqTopicHelper.get_topic(self._fullTopic)
+        self._consumerGroup = mr.get_consumer_group(source)
 
-        self._qos = mr.getQos(source)
-        self._times = mr.getTimes(source)
-        self._sequence = mr.isSequence(source)
-        self._transaction = mr.isTransaction(source)
+        self._qos = mr.get_qos(source)
+        self._times = mr.get_times(source)
+        self._sequence = mr.is_sequence(source)
+        self._transaction = mr.is_transaction(source)
 
-        self._expirationL = mr.getExpiration(source)
+        self._expirationL = mr.get_expiration(source)
         self._expiration = self._expirationL
 
     def getSource(self) -> Message:
         return self._source
 
-    def getSender(self) -> str | None:
+    def get_sender(self) -> str | None:
         return self._sender
 
-    def getKey(self) -> str:
+    def get_key(self) -> str:
         return self._key
 
-    def getTag(self) -> str:
+    def get_tag(self) -> str:
         return self._tag
 
-    def getTopic(self) -> str:
+    def get_topic(self) -> str:
         return self._topic
 
     def getFullTopic(self)->str:
         return self._fullTopic
 
-    def getConsumerGroup(self) -> str:
+    def get_consumer_group(self) -> str:
         return self._consumerGroup
 
-    def getBody(self) -> bytes:
+    def get_body(self) -> bytes:
         return self._source.data_as_bytes()
-    def getBodyAsString(self) -> str:
+    def get_body_as_string(self) -> str:
         return self._source.data_as_string()
 
-    def getQos(self) -> int:
+    def get_qos(self) -> int:
         return self._qos
 
-    def getAttr(self, name: str) -> str | None:
+    def get_attr(self, name: str) -> str | None:
         return self._source.meta(MqConstants.MQ_ATTR_PREFIX + name)
 
-    def getExpiration(self) -> datetime | None:
+    def get_expiration(self) -> datetime | None:
         return self._expiration
 
-    def isTransaction(self) -> bool:
+    def is_transaction(self) -> bool:
         return self._transaction
 
-    def isSequence(self) -> bool:
+    def is_sequence(self) -> bool:
         return self._sequence
 
-    def getTimes(self) -> int:
+    def get_times(self) -> int:
         return self._times
 
     def acknowledge(self, isOk: bool):
@@ -121,7 +121,7 @@ class MqMessageReceivedImpl(MqMessageReceived):
             "key='" + self._key + '\'' + \
             ", tag='" + self._tag + '\'' + \
             ", topic='" + self._topic + '\'' + \
-            ", body='" + self.getBodyAsString() + '\'' + \
+            ", body='" + self.get_body_as_string() + '\'' + \
             '}'
 
 

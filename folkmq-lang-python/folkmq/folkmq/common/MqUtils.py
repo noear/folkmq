@@ -14,7 +14,7 @@ class MqUtils:
     __v2 = MqMetasResolverV2()
 
     @staticmethod
-    def getOf(t:Session|Message|None) -> MqMetasResolver:
+    def get_of(t: Session | Message | None) -> MqMetasResolver:
         if t is None:
             return MqUtils.__v2
         else:

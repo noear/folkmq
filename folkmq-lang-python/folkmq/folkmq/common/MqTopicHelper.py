@@ -1,7 +1,7 @@
 class MqTopicHelper:
     #获取完整主题
     @staticmethod
-    def getFullTopic(namespace:str, topic:str):
+    def get_full_topic(namespace:str, topic:str):
         if namespace:
             return f"{namespace}:{topic}"
         else:
@@ -9,7 +9,7 @@ class MqTopicHelper:
 
     #获取主题
     @staticmethod
-    def getTopic(fullTopic:str):
+    def get_topic(fullTopic:str):
         idx = fullTopic.find(":")
         if  idx > 0:
             return fullTopic[idx + 1]

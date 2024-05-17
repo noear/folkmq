@@ -6,12 +6,14 @@ services:
     container_name: folkmq-server-broker
     ports:
       - 8602:8602
-      - 18602:18602
+      - 18602:18602 #mq: tcp 端口
+#      - 18603:18603 #mq: websocket 端口
     volumes:
       - ./data/broker:/data
       - ./logs/broker:/logs
     environment:
       - folkmq.admin=admin  #管理后台密码（暂时没有管理后台）
+#      - folkmq.websocket=true #启用 websocket 端口
 #      - folkmq.access.ak=demo              #消息访问账号
 #      - folkmq.access.sk=YapLHTx19RlsEE16  #消息访问密钥
       - TZ=Asia/Shanghai

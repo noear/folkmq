@@ -47,6 +47,10 @@ public class BrokerListenerFolkmq extends BrokerListener {
         }
     }
 
+    public boolean hasSubscribe(String topic) {
+        return subscribeMap.containsKey(topic);
+    }
+
     /**
      * 配置访问账号
      *

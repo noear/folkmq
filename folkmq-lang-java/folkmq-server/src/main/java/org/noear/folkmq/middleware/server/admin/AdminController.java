@@ -86,13 +86,18 @@ public class AdminController extends BaseController {
     @Mapping("/admin/publish/ajax/post")
     public Result publish_ajax_post(String topic, String scheduled, int qos, String content) {
         try {
-            Date scheduledDate = DateUtil.parse(scheduled);
-            MqMessage message = new MqMessage(content).qos(qos).scheduled(scheduledDate);
-            Message routingMessage = MqUtils.getV2().routingMessageBuild(topic, message);
+            if (serviceInternal.hasSubscribe(topic)) {
+                Date scheduledDate = DateUtil.parse(scheduled);
+                MqMessage message = new MqMessage(content).qos(qos).scheduled(scheduledDate);
+                Message routingMessage = MqUtils.getV2().routingMessageBuild(topic, message);
 
-            serviceInternal.routingDo(MqUtils.getV2(), routingMessage);
 
-            return Result.succeed();
+                serviceInternal.routingDo(MqUtils.getV2(), routingMessage);
+
+                return Result.succeed();
+            } else {
+                return Result.failure("主题不存在!");
+            }
         } catch (Exception e) {
             return Result.failure(e.getLocalizedMessage());
         }

@@ -48,16 +48,16 @@ public class AdminController extends BaseController {
 
     @Mapping("/admin")
     public ModelAndView admin() {
-        if(LicenceUtils.getGlobal().isValid()){
+        if (LicenceUtils.getGlobal().isValid()) {
             //有效许可证
             ModelAndView vm = view("admin");
 
             vm.put("isValid", LicenceUtils.getGlobal().isValid());
 
             if (LicenceUtils.getGlobal().isValid()) {
-                if(LicenceUtils.getGlobal().isExpired()){
+                if (LicenceUtils.getGlobal().isExpired()) {
                     vm.put("licenceBtn", "过期授权");
-                }else{
+                } else {
                     vm.put("licenceBtn", "正版授权");
                 }
             } else {
@@ -65,7 +65,7 @@ public class AdminController extends BaseController {
             }
 
             return vm;
-        }else{
+        } else {
             //无效许可证
             ModelAndView vm = view("admin_licence_invalid");
 
@@ -188,14 +188,18 @@ public class AdminController extends BaseController {
     @Mapping("/admin/publish/ajax/post")
     public Result publish_ajax_post(String topic, String scheduled, int qos, String content) {
         try {
-            Date scheduledDate = DateUtil.parse(scheduled);
-            MqMessage message = new MqMessage(content).qos(qos).scheduled(scheduledDate);
-            Message routingMessage = MqUtils.getV2().routingMessageBuild(topic, message);
+            if (brokerListener.hasSubscribe(topic)) {
+                Date scheduledDate = DateUtil.parse(scheduled);
+                MqMessage message = new MqMessage(content).qos(qos).scheduled(scheduledDate);
+                Message routingMessage = MqUtils.getV2().routingMessageBuild(topic, message);
 
-            if (brokerListener.publishDo(routingMessage, qos)) {
-                return Result.succeed();
+                if (brokerListener.publishDo(routingMessage, qos)) {
+                    return Result.succeed();
+                } else {
+                    return Result.failure("集群没有服务节点");
+                }
             } else {
-                return Result.failure("集群没有服务节点");
+                return Result.failure("主题不存在!");
             }
         } catch (Exception e) {
             return Result.failure(e.getLocalizedMessage());

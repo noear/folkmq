@@ -10,15 +10,11 @@ public class ProducerTest {
         MqClient client = FolkMQ.createClient("folkmq://127.0.0.1:18602?ak=folkmq&sk=YapLHTx19RlsEE16")
                 .connect();
 
-        int count = 10_000;
-
-        //发布预热
-        for (int i = 0; i < 100; i++) {
-            client.publish("hot", new MqMessage("hot-" + i));
-        }
-
-        for (int i = 0; i < count; i++) {
-            client.publishAsync("test", new MqMessage("test-" + i));
+        long i = 0;
+        while (true){
+            client.publish("/jlwu/receive/gateway", new MqMessage("hot-" + i));
+            i++;
+            Thread.sleep(10);
         }
     }
 }

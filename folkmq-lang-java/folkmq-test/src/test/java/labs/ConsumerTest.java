@@ -8,14 +8,11 @@ public class ConsumerTest {
 
         //客户端
         MqClient client = FolkMQ.createClient("folkmq://127.0.0.1:18602?ak=folkmq&sk=YapLHTx19RlsEE16")
+                .nameAs("iot")
                 .connect();
 
         //订阅
-        client.subscribe("hot", "a", message -> {
-            System.out.println("::" + message.getTopic() + " - " + message);
-        });
-
-        client.subscribe("test", "a", message -> {
+        client.subscribe("/jlwu/receive/gateway",  message -> {
             System.out.println("::" + message.getTopic() + " - " + message);
         });
     }

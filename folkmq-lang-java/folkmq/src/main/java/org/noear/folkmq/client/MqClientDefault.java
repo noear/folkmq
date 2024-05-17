@@ -89,6 +89,7 @@ public class MqClientDefault implements MqClientInternal {
     public MqClient nameAs(String name) {
         MqAssert.requireNonNull(name, "Param 'name' can't be null");
         MqAssert.assertMeta(name, "name");
+        MqAssert.assertMetaSymbols(name, "name", '/', "/");
 
         this.name = name;
         return this;
@@ -102,6 +103,12 @@ public class MqClientDefault implements MqClientInternal {
     @Override
     public MqClient namespaceAs(String namespace) {
         this.namespace = namespace;
+
+        if (StrUtils.isNotEmpty(namespace)) {
+            MqAssert.assertMeta(namespace, "namespace");
+            MqAssert.assertMetaSymbols(namespace, "namespace", '/', "/");
+        }
+
         return this;
     }
 

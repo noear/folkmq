@@ -32,6 +32,11 @@ public interface MqServiceInternal {
     Map<String, Set<String>> getSubscribeMap();
 
     /**
+     * 是否有主题订阅
+     * */
+    boolean hasSubscribe(String topic);
+
+    /**
      * 获取队列字典(queueName=>Queue)
      */
     Map<String, MqQueue> getQueueMap();

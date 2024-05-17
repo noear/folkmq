@@ -28,6 +28,7 @@ public class MqAssert {
         assertMetaSymbols(str, paramName, '%', "%");
         assertMetaSymbols(str, paramName, '^', "^");
         assertMetaSymbols(str, paramName, '*', "*");
+        assertMetaSymbols(str, paramName, '~', "~");
     }
 
     public static void assertMetaSymbols(String str, String paramName, char c, String cS) {

@@ -104,9 +104,7 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
             messageHolder.setDistributeIdx(messageIndexer.incrementAndGet());
 
             messageMap.put(messageHolder.getKey(), messageHolder);
-            messageQueue.add(messageHolder);
-
-            messageCountAdd(messageHolder);
+            internalAdd(messageHolder);
         } finally {
             messageAddLock.unlock();
         }
@@ -178,12 +176,10 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
 
     private void internalAdd(MqMessageHolder mh) {
         messageQueue.add(mh);
-        messageCountAdd(mh);
     }
 
     private void internalRemove(MqMessageHolder mh) {
         messageQueue.remove(mh);
-        messageCountSub(mh);
     }
 
     /**
@@ -237,8 +233,6 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
      * 执行转发
      */
     protected boolean transpond0(MqMessageHolder messageHolder) {
-        messageCountSub(messageHolder);
-
         if (messageHolder.isDone()) {
             //已完成
             messageMap.remove(messageHolder.getKey());
@@ -330,8 +324,6 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
      * 执行派发
      */
     protected boolean distribute0(MqMessageHolder messageHolder) {
-        messageCountSub(messageHolder);
-
         if (messageHolder.isDone()) {
             //已完成
             messageMap.remove(messageHolder.getKey());
@@ -349,7 +341,7 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
         }
 
         if (messageHolder.isSequence()) {
-            if(messageHolder.getDistributeTimeRef() > System.currentTimeMillis()){
+            if (messageHolder.getDistributeTimeRef() > System.currentTimeMillis()) {
                 //如果未到，提前结束
                 internalAdd(messageHolder);
                 return false;

@@ -9,9 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.DelayQueue;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.atomic.LongAdder;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -24,7 +22,7 @@ public abstract class MqQueueBase implements MqQueue {
     //消息字典
     protected final Map<String, MqMessageHolder> messageMap;
     //消息队列与处理线程
-    protected final DelayQueue<MqMessageHolder> messageQueue;
+    protected final MqMessageHolderQueue messageQueue;
     //消息最后派发时间
     protected final AtomicLong messageDistributeTime = new AtomicLong(0);
     //消息索引器
@@ -34,54 +32,17 @@ public abstract class MqQueueBase implements MqQueue {
 
     //消费者会话列表
     private final List<Session> consumerSessions = new CopyOnWriteArrayList<>();
-    //消息计数器
-    private final LongAdder[] messageCounters = new LongAdder[9];
 
     public MqQueueBase() {
         this.messageMap = new ConcurrentHashMap<>();
-        this.messageQueue = new DelayQueue<>();
-
-        //初始化计数器
-        for (int i = 0; i < messageCounters.length; i++) {
-            messageCounters[i] = new LongAdder();
-        }
-    }
-
-    /**
-     * 消息计数加数
-     */
-    public void messageCountAdd(MqMessageHolder mh) {
-        int n = mh.getDistributeCount();
-
-        if (n > 7) {
-            messageCounters[8].increment();
-        } else {
-            messageCounters[n].increment();
-        }
-    }
-
-    /**
-     * 消息计数减数
-     */
-    public void messageCountSub(MqMessageHolder mh) {
-        int n = mh.getDistributeCount();
-
-        if (n > 7) {
-            messageCounters[8].decrement();
-        } else {
-            messageCounters[n].decrement();
-        }
+        this.messageQueue = new MqMessageHolderQueue();
     }
 
     /**
      * 获取消息计数
      */
     public long messageCount(int n) {
-        if (n > 7) {
-            return messageCounters[8].longValue();
-        } else {
-            return messageCounters[n].longValue();
-        }
+        return messageQueue.countGet(n);
     }
 
 

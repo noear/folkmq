@@ -68,6 +68,11 @@ public abstract class MqServiceListenerBase extends EventListener implements MqS
         return Collections.unmodifiableMap(subscribeMap);
     }
 
+    @Override
+    public boolean hasSubscribe(String topic) {
+        return subscribeMap.containsKey(topic);
+    }
+
     /**
      * 获取队列集合
      */

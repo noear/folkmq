@@ -4,7 +4,7 @@ from setuptools import setup,find_packages
 
 setup(
     name='folkmq',
-    version='1.4.5',
+    version='1.4.6',
     description='@noear/folkmq python project',
     author='noear',
     url='https://folkmq.noear.org/',
@@ -12,7 +12,7 @@ setup(
     install_requires=[                          # 依赖包
         'loguru>=0.7.2',
         'websockets>=12.0',
-        'socket.d>=2.4.17'
+        'socket.d>=2.4.18'
     ],
     classifiers=[
         'Development Status :: 5 - Production/Stable',

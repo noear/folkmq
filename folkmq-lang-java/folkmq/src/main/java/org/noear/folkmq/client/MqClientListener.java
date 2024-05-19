@@ -36,14 +36,19 @@ public class MqClientListener extends EventListener {
             try {
                 MqMessageReceivedImpl message = new MqMessageReceivedImpl(client, s, m);
 
-                if (message.isSequence()) {
-                    RunUtils.single(() -> onReceive(s, m, message, false));
-                } else {
-                    if (client.consumeExecutor == null) {
-                        RunUtils.async(() -> onReceive(s, m, message, false));
+                try {
+                    if (message.isSequence()) {
+                        RunUtils.single(() -> onReceive(s, m, message, false));
                     } else {
-                        client.consumeExecutor.submit(() -> onReceive(s, m, message, false));
+                        if (client.consumeExecutor == null) {
+                            RunUtils.async(() -> onReceive(s, m, message, false));
+                        } else {
+                            client.consumeExecutor.submit(() -> onReceive(s, m, message, false));
+                        }
                     }
+                } catch (Throwable e) {
+                    client.reply(s, m, message, false, new MqAlarm(e.getMessage()));
+                    log.warn("Client consume handle error, sid={}", m.sid(), e);
                 }
             } catch (Throwable e) {
                 log.warn("Client consume handle error, sid={}", m.sid(), e);
@@ -54,10 +59,15 @@ public class MqClientListener extends EventListener {
             try {
                 MqMessageReceivedImpl message = new MqMessageReceivedImpl(client, s, m);
 
-                if (client.consumeExecutor == null) {
-                    RunUtils.async(() -> onReceive(s, m, message, true));
-                } else {
-                    client.consumeExecutor.submit(() -> onReceive(s, m, message, true));
+                try {
+                    if (client.consumeExecutor == null) {
+                        RunUtils.async(() -> onReceive(s, m, message, true));
+                    } else {
+                        client.consumeExecutor.submit(() -> onReceive(s, m, message, true));
+                    }
+                }catch (Throwable e) {
+                    client.reply(s, m, message, false, new MqAlarm(e.getMessage()));
+                    log.warn("Client consume handle error, sid={}", m.sid(), e);
                 }
             } catch (Throwable e) {
                 log.warn("Client consume handle error, sid={}", m.sid(), e);

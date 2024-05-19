@@ -92,7 +92,7 @@ public class QueueForceService {
     }
 
     /**
-     * 强制删除
+     * 强制清空
      */
     public Result forceClear(MqServiceInternal server, String topic, String consumerGroup, boolean isStandalone) {
         if (force_lock.get()) {

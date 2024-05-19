@@ -85,6 +85,12 @@ public class AdminQueueController extends BaseController {
     }
 
     @Post
+    @Mapping("/admin/queue_details/ajax/clear")
+    public Result queue_details_ajax_clear(@NotEmpty String topic, @NotEmpty String consumerGroup) {
+        return queueForceService.forceClear(server, topic, consumerGroup, MetricsConfig.isStandalone);
+    }
+
+    @Post
     @Mapping("/admin/queue_details/ajax/delete")
     public Result queue_details_ajax_delete(@NotEmpty String topic, @NotEmpty String consumerGroup) {
         return queueForceService.forceDelete(server, topic, consumerGroup, MetricsConfig.isStandalone);

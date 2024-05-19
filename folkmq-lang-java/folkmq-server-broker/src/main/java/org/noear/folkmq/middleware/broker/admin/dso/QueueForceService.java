@@ -133,7 +133,7 @@ public class QueueForceService {
     }
 
     /**
-     * 强制删除
+     * 强制清空
      */
     public Result forceClear( String topic, String consumerGroup) {
         if (force_lock.get()) {
@@ -145,7 +145,7 @@ public class QueueForceService {
             force_lock.set(true);
             String queueName = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP + consumerGroup;
 
-            log.warn("Queue forceDelete: queueName={}", queueName);
+            log.warn("Queue forceClear: queueName={}", queueName);
 
             QueueVo queueVo = viewQueueService.getQueueVo(queueName);
             if (queueVo != null) {

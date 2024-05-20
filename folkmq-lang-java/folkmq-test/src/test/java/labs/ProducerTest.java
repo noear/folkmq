@@ -14,7 +14,6 @@ public class ProducerTest {
         while (true){
             client.publish("/jlwu/receive/gateway", new MqMessage("hot-" + i));
             i++;
-            Thread.sleep(10);
         }
     }
 }

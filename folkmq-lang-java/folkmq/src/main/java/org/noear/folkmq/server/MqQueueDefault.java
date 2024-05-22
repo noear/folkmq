@@ -409,25 +409,52 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
             //::Qos1
 
             //1.给会话发送消息 //如果有异步，上面会加入队列
-            s1.sendAndRequest(MqConstants.MQ_EVENT_DISTRIBUTE, messageHolder.getEntity(), -1).thenReply(r -> {
-                int ack = Integer.parseInt(r.metaOrDefault(MqConstants.MQ_META_ACK, "0"));
-                acknowledgeDo(messageHolder, ack, true);
-            }).thenError(err -> {
-                acknowledgeDo(messageHolder, 0, true);
-            });
+            if (messageHolder.isBroadcast()) {
+                for (Session s0 : getSessions()) {
+                    if (allowSend(s0)) {
+                        s0.sendAndRequest(MqConstants.MQ_EVENT_DISTRIBUTE, messageHolder.getEntity(), -1).thenReply(r -> {
+                            int ack = Integer.parseInt(r.metaOrDefault(MqConstants.MQ_META_ACK, "0"));
+                            acknowledgeDo(messageHolder, ack, true);
+                        }).thenError(err -> {
+                            acknowledgeDo(messageHolder, 0, true);
+                        });
+                    }
+                }
+            } else {
+                s1.sendAndRequest(MqConstants.MQ_EVENT_DISTRIBUTE, messageHolder.getEntity(), -1).thenReply(r -> {
+                    int ack = Integer.parseInt(r.metaOrDefault(MqConstants.MQ_META_ACK, "0"));
+                    acknowledgeDo(messageHolder, ack, true);
+                }).thenError(err -> {
+                    acknowledgeDo(messageHolder, 0, true);
+                });
+            }
 
             //2.添加保险延时任务：如果没有回执就重发 //重新入队列，是避免重启时数据丢失
             messageHolder.setDistributeTime(System.currentTimeMillis() + MqNextTime.maxConsumeMillis());
             internalAdd(messageHolder);
         } else {
             //::Qos0
-            s1.send(MqConstants.MQ_EVENT_DISTRIBUTE, messageHolder.getEntity());
+            if (messageHolder.isBroadcast()) {
+                for (Session s0 : getSessions()) {
+                    if (allowSend(s0)) {
+                        s0.send(MqConstants.MQ_EVENT_DISTRIBUTE, messageHolder.getEntity());
+                    }
+                }
+            } else {
+                s1.send(MqConstants.MQ_EVENT_DISTRIBUTE, messageHolder.getEntity());
+            }
+
             acknowledgeDo(messageHolder, 1, false);
         }
     }
 
     private void acknowledgeDo(MqMessageHolder messageHolder, int ack, boolean removeQueue) {
         try {
+            if (messageMap.containsKey(messageHolder.getKey()) == false) {
+                //广播消息，会有多次回调；可能已结束了
+                return;
+            }
+
             //观察者::回执时
             watcher.onAcknowledge(topic, consumerGroup, messageHolder, ack > 0);
 
@@ -447,5 +474,12 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
         } finally {
             sequenceLock.set(false);
         }
+    }
+
+    /**
+     * 允许发送
+     */
+    private boolean allowSend(Session s) {
+        return s.isValid() && s.isClosing() == false;
     }
 }

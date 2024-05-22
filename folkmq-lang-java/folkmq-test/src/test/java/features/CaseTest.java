@@ -192,4 +192,11 @@ public class CaseTest {
         testCase.start();
         testCase.stop();
     }
+
+    @Test
+    public void TestCase31_broadcast() throws Exception {
+        BaseTestCase testCase = new TestCase31_broadcast(2031);
+        testCase.start();
+        testCase.stop();
+    }
 }

@@ -2,6 +2,7 @@ package org.noear.folkmq.middleware.broker.mq;
 
 import org.noear.folkmq.FolkMQ;
 import org.noear.folkmq.common.MqConstants;
+import org.noear.folkmq.common.MqUtils;
 import org.noear.snack.ONode;
 import org.noear.socketd.broker.BrokerListener;
 import org.noear.socketd.transport.core.Entity;
@@ -133,18 +134,32 @@ public class BrokerListenerFolkmq extends BrokerListener {
             removePlayer(queueName, requester);
         } else if (MqConstants.MQ_EVENT_DISTRIBUTE.equals(message.event())) {
             String atName = message.atName();
+            boolean isBroadcast = MqUtils.getV2().isBroadcast(message.entity());
 
-            //单发模式（给同名的某个玩家，轮询负截均衡）
-            Session responder = getPlayerAny(atName, requester, message);
-            if (responder != null && responder.isValid()) {
-                //转发消息
-                try {
-                    forwardToSession(requester, message, responder);
-                } catch (Throwable e) {
-                    acknowledgeAsNo(requester, message);
+            if (isBroadcast) {
+                //广播模式
+                for (Session s0 : getPlayerAll(atName)) {
+                    if (MqUtils.allowSend(s0)) {
+                        try {
+                            forwardToSession(requester, message, s0);
+                        } catch (Throwable e) {
+                            acknowledgeAsNo(requester, message);
+                        }
+                    }
                 }
             } else {
-                acknowledgeAsNo(requester, message);
+                //单发模式（给同名的某个玩家，轮询负截均衡）
+                Session responder = getPlayerAny(atName, requester, message);
+                if (MqUtils.allowSend(responder)) {
+                    //转发消息
+                    try {
+                        forwardToSession(requester, message, responder);
+                    } catch (Throwable e) {
+                        acknowledgeAsNo(requester, message);
+                    }
+                } else {
+                    acknowledgeAsNo(requester, message);
+                }
             }
 
             //结束处理
@@ -171,7 +186,7 @@ public class BrokerListenerFolkmq extends BrokerListener {
 
             //结束处理
             return;
-        } else if(MqConstants.MQ_EVENT_REQUEST.equals(message.event())) {
+        } else if (MqConstants.MQ_EVENT_REQUEST.equals(message.event())) {
             String atName = message.atName();
 
             //单发模式（给同名的某个玩家，轮询负截均衡）

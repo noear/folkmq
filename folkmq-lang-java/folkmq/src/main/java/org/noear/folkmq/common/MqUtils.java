@@ -39,4 +39,15 @@ public class MqUtils {
             return v2;
         }
     }
+
+    /**
+     * 允许发送
+     */
+    public static boolean allowSend(Session s) {
+        if (s == null) {
+            return false;
+        } else {
+            return s.isValid() && s.isClosing() == false;
+        }
+    }
 }

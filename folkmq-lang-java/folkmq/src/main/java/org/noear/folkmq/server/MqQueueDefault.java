@@ -1,6 +1,7 @@
 package org.noear.folkmq.server;
 
 import org.noear.folkmq.common.MqConstants;
+import org.noear.folkmq.common.MqUtils;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
 import org.noear.socketd.transport.core.entity.MessageBuilder;
@@ -411,7 +412,7 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
             //1.给会话发送消息 //如果有异步，上面会加入队列
             if (messageHolder.isBroadcast()) {
                 for (Session s0 : getSessions()) {
-                    if (allowSend(s0)) {
+                    if (MqUtils.allowSend(s0)) {
                         s0.sendAndRequest(MqConstants.MQ_EVENT_DISTRIBUTE, messageHolder.getEntity(), -1).thenReply(r -> {
                             int ack = Integer.parseInt(r.metaOrDefault(MqConstants.MQ_META_ACK, "0"));
                             acknowledgeDo(messageHolder, ack, true);
@@ -436,7 +437,7 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
             //::Qos0
             if (messageHolder.isBroadcast()) {
                 for (Session s0 : getSessions()) {
-                    if (allowSend(s0)) {
+                    if (MqUtils.allowSend(s0)) {
                         s0.send(MqConstants.MQ_EVENT_DISTRIBUTE, messageHolder.getEntity());
                     }
                 }
@@ -474,12 +475,5 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
         } finally {
             sequenceLock.set(false);
         }
-    }
-
-    /**
-     * 允许发送
-     */
-    private boolean allowSend(Session s) {
-        return s.isValid() && s.isClosing() == false;
     }
 }

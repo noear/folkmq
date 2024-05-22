@@ -151,7 +151,7 @@ public class MqMetasResolverV2 implements MqMetasResolver {
             entity.metaPut(MqMetasV2.MQ_META_SENDER, message.getSender());
         }
 
-        if(message.isBroadcast()){
+        if (message.isBroadcast()) {
             entity.metaPut(MqMetasV2.MQ_META_BROADCAST, "1");
         }
 
@@ -162,7 +162,7 @@ public class MqMetasResolverV2 implements MqMetasResolver {
             if (message.isSequence()) {
                 entity.metaPut(MqMetasV2.MQ_META_SEQUENCE, "1");
 
-                if(message.isTransaction() == false && StrUtils.isNotEmpty(message.getSequenceSharding())){
+                if (message.isTransaction() == false && StrUtils.isNotEmpty(message.getSequenceSharding())) {
                     //不是事务，并且有顺序分片
                     entity.metaPut(EntityMetas.META_X_HASH, message.getSequenceSharding());
                 }

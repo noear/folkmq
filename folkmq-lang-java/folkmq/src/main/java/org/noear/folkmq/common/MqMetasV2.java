@@ -52,7 +52,7 @@ public interface MqMetasV2 {
     String MQ_META_TRANSACTION = "t4";
 
     /**
-     * 元信息：消息是否事务
+     * 元信息：消息是否广播
      */
     String MQ_META_BROADCAST = "b0";
 

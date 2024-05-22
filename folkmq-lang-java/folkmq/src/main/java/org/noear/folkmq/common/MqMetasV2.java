@@ -52,6 +52,11 @@ public interface MqMetasV2 {
     String MQ_META_TRANSACTION = "t4";
 
     /**
+     * 元信息：消息是否事务
+     */
+    String MQ_META_BROADCAST = "b0";
+
+    /**
      * 元信息：消息质量等级
      */
     String MQ_META_QOS = "q1";

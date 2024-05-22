@@ -175,24 +175,10 @@ public abstract class MqServiceListenerBase extends EventListener implements MqS
     @Override
     public void routingDo(MqMetasResolver mr, Message message) {
         //复用解析
-        String sender = mr.getSender(message);
-        String key = mr.getKey(message);
-        String topic = mr.getTopic(message);
-        int qos = mr.getQos(message);
-        int times = mr.getTimes(message);
-        long expiration = mr.getExpiration(message);
-        long scheduled = mr.getScheduled(message);
-        boolean sequence = mr.isSequence(message);
-        boolean transaction = mr.isTransaction(message);
-
-        if (scheduled == 0) {
-            //默认为当前ms（相对于后面者，有个排序作用）
-            scheduled = System.currentTimeMillis();
-        }
-
+        MqData mqMessage = new MqData(mr, message);
 
         //取出所有订阅的主题消费者
-        Set<String> topicConsumerSet = subscribeMap.get(topic);
+        Set<String> topicConsumerSet = subscribeMap.get(mqMessage.topic);
 
         if (topicConsumerSet != null) {
             //避免遍历 Set 时，出现 add or remove 而异常
@@ -204,39 +190,26 @@ public abstract class MqServiceListenerBase extends EventListener implements MqS
                     continue;
                 }
 
-                routingToQueueDo(mr, queue, message, key, qos, sequence, expiration, transaction, sender, times, scheduled);
+                routingToQueueDo(mqMessage, queue);
             }
         }
     }
 
     protected void routingToQueueName(MqMetasResolver mr, Message message, String queueName) {
         //复用解析
-        String sender = mr.getSender(message);
-        String key = mr.getKey(message);
-        int qos = mr.getQos(message);
-        int times = mr.getTimes(message);
-        long expiration = mr.getExpiration(message);
-        long scheduled = mr.getScheduled(message);
-        boolean sequence = mr.isSequence(message);
-        boolean transaction = mr.isTransaction(message);
-
-        if (scheduled == 0) {
-            //默认为当前ms（相对于后面者，有个排序作用）
-            scheduled = System.currentTimeMillis();
-        }
-
+        MqData mqMessage = new MqData(mr, message);
         //取出所有订阅的主题消费者
         MqQueue queue = queueMap.get(queueName);
 
-        routingToQueueDo(mr, queue, message, key, qos, sequence, expiration, transaction, sender, times, scheduled);
+        routingToQueueDo(mqMessage, queue);
     }
 
     /**
      * 执行路由
      */
-    public void routingToQueueDo(MqMetasResolver mr, MqQueue queue, Message message, String key, int qos, boolean sequence, long expiration, boolean transaction, String sender, int times, long scheduled) {
+    public void routingToQueueDo(MqData message, MqQueue queue) {
         if (queue != null) {
-            MqMessageHolder messageHolder = new MqMessageHolder(mr, queue.getQueueName(), queue.getConsumerGroup(), message, key, qos, sequence, expiration, transaction, sender, times, scheduled);
+            MqMessageHolder messageHolder = new MqMessageHolder(message, queue.getQueueName(), queue.getConsumerGroup());
             queue.add(messageHolder);
         }
     }

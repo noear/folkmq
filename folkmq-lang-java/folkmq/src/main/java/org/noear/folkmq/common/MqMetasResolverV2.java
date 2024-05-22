@@ -96,6 +96,11 @@ public class MqMetasResolverV2 implements MqMetasResolver {
     }
 
     @Override
+    public boolean isBroadcast(Entity m) {
+        return "1".equals(m.meta(MqMetasV2.MQ_META_BROADCAST));
+    }
+
+    @Override
     public boolean isTransaction(Entity m) {
         return "1".equals(m.meta(MqMetasV2.MQ_META_TRANSACTION));
     }
@@ -144,6 +149,10 @@ public class MqMetasResolverV2 implements MqMetasResolver {
 
         if (StrUtils.isNotEmpty(message.getSender())) {
             entity.metaPut(MqMetasV2.MQ_META_SENDER, message.getSender());
+        }
+
+        if(message.isBroadcast()){
+            entity.metaPut(MqMetasV2.MQ_META_BROADCAST, "1");
         }
 
         //是否有序

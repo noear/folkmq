@@ -11,16 +11,16 @@ import java.util.Date;
 public interface MqMessageBase {
     /**
      * 发送人
-     * */
+     */
     String getSender();
 
     /**
      * 主键
      *
      * @deprecated 1.4
-     * */
+     */
     @Deprecated
-    default String getTid(){
+    default String getTid() {
         return getKey();
     }
 
@@ -31,7 +31,7 @@ public interface MqMessageBase {
 
     /**
      * 标签
-     * */
+     */
     String getTag();
 
     /**
@@ -48,6 +48,11 @@ public interface MqMessageBase {
      * 是否事务
      */
     boolean isTransaction();
+
+    /**
+     * 是否广播
+     */
+    boolean isBroadcast();
 
     /**
      * 是否有序

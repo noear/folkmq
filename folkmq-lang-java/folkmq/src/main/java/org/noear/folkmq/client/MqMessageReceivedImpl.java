@@ -30,6 +30,7 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
     private final String fullTopic;
     private final String consumerGroup;
     private final Date expiration;
+    private final boolean broadcast;
     private final boolean sequence;
     private final boolean transaction;
     private final int qos;
@@ -52,6 +53,7 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
 
         this.qos = mr.getQos(source);
         this.times = mr.getTimes(source);
+        this.broadcast = mr.isBroadcast(source);
         this.sequence = mr.isSequence(source);
         this.transaction = mr.isTransaction(source);
 
@@ -154,6 +156,14 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
     @Override
     public boolean isTransaction() {
         return transaction;
+    }
+
+    /**
+     * 是否广播
+     * */
+    @Override
+    public boolean isBroadcast() {
+        return broadcast;
     }
 
     /**

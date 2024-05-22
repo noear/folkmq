@@ -1,8 +1,6 @@
 package org.noear.folkmq.server;
 
 import org.noear.folkmq.common.MqMetasResolver;
-import org.noear.socketd.transport.core.EntityMetas;
-import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.entity.EntityDefault;
 
 import java.util.concurrent.Delayed;
@@ -16,22 +14,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @since 1.0
  */
 public class MqMessageHolder implements Delayed {
-    protected final MqMetasResolver mr;
-    //发送人
-    private final String sender;
+    private final MqData message;
+    public final MqMetasResolver mr;
     //消息实体
     private final EntityDefault entity;
-    //跟踪Id
-    private final String key;
-    //投放目标
-    private final String atName;
-    //质量等级（0 或 1）
-    private final int qos;
-    //过期时间
-    private final long expiration;
-    //是否有序
-    private final boolean sequence;
-    private final String sequenceSharding;
+
     //是否事务
     private boolean transaction;
 
@@ -45,57 +32,50 @@ public class MqMessageHolder implements Delayed {
     //是否完成
     private AtomicBoolean isDone;
 
-    public MqMessageHolder(MqMetasResolver mr, String queueName, String consumerGroup, Message from, String key, int qos, boolean sequence, long expiration, boolean transaction, String sender, int distributeCount, long distributeTime) {
-        this.mr = mr;
-        this.atName = from.atName();
-        this.sender = sender;
-        this.entity = new EntityDefault().dataSet(from.data()).metaMapPut(from.metaMap());
+    public MqMessageHolder(MqData mqMessage, String queueName, String consumerGroup) {
+        this.message = mqMessage;
+        this.mr = mqMessage.mr;
+        this.entity = new EntityDefault().dataSet(message.source.data()).metaMapPut(message.source.metaMap());
 
-        mr.setConsumerGroup(entity, consumerGroup);
-
+        message.mr.setConsumerGroup(entity, consumerGroup);
 
         this.isDone = new AtomicBoolean();
 
-        this.key = key;
-        this.qos = qos;
-        this.expiration = expiration;
-        this.sequence = sequence;
-        this.sequenceSharding = from.meta(EntityMetas.META_X_HASH);
-        this.transaction = transaction;
-        this.distributeCount = distributeCount;
-        this.distributeTimeRef = distributeTime;
+        this.transaction = message.transaction;
+        this.distributeCount = message.times;
+        this.distributeTimeRef = message.scheduled;
         this.distributeTime = distributeTimeRef;
 
-        if (sequence) {
+        if (message.sequence) {
             this.entity.at(queueName);
         } else {
             this.entity.at(queueName + "!");
         }
 
         if (transaction) {
-            this.entity.at(sender);
+            this.entity.at(message.sender);
         }
     }
 
     /**
      * 发送人
-     * */
+     */
     public String getSender() {
-        return sender;
+        return message.sender;
     }
 
     /**
      * 获取投放目标
      */
     public String getAtName() {
-        return atName;
+        return message.atName;
     }
 
     /**
      * 获取消息主键
      */
     public String getKey() {
-        return key;
+        return message.key;
     }
 
     /**
@@ -109,20 +89,20 @@ public class MqMessageHolder implements Delayed {
      * 质量等级（0 或 1）
      */
     public int getQos() {
-        return qos;
+        return message.qos;
     }
 
     /**
      * 过期时间
      */
     public long getExpiration() {
-        return expiration;
+        return message.expiration;
     }
 
     /**
      * 是否事务
-     * */
-    public boolean isTransaction(){
+     */
+    public boolean isTransaction() {
         return transaction;
     }
 
@@ -133,26 +113,33 @@ public class MqMessageHolder implements Delayed {
         distributeTime = distributeTimeRef;
 
         //设置新的派发次数和下次时间
-        mr.setTimes(entity, distributeCount);
-        mr.setScheduled(entity, distributeTime);
-        mr.setExpiration(entity, null);
-        mr.setTransaction(entity, false);
+        message.mr.setTimes(entity, distributeCount);
+        message.mr.setScheduled(entity, distributeTime);
+        message.mr.setExpiration(entity, null);
+        message.mr.setTransaction(entity, false);
 
         return this;
+    }
+
+    /**
+     * 是否广播
+     * */
+    public boolean isBroadcast(){
+        return message.broadcast;
     }
 
     /**
      * 是否顺序
      */
     public boolean isSequence() {
-        return sequence;
+        return message.sequence;
     }
 
     /**
      * 获取顺序分片
-     * */
+     */
     public String getSequenceSharding() {
-        return sequenceSharding;
+        return message.sequenceSharding;
     }
 
     /**
@@ -208,12 +195,12 @@ public class MqMessageHolder implements Delayed {
         distributeTimeRef = MqNextTime.getNextTime(this);
 
         //设置新的派发次数和下次时间
-        mr.setTimes(entity, distributeCount);
+        message.mr.setTimes(entity, distributeCount);
 
         if (isSequence() == false) {
             //如果不是顺序消息，调整队列里的派发时间；否则走外部了的时间控制
             distributeTime = distributeTimeRef;
-            mr.setScheduled(entity, distributeTimeRef);
+            message.mr.setScheduled(entity, distributeTimeRef);
         }
 
         return this;

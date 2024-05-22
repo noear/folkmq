@@ -33,7 +33,7 @@ public interface MqServiceInternal {
 
     /**
      * 是否有主题订阅
-     * */
+     */
     boolean hasSubscribe(String topic);
 
     /**
@@ -79,17 +79,10 @@ public interface MqServiceInternal {
     /**
      * 执行路由
      *
-     * @param queue       队列
-     * @param message     消息
-     * @param key         主键
-     * @param qos         质量等级
-     * @param sequence    是否为顺序
-     * @param expiration  过期时间
-     * @param transaction 是否事务
-     * @param times       派发次数
-     * @param scheduled   计划时间
+     * @param mqMessage 消息
+     * @param queue     队列
      */
-    void routingToQueueDo(MqMetasResolver mr, MqQueue queue, Message message, String key, int qos, boolean sequence, long expiration, boolean transaction, String sender, int times, long scheduled);
+    void routingToQueueDo(MqData mqMessage, MqQueue queue);
 
     /**
      * 添加事件扩展

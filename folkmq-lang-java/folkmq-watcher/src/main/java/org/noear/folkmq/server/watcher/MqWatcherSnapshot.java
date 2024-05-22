@@ -250,26 +250,11 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
                             .entity(entity)
                             .build();
 
-
                     MqMetasResolver mr = MqUtils.getOf(message);
-
-                    String sender = mr.getSender(message);
-                    String key = mr.getKey(message);
-                    int qos = mr.getQos(message);
-                    int times = mr.getTimes(message);
-                    long expiration = mr.getExpiration(message);
-                    long scheduled = mr.getScheduled(message);
-                    boolean sequence = mr.isSequence(message);
-                    boolean transaction = mr.isTransaction(message);
-
-
-                    if (scheduled == 0) {
-                        //默认为当前ms（相对于后面者，有个排序作用）
-                        scheduled = System.currentTimeMillis();
-                    }
+                    MqData mqMessage = new MqData(mr, message);
 
                     MqQueue queue = serverRef.getQueue(queueName);
-                    serverRef.routingToQueueDo(mr, queue, message, key, qos, sequence, expiration, transaction, sender, times, scheduled);
+                    serverRef.routingToQueueDo(mqMessage, queue);
                 }
             }
         }

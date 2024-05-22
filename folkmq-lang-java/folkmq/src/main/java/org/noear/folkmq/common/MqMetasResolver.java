@@ -88,6 +88,11 @@ public interface MqMetasResolver {
     boolean isSequence(Entity m);
 
     /**
+     * 是否广播
+     * */
+    boolean isBroadcast(Entity m);
+
+    /**
      * 是否事务
      */
     boolean isTransaction(Entity m);

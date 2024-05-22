@@ -23,6 +23,7 @@ public class MqMessage implements MqMessageBase {
     private String tag;
     private Date scheduled;
     private Date expiration;
+    private boolean broadcast;
     private boolean sequence;
     private String sequenceSharding;
     private int qos = 1;
@@ -106,6 +107,14 @@ public class MqMessage implements MqMessageBase {
     }
 
     /**
+     * 是否广播
+     */
+    @Override
+    public boolean isBroadcast() {
+        return broadcast;
+    }
+
+    /**
      * 是否为顺序
      */
     @Override
@@ -159,6 +168,14 @@ public class MqMessage implements MqMessageBase {
             transaction.binding(this);
         }
 
+        return this;
+    }
+
+    /**
+     * 是否广播
+     */
+    public MqMessage broadcast(boolean broadcast) {
+        this.broadcast = broadcast;
         return this;
     }
 

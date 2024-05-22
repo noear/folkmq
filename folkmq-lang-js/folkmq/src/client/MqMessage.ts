@@ -33,6 +33,11 @@ export interface MqMessageBase {
     isTransaction(): boolean;
 
     /**
+     * 是否广播
+     */
+    isBroadcast(): boolean;
+
+    /**
      * 是否有序
      */
     isSequence(): boolean;
@@ -56,6 +61,7 @@ export class MqMessage implements MqMessageBase {
     private _tag: string | null = null;
     private _scheduled: Date | null = null;
     private _expiration: Date | null = null;
+    private _broadcast: boolean = false;
     private _sequence: boolean = false;
     private _sequenceSharding: string | null = null;
     private _qos: number = 1;
@@ -105,6 +111,10 @@ export class MqMessage implements MqMessageBase {
         return this._transaction != null;
     }
 
+    isBroadcast(): boolean {
+        return this._broadcast;
+    }
+
     isSequence(): boolean {
         return this._sequence;
     }
@@ -143,6 +153,11 @@ export class MqMessage implements MqMessageBase {
         if (sharding) {
             this._sequenceSharding = (sequence ? sharding : null);
         }
+        return this;
+    }
+
+    broadcast(broadcast: boolean): MqMessage {
+        this._broadcast = broadcast;
         return this;
     }
 

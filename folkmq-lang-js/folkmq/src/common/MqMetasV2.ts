@@ -49,6 +49,11 @@ export class MqMetasV2{
     static readonly MQ_META_TRANSACTION = "t4";
 
     /**
+     * 元信息：消息是否广播
+     */
+    static readonly MQ_META_BROADCAST = "b0";
+
+    /**
      * 元信息：消息质量等级
      */
     static readonly MQ_META_QOS = "q1";

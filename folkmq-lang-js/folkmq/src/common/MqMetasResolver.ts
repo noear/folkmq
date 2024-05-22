@@ -85,6 +85,11 @@ export interface MqMetasResolver {
     isSequence(m: Entity): boolean;
 
     /**
+     * 是否广播
+     * */
+    isBroadcast(m: Entity): boolean;
+
+    /**
      * 是否事务
      */
     isTransaction(m: Entity): boolean;

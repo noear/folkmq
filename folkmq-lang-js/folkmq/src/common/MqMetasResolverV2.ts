@@ -75,6 +75,10 @@ export class MqMetasResolverV2 implements MqMetasResolver {
         return "1" == (m.meta(MqMetasV2.MQ_META_SEQUENCE));
     }
 
+    isBroadcast(m: Entity): boolean {
+        return "1" == (m.meta(MqMetasV2.MQ_META_BROADCAST));
+    }
+
     isTransaction(m: Entity): boolean {
         return "1" == (m.meta(MqMetasV2.MQ_META_TRANSACTION));
     }
@@ -114,6 +118,10 @@ export class MqMetasResolverV2 implements MqMetasResolver {
 
         if (message.getSender()) {
             entity.metaPut(MqMetasV2.MQ_META_SENDER, message.getSender());
+        }
+
+        if(message.isBroadcast()){
+            entity.metaPut(MqMetasV2.MQ_META_BROADCAST, "1");
         }
 
         //是否有序

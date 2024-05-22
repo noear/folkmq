@@ -59,6 +59,7 @@ export class MqMessageReceivedImpl implements MqMessageReceived {
     private readonly _consumerGroup: string;
     private readonly _expiration: Date | null;
     private readonly _sequence: boolean;
+    private readonly _broadcast:boolean;
     private readonly _transaction: boolean;
     private readonly _qos: number;
     private readonly _times: number;
@@ -81,6 +82,7 @@ export class MqMessageReceivedImpl implements MqMessageReceived {
         this._qos = mr.getQos(source);
         this._times = mr.getTimes(source);
         this._sequence = mr.isSequence(source);
+        this._broadcast = mr.isBroadcast(source);
         this._transaction = mr.isTransaction(source);
 
         let expirationL = mr.getExpiration(source);
@@ -175,6 +177,13 @@ export class MqMessageReceivedImpl implements MqMessageReceived {
      */
     isTransaction(): boolean {
         return this._transaction;
+    }
+
+    /**
+     * 是否广播
+     * */
+    isBroadcast(): boolean {
+        return this._broadcast;
     }
 
     /**

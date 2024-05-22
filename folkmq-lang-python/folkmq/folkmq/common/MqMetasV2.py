@@ -45,6 +45,11 @@ class MqMetasV2:
     MQ_META_TRANSACTION = "t4"
 
     #
+    # 元信息：消息是否广播
+    #
+    MQ_META_BROADCAST = "b0"
+
+    #
     # 元信息：消息质量等级
     #
     MQ_META_QOS = "q1"

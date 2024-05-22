@@ -63,6 +63,9 @@ class MqMetasResolverV1(MqMetasResolver):
     def is_sequence(self, m: Entity) -> bool:
         return "1" == (m.meta_or_default(MqMetasV1.MQ_META_SEQUENCE, "0"))
 
+    def is_broadcast(self, m: Entity) ->bool:
+        return "1" == (m.meta(MqMetasV2.MQ_META_BROADCAST))
+
     def is_transaction(self, m: Entity) -> bool:
         return "1" == (m.meta(MqMetasV2.MQ_META_TRANSACTION))
 
@@ -100,6 +103,8 @@ class MqMetasResolverV1(MqMetasResolver):
         if message.get_sender():
             entity.meta_put(MqMetasV2.MQ_META_SENDER, message.get_sender())
 
+        if message.is_broadcast():
+            entity.meta_put(MqMetasV2.MQ_META_BROADCAST, "1")
 
         # 是否有序
         if  message.is_sequence() or message.is_transaction():

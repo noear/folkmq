@@ -99,6 +99,12 @@ class MqMetasResolver:
     def is_sequence(self, m: Entity)->bool:...
 
     #
+    # 是否广播
+    #
+    @abc.abstractmethod
+    def is_broadcast(self, m: Entity)->bool:...
+
+    #
     # 是否事务
     #
     @abc.abstractmethod

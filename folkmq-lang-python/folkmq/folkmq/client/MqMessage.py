@@ -35,6 +35,10 @@ class MqMessageBase:
     @abstractmethod
     def is_sequence(self) -> bool: ...
 
+    # 是否广播
+    @abstractmethod
+    def is_broadcast(self) -> bool: ...
+
     #质量等级
     @abstractmethod
     def get_qos(self) -> int: ...
@@ -61,6 +65,7 @@ class MqMessage(MqMessageBase):
         self.__scheduled:datetime = None
         self.__expiration:datetime = None;
         self.__sequence:bool = False
+        self.__broadcast:bool = False
         self.__sequenceSharding: str | None = None
         self.__qos:int = 1
 
@@ -87,6 +92,9 @@ class MqMessage(MqMessageBase):
 
     def is_transaction(self) -> bool:
         return self.__transaction is not None
+
+    def is_broadcast(self) -> bool:
+        return self.__broadcast
 
     def is_sequence(self) -> bool:
         return self.__sequence
@@ -123,6 +131,10 @@ class MqMessage(MqMessageBase):
                 self.__sequenceSharding = sharding
         else:
             self.__sequenceSharding = None
+        return self
+
+    def broadcast(self, broadcast: bool)-> 'MqMessage':
+        self.__broadcast = broadcast
         return self
 
 

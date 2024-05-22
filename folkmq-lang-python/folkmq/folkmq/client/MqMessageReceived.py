@@ -44,83 +44,88 @@ class MqMessageReceived(MqMessageBase):
 
 class MqMessageReceivedImpl(MqMessageReceived):
     def __init__(self, clientInternal:'MqClientInternal', session:Session, source:Message):
-        self._clientInternal = clientInternal
-        self._session = session
-        self._source = source
+        self.__clientInternal = clientInternal
+        self.__session = session
+        self.__source = source
 
         mr  = MqUtils.get_of(source)
 
-        self._sender = mr.get_sender(source)
+        self.__sender = mr.get_sender(source)
 
-        self._key = mr.get_key(source)
-        self._tag = mr.get_tag(source)
-        self._fullTopic = mr.get_topic(source)
-        self._topic = MqTopicHelper.get_topic(self._fullTopic)
-        self._consumerGroup = mr.get_consumer_group(source)
+        self.__key = mr.get_key(source)
+        self.__tag = mr.get_tag(source)
+        self.__fullTopic = mr.get_topic(source)
+        self.__topic = MqTopicHelper.get_topic(self.__fullTopic)
+        self.__consumerGroup = mr.get_consumer_group(source)
 
-        self._qos = mr.get_qos(source)
-        self._times = mr.get_times(source)
-        self._sequence = mr.is_sequence(source)
-        self._transaction = mr.is_transaction(source)
+        self.__qos = mr.get_qos(source)
+        self.__times = mr.get_times(source)
+        self.__sequence = mr.is_sequence(source)
+        self.__broadcast = mr.is_broadcast(source)
+        self.__transaction = mr.is_transaction(source)
 
-        self._expirationL = mr.get_expiration(source)
-        self._expiration = self._expirationL
+        self.__expirationL = mr.get_expiration(source)
+        self.__expiration = self.__expirationL
 
     def getSource(self) -> Message:
-        return self._source
+        return self.__source
 
     def get_sender(self) -> str | None:
-        return self._sender
+        return self.__sender
 
     def get_key(self) -> str:
-        return self._key
+        return self.__key
 
     def get_tag(self) -> str:
-        return self._tag
+        return self.__tag
 
     def get_topic(self) -> str:
-        return self._topic
+        return self.__topic
 
-    def getFullTopic(self)->str:
-        return self._fullTopic
+    def get_full_topic(self)->str:
+        return self.__fullTopic
 
     def get_consumer_group(self) -> str:
-        return self._consumerGroup
+        return self.__consumerGroup
 
     def get_body(self) -> bytes:
-        return self._source.data_as_bytes()
+        return self.__source.data_as_bytes()
+
     def get_body_as_string(self) -> str:
-        return self._source.data_as_string()
+        return self.__source.data_as_string()
 
     def get_qos(self) -> int:
-        return self._qos
+        return self.__qos
 
     def get_attr(self, name: str) -> str | None:
-        return self._source.meta(MqConstants.MQ_ATTR_PREFIX + name)
+        return self.__source.meta(MqConstants.MQ_ATTR_PREFIX + name)
 
     def get_expiration(self) -> datetime | None:
-        return self._expiration
+        return self.__expiration
 
     def is_transaction(self) -> bool:
-        return self._transaction
+        return self.__transaction
 
     def is_sequence(self) -> bool:
-        return self._sequence
+        return self.__sequence
+
+    def is_broadcast(self) -> bool:
+        return self.__broadcast
 
     def get_times(self) -> int:
-        return self._times
+        return self.__times
 
     def acknowledge(self, isOk: bool):
-        self._clientInternal.reply(self._session, self._source, self, isOk, None)
+        self.__clientInternal.reply(self.__session, self.__source, self, isOk, None)
 
     def response(self, entity:Entity):
-        self._clientInternal.reply(self._session, self._source, self, True, entity)
+        self.__clientInternal.reply(self.__session, self.__source, self, True, entity)
 
     def __str__(self) ->str:
         return "MqMessageReceived{" + \
-            "key='" + self._key + '\'' + \
-            ", tag='" + self._tag + '\'' + \
-            ", topic='" + self._topic + '\'' + \
+            "key='" + self.__key + '\'' + \
+            ", tag='" + self.__tag + '\'' + \
+            ", topic='" + self.__topic + '\'' + \
             ", body='" + self.get_body_as_string() + '\'' + \
             '}'
 

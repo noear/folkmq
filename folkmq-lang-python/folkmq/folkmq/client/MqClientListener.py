@@ -61,7 +61,7 @@ class MqClientListener(EventListener):
                     err_msg = traceback.format_exc()
                     log.warning(f"Client request handle error, key={message.get_key()} \n{err_msg}")
         else:
-            subscription = self._client.getSubscription(message.getFullTopic(), message.get_consumer_group())
+            subscription = self._client.getSubscription(message.get_full_topic(), message.get_consumer_group())
 
             try:
                 if subscription is not None:

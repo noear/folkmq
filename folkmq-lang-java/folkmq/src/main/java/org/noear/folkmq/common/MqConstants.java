@@ -167,11 +167,15 @@ public interface MqConstants {
     /**
      * 客户端流超时默认值
      */
-    long STREAM_TIMEOUT_CLIENT_DEFAULT = 30 * 1000;
+    long CLIENT_STREAM_TIMEOUT_DEFAULT = 30 * 1000;
 
+    /**
+     * 客户端写信号量默认值
+     */
+    int CLIENT_WRITE_SEMAPHORE_DEFAULT = 100;
 
     /**
      * 服务端流超时默认值
      */
-    long STREAM_TIMEOUT_SERVER_DEFAULT = 60 * 1000 * 5;
+    long SERVER_STREAM_TIMEOUT_DEFAULT = 60 * 1000 * 5;
 }

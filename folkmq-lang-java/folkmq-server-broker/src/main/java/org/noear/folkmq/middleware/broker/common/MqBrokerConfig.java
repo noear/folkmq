@@ -32,7 +32,7 @@ public class MqBrokerConfig {
         codecThreads = Solon.cfg().getInt(ConfigNames.folkmq_codecThreads, 1);
         exchangeThreads = Solon.cfg().getInt(ConfigNames.folkmq_exchangeThreads, 1);
 
-        streamTimeout = Solon.cfg().getLong(ConfigNames.folkmq_streamTimeout, MqConstants.STREAM_TIMEOUT_SERVER_DEFAULT);
+        streamTimeout = Solon.cfg().getLong(ConfigNames.folkmq_streamTimeout, MqConstants.SERVER_STREAM_TIMEOUT_DEFAULT);
     }
 
     public static Map<String, String> getAccessMap() {

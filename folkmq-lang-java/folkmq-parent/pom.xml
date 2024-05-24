@@ -19,8 +19,8 @@
         <java.version>1.8</java.version>
 
         <folkmq.version>1.4.6</folkmq.version>
-        <socketd.version>2.4.18</socketd.version>
-        <snack3.version>3.2.97</snack3.version>
+        <socketd.version>2.5.0</socketd.version>
+        <snack3.version>3.2.98</snack3.version>
         <solon.version>2.8.0</solon.version>
 
         <micrometer.version>1.11.1</micrometer.version>

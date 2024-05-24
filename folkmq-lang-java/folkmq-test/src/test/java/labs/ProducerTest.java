@@ -12,7 +12,7 @@ public class ProducerTest {
 
         long i = 0;
         while (true){
-            client.publish("/jlwu/receive/gateway", new MqMessage("hot-" + i));
+            client.publishAsync("/jlwu/receive/gateway", new MqMessage("hot-" + i));
             i++;
         }
     }

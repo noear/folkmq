@@ -5,6 +5,7 @@ import org.noear.folkmq.common.MqConstants;
 import org.noear.folkmq.common.MqUtils;
 import org.noear.snack.ONode;
 import org.noear.socketd.broker.BrokerListener;
+import org.noear.socketd.cluster.LoadBalancer;
 import org.noear.socketd.transport.core.Entity;
 import org.noear.socketd.transport.core.EntityMetas;
 import org.noear.socketd.transport.core.Message;
@@ -139,7 +140,7 @@ public class BrokerListenerFolkmq extends BrokerListener {
             if (isBroadcast) {
                 //广播模式
                 for (Session s0 : getPlayerAll(atName)) {
-                    if (MqUtils.allowSend(s0)) {
+                    if (LoadBalancer.isActive(s0)) {
                         try {
                             forwardToSession(requester, message, s0);
                         } catch (Throwable e) {
@@ -150,7 +151,7 @@ public class BrokerListenerFolkmq extends BrokerListener {
             } else {
                 //单发模式（给同名的某个玩家，轮询负截均衡）
                 Session responder = getPlayerAny(atName, requester, message);
-                if (MqUtils.allowSend(responder)) {
+                if (LoadBalancer.isActive(responder)) {
                     //转发消息
                     try {
                         forwardToSession(requester, message, responder);

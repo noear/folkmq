@@ -48,9 +48,9 @@ public class MqMessageHolder implements Delayed {
         this.distributeTime = distributeTimeRef;
 
         if (this.draft.sequence) {
-            this.entity.at(queueName);
-        } else {
             this.entity.at(queueName + "!");
+        } else {
+            this.entity.at(queueName);
         }
 
         if (transaction) {

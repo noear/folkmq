@@ -141,7 +141,7 @@ public class MqClientDefault implements MqClientInternal {
                     c.metaPut(MqConstants.FOLKMQ_VERSION, FolkMQ.versionCodeAsString())
                             .heartbeatInterval(6_000)
                             .streamTimeout(MqConstants.CLIENT_STREAM_TIMEOUT_DEFAULT)
-                            .writeSemaphore(MqConstants.CLIENT_WRITE_SEMAPHORE_DEFAULT, true)
+                            .writeSemaphore(MqConstants.CLIENT_WRITE_SEMAPHORE_DEFAULT)
                             .maxMemoryRatio(0.8F)
                             .serialSend(true)
                             .ioThreads(1)

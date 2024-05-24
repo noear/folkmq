@@ -406,29 +406,16 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
         //观察者::派发时（在元信息调整之后，再观察）
         watcher.onDistribute(topic, consumerGroup, messageHolder);
 
-        if (messageHolder.getQos() > 0) {
+        if (messageHolder.getQos() > 0 || messageHolder.isBroadcast() == false) {
             //::Qos1
 
             //1.给会话发送消息 //如果有异步，上面会加入队列
-            if (messageHolder.isBroadcast()) {
-                for (Session s0 : getSessions()) {
-                    if (LoadBalancer.isActive(s0)) {
-                        s0.sendAndRequest(MqConstants.MQ_EVENT_DISTRIBUTE, messageHolder.getEntity(), -1).thenReply(r -> {
-                            int ack = Integer.parseInt(r.metaOrDefault(MqConstants.MQ_META_ACK, "0"));
-                            acknowledgeDo(messageHolder, ack, true);
-                        }).thenError(err -> {
-                            acknowledgeDo(messageHolder, 0, true);
-                        });
-                    }
-                }
-            } else {
-                s1.sendAndRequest(MqConstants.MQ_EVENT_DISTRIBUTE, messageHolder.getEntity(), -1).thenReply(r -> {
-                    int ack = Integer.parseInt(r.metaOrDefault(MqConstants.MQ_META_ACK, "0"));
-                    acknowledgeDo(messageHolder, ack, true);
-                }).thenError(err -> {
-                    acknowledgeDo(messageHolder, 0, true);
-                });
-            }
+            s1.sendAndRequest(MqConstants.MQ_EVENT_DISTRIBUTE, messageHolder.getEntity(), -1).thenReply(r -> {
+                int ack = Integer.parseInt(r.metaOrDefault(MqConstants.MQ_META_ACK, "0"));
+                acknowledgeDo(messageHolder, ack, true);
+            }).thenError(err -> {
+                acknowledgeDo(messageHolder, 0, true);
+            });
 
             //2.添加保险延时任务：如果没有回执就重发 //重新入队列，是避免重启时数据丢失
             messageHolder.setDistributeTime(System.currentTimeMillis() + MqNextTime.maxConsumeMillis());

@@ -11,7 +11,7 @@ public class ProducerTest {
                 .connect();
 
         long i = 0;
-        while (true){
+        while (true) {
             client.publishAsync("/jlwu/receive/gateway", new MqMessage("hot-" + i));
             i++;
         }

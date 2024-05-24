@@ -14,10 +14,14 @@ class FolkMQ:
 
     @staticmethod
     def version_name()->str:
-        return "1.4.6"
+        return "1.5.0"
 
     @staticmethod
     def create_client(*serverUrls) -> MqClient:
         return MqClientDefault(serverUrls)
+
+    @staticmethod
+    def new_message(body: str|bytes, key:str|None = None):
+        return MqMessage(body,key)
 
 

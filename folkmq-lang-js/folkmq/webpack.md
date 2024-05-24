@@ -29,6 +29,12 @@ cnpm i -D webpack
 cnpm i -D webpack-cli
 ```
 
+* 装包
+
+```
+npm install
+```
+
 * 发包
 
 ```
@@ -39,7 +45,7 @@ npm publish
 ```javascript
 
 /*!
- * FolkMQ v1.4.6
+ * FolkMQ v1.5.0
  * (c) 2023-2024 noear.org
  * Released under the LGPL-2.1 License.
  */

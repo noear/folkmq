@@ -8,6 +8,7 @@ public class ServerVo {
     public String sid;
     public String addree;
     public String adminUrl;
+    public String memoryRatio;
 
     public String getSid() {
         return sid;
@@ -19,5 +20,9 @@ public class ServerVo {
 
     public String getAdminUrl() {
         return adminUrl;
+    }
+
+    public String getMemoryRatio() {
+        return memoryRatio;
     }
 }

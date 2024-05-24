@@ -2,6 +2,7 @@ package org.noear.folkmq.middleware.broker.admin;
 
 import org.noear.folkmq.middleware.broker.admin.dso.LicenceUtils;
 import org.noear.folkmq.middleware.broker.admin.dso.ViewQueueService;
+import org.noear.folkmq.middleware.broker.admin.model.ServerInfoVo;
 import org.noear.folkmq.middleware.broker.admin.model.ServerVo;
 import org.noear.folkmq.middleware.broker.admin.model.TopicVo;
 import org.noear.folkmq.middleware.broker.mq.BrokerListenerFolkmq;
@@ -26,6 +27,8 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.*;
+
+import static javax.management.Query.attr;
 
 /**
  * 管理控制器
@@ -150,6 +153,13 @@ public class AdminController extends BaseController {
                 serverVo.sid = session.sessionId();
                 serverVo.addree = adminAddr + ":" + socketAddress.getPort();
                 serverVo.adminUrl = "http://" + adminAddr + ":" + adminPort + "/admin";
+
+                ServerInfoVo infoVo = session.attr("ServerInfoVo");
+                if (infoVo != null) {
+                    serverVo.memoryRatio = String.format("%.2f%%", infoVo.memoryRatio * 100);
+                } else {
+                    serverVo.memoryRatio = "-";
+                }
 
                 list.add(serverVo);
 

@@ -113,6 +113,11 @@ public interface MqConstants {
     String ADMIN_VIEW_QUEUE = "admin.view.queue";
 
     /**
+     * 管理视图-实例（集群节点）
+     */
+    String ADMIN_VIEW_INSTANCE = "admin.view.instance";
+
+    /**
      * 管理队列-强制删除
      */
     String ADMIN_QUEUE_FORCE_DELETE = "admin.queue.force.delete";

@@ -31,7 +31,8 @@
     <table>
         <thead>
         <tr>
-            <td width="300px" class="left">地址</td>
+            <td width="200px" class="left">地址</td>
+            <td width="120px" class="left">内存用率</td>
             <td class="left">控制台</td>
             <td width="100px"></td>
         </tr>
@@ -40,9 +41,13 @@
         <#list list as item>
             <tr>
                 <td class="left">${item.addree}</td>
+                <td class="left">
+                    ${item.memoryRatio!}
+                </td>
                 <td class="left break">
                     <a href="${item.adminUrl}" target="_blank">${item.adminUrl}</a>
                 </td>
+
                 <td>
                     <a href="#" onclick="saveDo('${item.sid}');return false;">更新快照</a>
                 </td>

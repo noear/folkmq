@@ -1,6 +1,7 @@
 package org.noear.folkmq.middleware.broker.admin.dso;
 
 import org.noear.folkmq.middleware.broker.admin.model.QueueVo;
+import org.noear.folkmq.middleware.broker.admin.model.ServerInfoVo;
 import org.noear.folkmq.middleware.broker.common.ConfigNames;
 import org.noear.folkmq.middleware.broker.mq.BrokerListenerFolkmq;
 import org.noear.folkmq.common.MqConstants;
@@ -82,11 +83,11 @@ public class ViewQueueService implements LifecycleBean {
                 }
             }
         }
-        
+
         return list;
     }
 
-    public void removeQueueVo(String queueName){
+    public void removeQueueVo(String queueName) {
         queueVoMap.remove(queueName);
         queueVoMapTmp.remove(queueName);
         queueSet.remove(queueName);
@@ -99,7 +100,7 @@ public class ViewQueueService implements LifecycleBean {
 
     /**
      * 延时处理
-     * */
+     */
     private void delay() {
         long sync_time_millis = Integer.parseInt(Solon.cfg().get(
                 ConfigNames.folkmq_view_queue_syncInterval,
@@ -131,11 +132,17 @@ public class ViewQueueService implements LifecycleBean {
                         List<QueueVo> list = ONode.loadStr(json).toObjectList(QueueVo.class);
                         addQueueVo(list, queueVoMapTmp);
                     });
+
+                    session.sendAndRequest(MqConstants.ADMIN_VIEW_INSTANCE, new StringEntity(""), -1).thenReply(r -> {
+                        String json = r.dataAsString();
+                        ServerInfoVo infoVo = ONode.loadStr(json).toObject(ServerInfoVo.class);
+                        session.attrPut("ServerInfoVo", infoVo);
+                    });
                 } catch (Throwable e) {
                     log.warn("Cmd 'admin.view.queue' call error", e);
                 }
             }
-        }finally {
+        } finally {
             delay();
         }
     }

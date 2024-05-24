@@ -2,6 +2,7 @@ package org.noear.folkmq.middleware.server.mq;
 
 import org.noear.folkmq.FolkMQ;
 import org.noear.folkmq.common.MqConstants;
+import org.noear.folkmq.middleware.server.admin.model.ServerInfoVo;
 import org.noear.folkmq.server.MqServer;
 import org.noear.folkmq.server.MqServiceInternal;
 import org.noear.folkmq.server.MqServiceListener;
@@ -15,6 +16,7 @@ import org.noear.snack.ONode;
 import org.noear.socketd.SocketD;
 import org.noear.socketd.cluster.ClusterClientSession;
 import org.noear.socketd.transport.core.entity.StringEntity;
+import org.noear.socketd.utils.MemoryUtils;
 import org.noear.solon.Solon;
 import org.noear.solon.Utils;
 import org.noear.solon.annotation.Component;
@@ -116,6 +118,16 @@ public class FolkmqLifecycleBean implements LifecycleBean {
         brokerServiceListener.doOn(MqConstants.ADMIN_VIEW_QUEUE, (s, m) -> {
             if (m.isRequest() || m.isSubscribe()) {
                 String json = ONode.stringify(ViewUtils.queueView(brokerServiceListener));
+                s.replyEnd(m, new StringEntity(json));
+            }
+        });
+
+        //允许控制台获取服务信息（暂时只看内存）
+        brokerServiceListener.doOn(MqConstants.ADMIN_VIEW_INSTANCE, (s, m) -> {
+            if (m.isRequest() || m.isSubscribe()) {
+                ServerInfoVo infoVo = new ServerInfoVo();
+                infoVo.memoryRatio = MemoryUtils.getUseMemoryRatio();
+                String json = ONode.stringify(infoVo);
                 s.replyEnd(m, new StringEntity(json));
             }
         });

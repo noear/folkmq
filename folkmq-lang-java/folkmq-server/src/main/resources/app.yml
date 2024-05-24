@@ -27,7 +27,7 @@ solon.logging.logger:
   "root": #默认记录器配置
     level: INFO
   "io.netty":
-    level: WARN
+    level: ERROR
 
 
 folkmq:

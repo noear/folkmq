@@ -17,7 +17,7 @@ public interface ConfigNames {
     String folkmq_codecThreads = "folkmq.codecThreads";
     //最大线程数
     String folkmq_exchangeThreads = "folkmq.exchangeThreads";
-
+    //流超时
     String folkmq_streamTimeout = "folkmq.streamTimeout";
 
 

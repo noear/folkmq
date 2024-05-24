@@ -1,5 +1,6 @@
 package org.noear.folkmq.middleware.server.common;
 
+import org.noear.folkmq.common.MqConstants;
 import org.noear.socketd.utils.StrUtils;
 import org.noear.solon.Solon;
 
@@ -32,7 +33,7 @@ public class MqServerConfig {
         codecThreads = Solon.cfg().getInt(ConfigNames.folkmq_codecThreads, 1);
         exchangeThreads = Solon.cfg().getInt(ConfigNames.folkmq_exchangeThreads, 1);
 
-        streamTimeout = Solon.cfg().getLong(ConfigNames.folkmq_streamTimeout, 60_000 * 5);
+        streamTimeout = Solon.cfg().getLong(ConfigNames.folkmq_streamTimeout, MqConstants.STREAM_TIMEOUT_SERVER_DEFAULT);
     }
 
     public static Map<String, String> getAccessMap() {

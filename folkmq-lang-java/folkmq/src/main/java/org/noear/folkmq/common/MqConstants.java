@@ -74,7 +74,7 @@ public interface MqConstants {
     String MQ_EVENT_DISTRIBUTE = "mq.event.distribute";
     /**
      * 事件：请求
-     * */
+     */
     String MQ_EVENT_REQUEST = "mq.event.request";
     /**
      * 事件：保存快照
@@ -83,7 +83,7 @@ public interface MqConstants {
 
     /**
      * 事件：加入集群
-     * */
+     */
     String MQ_EVENT_JOIN = "mq.event.join";
 
 
@@ -156,16 +156,22 @@ public interface MqConstants {
 
     /**
      * 事件缓存队列消息费者
-     * */
+     */
     String MQ_TRAN_CONSUMER_GROUP = "!";
 
     /**
      * 消息属性前缀
-     * */
+     */
     String MQ_ATTR_PREFIX = "!";
 
     /**
-     * 最大分片大小（1m）
+     * 客户端流超时默认值
      */
-    int MAX_FRAGMENT_SIZE = 1024 * 1024;
+    long STREAM_TIMEOUT_CLIENT_DEFAULT = 30 * 1000;
+
+
+    /**
+     * 服务端流超时默认值
+     */
+    long STREAM_TIMEOUT_SERVER_DEFAULT = 60 * 1000 * 5;
 }

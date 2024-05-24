@@ -15,6 +15,8 @@ public interface ConfigNames {
     String folkmq_codecThreads = "folkmq.codecThreads";
     //交换线程数
     String folkmq_exchangeThreads = "folkmq.exchangeThreads";
+    //流超时
+    String folkmq_streamTimeout = "folkmq.streamTimeout";
 
     //视图队列同步间隔（ms）
     String folkmq_view_queue_syncInterval = "folkmq.view.queue.syncInterval";

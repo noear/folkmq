@@ -1,6 +1,7 @@
 package org.noear.folkmq.middleware.broker.mq;
 
 import org.noear.folkmq.FolkMQ;
+import org.noear.folkmq.common.MqConstants;
 import org.noear.folkmq.middleware.broker.admin.dso.QueueForceService;
 import org.noear.folkmq.middleware.broker.common.MqBrokerConfig;
 import org.noear.socketd.SocketD;
@@ -46,7 +47,7 @@ public class BrokerLifecycleBean implements LifecycleBean {
                 .config(c -> c.port(Solon.cfg().serverPort() + 10000)
                         .serialSend(true)
                         .maxMemoryRatio(0.8F)
-                        .streamTimeout(30_000)
+                        .streamTimeout(MqBrokerConfig.streamTimeout)
                         .writeSemaphore(10, true)
                         .ioThreads(MqBrokerConfig.ioThreads)
                         .codecThreads(MqBrokerConfig.codecThreads)
@@ -62,7 +63,7 @@ public class BrokerLifecycleBean implements LifecycleBean {
                     .config(c -> c.port(Solon.cfg().serverPort() + 10001)
                             .serialSend(true)
                             .maxMemoryRatio(0.8F)
-                            .streamTimeout(30_000)
+                            .streamTimeout(MqBrokerConfig.streamTimeout)
                             .writeSemaphore(10, true)
                             .ioThreads(MqBrokerConfig.ioThreads)
                             .codecThreads(MqBrokerConfig.codecThreads)

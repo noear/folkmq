@@ -1,5 +1,6 @@
 package org.noear.folkmq.server;
 
+import org.noear.folkmq.common.MqConstants;
 import org.noear.socketd.SocketD;
 import org.noear.socketd.transport.server.Server;
 import org.noear.socketd.transport.server.ServerConfigHandler;
@@ -99,7 +100,7 @@ public class MqServerDefault implements MqServer {
 
         server.config(c -> c.serialSend(true)
                 .maxMemoryRatio(0.8F)
-                .streamTimeout(60_000 * 5)
+                .streamTimeout(MqConstants.STREAM_TIMEOUT_SERVER_DEFAULT)
                 .ioThreads(1)
                 .codecThreads(1)
                 .exchangeThreads(1));

@@ -175,10 +175,10 @@ public abstract class MqServiceListenerBase extends EventListener implements MqS
     @Override
     public void routingDo(MqMetasResolver mr, Message message) {
         //复用解析
-        MqData mqMessage = new MqData(mr, message);
+        MqDraft draft = new MqDraft(mr, message);
 
         //取出所有订阅的主题消费者
-        Set<String> topicConsumerSet = subscribeMap.get(mqMessage.topic);
+        Set<String> topicConsumerSet = subscribeMap.get(draft.topic);
 
         if (topicConsumerSet != null) {
             //避免遍历 Set 时，出现 add or remove 而异常
@@ -190,26 +190,26 @@ public abstract class MqServiceListenerBase extends EventListener implements MqS
                     continue;
                 }
 
-                routingToQueueDo(mqMessage, queue);
+                routingToQueueDo(draft, queue);
             }
         }
     }
 
     protected void routingToQueueName(MqMetasResolver mr, Message message, String queueName) {
         //复用解析
-        MqData mqMessage = new MqData(mr, message);
+        MqDraft draft = new MqDraft(mr, message);
         //取出所有订阅的主题消费者
         MqQueue queue = queueMap.get(queueName);
 
-        routingToQueueDo(mqMessage, queue);
+        routingToQueueDo(draft, queue);
     }
 
     /**
      * 执行路由
      */
-    public void routingToQueueDo(MqData message, MqQueue queue) {
+    public void routingToQueueDo(MqDraft draft, MqQueue queue) {
         if (queue != null) {
-            MqMessageHolder messageHolder = new MqMessageHolder(message, queue.getQueueName(), queue.getConsumerGroup());
+            MqMessageHolder messageHolder = new MqMessageHolder(draft, queue.getQueueName(), queue.getConsumerGroup());
             queue.add(messageHolder);
         }
     }

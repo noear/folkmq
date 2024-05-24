@@ -251,10 +251,10 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
                             .build();
 
                     MqMetasResolver mr = MqUtils.getOf(message);
-                    MqData mqMessage = new MqData(mr, message);
+                    MqDraft draft = new MqDraft(mr, message);
 
                     MqQueue queue = serverRef.getQueue(queueName);
-                    serverRef.routingToQueueDo(mqMessage, queue);
+                    serverRef.routingToQueueDo(draft, queue);
                 }
             }
         }

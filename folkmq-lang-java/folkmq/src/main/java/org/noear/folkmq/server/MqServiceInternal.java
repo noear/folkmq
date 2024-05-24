@@ -79,10 +79,10 @@ public interface MqServiceInternal {
     /**
      * 执行路由
      *
-     * @param mqMessage 消息
-     * @param queue     队列
+     * @param draft 消息草稿
+     * @param queue 队列
      */
-    void routingToQueueDo(MqData mqMessage, MqQueue queue);
+    void routingToQueueDo(MqDraft draft, MqQueue queue);
 
     /**
      * 添加事件扩展

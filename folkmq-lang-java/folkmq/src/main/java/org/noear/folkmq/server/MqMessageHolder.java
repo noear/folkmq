@@ -14,8 +14,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @since 1.0
  */
 public class MqMessageHolder implements Delayed {
-    private final MqData message;
     public final MqMetasResolver mr;
+    //消息草稿
+    private final MqDraft draft;
     //消息实体
     private final EntityDefault entity;
 
@@ -32,28 +33,28 @@ public class MqMessageHolder implements Delayed {
     //是否完成
     private AtomicBoolean isDone;
 
-    public MqMessageHolder(MqData mqMessage, String queueName, String consumerGroup) {
-        this.message = mqMessage;
-        this.mr = mqMessage.mr;
-        this.entity = new EntityDefault().dataSet(message.source.data()).metaMapPut(message.source.metaMap());
+    public MqMessageHolder(MqDraft draft, String queueName, String consumerGroup) {
+        this.draft = draft;
+        this.mr = draft.mr;
+        this.entity = new EntityDefault().dataSet(this.draft.source.data()).metaMapPut(this.draft.source.metaMap());
 
-        message.mr.setConsumerGroup(entity, consumerGroup);
+        this.mr.setConsumerGroup(entity, consumerGroup);
 
         this.isDone = new AtomicBoolean();
 
-        this.transaction = message.transaction;
-        this.distributeCount = message.times;
-        this.distributeTimeRef = message.scheduled;
+        this.transaction = this.draft.transaction;
+        this.distributeCount = this.draft.times;
+        this.distributeTimeRef = this.draft.scheduled;
         this.distributeTime = distributeTimeRef;
 
-        if (message.sequence) {
+        if (this.draft.sequence) {
             this.entity.at(queueName);
         } else {
             this.entity.at(queueName + "!");
         }
 
         if (transaction) {
-            this.entity.at(message.sender);
+            this.entity.at(this.draft.sender);
         }
     }
 
@@ -61,21 +62,21 @@ public class MqMessageHolder implements Delayed {
      * 发送人
      */
     public String getSender() {
-        return message.sender;
+        return draft.sender;
     }
 
     /**
      * 获取投放目标
      */
     public String getAtName() {
-        return message.atName;
+        return draft.atName;
     }
 
     /**
      * 获取消息主键
      */
     public String getKey() {
-        return message.key;
+        return draft.key;
     }
 
     /**
@@ -89,14 +90,14 @@ public class MqMessageHolder implements Delayed {
      * 质量等级（0 或 1）
      */
     public int getQos() {
-        return message.qos;
+        return draft.qos;
     }
 
     /**
      * 过期时间
      */
     public long getExpiration() {
-        return message.expiration;
+        return draft.expiration;
     }
 
     /**
@@ -113,10 +114,10 @@ public class MqMessageHolder implements Delayed {
         distributeTime = distributeTimeRef;
 
         //设置新的派发次数和下次时间
-        message.mr.setTimes(entity, distributeCount);
-        message.mr.setScheduled(entity, distributeTime);
-        message.mr.setExpiration(entity, null);
-        message.mr.setTransaction(entity, false);
+        mr.setTimes(entity, distributeCount);
+        mr.setScheduled(entity, distributeTime);
+        mr.setExpiration(entity, null);
+        mr.setTransaction(entity, false);
 
         return this;
     }
@@ -125,21 +126,21 @@ public class MqMessageHolder implements Delayed {
      * 是否广播
      * */
     public boolean isBroadcast(){
-        return message.broadcast;
+        return draft.broadcast;
     }
 
     /**
      * 是否顺序
      */
     public boolean isSequence() {
-        return message.sequence;
+        return draft.sequence;
     }
 
     /**
      * 获取顺序分片
      */
     public String getSequenceSharding() {
-        return message.sequenceSharding;
+        return draft.sequenceSharding;
     }
 
     /**
@@ -195,12 +196,12 @@ public class MqMessageHolder implements Delayed {
         distributeTimeRef = MqNextTime.getNextTime(this);
 
         //设置新的派发次数和下次时间
-        message.mr.setTimes(entity, distributeCount);
+        mr.setTimes(entity, distributeCount);
 
         if (isSequence() == false) {
             //如果不是顺序消息，调整队列里的派发时间；否则走外部了的时间控制
             distributeTime = distributeTimeRef;
-            message.mr.setScheduled(entity, distributeTimeRef);
+            mr.setScheduled(entity, distributeTimeRef);
         }
 
         return this;

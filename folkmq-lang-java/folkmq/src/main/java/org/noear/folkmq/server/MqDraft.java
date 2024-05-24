@@ -5,10 +5,12 @@ import org.noear.socketd.transport.core.EntityMetas;
 import org.noear.socketd.transport.core.Message;
 
 /**
+ * 消息草稿
+ *
  * @author noear
  * @since 1.4
  */
-public class MqData {
+public class MqDraft {
     public final MqMetasResolver mr;
     public final Message source;
     public final String sender;
@@ -24,7 +26,7 @@ public class MqData {
     public final boolean transaction;
     public final String sequenceSharding;
 
-    public MqData(MqMetasResolver mr, Message source) {
+    public MqDraft(MqMetasResolver mr, Message source) {
         this.mr = mr;
         this.source = source;
 

@@ -139,6 +139,10 @@ public class BrokerListenerFolkmq extends BrokerListener {
 
             if (isBroadcast) {
                 //广播模式
+                if (atName.endsWith("!")) {
+                    atName = atName.substring(0, atName.length() - 1);
+                }
+
                 for (Session s0 : getPlayerAll(atName)) {
                     if (LoadBalancer.isActive(s0)) {
                         try {

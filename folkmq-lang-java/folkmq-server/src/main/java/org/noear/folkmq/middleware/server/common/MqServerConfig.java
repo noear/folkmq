@@ -19,16 +19,20 @@ public class MqServerConfig {
     public static final int codecThreads;
     public static final int exchangeThreads;
 
+    public static final long streamTimeout;
+
     static {
         accessAk = Solon.cfg().get(ConfigNames.folkmq_access_ak);
         accessSk = Solon.cfg().get(ConfigNames.folkmq_access_sk);
+
+        apiToken = Solon.cfg().get(ConfigNames.folkmq_api_token, "");
 
 
         ioThreads = Solon.cfg().getInt(ConfigNames.folkmq_ioThreads, 1);
         codecThreads = Solon.cfg().getInt(ConfigNames.folkmq_codecThreads, 1);
         exchangeThreads = Solon.cfg().getInt(ConfigNames.folkmq_exchangeThreads, 1);
 
-        apiToken = Solon.cfg().get(ConfigNames.folkmq_api_token, "");
+        streamTimeout = Solon.cfg().getLong(ConfigNames.folkmq_streamTimeout, 60_000 * 5);
     }
 
     public static Map<String, String> getAccessMap() {

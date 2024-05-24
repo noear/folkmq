@@ -99,6 +99,7 @@ public class MqServerDefault implements MqServer {
 
         server.config(c -> c.serialSend(true)
                 .maxMemoryRatio(0.8F)
+                .streamTimeout(60_000 * 5)
                 .ioThreads(1)
                 .codecThreads(1)
                 .exchangeThreads(1));

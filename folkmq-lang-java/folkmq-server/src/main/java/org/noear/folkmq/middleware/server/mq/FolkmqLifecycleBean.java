@@ -89,6 +89,7 @@ public class FolkmqLifecycleBean implements LifecycleBean {
         localServer = FolkMQ.createServer(schema)
                 .config(c -> c.serialSend(true)
                         .maxMemoryRatio(0.8F)
+                        .streamTimeout(MqServerConfig.streamTimeout)
                         .ioThreads(MqServerConfig.ioThreads)
                         .codecThreads(MqServerConfig.codecThreads)
                         .exchangeThreads(MqServerConfig.exchangeThreads))

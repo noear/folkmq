@@ -18,6 +18,9 @@ public interface ConfigNames {
     //最大线程数
     String folkmq_exchangeThreads = "folkmq.exchangeThreads";
 
+    String folkmq_streamTimeout = "folkmq.streamTimeout";
+
+
     //快照相关
     String folkmq_snapshot_enable = "folkmq.snapshot.enable";
     String folkmq_snapshot_save900 = "folkmq.snapshot.save900";

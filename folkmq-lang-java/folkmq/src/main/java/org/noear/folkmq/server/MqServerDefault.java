@@ -98,6 +98,7 @@ public class MqServerDefault implements MqServer {
         server = SocketD.createServer(serverSchema);
 
         server.config(c -> c.serialSend(true)
+                .maxMemoryRatio(0.8F)
                 .ioThreads(1)
                 .codecThreads(1)
                 .exchangeThreads(1));

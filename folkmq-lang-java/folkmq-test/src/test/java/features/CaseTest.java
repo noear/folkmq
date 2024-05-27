@@ -199,4 +199,25 @@ public class CaseTest {
         testCase.start();
         testCase.stop();
     }
+
+    @Test
+    public void TestCase32_expiration_tran() throws Exception {
+        BaseTestCase testCase = new TestCase32_expiration_tran(2032);
+        testCase.start();
+        testCase.stop();
+    }
+
+    @Test
+    public void TestCase33_scheduled_tran() throws Exception {
+        BaseTestCase testCase = new TestCase33_scheduled_tran(2033);
+        testCase.start();
+        testCase.stop();
+    }
+
+    @Test
+    public void TestCase34_sequence_tran() throws Exception {
+        BaseTestCase testCase = new TestCase34_sequence_tran(2034);
+        testCase.start();
+        testCase.stop();
+    }
 }

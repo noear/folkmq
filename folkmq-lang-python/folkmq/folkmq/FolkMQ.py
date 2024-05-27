@@ -14,7 +14,7 @@ class FolkMQ:
 
     @staticmethod
     def version_name()->str:
-        return "1.5.0"
+        return "1.5.1"
 
     @staticmethod
     def create_client(*serverUrls) -> MqClient:

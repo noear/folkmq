@@ -403,7 +403,7 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
         //观察者::派发时（在元信息调整之后，再观察）
         watcher.onDistribute(topic, consumerGroup, messageHolder);
 
-        if (messageHolder.getQos() > 0 || messageHolder.isBroadcast() == false) {
+        if (messageHolder.getQos() > 0 && messageHolder.isBroadcast() == false) {
             //::Qos1
 
             //1.给会话发送消息 //如果有异步，上面会加入队列

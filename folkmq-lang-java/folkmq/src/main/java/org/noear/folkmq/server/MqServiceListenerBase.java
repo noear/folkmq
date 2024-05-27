@@ -195,9 +195,7 @@ public abstract class MqServiceListenerBase extends EventListener implements MqS
         }
     }
 
-    protected void routingToQueueName(MqMetasResolver mr, Message message, String queueName) {
-        //复用解析
-        MqDraft draft = new MqDraft(mr, message);
+    protected void routingToQueueName(MqDraft draft, String queueName) {
         //取出所有订阅的主题消费者
         MqQueue queue = queueMap.get(queueName);
 

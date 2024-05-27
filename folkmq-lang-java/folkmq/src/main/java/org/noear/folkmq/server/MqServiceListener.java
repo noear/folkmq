@@ -57,13 +57,13 @@ public class MqServiceListener extends MqServiceListenerBase implements MqServic
                 mr.setScheduled(m, System.currentTimeMillis() + MqNextTime.TIME_1M);
 
                 //预备存储
-                String key = mr.getKey(m);
-                String topic = mr.getTopic(m);
-                String queueName = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP + MqConstants.MQ_TRAN_CONSUMER_GROUP;
+                MqDraft draft = new MqDraft(mr, m);
 
-                transactionMessageMap.put(key, topic);
-                queueGetOrInit(topic, MqConstants.MQ_TRAN_CONSUMER_GROUP, queueName);
-                routingToQueueName(mr, m, queueName);
+                String queueName = draft.topic + MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP + MqConstants.MQ_TRAN_CONSUMER_GROUP;
+
+                transactionMessageMap.put(draft.key, draft.topic);
+                queueGetOrInit(draft.topic, MqConstants.MQ_TRAN_CONSUMER_GROUP, queueName);
+                routingToQueueName(draft, queueName);
             } else {
                 onPublish(s, m, mr);
             }

@@ -73,6 +73,13 @@ public interface MqMetasResolver {
     void setExpiration(Entity m, Long expiration);
 
     /**
+     * 备份过期时间
+     *
+     * @param isBak 是否为备份（true:备份，false:恢复）
+     * */
+    void bakExpiration(Entity m, boolean isBak);
+
+    /**
      * 获取定时时间
      */
     long getScheduled(Entity m);
@@ -81,6 +88,13 @@ public interface MqMetasResolver {
      * 设置定时时间
      */
     void setScheduled(Entity m, long scheduled);
+
+    /**
+     * 备份定时时间
+     *
+     * @param isBak 是否为备份（true:备份，false:恢复）
+     */
+    void bakScheduled(Entity m, boolean isBak);
 
     /**
      * 是否有序

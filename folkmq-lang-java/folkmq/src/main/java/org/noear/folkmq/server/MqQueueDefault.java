@@ -167,10 +167,7 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
         messageMap.remove(messageHolder.getKey());
 
         if (isRollback == false) {
-            messageHolder.noTransaction();
-            Message message = new MessageBuilder()
-                    .sid(messageHolder.getKey())
-                    .entity(messageHolder.getEntity()).build();
+            Message message = messageHolder.noTransaction();
             serviceListener.routingDo(messageHolder.mr, message);
         }
     }

@@ -1,7 +1,9 @@
 package org.noear.folkmq.server;
 
 import org.noear.folkmq.common.MqMetasResolver;
+import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.entity.EntityDefault;
+import org.noear.socketd.transport.core.entity.MessageBuilder;
 
 import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
@@ -107,19 +109,21 @@ public class MqMessageHolder implements Delayed {
         return transaction;
     }
 
-    public MqMessageHolder noTransaction() {
+    public Message noTransaction() {
         transaction = false;
         distributeCount = 0;
         distributeTimeRef = System.currentTimeMillis();
         distributeTime = distributeTimeRef;
 
         //设置新的派发次数和下次时间
-        mr.setTimes(entity, distributeCount);
-        mr.setScheduled(entity, distributeTime);
-        mr.setExpiration(entity, null);
-        mr.setTransaction(entity, false);
+        mr.setTimes(entity, 0); //重新计数
+        mr.bakScheduled(entity, false); //恢复定时
+        mr.bakExpiration(entity, false); //恢复有效期
+        mr.setTransaction(entity, false); //转为非事务
 
-        return this;
+        return new MessageBuilder()
+                .sid(getKey())
+                .entity(getEntity()).build();
     }
 
     /**

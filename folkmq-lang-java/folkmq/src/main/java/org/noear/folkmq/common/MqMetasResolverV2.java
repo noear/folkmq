@@ -81,6 +81,22 @@ public class MqMetasResolverV2 implements MqMetasResolver {
     }
 
     @Override
+    public void bakExpiration(Entity m, boolean isBak) {
+        if (isBak) {
+            String tmp = m.meta(MqMetasV2.MQ_META_EXPIRATION);
+            if (tmp != null) {
+                m.putMeta(MqMetasV2.MQ_META_EXPIRATION_BAK, tmp);
+            }
+        } else {
+            String tmp = m.meta(MqMetasV2.MQ_META_EXPIRATION_BAK);
+            if (tmp != null) {
+                m.putMeta(MqMetasV2.MQ_META_EXPIRATION, tmp);
+                m.delMeta(MqMetasV2.MQ_META_EXPIRATION_BAK);
+            }
+        }
+    }
+
+    @Override
     public long getScheduled(Entity m) {
         return Long.parseLong(m.metaOrDefault(MqMetasV2.MQ_META_SCHEDULED, "0"));
     }
@@ -88,6 +104,22 @@ public class MqMetasResolverV2 implements MqMetasResolver {
     @Override
     public void setScheduled(Entity m, long scheduled) {
         m.putMeta(MqMetasV2.MQ_META_SCHEDULED, String.valueOf(scheduled));
+    }
+
+    @Override
+    public void bakScheduled(Entity m, boolean isBak) {
+        if (isBak) {
+            String tmp = m.meta(MqMetasV2.MQ_META_SCHEDULED);
+            if (tmp != null) {
+                m.putMeta(MqMetasV2.MQ_META_SCHEDULED_BAK, tmp);
+            }
+        } else {
+            String tmp = m.meta(MqMetasV2.MQ_META_SCHEDULED_BAK);
+            if (tmp != null) {
+                m.putMeta(MqMetasV2.MQ_META_SCHEDULED, tmp);
+                m.delMeta(MqMetasV2.MQ_META_SCHEDULED_BAK);
+            }
+        }
     }
 
     @Override

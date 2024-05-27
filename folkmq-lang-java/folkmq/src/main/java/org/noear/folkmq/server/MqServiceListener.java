@@ -51,9 +51,12 @@ public class MqServiceListener extends MqServiceListenerBase implements MqServic
             boolean isTrans = mr.isTransaction(m);
 
             if (isTrans) {
-                //存活为2小时
+                //备份
+                mr.bakExpiration(m, true);
+                mr.bakScheduled(m, true);
+
+                //存活为2小时，延后为1分钟
                 mr.setExpiration(m, System.currentTimeMillis() + MqNextTime.TIME_1H);
-                //延后为1分钟
                 mr.setScheduled(m, System.currentTimeMillis() + MqNextTime.TIME_1M);
 
                 //预备存储

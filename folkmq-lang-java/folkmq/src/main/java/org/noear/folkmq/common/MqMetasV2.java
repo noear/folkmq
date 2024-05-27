@@ -39,9 +39,17 @@ public interface MqMetasV2 {
      */
     String MQ_META_SCHEDULED = "s1";
     /**
+     * 元信息：消息调度时间
+     */
+    String MQ_META_SCHEDULED_BAK = "s1_";
+    /**
      * 元信息：消息过期时间
      */
     String MQ_META_EXPIRATION = "e1";
+    /**
+     * 元信息：消息过期时间备份
+     */
+    String MQ_META_EXPIRATION_BAK = "e1_";
     /**
      * 元信息：消息是否有序
      */

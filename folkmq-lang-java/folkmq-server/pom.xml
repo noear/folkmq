@@ -22,18 +22,7 @@
 
         <dependency>
             <groupId>org.noear</groupId>
-            <artifactId>folkmq-transport-netty</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.noear</groupId>
             <artifactId>solon-api</artifactId>
-            <version>${solon.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.noear</groupId>
-            <artifactId>solon.sessionstate.jwt</artifactId>
             <version>${solon.version}</version>
         </dependency>
 

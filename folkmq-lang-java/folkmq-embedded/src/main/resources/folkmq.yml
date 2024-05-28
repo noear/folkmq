@@ -4,12 +4,8 @@ server.session:
 solon.app:
   group: folkmq
   name: folkmq-server
-
-solon:
   stop:
     delay: "4s"
-  config:
-    add: "./data/app.yml"
 
 folkmq:
   admin: admin

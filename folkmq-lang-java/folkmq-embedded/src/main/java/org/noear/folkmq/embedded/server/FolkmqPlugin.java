@@ -30,6 +30,7 @@ public class FolkmqPlugin implements Plugin {
 
         //加载配置文件
         Solon.cfg().loadAddIfAbsent(ResourceUtil.getResource("folkmq.yml"));
+        Solon.cfg().loadAddIfAbsent(ResourceUtil.findResource("./data/app.yml"));
 
         //启用安全停止
         Solon.app().cfg().stopSafe(true);

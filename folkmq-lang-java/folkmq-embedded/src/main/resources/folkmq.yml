@@ -1,3 +1,5 @@
+server.port: 8602
+
 server.session:
   state.jwt.secret: "YTkBY+iXQxPt6e3UG4/VRHAHXePJZTSyc3cAE6btwfI="
 

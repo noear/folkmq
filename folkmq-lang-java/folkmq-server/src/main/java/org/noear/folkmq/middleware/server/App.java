@@ -1,6 +1,8 @@
 package org.noear.folkmq.middleware.server;
 
+import org.noear.folkmq.embedded.MqServerConfig;
 import org.noear.solon.Solon;
+import org.noear.solon.core.event.AppPluginLoadEndEvent;
 
 /**
  * @author noear
@@ -9,7 +11,9 @@ import org.noear.solon.Solon;
 public class App {
     public static void main(String[] args) {
         Solon.start(App.class, args, app -> {
-            app.get("/", ctx -> ctx.redirect("/folkmq/login"));
+            app.onEvent(AppPluginLoadEndEvent.class, e -> {
+                app.get("/", ctx -> ctx.redirect(MqServerConfig.path + "/login"));
+            });
         });
     }
 }

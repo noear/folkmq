@@ -1,11 +1,10 @@
-package org.noear.folkmq.embedded.server.admin;
+package org.noear.folkmq.embedded.admin;
 
-import org.noear.folkmq.embedded.server.admin.utils.ImageUtils;
-import org.noear.folkmq.embedded.server.admin.utils.RandomUtils;
-import org.noear.folkmq.embedded.server.common.ConfigNames;
+import org.noear.folkmq.embedded.admin.utils.ImageUtils;
+import org.noear.folkmq.embedded.admin.utils.RandomUtils;
+import org.noear.folkmq.embedded.MqConfigNames;
 import org.noear.solon.Solon;
 import org.noear.solon.Utils;
-import org.noear.solon.annotation.Controller;
 import org.noear.solon.annotation.Mapping;
 import org.noear.solon.annotation.Post;
 import org.noear.solon.core.handle.Context;
@@ -33,7 +32,7 @@ public class LoginController extends BaseController {
     private final String adminUser = "admin";
 
     public LoginController(){
-        adminPassword = Solon.cfg().get(ConfigNames.folkmq_admin, "");
+        adminPassword = Solon.cfg().get(MqConfigNames.folkmq_admin, "");
     }
 
     @Mapping("/")

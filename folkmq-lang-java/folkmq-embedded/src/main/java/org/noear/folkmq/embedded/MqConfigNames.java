@@ -1,10 +1,12 @@
-package org.noear.folkmq.embedded.server.common;
+package org.noear.folkmq.embedded;
 
 /**
  * @author noear
  * @since 1.0
  */
-public interface ConfigNames {
+public interface MqConfigNames {
+    //管理路径
+    String folkmq_path = "folkmq.path";
     //管理密码
     String folkmq_admin = "folkmq.admin";
     //通讯架构

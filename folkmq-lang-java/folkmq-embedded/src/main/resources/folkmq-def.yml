@@ -9,15 +9,17 @@ solon.app:
   stop:
     delay: "4s"
 
+folkmq.snapshot:
+  enable: true
+  save900: 1
+  save300: 10
+  save100: 10000
+
 folkmq:
+  path: "/folkmq"
   admin: admin
   schema: ""
   maxConsumeWaiting: "180s"
-  snapshot:
-    enable: true
-    save900: 1
-    save300: 10
-    save100: 10000
 
 #folkmq.api.token: "GhVPG@hjJMViC7xN"
 #folkmq.broker: "folkmq://127.0.0.1:18602"

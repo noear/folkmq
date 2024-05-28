@@ -1,4 +1,4 @@
-package org.noear.folkmq.embedded.server.admin.dso;
+package org.noear.folkmq.embedded.admin.dso;
 
 import org.noear.folkmq.common.MqConstants;
 import org.noear.folkmq.server.MqQueue;

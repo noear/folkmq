@@ -1,4 +1,4 @@
-package org.noear.folkmq.embedded.server.admin.model;
+package org.noear.folkmq.embedded.admin.model;
 
 import java.io.Serializable;
 

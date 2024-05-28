@@ -1,4 +1,4 @@
-package org.noear.folkmq.embedded.server.admin.utils;
+package org.noear.folkmq.embedded.admin.utils;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;

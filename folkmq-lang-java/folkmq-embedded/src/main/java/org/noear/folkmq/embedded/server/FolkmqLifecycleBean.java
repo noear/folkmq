@@ -1,12 +1,12 @@
-package org.noear.folkmq.embedded.server.mq;
+package org.noear.folkmq.embedded.server;
 
 import org.noear.folkmq.FolkMQ;
 import org.noear.folkmq.common.MqConstants;
-import org.noear.folkmq.embedded.server.admin.dso.QueueForceService;
-import org.noear.folkmq.embedded.server.admin.dso.ViewUtils;
-import org.noear.folkmq.embedded.server.admin.model.ServerInfoVo;
-import org.noear.folkmq.embedded.server.common.ConfigNames;
-import org.noear.folkmq.embedded.server.common.MqServerConfig;
+import org.noear.folkmq.embedded.admin.dso.QueueForceService;
+import org.noear.folkmq.embedded.admin.dso.ViewUtils;
+import org.noear.folkmq.embedded.admin.model.ServerInfoVo;
+import org.noear.folkmq.embedded.MqConfigNames;
+import org.noear.folkmq.embedded.MqServerConfig;
 import org.noear.folkmq.server.MqServer;
 import org.noear.folkmq.server.MqServiceInternal;
 import org.noear.folkmq.server.MqServiceListener;
@@ -51,13 +51,13 @@ public class FolkmqLifecycleBean implements LifecycleBean {
 
     @Override
     public void start() throws Throwable {
-        String brokerServer = Solon.cfg().get(ConfigNames.folkmq_broker);
+        String brokerServer = Solon.cfg().get(MqConfigNames.folkmq_broker);
 
-        saveEnable = Solon.cfg().getBool(ConfigNames.folkmq_snapshot_enable, true);
+        saveEnable = Solon.cfg().getBool(MqConfigNames.folkmq_snapshot_enable, true);
 
-        long save900 = Solon.cfg().getLong(ConfigNames.folkmq_snapshot_save900, 0);
-        long save300 = Solon.cfg().getLong(ConfigNames.folkmq_snapshot_save300, 0);
-        long save100 = Solon.cfg().getLong(ConfigNames.folkmq_snapshot_save100, 0);
+        long save900 = Solon.cfg().getLong(MqConfigNames.folkmq_snapshot_save900, 0);
+        long save300 = Solon.cfg().getLong(MqConfigNames.folkmq_snapshot_save300, 0);
+        long save100 = Solon.cfg().getLong(MqConfigNames.folkmq_snapshot_save100, 0);
 
         //初始化快照持久化
         snapshotPlus = new MqWatcherSnapshotPlus();
@@ -84,7 +84,7 @@ public class FolkmqLifecycleBean implements LifecycleBean {
 
     private void startLocalServerMode(MqWatcherSnapshotPlus snapshotPlus) throws Exception {
         //通讯架构
-        String schema = Solon.cfg().get(ConfigNames.folkmq_schema);
+        String schema = Solon.cfg().get(MqConfigNames.folkmq_schema);
 
         //服务端（鉴权为可选。不添加则不鉴权）
         localServer = FolkMQ.createServer(schema)

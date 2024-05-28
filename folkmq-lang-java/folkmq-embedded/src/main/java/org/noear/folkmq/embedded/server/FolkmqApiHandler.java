@@ -1,11 +1,11 @@
-package org.noear.folkmq.embedded.server.mq;
+package org.noear.folkmq.embedded.server;
 
 import org.noear.folkmq.common.MqApis;
 import org.noear.folkmq.common.MqConstants;
-import org.noear.folkmq.embedded.server.admin.dso.QueueForceService;
-import org.noear.folkmq.embedded.server.admin.dso.ViewUtils;
-import org.noear.folkmq.embedded.server.admin.model.QueueVo;
-import org.noear.folkmq.embedded.server.common.MqServerConfig;
+import org.noear.folkmq.embedded.admin.dso.QueueForceService;
+import org.noear.folkmq.embedded.admin.dso.ViewUtils;
+import org.noear.folkmq.embedded.admin.model.QueueVo;
+import org.noear.folkmq.embedded.MqServerConfig;
 import org.noear.folkmq.server.MqServiceListener;
 import org.noear.snack.ONode;
 import org.noear.socketd.transport.core.Message;

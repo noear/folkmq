@@ -1,6 +1,6 @@
-package org.noear.folkmq.embedded.server.admin.dso;
+package org.noear.folkmq.embedded.admin.dso;
 
-import org.noear.folkmq.embedded.server.admin.model.QueueVo;
+import org.noear.folkmq.embedded.admin.model.QueueVo;
 import org.noear.folkmq.server.MqQueue;
 import org.noear.folkmq.server.MqQueueDefault;
 import org.noear.folkmq.server.MqServiceInternal;

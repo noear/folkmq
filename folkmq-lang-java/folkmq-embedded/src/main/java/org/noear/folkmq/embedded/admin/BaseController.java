@@ -1,6 +1,7 @@
-package org.noear.folkmq.embedded.server.admin;
+package org.noear.folkmq.embedded.admin;
 
 import org.noear.folkmq.FolkMQ;
+import org.noear.folkmq.embedded.MqServerConfig;
 import org.noear.solon.core.handle.ModelAndView;
 
 /**
@@ -22,7 +23,7 @@ public abstract class BaseController {
         viewModel.put("title", "FolkMQ-S");
         viewModel.put("app", "FolkMQ-S");
         viewModel.put("version", FolkMQ.versionName());
-        viewModel.put("root", "/folkmq");
+        viewModel.put("root", MqServerConfig.path);
 
         viewModel.put("css", "/folkmq/css");
         viewModel.put("js", "/folkmq/js");

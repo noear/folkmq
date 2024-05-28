@@ -1,8 +1,8 @@
-package org.noear.folkmq.embedded.server;
+package org.noear.folkmq.embedded;
 
-import org.noear.folkmq.embedded.server.admin.AdminController;
-import org.noear.folkmq.embedded.server.admin.AdminQueueController;
-import org.noear.folkmq.embedded.server.admin.LoginController;
+import org.noear.folkmq.embedded.admin.AdminController;
+import org.noear.folkmq.embedded.admin.AdminQueueController;
+import org.noear.folkmq.embedded.admin.LoginController;
 import org.noear.socketd.SocketD;
 import org.noear.socketd.transport.java_websocket.WsNioProvider;
 import org.noear.socketd.transport.netty.tcp.TcpNioProvider;
@@ -29,7 +29,7 @@ public class FolkmqPlugin implements Plugin {
         SocketD.registerClientProvider(new UdpNioProvider());
 
         //加载配置文件
-        Solon.cfg().loadAddIfAbsent(ResourceUtil.getResource("folkmq.yml"));
+        Solon.cfg().loadAddIfAbsent(ResourceUtil.getResource("folkmq-def.yml"));
         Solon.cfg().loadAddIfAbsent(ResourceUtil.findResource("./data/app.yml"));
 
         //启用安全停止
@@ -49,8 +49,8 @@ public class FolkmqPlugin implements Plugin {
 
         //扫描
         context.beanScan(FolkmqPlugin.class);
-        Solon.app().add("/folkmq/", AdminController.class);
-        Solon.app().add("/folkmq/", AdminQueueController.class);
-        Solon.app().add("/folkmq/", LoginController.class);
+        Solon.app().add(MqServerConfig.path, AdminController.class);
+        Solon.app().add(MqServerConfig.path, AdminQueueController.class);
+        Solon.app().add(MqServerConfig.path, LoginController.class);
     }
 }

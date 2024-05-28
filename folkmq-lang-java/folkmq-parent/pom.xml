@@ -36,6 +36,7 @@
     <modules>
         <module>../folkmq</module>
         <module>../folkmq-watcher</module>
+        <module>../folkmq-embedded</module>
         <module>../folkmq-solon</module>
         <module>../folkmq-transport-java-tcp</module>
         <module>../folkmq-transport-java-websocket</module>
@@ -54,6 +55,12 @@
             <dependency>
                 <groupId>org.noear</groupId>
                 <artifactId>folkmq-watcher</artifactId>
+                <version>${folkmq.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.noear</groupId>
+                <artifactId>folkmq-embedded</artifactId>
                 <version>${folkmq.version}</version>
             </dependency>
 

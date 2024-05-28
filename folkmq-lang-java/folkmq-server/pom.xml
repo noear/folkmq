@@ -17,7 +17,7 @@
     <dependencies>
         <dependency>
             <groupId>org.noear</groupId>
-            <artifactId>folkmq-watcher</artifactId>
+            <artifactId>folkmq-embedded</artifactId>
         </dependency>
 
         <dependency>
@@ -27,19 +27,8 @@
 
         <dependency>
             <groupId>org.noear</groupId>
-            <artifactId>folkmq-transport-java-websocket</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.noear</groupId>
-            <artifactId>solon-web</artifactId>
+            <artifactId>solon-api</artifactId>
             <version>${solon.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.noear</groupId>
-                    <artifactId>solon.sessionstate.local</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <dependency>

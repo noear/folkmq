@@ -1,0 +1,29 @@
+server.session:
+  state.jwt.secret: "YTkBY+iXQxPt6e3UG4/VRHAHXePJZTSyc3cAE6btwfI="
+
+solon.app:
+  group: folkmq
+  name: folkmq-server
+
+solon:
+  stop:
+    delay: "4s"
+  config:
+    add: "./data/app.yml"
+
+folkmq:
+  admin: admin
+  schema: ""
+  maxConsumeWaiting: "180s"
+  snapshot:
+    enable: true
+    save900: 1
+    save300: 10
+    save100: 10000
+
+#folkmq.api.token: "GhVPG@hjJMViC7xN"
+#folkmq.broker: "folkmq://127.0.0.1:18602"
+
+#folkmq.access:
+#  ak : "demo"
+#  sk : "YapLHTx19RlsEE16"

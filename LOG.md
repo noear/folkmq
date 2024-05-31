@@ -9,6 +9,7 @@
 * 添加 server-broker 的 maxConsumeWaiting 配置??
 * 添加 server-broker 控制多账账号管理??
 * 添加 server-broker 授权码可视化配置??
+* 修复 强制派送对无ack返回消息失效的问题
 
 ### 1.5.1
 * 优化 消息事务增加对“延时消息”、“时效消息”支持

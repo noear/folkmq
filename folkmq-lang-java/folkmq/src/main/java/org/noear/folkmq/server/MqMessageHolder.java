@@ -30,6 +30,7 @@ public class MqMessageHolder implements Delayed {
     private volatile long distributeTimeRef;
     //派发次数
     private volatile int distributeCount;
+    private volatile int distributeCountPre;
     //派发顺序
     private volatile long distributeIdx;
     //是否完成
@@ -45,9 +46,12 @@ public class MqMessageHolder implements Delayed {
         this.isDone = new AtomicBoolean();
 
         this.transaction = this.draft.transaction;
+
         this.distributeCount = this.draft.times;
+        this.distributeCountPre = this.distributeCount;
+
         this.distributeTimeRef = this.draft.scheduled;
-        this.distributeTime = distributeTimeRef;
+        this.distributeTime = this.distributeTimeRef;
 
         if (this.draft.sequence) {
             this.entity.at(queueName + "!");
@@ -111,6 +115,7 @@ public class MqMessageHolder implements Delayed {
 
     public Message noTransaction() {
         transaction = false;
+        distributeCountPre = 0;
         distributeCount = 0;
         distributeTimeRef = System.currentTimeMillis();
         distributeTime = distributeTimeRef;
@@ -183,6 +188,9 @@ public class MqMessageHolder implements Delayed {
         return distributeCount;
     }
 
+    public int getDistributeCountPre() {
+        return distributeCountPre;
+    }
 
     public boolean isDone() {
         return isDone.get();
@@ -190,6 +198,14 @@ public class MqMessageHolder implements Delayed {
 
     public void setDone(boolean done) {
         isDone.set(done);
+    }
+
+    /**
+     * 预延后
+     * */
+    public MqMessageHolder preDelayed(){
+        distributeCountPre++;
+        return this;
     }
 
     /**

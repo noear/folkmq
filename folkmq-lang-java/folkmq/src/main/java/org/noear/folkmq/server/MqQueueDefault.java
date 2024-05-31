@@ -4,7 +4,6 @@ import org.noear.folkmq.common.MqConstants;
 import org.noear.socketd.cluster.LoadBalancer;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
-import org.noear.socketd.transport.core.entity.MessageBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -211,7 +210,7 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
         while (iterator.hasNext()) {
             Map.Entry<String, MqMessageHolder> kv = iterator.next();
             MqMessageHolder msg = kv.getValue();
-            if (msg.getDistributeCount() >= times && msg.isDone() == false) {
+            if (msg.isDone() == false && (msg.getDistributeCount() >= times || msg.getDistributeCountPre() >= times)) {
                 msgList.add(msg);
             }
 
@@ -416,6 +415,7 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
 
             //2.添加保险延时任务：如果没有回执就重发 //重新入队列，是避免重启时数据丢失
             messageHolder.setDistributeTime(System.currentTimeMillis() + MqNextTime.maxConsumeMillis());
+            messageHolder.preDelayed();
             internalAdd(messageHolder);
         } else {
             //::Qos0

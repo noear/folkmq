@@ -2,10 +2,13 @@
 
 * 添加 命名空间与多租户支持（企业版）
 * 添加 后台资源看板（显示内存），并添加手动 GC 操作?
+* 添加 broker 配置可同步给 server 的能力
 
 ### 1.5.2
-* 添加 broker 的 maxConsumeWaiting 配置
-* 添加 broker 配置可同步给 server 的能力
+* 新增 folkmq-embedded （内嵌版，带控制台的）
+* 添加 server-broker 的 maxConsumeWaiting 配置??
+* 添加 server-broker 控制多账账号管理??
+* 添加 server-broker 授权码可视化配置??
 
 ### 1.5.1
 * 优化 消息事务增加对“延时消息”、“时效消息”支持

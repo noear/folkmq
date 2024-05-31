@@ -38,6 +38,18 @@
 
         <dependency>
             <groupId>org.noear</groupId>
+            <artifactId>solon.serialization.snack3</artifactId>
+            <version>${solon.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.noear</groupId>
+            <artifactId>solon.web.staticfiles</artifactId>
+            <version>${solon.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.noear</groupId>
             <artifactId>solon.view.freemarker</artifactId>
             <version>${solon.version}</version>
         </dependency>

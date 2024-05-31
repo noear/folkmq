@@ -29,8 +29,12 @@ public class FolkmqPlugin implements Plugin {
         SocketD.registerClientProvider(new UdpNioProvider());
 
         //加载配置文件
+        Solon.cfg().loadAdd(ResourceUtil.getResource("folkmq.yml"));
+        Solon.cfg().loadAdd(ResourceUtil.findResource("./data/folkmq.yml"));
+
+        //加载默认配置文件
         Solon.cfg().loadAddIfAbsent(ResourceUtil.getResource("folkmq-def.yml"));
-        Solon.cfg().loadAddIfAbsent(ResourceUtil.findResource("./data/app.yml"));
+
 
         //启用安全停止
         Solon.app().cfg().stopSafe(true);

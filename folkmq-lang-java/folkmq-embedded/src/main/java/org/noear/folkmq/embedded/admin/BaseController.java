@@ -25,6 +25,7 @@ public abstract class BaseController {
         viewModel.put("version", FolkMQ.versionName());
         viewModel.put("root", MqServerConfig.path);
 
+        viewModel.put("static", "/folkmq");
         viewModel.put("css", "/folkmq/css");
         viewModel.put("js", "/folkmq/js");
         viewModel.put("img", "/folkmq/img");

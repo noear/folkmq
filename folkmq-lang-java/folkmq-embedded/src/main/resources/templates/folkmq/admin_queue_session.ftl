@@ -3,7 +3,7 @@
 <head>
     <title>${app} - 队列会话</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8 "/>
-    <link rel="shortcut icon" type="image/x-icon" href="${root}/favicon.ico"/>
+    <link rel="shortcut icon" type="image/x-icon" href="${static}/favicon.ico"/>
     <link rel="stylesheet" href="${css}/main.css"/>
     <style>
         datagrid b{color: #8D8D8D;font-weight: normal}

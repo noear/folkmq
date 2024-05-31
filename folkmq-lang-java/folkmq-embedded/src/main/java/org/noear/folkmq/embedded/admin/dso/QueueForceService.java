@@ -47,7 +47,7 @@ public class QueueForceService {
                     return Result.failure("没有消息可派发!");
                 }
 
-                queue.forceDistribute(2, 0);
+                queue.forceDistribute(1, 0);
 
                 return Result.succeed();
             } else {

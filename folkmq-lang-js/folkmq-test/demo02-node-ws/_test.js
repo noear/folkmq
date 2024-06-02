@@ -8,7 +8,9 @@ async function main() {
 
     client.send(FolkMQ.newMessage("helloworld!").tag("hello"), "demoapp1").thenReply(resp=>{
         console.log(resp.dataAsString());
-    })
+    }).thenError(err=>{
+        console.log(err.message);
+    });
 
 }
 

@@ -19,6 +19,7 @@
 
             if(!data.licence){
                 top.layer.alert('请输入许可证');
+                return;
             }
 
             $.post('/admin/licence/ajax/verify', data, rst => {

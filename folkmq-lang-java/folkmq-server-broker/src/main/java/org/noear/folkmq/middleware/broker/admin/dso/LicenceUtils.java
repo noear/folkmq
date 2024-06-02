@@ -163,7 +163,7 @@ public class LicenceUtils {
                 tmp.months = Integer.parseInt(licence[4]);
                 tmp.consumer = licence[5];
 
-                if (tmp.edition > 0) {
+                if (tmp.edition > 20 && tmp.edition < 30) {
                     //0 Community Edition, 21.Enterprise Standard edition, 22 Enterprise Premium Edition, 23 Enterprise Ultimate Edition
 
                     StringBuilder buf = new StringBuilder();

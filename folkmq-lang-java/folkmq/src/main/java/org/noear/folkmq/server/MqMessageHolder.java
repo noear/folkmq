@@ -133,8 +133,8 @@ public class MqMessageHolder implements Delayed {
 
     /**
      * 是否广播
-     * */
-    public boolean isBroadcast(){
+     */
+    public boolean isBroadcast() {
         return draft.broadcast;
     }
 
@@ -202,9 +202,10 @@ public class MqMessageHolder implements Delayed {
 
     /**
      * 预延后
-     * */
-    public MqMessageHolder preDelayed(){
+     */
+    public MqMessageHolder preDelayed(long distributeTime) {
         distributeCountPre++;
+        setDistributeTime(distributeTime);
         return this;
     }
 
@@ -212,8 +213,17 @@ public class MqMessageHolder implements Delayed {
      * 延后（生成下次派发时间）
      */
     public MqMessageHolder delayed() {
+        return delayed(MqNextTime.getNextTime(distributeCount + 1));
+    }
+
+    /**
+     * 延后（生成下次派发时间）
+     */
+    public MqMessageHolder delayed(long newTime) {
         distributeCount++;
-        distributeTimeRef = MqNextTime.getNextTime(this);
+        //真正延后时，重置回来
+        distributeCountPre = distributeCount;
+        distributeTimeRef = newTime;
 
         //设置新的派发次数和下次时间
         mr.setTimes(entity, distributeCount);
@@ -229,7 +239,8 @@ public class MqMessageHolder implements Delayed {
 
     @Override
     public long getDelay(TimeUnit unit) {
-        return unit.convert(distributeTime - System.currentTimeMillis(), TimeUnit.MILLISECONDS);
+        long duration = distributeTime - System.currentTimeMillis();
+        return unit.convert(duration, TimeUnit.MILLISECONDS);
     }
 
     @Override

@@ -221,7 +221,7 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
 
         for (MqMessageHolder msg : msgList) {
             messageQueue.remove(msg);
-            msg.setDistributeTime(System.currentTimeMillis());
+            msg.delayed(System.currentTimeMillis());
             messageQueue.add(msg);
         }
     }
@@ -414,8 +414,7 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
             });
 
             //2.添加保险延时任务：如果没有回执就重发 //重新入队列，是避免重启时数据丢失
-            messageHolder.setDistributeTime(System.currentTimeMillis() + MqNextTime.maxConsumeMillis());
-            messageHolder.preDelayed();
+            messageHolder.preDelayed(System.currentTimeMillis() + MqNextTime.maxConsumeMillis());
             internalAdd(messageHolder);
         } else {
             //::Qos0

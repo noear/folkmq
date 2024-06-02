@@ -29,10 +29,10 @@ public class MqNextTime {
     /**
      * 获取下次派发时间
      *
-     * @param messageHolder 消息
+     * @param distributeCount 派发次数
      * */
-    public static long getNextTime(MqMessageHolder messageHolder) {
-        switch (messageHolder.getDistributeCount()) {
+    public static long getNextTime(int distributeCount) {
+        switch (distributeCount) {
             case 0:
                 return 0;
             case 1:

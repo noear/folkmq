@@ -11,7 +11,7 @@ solon:
   stop:
     delay: "4s"
   config:
-    add: "./data/app.yml"
+    add: "./data/app.yml,./data/folkmq.yml"
 
 solon.logging.appender:
   console:

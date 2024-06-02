@@ -26,7 +26,7 @@ public class ConfigUtils {
 
             try {
                 if (_dom == null) {
-                    File file = new File("./data/config.json");
+                    File file = new File("./data/folkmq.json");
                     if (file.exists()) {
                         try {
                             String json = IoUtils.readFile(file);
@@ -61,7 +61,7 @@ public class ConfigUtils {
                 dir.mkdirs();
             }
 
-            File file = new File("./data/config.json");
+            File file = new File("./data/folkmq.json");
             if (file.exists() == false) {
                 file.createNewFile();
             }

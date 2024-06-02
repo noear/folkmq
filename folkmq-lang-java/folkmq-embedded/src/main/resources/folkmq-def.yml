@@ -9,6 +9,12 @@ solon.app:
   stop:
     delay: "4s"
 
+folkmq.transport:
+  - org.noear.socketd.transport.netty.tcp.TcpNioProvider
+  - org.noear.socketd.transport.netty.udp.UdpNioProvider
+  - org.noear.socketd.transport.java_websocket.WsNioProvider
+  - org.noear.socketd.transport.smartsocket.tcp.TcpAioProvider
+
 folkmq.snapshot:
   enable: true
   save900: 1

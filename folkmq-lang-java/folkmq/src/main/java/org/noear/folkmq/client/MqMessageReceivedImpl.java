@@ -196,6 +196,7 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
     public String toString() {
         StringBuilder buf = new StringBuilder();
         buf.append("MqMessageReceived{");
+        buf.append("times='").append(times).append("',");
         buf.append("key='").append(key).append("',");
         buf.append("tag='").append(tag).append("',");
         buf.append("topic='").append(topic).append("',");

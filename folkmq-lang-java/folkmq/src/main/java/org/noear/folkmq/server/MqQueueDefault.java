@@ -1,9 +1,9 @@
 package org.noear.folkmq.server;
 
 import org.noear.folkmq.common.MqConstants;
-import org.noear.socketd.cluster.LoadBalancer;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
+import org.noear.socketd.utils.SessionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -421,7 +421,7 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
             //::Qos0
             if (messageHolder.isBroadcast()) {
                 for (Session s0 : getSessions()) {
-                    if (LoadBalancer.isActive(s0)) {
+                    if (SessionUtils.isActive(s0)) {
                         s0.send(MqConstants.MQ_EVENT_DISTRIBUTE, messageHolder.getEntity());
                     }
                 }

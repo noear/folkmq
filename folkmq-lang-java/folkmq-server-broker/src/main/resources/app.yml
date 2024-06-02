@@ -29,6 +29,13 @@ solon.logging.logger:
   "io.netty":
     level: ERROR
 
+
+folkmq.transport:
+  - org.noear.socketd.transport.netty.tcp.TcpNioProvider
+  - org.noear.socketd.transport.netty.udp.UdpNioProvider
+  - org.noear.socketd.transport.java_websocket.WsNioProvider
+  - org.noear.socketd.transport.smartsocket.tcp.TcpAioProvider
+
 folkmq:
   admin: admin
   licence: ""

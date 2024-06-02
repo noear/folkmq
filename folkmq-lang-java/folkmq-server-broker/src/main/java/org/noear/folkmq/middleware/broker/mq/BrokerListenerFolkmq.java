@@ -5,12 +5,12 @@ import org.noear.folkmq.common.MqConstants;
 import org.noear.folkmq.common.MqUtils;
 import org.noear.snack.ONode;
 import org.noear.socketd.broker.BrokerListener;
-import org.noear.socketd.cluster.LoadBalancer;
 import org.noear.socketd.transport.core.Entity;
 import org.noear.socketd.transport.core.EntityMetas;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
 import org.noear.socketd.transport.core.entity.StringEntity;
+import org.noear.socketd.utils.SessionUtils;
 import org.noear.socketd.utils.StrUtils;
 
 import java.io.IOException;
@@ -144,7 +144,7 @@ public class BrokerListenerFolkmq extends BrokerListener {
                 }
 
                 for (Session s0 : getPlayerAll(atName)) {
-                    if (LoadBalancer.isActive(s0)) {
+                    if (SessionUtils.isActive(s0)) {
                         try {
                             forwardToSession(requester, message, s0);
                         } catch (Throwable e) {
@@ -155,7 +155,7 @@ public class BrokerListenerFolkmq extends BrokerListener {
             } else {
                 //单发模式（给同名的某个玩家，轮询负截均衡）
                 Session responder = getPlayerAny(atName, requester, message);
-                if (LoadBalancer.isActive(responder)) {
+                if (SessionUtils.isActive(responder)) {
                     //转发消息
                     try {
                         forwardToSession(requester, message, responder);

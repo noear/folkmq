@@ -93,6 +93,7 @@ public class AdminController extends BaseController {
             }
 
             vm.put("isAuthorized", true);
+            vm.put("editionName", LicenceUtils.getGlobal().getEditionName());
             vm.put("subscribeDate", LicenceUtils.getGlobal().getSubscribe());
             vm.put("subscribeMonths", LicenceUtils.getGlobal().getMonthsStr());
             vm.put("consumer", LicenceUtils.getGlobal().getConsumer());

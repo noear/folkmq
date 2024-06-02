@@ -27,6 +27,11 @@
                 </tr>
 
                 <tr>
+                    <td>授权版本</td>
+                    <td>${editionName!}</td>
+                </tr>
+
+                <tr>
                     <td>开始时间</td>
                     <td>${subscribeDate!}</td>
                 </tr>

@@ -1,11 +1,9 @@
-package org.noear.folkmq.server.watcher.utils;
+package org.noear.folkmq.utils;
 
 import org.noear.socketd.utils.StrUtils;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 
 /**
  * 输入输出工具
@@ -101,5 +99,33 @@ public class IoUtils {
         }
 
         return out;
+    }
+
+
+    /**
+     * 读取文件
+     */
+    public static String readFile(File file) throws IOException {
+        try (InputStream input = new FileInputStream(file)) {
+            byte[] bytes = transferToBytes(input);
+
+            //解压
+            byte[] contentBytes = bytes;
+            return new String(contentBytes, StandardCharsets.UTF_8);
+        }
+    }
+
+    /**
+     * 保存文件
+     */
+    public static void saveFile(File file, String content) throws IOException {
+        //压缩
+        byte[] contentBytes = content.getBytes(StandardCharsets.UTF_8);
+        byte[] bytes = contentBytes;
+
+        try (ByteArrayInputStream input = new ByteArrayInputStream(bytes);
+             OutputStream out = new FileOutputStream(file)) {
+            transferTo(input, out);
+        }
     }
 }

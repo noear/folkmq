@@ -22,41 +22,33 @@ public class LicenceUtils {
 
     private static final String publicKey = "MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAI6+FX3DPmY0/dLXOOiVJwBhllQ6a34+8/WKS77L7BB9Ch3oyqXA41zqO3vQM2COIZDTxKSgPuRkOlFaKptoG0cCAwEAAQ==";
 
-    private String sn;
-    private String version;
-    private int edition;
-    private String subscribe;
-    private int months;
-    private String consumer;
-
-    private boolean isValid;
-    private String description;
+    private LicenceDo licenceDo = new LicenceDo();
 
     /**
      * 串号
      */
     public String getSn() {
-        return sn;
+        return licenceDo.sn;
     }
 
     /**
      * 产品版本
      */
     public int getEdition() {
-        return edition;
+        return licenceDo.edition;
     }
 
     /**
      * 产品版本名字
      */
     public String getEditionName() {
-        if (edition == 23) {
+        if (licenceDo.edition == 23) {
             return "Enterprise Ultimate Edition";
-        } else if (edition == 22) {
+        } else if (licenceDo.edition == 22) {
             return "Enterprise Premium Edition";
-        } else if (edition == 21) {
+        } else if (licenceDo.edition == 21) {
             return "Enterprise Standard edition";
-        } else if (edition > 0) {
+        } else if (licenceDo.edition > 0) {
             return "Unknown Edition";
         } else {
             return "Community Edition";
@@ -67,24 +59,24 @@ public class LicenceUtils {
      * 订阅者
      */
     public String getSubscribe() {
-        return subscribe;
+        return licenceDo.subscribe;
     }
 
     /**
      * 订阅月数
      */
     public int getMonths() {
-        return months;
+        return licenceDo.months;
     }
 
     /**
      * 订阅月数字符串模式
      */
     public String getMonthsStr() {
-        if (months >= 36) {
+        if (licenceDo.months >= 36) {
             return "永久";
         } else {
-            return months + "个月";
+            return licenceDo.months + "个月";
         }
     }
 
@@ -92,35 +84,35 @@ public class LicenceUtils {
      * 版本号
      */
     public String getVersion() {
-        return version;
+        return licenceDo.version;
     }
 
     /**
      * 客户
      */
     public String getConsumer() {
-        return consumer;
+        return licenceDo.consumer;
     }
 
     /**
      * 是否有效
      */
     public boolean isValid() {
-        return isValid;
+        return licenceDo.isValid;
     }
 
     /**
      * 是否过期
      */
     public boolean isExpired() {
-        if (months >= 36) {
+        if (licenceDo.months >= 36) {
             return false;
         }
 
         try {
-            LocalDate subscribeDate = DateUtil.parse(subscribe).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            LocalDate subscribeDate = DateUtil.parse(licenceDo.subscribe).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
-            LocalDate tmp = subscribeDate.plusMonths(months);
+            LocalDate tmp = subscribeDate.plusMonths(licenceDo.months);
             //当前时间大于授权时间
             return LocalDate.now().compareTo(tmp) > 0;
         } catch (Throwable e) {
@@ -132,55 +124,71 @@ public class LicenceUtils {
      * 描述
      */
     public String getDescription() {
-        if (description == null) {
-            try {
-                String appLicence = Solon.cfg().get(ConfigNames.folkmq_licence, "");
-
-                if (Utils.isNotEmpty(appLicence)) {
-                    String licenceStr = LicenceHelper.licenceDecode(appLicence, publicKey);
-                    String[] licence = licenceStr.split(",");
-
-                    if (licence.length >= 6) {
-                        // 0:sn,1:e,2:v,3:t,4:m,5:c
-                        sn = licence[0];
-                        edition = Integer.parseInt(licence[1]);
-                        version = licence[2];
-                        subscribe = licence[3];
-                        months = Integer.parseInt(licence[4]);
-                        consumer = licence[5];
-
-                        if (edition > 0) {
-                            //sn,e,t,m,v,c  //e=0 Community Edition, 1 Professional Edition, 2 Enterprise Edition
-
-                            StringBuilder buf = new StringBuilder();
-                            buf.append("Licence (for FolkMQ): ");
-                            buf.append("SN=").append(getSn()).append(", ");
-                            buf.append("E=").append(getEditionName()).append(", ");
-                            buf.append("T=").append(getSubscribe()).append(", ");
-                            buf.append("M=").append(getMonths());
-
-                            isValid = true;
-                            description = buf.toString();
-                        }
-                    }
-                }
-            } catch (Throwable e) {
-
-            }
-
-            if (description == null) {
-                description = "Licence (for FolkMQ): Unauthorized (with legal risks)";
-            }
-        }
-
-        return description;
+        return licenceDo.description;
     }
 
 
     /**
      * 加载（解析）
      */
-    public void load() {
-        getDescription();
+    public boolean load() {
+        String licenceEncoded = ConfigUtils.get(ConfigNames.folkmq_licence);
+        if(Utils.isEmpty(licenceEncoded)) {
+            licenceEncoded = Solon.cfg().get(ConfigNames.folkmq_licence);
+        }
+
+        return load(licenceEncoded);
+    }
+
+    /**
+     * 加载（解析）
+     */
+    public boolean load(String licenceEncoded) {
+        if (Utils.isEmpty(licenceEncoded)) {
+            return false;
+        }
+
+        LicenceDo tmp = new LicenceDo();
+        tmp.isValid = false;
+
+        try {
+            String licenceStr = LicenceHelper.licenceDecode(licenceEncoded, publicKey);
+            String[] licence = licenceStr.split(",");
+
+            if (licence.length >= 6) {
+                tmp.sn = licence[0];
+                tmp.edition = Integer.parseInt(licence[1]);
+                tmp.version = licence[2];
+                tmp.subscribe = licence[3];
+                tmp.months = Integer.parseInt(licence[4]);
+                tmp.consumer = licence[5];
+
+                if (tmp.edition > 0) {
+                    //0 Community Edition, 21.Enterprise Standard edition, 22 Enterprise Premium Edition, 23 Enterprise Ultimate Edition
+
+                    StringBuilder buf = new StringBuilder();
+                    buf.append("Licence (for FolkMQ): ");
+                    buf.append("SN=").append(getSn()).append(", ");
+                    buf.append("E=").append(getEditionName()).append(", ");
+                    buf.append("T=").append(getSubscribe()).append(", ");
+                    buf.append("M=").append(getMonths());
+
+                    tmp.isValid = true;
+                    tmp.description = buf.toString();
+                }
+            }
+
+        } catch (Throwable e) {
+
+        }
+
+        if (tmp.isValid) {
+            this.licenceDo = tmp;
+            ConfigUtils.set(ConfigNames.folkmq_licence, licenceEncoded);
+        } else {
+            tmp.description = "Licence (for FolkMQ): Unauthorized (with legal risks)";
+        }
+
+        return tmp.isValid;
     }
 }

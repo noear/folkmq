@@ -16,6 +16,7 @@ import org.noear.socketd.transport.core.entity.StringEntity;
 import org.noear.solon.annotation.Controller;
 import org.noear.solon.annotation.Inject;
 import org.noear.solon.annotation.Mapping;
+import org.noear.solon.annotation.Post;
 import org.noear.solon.core.handle.ModelAndView;
 import org.noear.solon.core.handle.Result;
 import org.noear.solon.validation.annotation.Logined;
@@ -71,8 +72,6 @@ public class AdminController extends BaseController {
         } else {
             //无效许可证
             ModelAndView vm = view("admin_licence_invalid");
-
-            vm.put("sn", "无效授权（请获取企业版授权：<a href='https://folkmq.noear.org' target='_blank'>https://folkmq.noear.org</a>）");
             return vm;
         }
     }
@@ -100,6 +99,18 @@ public class AdminController extends BaseController {
         }
 
         return vm;
+    }
+
+    @Post
+    @Mapping("/admin/licence/ajax/verify")
+    public Result licence_ajax_verify(String licence) {
+        boolean isOk = LicenceUtils.getGlobal().load(licence);
+
+        if (isOk) {
+            return Result.succeed();
+        } else {
+            return Result.failure("许可证无效");
+        }
     }
 
     @Mapping("/admin/topic")

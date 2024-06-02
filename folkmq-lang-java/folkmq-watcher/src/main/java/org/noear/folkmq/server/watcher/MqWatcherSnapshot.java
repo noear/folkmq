@@ -4,7 +4,7 @@ import org.noear.folkmq.common.MqConstants;
 import org.noear.folkmq.common.MqMetasResolver;
 import org.noear.folkmq.common.MqUtils;
 import org.noear.folkmq.server.*;
-import org.noear.folkmq.server.watcher.utils.IoUtils;
+import org.noear.folkmq.utils.IoUtils;
 import org.noear.snack.ONode;
 import org.noear.snack.core.Feature;
 import org.noear.snack.core.Options;
@@ -414,7 +414,7 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
                     try {
                         Entity entity = messageHolder.getEntity();
                         ONode entityJson = new ONode(Options.def().add(Feature.DisThreadLocal));
-                        entityJson.set("v",2); //ver
+                        entityJson.set("v", 2); //ver
                         entityJson.set("meta", entity.metaString());
                         entityJson.set("data", Base64.getEncoder().encodeToString(entity.dataAsBytes()));
 

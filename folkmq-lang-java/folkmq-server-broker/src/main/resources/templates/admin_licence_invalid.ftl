@@ -12,6 +12,28 @@
         body > header aside a{display:inline-block; height:100%; padding:0 15px; }
         body > header aside .split{border-left:1px solid #444;}
     </style>
+    <script>
+        function verifyDo() {
+            let data={};
+            data.licence = $('#licence').val();
+
+            if(!data.licence){
+                top.layer.alert('请输入许可证');
+            }
+
+            $.post('/admin/licence/ajax/verify', data, rst => {
+                if (rst.code == 200) {
+                    top.layer.msg('操作成功');
+
+                    setTimeout(function () {
+                        top.location.reload();
+                    }, 800);
+                } else {
+                    top.layer.msg(rst.description);
+                }
+            });
+        }
+    </script>
 </head>
 <body>
 <header>
@@ -34,12 +56,18 @@
     </left>
     <right class="pad10">
         <toolbar class="blockquote">
-            <left>许可证</left>
+            <left>输入许可证</left>
             <right></right>
         </toolbar>
         <detail>
             <form id="form">
-                <div>${sn!}</div>
+                <p>
+                    <input id="licence" type="text" class="longtxt"> <button type="button" onclick="verifyDo()">保存</button>
+                </p>
+                <br/>
+                <p>
+                    没有？获取企业版授权：<a href='https://folkmq.noear.org' target='_blank'>https://folkmq.noear.org</a>
+                </p>
             </form>
         </detail>
     </right>

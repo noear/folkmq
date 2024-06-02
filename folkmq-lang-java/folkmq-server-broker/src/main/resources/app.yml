@@ -38,7 +38,6 @@ folkmq.transport:
 
 folkmq:
   admin: admin
-  licence: ""
   websocket: false
   view:
     queue:

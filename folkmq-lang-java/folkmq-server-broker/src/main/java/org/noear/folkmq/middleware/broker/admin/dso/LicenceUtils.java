@@ -133,9 +133,6 @@ public class LicenceUtils {
      */
     public boolean load() {
         String licenceEncoded = ConfigUtils.get(ConfigNames.folkmq_licence);
-        if(Utils.isEmpty(licenceEncoded)) {
-            licenceEncoded = Solon.cfg().get(ConfigNames.folkmq_licence);
-        }
 
         return load(licenceEncoded);
     }

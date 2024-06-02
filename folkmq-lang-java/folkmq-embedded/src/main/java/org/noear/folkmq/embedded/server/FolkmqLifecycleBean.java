@@ -35,6 +35,11 @@ import java.util.List;
 @Component
 public class FolkmqLifecycleBean implements LifecycleBean {
     private static final Logger log = LoggerFactory.getLogger(FolkmqLifecycleBean.class);
+    private static boolean isStandalone;
+
+    public static boolean isStandalone() {
+        return isStandalone;
+    }
 
     @Inject
     private AppContext appContext;
@@ -68,10 +73,10 @@ public class FolkmqLifecycleBean implements LifecycleBean {
         appContext.wrapAndPut(MqWatcherSnapshotPlus.class, snapshotPlus);
 
         if (Utils.isEmpty(brokerServer)) {
-            MqServerConfig.isStandalone = true;
+            isStandalone = true;
             startLocalServerMode(snapshotPlus);
         } else {
-            MqServerConfig.isStandalone = false;
+            isStandalone = false;
             startBrokerSession(brokerServer, snapshotPlus);
         }
 

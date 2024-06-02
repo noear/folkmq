@@ -80,21 +80,21 @@ public class FolkmqApiHandler implements MessageHandler {
 
             if (MqApis.MQ_QUEUE_FORCE_CLEAR.equals(name)) {
                 //{code,data}
-                queueForceService.forceClear(serviceListener, topic, consumerGroup, MqServerConfig.isStandalone);
+                queueForceService.forceClear(serviceListener, topic, consumerGroup, MqServerConfig.isStandalone());
                 replyDo(s, m, Result.succeed());
                 return;
             }
 
             if (MqApis.MQ_QUEUE_FORCE_DELETE.equals(name)) {
                 //{code,data}
-                queueForceService.forceDelete(serviceListener, topic, consumerGroup, MqServerConfig.isStandalone);
+                queueForceService.forceDelete(serviceListener, topic, consumerGroup, MqServerConfig.isStandalone());
                 replyDo(s, m, Result.succeed());
                 return;
             }
 
             if (MqApis.MQ_QUEUE_FORCE_DISTRIBUTE.equals(name)) {
                 //{code,data}
-                queueForceService.forceDelete(serviceListener, topic, consumerGroup, MqServerConfig.isStandalone);
+                queueForceService.forceDelete(serviceListener, topic, consumerGroup, MqServerConfig.isStandalone());
                 replyDo(s, m, Result.succeed());
                 return;
             }

@@ -1,9 +1,11 @@
 package org.noear.folkmq.embedded;
 
 import org.noear.folkmq.common.MqConstants;
+import org.noear.folkmq.embedded.server.FolkmqLifecycleBean;
 import org.noear.socketd.utils.StrUtils;
 import org.noear.solon.Solon;
 
+import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -11,7 +13,9 @@ import java.util.Map;
  * @since 1.0
  */
 public class MqServerConfig {
-    public static boolean isStandalone;
+    public static boolean isStandalone(){
+        return FolkmqLifecycleBean.isStandalone();
+    }
 
     public static final String path;
 
@@ -54,6 +58,6 @@ public class MqServerConfig {
             accessMap.put(ak, sk);
         }
 
-        return accessMap;
+        return Collections.unmodifiableMap(accessMap);
     }
 }

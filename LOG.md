@@ -4,12 +4,14 @@
 * 添加 后台资源看板（显示内存），并添加手动 GC 操作?
 * 添加 broker 配置可同步给 server 的能力
 
-### 1.5.2
-* 新增 folkmq-embedded （内嵌版，带控制台的）
-* 添加 server-broker 的 maxConsumeWaiting 配置??
+### 1.5.3
 * 添加 server-broker 控制多账账号管理??
-* 添加 server-broker 授权码可视化配置??
-* 修复 强制派送对无ack返回消息失效的问题???
+
+### 1.5.2
+* 新增 folkmq-embedded （带控制台的"内嵌版"）
+* 添加 server-broker 的 folkmq.maxConsumeWaiting 配置支持
+* 优化 server-broker 许可证配置改为可视界面
+* 优化 强制派送条件，对正在派发中或超过1次的消息有效（之前为2次）
 * socket.d 升为 2.5.2
 
 ### 1.5.1

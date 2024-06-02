@@ -3,6 +3,7 @@ package org.noear.folkmq.middleware.broker.mq;
 import org.noear.folkmq.FolkMQ;
 import org.noear.folkmq.common.MqConstants;
 import org.noear.folkmq.common.MqUtils;
+import org.noear.folkmq.server.MqNextTime;
 import org.noear.snack.ONode;
 import org.noear.socketd.broker.BrokerListener;
 import org.noear.socketd.transport.core.Entity;
@@ -10,6 +11,7 @@ import org.noear.socketd.transport.core.EntityMetas;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
 import org.noear.socketd.transport.core.entity.StringEntity;
+import org.noear.socketd.utils.RunUtils;
 import org.noear.socketd.utils.SessionUtils;
 import org.noear.socketd.utils.StrUtils;
 
@@ -146,7 +148,7 @@ public class BrokerListenerFolkmq extends BrokerListener {
                 for (Session s0 : getPlayerAll(atName)) {
                     if (SessionUtils.isActive(s0)) {
                         try {
-                            forwardToSession(requester, message, s0);
+                            forwardToSession2(requester, message, s0, MqNextTime.maxConsumeMillis());
                         } catch (Throwable e) {
                             acknowledgeAsNo(requester, message);
                         }
@@ -158,7 +160,7 @@ public class BrokerListenerFolkmq extends BrokerListener {
                 if (SessionUtils.isActive(responder)) {
                     //转发消息
                     try {
-                        forwardToSession(requester, message, responder);
+                        forwardToSession2(requester, message, responder, MqNextTime.maxConsumeMillis());
                     } catch (Throwable e) {
                         acknowledgeAsNo(requester, message);
                     }
@@ -199,7 +201,7 @@ public class BrokerListenerFolkmq extends BrokerListener {
             if (responder != null && responder.isValid()) {
                 //转发消息
                 try {
-                    forwardToSession(requester, message, responder);
+                    forwardToSession2(requester, message, responder, MqNextTime.maxConsumeMillis());
                 } catch (Throwable e) {
                     requester.sendAlarm(message, "Broker forward '@" + atName + "' error: " + e.getMessage());
                 }
@@ -222,6 +224,38 @@ public class BrokerListenerFolkmq extends BrokerListener {
         }
 
         super.onMessage(requester, message);
+    }
+
+    private void forwardToSession2(Session requester, Message message, Session responder, long timeout) throws IOException {
+        if (message.isRequest()) {
+            responder.sendAndRequest(message.event(), message, timeout).thenReply(reply -> {
+                if (SessionUtils.isValid(requester)) {
+                    requester.reply(message, reply);
+                }
+            }).thenError(err -> {
+                //传递异常
+                if (SessionUtils.isValid(requester)) {
+                    RunUtils.runAndTry(() -> requester.sendAlarm(message, err.getMessage()));
+                }
+            });
+        } else if (message.isSubscribe()) {
+            responder.sendAndSubscribe(message.event(), message, timeout).thenReply(reply -> {
+                if (SessionUtils.isValid(requester)) {
+                    if (reply.isEnd()) {
+                        requester.replyEnd(message, reply);
+                    } else {
+                        requester.reply(message, reply);
+                    }
+                }
+            }).thenError(err -> {
+                //传递异常
+                if (SessionUtils.isValid(requester)) {
+                    RunUtils.runAndTry(() -> requester.sendAlarm(message, err.getMessage()));
+                }
+            });
+        } else {
+            responder.send(message.event(), message);
+        }
     }
 
     private void onSubscribe(Session requester, Message message) {

@@ -7,7 +7,7 @@ package org.noear.folkmq.server;
  * @since 1.0
  */
 public class MqNextTime {
-    private static long maxConsumeMillis = 1000 * 60 * 3;
+    private static long maxConsumeMillis = 1000 * 60 * 3; //3分钟
 
     public static final long TIME_1H = 1000 * 60 * 60;
     public static final long TIME_1M = 1000 * 60;

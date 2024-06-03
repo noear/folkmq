@@ -12,7 +12,7 @@ setup(
     install_requires=[                          # 依赖包
         'loguru>=0.7.2',
         'websockets>=12.0',
-        'socket.d>=2.5.2'
+        'socket.d>=2.5.3'
     ],
     classifiers=[
         'Development Status :: 5 - Production/Stable',

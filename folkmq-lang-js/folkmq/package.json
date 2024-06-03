@@ -12,6 +12,6 @@
     "webpack-cli": "^5.1.4"
   },
   "dependencies": {
-    "@noear/socket.d": "2.5.2"
+    "@noear/socket.d": "2.5.3"
   }
 }

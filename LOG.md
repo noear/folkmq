@@ -12,7 +12,7 @@
 * 添加 server-broker 的 folkmq.maxConsumeWaiting 配置支持
 * 优化 server-broker 许可证配置改为可视界面
 * 优化 强制派送条件，对正在派发中或超过1次的消息有效（之前为2次）
-* socket.d 升为 2.5.2
+* socket.d 升为 2.5.3
 
 ### 1.5.1
 * 优化 消息事务增加对“延时消息”、“时效消息”支持

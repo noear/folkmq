@@ -47,7 +47,7 @@ npm publish
 /*!
  * FolkMQ v1.5.2
  * (c) 2023-2024 noear.org
- * Released under the AGPL-2.1 License.
+ * Released under the AGPL-3.0 License.
  */
 
 ```

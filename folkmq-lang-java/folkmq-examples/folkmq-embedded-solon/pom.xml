@@ -6,7 +6,7 @@
 
 
     <groupId>org.noear</groupId>
-    <artifactId>folkmq-examples</artifactId>
+    <artifactId>folkmq-embedded-solon</artifactId>
     <version>demo</version>
     <packaging>jar</packaging>
 

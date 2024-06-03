@@ -190,6 +190,9 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
 
             messageMap.clear();
             messageQueue.clear();
+
+            //清空后 gc 下
+            System.gc();
         } finally {
             messageAddLock.unlock();
         }

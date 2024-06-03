@@ -46,6 +46,15 @@ public class MqMessageHolderQueue extends DelayQueue<MqMessageHolder> {
         return tmp;
     }
 
+    @Override
+    public void clear() {
+        super.clear();
+
+        for (LongAdder l1 : _counters) {
+            l1.reset();
+        }
+    }
+
     /**
      * 计数加数
      */

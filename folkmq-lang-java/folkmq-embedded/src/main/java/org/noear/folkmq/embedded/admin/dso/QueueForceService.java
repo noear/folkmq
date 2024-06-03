@@ -108,6 +108,10 @@ public class QueueForceService {
 
             MqQueue queue = server.getQueue(queueName);
             if (queue != null) {
+                if (queue.sessionCount() > 0 && isStandalone) {
+                    return Result.failure("有消费者连接，不能清空!");
+                }
+
                 queue.forceClear();
 
                 return Result.succeed();

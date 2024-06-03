@@ -22,7 +22,7 @@
                         success: function (data) {
                             top.layer.close(loadIndex);
                             if (data.code == 200) {
-                                top.layer.msg('已推送指令')
+                                top.layer.msg('已推送指令');
                                 setTimeout(function () {
                                     top.layer.closeAll();
                                 }, 800);
@@ -48,7 +48,7 @@
                         success: function (data) {
                             top.layer.close(loadIndex);
                             if (data.code == 200) {
-                                top.layer.msg('操作成功')
+                                top.layer.msg('已推送指令');
                                 setTimeout(function () {
                                     top.layer.closeAll();
                                 }, 800);

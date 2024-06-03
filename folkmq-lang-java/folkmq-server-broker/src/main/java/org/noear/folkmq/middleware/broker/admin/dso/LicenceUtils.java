@@ -109,6 +109,11 @@ public class LicenceUtils {
             return false;
         }
 
+        if(isValid() == false){
+            //如果无效，则为过期
+            return true;
+        }
+
         try {
             LocalDate subscribeDate = DateUtil.parse(licenceDo.subscribe).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 

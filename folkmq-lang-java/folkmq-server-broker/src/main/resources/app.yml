@@ -39,6 +39,7 @@ folkmq.transport:
 folkmq:
   admin: admin
   websocket: false
+  maxConsumeWaiting: "180s"
   view:
     queue:
       syncInterval: 5000

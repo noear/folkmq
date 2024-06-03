@@ -52,8 +52,9 @@ public class AdminController extends BaseController {
 
     @Mapping("/admin")
     public ModelAndView admin() {
-        if (LicenceUtils.getGlobal().isValid()) {
-            //有效许可证
+        if (LicenceUtils.getGlobal().isValid() &&
+                LicenceUtils.getGlobal().isExpired() == false) {
+            //有效许可证（并且未过期）
             ModelAndView vm = view("admin");
 
             vm.put("isValid", LicenceUtils.getGlobal().isValid());
@@ -72,6 +73,8 @@ public class AdminController extends BaseController {
         } else {
             //无效许可证
             ModelAndView vm = view("admin_licence_invalid");
+            vm.put("isValid", LicenceUtils.getGlobal().isValid());
+            vm.put("isExpired", LicenceUtils.getGlobal().isExpired());
             return vm;
         }
     }
@@ -108,7 +111,11 @@ public class AdminController extends BaseController {
         boolean isOk = LicenceUtils.getGlobal().load(licence);
 
         if (isOk) {
-            return Result.succeed();
+            if (LicenceUtils.getGlobal().isExpired()) {
+                return Result.failure("许可证已过期");
+            } else {
+                return Result.succeed();
+            }
         } else {
             return Result.failure("许可证无效");
         }

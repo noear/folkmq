@@ -67,7 +67,11 @@
                 </p>
                 <br/>
                 <p>
-                    没有？获取企业版授权：<a href='https://folkmq.noear.org' target='_blank'>https://folkmq.noear.org</a>
+                    <#if isValid && isExpired>
+                        已过期？重新获取企业版授权：<a href='https://folkmq.noear.org' target='_blank'>https://folkmq.noear.org</a>
+                    <#else>
+                        没有？获取企业版授权：<a href='https://folkmq.noear.org' target='_blank'>https://folkmq.noear.org</a>
+                    </#if>
                 </p>
             </form>
         </detail>

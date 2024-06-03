@@ -15,9 +15,10 @@
         section table input{height: 30px!important; width: 100%;}
         section table button{color: #000; height: 30px; width: 120px;}
 
-        header p{margin: 10px;line-height: 30px;}
-        header sup{color: #fd6721; border-radius: 10px;margin-left: 5px;}
+        header p{margin: 10px;line-height: 30px;font-size: 1.1em}
+        header ver{display: inline-block; margin-left: 5px; background: #80ea6e; border-radius: 5px;font-size: small;font-weight:normal; padding: 0 4px;line-height:1.5em}
     </style>
+
 
     <script type="text/javascript">
         function checkClick() {
@@ -53,7 +54,7 @@
     <header>
     <flex>
         <left class="col-6">
-            <p>${title}<sup>${version}</sup></p>
+            <p>${title}<ver>${version}</ver></p>
         </left>
         <right class="col-6">
             <p>

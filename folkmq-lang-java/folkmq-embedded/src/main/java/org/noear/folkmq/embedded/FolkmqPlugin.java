@@ -52,7 +52,7 @@ public class FolkmqPlugin implements Plugin {
             try {
                 chain.doIntercept(ctx, mainHandler);
             } catch (ValidatorException e) {
-                ctx.redirect("/login");
+                ctx.redirect(MqServerConfig.path + "/login");
             }
         }));
 

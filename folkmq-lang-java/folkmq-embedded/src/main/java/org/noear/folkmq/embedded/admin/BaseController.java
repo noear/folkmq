@@ -18,7 +18,6 @@ public abstract class BaseController {
         //设置必要参数
         ModelAndView viewModel = new ModelAndView("/folkmq/" + viewName + ".ftl");
 
-        viewModel.put("root", "");
 
         viewModel.put("title", "FolkMQ-S");
         viewModel.put("app", "FolkMQ-S");

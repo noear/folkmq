@@ -10,6 +10,7 @@ import java.util.concurrent.atomic.LongAdder;
 public class MqMessageHolderMap extends ConcurrentHashMap<String, MqMessageHolder> {
     private final LongAdder changedSize = new LongAdder();
 
+    //不一定能用上（map 没变；queue 可能会变）
     public LongAdder changedSize() {
         return changedSize;
     }

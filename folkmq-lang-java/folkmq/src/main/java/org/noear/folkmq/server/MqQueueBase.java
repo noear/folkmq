@@ -6,10 +6,9 @@ import org.noear.socketd.utils.StrUtils;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.LongAdder;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -20,7 +19,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public abstract class MqQueueBase implements MqQueue {
     //消息字典
-    protected final Map<String, MqMessageHolder> messageMap;
+    protected final MqMessageHolderMap messageMap;
     //消息队列与处理线程
     protected final MqMessageHolderQueue messageQueue;
     //消息最后派发时间
@@ -34,7 +33,7 @@ public abstract class MqQueueBase implements MqQueue {
     private final List<Session> consumerSessions = new CopyOnWriteArrayList<>();
 
     public MqQueueBase() {
-        this.messageMap = new ConcurrentHashMap<>();
+        this.messageMap = new MqMessageHolderMap();
         this.messageQueue = new MqMessageHolderQueue();
     }
 
@@ -57,7 +56,7 @@ public abstract class MqQueueBase implements MqQueue {
      * 添加消费者会话
      */
     @Override
-    public void addSession(Session session) {
+    public void sessionAdd(Session session) {
         if (consumerSessions.contains(session) == false) {
             consumerSessions.add(session);
         }
@@ -67,19 +66,19 @@ public abstract class MqQueueBase implements MqQueue {
      * 移除消费者会话
      */
     @Override
-    public void removeSession(Session session) {
+    public void sessionRemove(Session session) {
         consumerSessions.remove(session);
     }
 
     @Override
-    public Collection<Session> getSessions() {
+    public Collection<Session> sessionAll() {
         return consumerSessions;
     }
 
     /**
      * 获取一个会话（轮询负载均衡）
      */
-    protected Session getSessionOne(MqMessageHolder messageHolder) {
+    protected Session sessionGetOne(MqMessageHolder messageHolder) {
         if (messageHolder.isSequence()) {
             if (StrUtils.isEmpty(messageHolder.getSequenceSharding())) {
                 return LoadBalancer.getAnyByHash(consumerSessions, getTopic());
@@ -94,6 +93,7 @@ public abstract class MqQueueBase implements MqQueue {
     /**
      * 消息总量
      */
+    @Override
     public int messageTotal() {
         return messageMap.size();
     }
@@ -101,8 +101,14 @@ public abstract class MqQueueBase implements MqQueue {
     /**
      * 消息总量2（用于做校验）
      */
+    @Override
     public int messageTotal2() {
         return messageQueue.size();
+    }
+
+    @Override
+    public LongAdder messageChangedCount() {
+        return messageMap.changedSize();
     }
 
     @Override

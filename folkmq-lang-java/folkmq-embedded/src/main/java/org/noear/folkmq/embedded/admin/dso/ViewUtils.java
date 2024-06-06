@@ -85,7 +85,7 @@ public class ViewUtils {
 
         MqQueue queue = server.getQueue(queueName);
         if (queue != null) {
-            List<Session> sessions = new ArrayList<>(queue.getSessions());
+            List<Session> sessions = new ArrayList<>(queue.sessionAll());
             for (Session s1 : sessions) {
                 list.add(s1.remoteAddress().toString());
 

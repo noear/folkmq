@@ -306,7 +306,7 @@ public class MqServiceListener extends MqServiceListenerBase implements MqServic
 
             //如果找到对应的队列
             if (queue != null) {
-                queue.removeSession(session);
+                queue.sessionRemove(session);
             }
         }
 

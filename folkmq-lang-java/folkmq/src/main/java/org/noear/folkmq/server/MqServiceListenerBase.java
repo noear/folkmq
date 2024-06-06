@@ -124,7 +124,7 @@ public abstract class MqServiceListenerBase extends EventListener implements MqS
                 session.attrPut(queueName, "1");
 
                 //加入队列会话
-                queue.addSession(session);
+                queue.sessionAdd(session);
             }
         }
     }
@@ -165,7 +165,7 @@ public abstract class MqServiceListenerBase extends EventListener implements MqS
 
         //3.退出队列会话
         if (queue != null) {
-            queue.removeSession(session);
+            queue.sessionRemove(session);
         }
     }
 

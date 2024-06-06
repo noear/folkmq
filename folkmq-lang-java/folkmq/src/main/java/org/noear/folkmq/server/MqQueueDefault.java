@@ -286,7 +286,7 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
                 //如果无效，则移掉
                 if (s1 != null) {
                     if (s1.isValid() == false) {
-                        removeSession(s1);
+                        sessionRemove(s1);
                     }
                 }
 
@@ -354,7 +354,7 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
         //如果有会话
         if (sessionCount() > 0) {
             //获取一个会话（轮询负载均衡）
-            Session s1 = getSessionOne(messageHolder);
+            Session s1 = sessionGetOne(messageHolder);
 
             //::派发
             try {
@@ -368,7 +368,7 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
             } catch (Throwable e) {
                 //如果无效，则移掉
                 if (s1 != null && s1.isValid() == false) {
-                    removeSession(s1);
+                    sessionRemove(s1);
                 }
 
                 //进入延后队列
@@ -422,7 +422,7 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
         } else {
             //::Qos0
             if (messageHolder.isBroadcast()) {
-                for (Session s0 : getSessions()) {
+                for (Session s0 : sessionAll()) {
                     if (SessionUtils.isActive(s0)) {
                         s0.send(MqConstants.MQ_EVENT_DISTRIBUTE, messageHolder.getEntity());
                     }

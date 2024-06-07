@@ -5,6 +5,7 @@ import org.noear.folkmq.common.*;
 import org.noear.snack.ONode;
 import org.noear.socketd.broker.BrokerListener;
 import org.noear.socketd.exception.SocketDAlarmException;
+import org.noear.socketd.transport.core.EntityMetas;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
 import org.noear.socketd.transport.core.entity.StringEntity;
@@ -49,6 +50,11 @@ public class MqServiceListener extends MqServiceListenerBase implements MqServic
             MqMetasResolver mr = MqUtils.getOf(m);
             //接收发布指令
             boolean isTrans = mr.isTransaction(m);
+
+            if (brokerMode) {
+                //如果是经理模式，派发的消息不受内存限制
+                m.putMeta(EntityMetas.META_X_UNLIMITED, "1");
+            }
 
             if (isTrans) {
                 //备份
@@ -252,7 +258,7 @@ public class MqServiceListener extends MqServiceListenerBase implements MqServic
             log.info("Broker channel opened, sessionId={}", session.sessionId());
         } else {
             //鉴权
-            if(this.auth(session) == false){
+            if (this.auth(session) == false) {
                 session.close();
                 return;
             }
@@ -269,6 +275,7 @@ public class MqServiceListener extends MqServiceListenerBase implements MqServic
 
     /**
      * 鉴权失败返回false
+     *
      * @param session
      * @return
      */

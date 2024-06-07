@@ -6,6 +6,8 @@ import org.noear.folkmq.middleware.broker.common.ConfigNames;
 import org.noear.folkmq.middleware.broker.mq.BrokerListenerFolkmq;
 import org.noear.folkmq.common.MqConstants;
 import org.noear.snack.ONode;
+import org.noear.socketd.transport.core.Entity;
+import org.noear.socketd.transport.core.EntityMetas;
 import org.noear.socketd.transport.core.Session;
 import org.noear.socketd.transport.core.entity.StringEntity;
 import org.noear.solon.Solon;
@@ -125,15 +127,17 @@ public class ViewQueueService implements LifecycleBean {
             queueVoMapTmp.clear();
 
             List<Session> sessions = new ArrayList<>(tmp);
+            Entity reqEntity = new StringEntity("").metaPut(EntityMetas.META_X_UNLIMITED, "1");
+
             for (Session session : sessions) {
                 try {
-                    session.sendAndRequest(MqConstants.ADMIN_VIEW_QUEUE, new StringEntity(""), -1).thenReply(r -> {
+                    session.sendAndRequest(MqConstants.ADMIN_VIEW_QUEUE, reqEntity).thenReply(r -> {
                         String json = r.dataAsString();
                         List<QueueVo> list = ONode.loadStr(json).toObjectList(QueueVo.class);
                         addQueueVo(list, queueVoMapTmp);
                     });
 
-                    session.sendAndRequest(MqConstants.ADMIN_VIEW_INSTANCE, new StringEntity(""), -1).thenReply(r -> {
+                    session.sendAndRequest(MqConstants.ADMIN_VIEW_INSTANCE, reqEntity).thenReply(r -> {
                         String json = r.dataAsString();
                         ServerInfoVo infoVo = ONode.loadStr(json).toObject(ServerInfoVo.class);
                         session.attrPut("ServerInfoVo", infoVo);

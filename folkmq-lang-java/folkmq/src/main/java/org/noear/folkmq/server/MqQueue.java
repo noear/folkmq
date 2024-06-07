@@ -3,7 +3,6 @@ package org.noear.folkmq.server;
 import org.noear.socketd.transport.core.Session;
 
 import java.util.Collection;
-import java.util.concurrent.atomic.LongAdder;
 
 /**
  * 队列（服务端给每对 [主题#消费者组] 安排一个队列，队列内通过轮询负载平衡派发）
@@ -90,11 +89,6 @@ public interface MqQueue {
      * 消息总量2（用作校验）
      */
     int messageTotal2();
-
-    /**
-     * 消息变更计数
-     * */
-    LongAdder messageChangedCount();
 
     /**
      * 关闭

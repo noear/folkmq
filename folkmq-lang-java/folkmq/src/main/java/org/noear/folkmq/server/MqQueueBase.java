@@ -107,11 +107,6 @@ public abstract class MqQueueBase implements MqQueue {
     }
 
     @Override
-    public LongAdder messageChangedCount() {
-        return messageMap.changedSize();
-    }
-
-    @Override
     public void close() {
         consumerSessions.clear();
 

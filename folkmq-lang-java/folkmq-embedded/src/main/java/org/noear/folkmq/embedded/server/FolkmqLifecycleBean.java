@@ -96,6 +96,7 @@ public class FolkmqLifecycleBean implements LifecycleBean {
                 .config(c -> c.serialSend(true)
                         .maxMemoryRatio(0.8F)
                         .streamTimeout(MqServerConfig.streamTimeout)
+                        .readSemaphore(MqConstants.CLIENT_READ_SEMAPHORE_DEFAULT)
                         .ioThreads(MqServerConfig.ioThreads)
                         .codecThreads(MqServerConfig.codecThreads)
                         .exchangeThreads(MqServerConfig.exchangeThreads))

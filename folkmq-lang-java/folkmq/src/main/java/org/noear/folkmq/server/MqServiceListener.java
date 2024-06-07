@@ -198,13 +198,13 @@ public class MqServiceListener extends MqServiceListenerBase implements MqServic
     /**
      * 启动
      */
-    public void start(OnStart onStart) throws Exception {
+    public void start(MqStarter starter) throws Exception {
         //观察者::服务启动之前
         watcher.onStartBefore();
 
         //启动
-        if (onStart != null) {
-            onStart.run();
+        if (starter != null) {
+            starter.start();
         }
         distributeThread.start();
 

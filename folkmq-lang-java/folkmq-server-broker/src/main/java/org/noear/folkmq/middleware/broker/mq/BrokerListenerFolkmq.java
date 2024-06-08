@@ -4,6 +4,7 @@ import org.noear.folkmq.FolkMQ;
 import org.noear.folkmq.common.MqConstants;
 import org.noear.folkmq.common.MqUtils;
 import org.noear.folkmq.server.MqNextTime;
+import org.noear.folkmq.server.MqQps;
 import org.noear.snack.ONode;
 import org.noear.socketd.broker.BrokerListener;
 import org.noear.socketd.transport.core.Entity;
@@ -18,6 +19,7 @@ import org.noear.socketd.utils.StrUtils;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledFuture;
 
 /**
  * FolkMq 经纪人监听
@@ -27,6 +29,17 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class BrokerListenerFolkmq extends BrokerListener {
     private final BrokerApiHandler apiHandler;
+    private final MqQps qpsPublish = new MqQps();
+    private final MqQps qpsDistribute = new MqQps();
+    private final ScheduledFuture<?> qpsScheduled;
+
+    public MqQps getQpsDistribute() {
+        return qpsDistribute;
+    }
+
+    public MqQps getQpsPublish() {
+        return qpsPublish;
+    }
 
     //访问账号
     private Map<String, String> accessMap = new HashMap<>();
@@ -42,7 +55,19 @@ public class BrokerListenerFolkmq extends BrokerListener {
 
     public BrokerListenerFolkmq(BrokerApiHandler apiHandler) {
         this.apiHandler = apiHandler;
+
+        this.qpsScheduled = RunUtils.delayAndRepeat(()->{
+            qpsPublish.reset();
+            qpsDistribute.reset();
+        },5_000);
     }
+
+    public void stop() {
+        if (qpsScheduled != null) {
+            qpsScheduled.cancel(true);
+        }
+    }
+
 
     public void removeSubscribe(String topic, String queueName) {
         Set<String> tmp = subscribeMap.get(topic);
@@ -136,6 +161,9 @@ public class BrokerListenerFolkmq extends BrokerListener {
 
             removePlayer(queueName, requester);
         } else if (MqConstants.MQ_EVENT_DISTRIBUTE.equals(message.event())) {
+            //记录流量
+            qpsDistribute.record();
+
             String atName = message.atName();
             boolean isBroadcast = MqUtils.getV2().isBroadcast(message.entity());
 
@@ -197,6 +225,9 @@ public class BrokerListenerFolkmq extends BrokerListener {
             //结束处理
             return;
         } else if (MqConstants.MQ_EVENT_REQUEST.equals(message.event())) {
+            //记录流量
+            qpsPublish.record();
+
             String atName = message.atName();
 
             //单发模式（给同名的某个玩家，轮询负截均衡）
@@ -224,6 +255,11 @@ public class BrokerListenerFolkmq extends BrokerListener {
                     requester.sessionId(),
                     requester.remoteAddress().getAddress().getHostAddress());
             return;
+        }
+
+        if(MqConstants.MQ_EVENT_PUBLISH.equals(message.event())) {
+            //记录流量
+            qpsPublish.record();
         }
 
         super.onMessage(requester, message);

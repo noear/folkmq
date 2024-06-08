@@ -36,6 +36,7 @@
         <menu>
             <div onclick="$('main').toggleClass('smlmenu');if(window.onMenuHide){window.onMenuHide();}"><i class='fa fa-bars'></i></div>
             <items>
+                <a href='/admin/stat' target="dock">流量看板</a>
                 <a class='sel' href='/admin/server' target="dock">集群节点</a>
                 <a href='/admin/topic' target="dock">主题看板</a>
                 <a href='/admin/queue' target="dock">队列看板</a>

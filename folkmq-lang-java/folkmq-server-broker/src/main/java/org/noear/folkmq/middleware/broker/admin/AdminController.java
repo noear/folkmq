@@ -79,6 +79,16 @@ public class AdminController extends BaseController {
         }
     }
 
+    @Mapping("/admin/stat")
+    public ModelAndView stat() {
+        ModelAndView mv = view("admin_stat");
+
+        mv.put("qpsPublish", brokerListener.getQpsPublish());
+        mv.put("qpsDistribute", brokerListener.getQpsDistribute());
+
+        return mv;
+    }
+
     @Mapping("/admin/licence")
     public ModelAndView licence() {
         ModelAndView vm = view("admin_licence");

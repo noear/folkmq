@@ -14,7 +14,7 @@ import org.noear.solon.annotation.Component;
 import org.noear.solon.annotation.Inject;
 import org.noear.solon.core.AppContext;
 import org.noear.solon.core.bean.LifecycleBean;
-import org.noear.solon.net.websocket.socketd.ToSocketdWebSocketListener;
+import org.noear.solon.core.event.EventBus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +35,6 @@ public class BrokerLifecycleBean implements LifecycleBean {
     private Server brokerServerTcp;
     private Server brokerServerWs;
     private BrokerListenerFolkmq brokerListener;
-    private ToSocketdWebSocketListener webSocketListener;
 
     @Override
     public void start() throws Throwable {
@@ -44,14 +43,19 @@ public class BrokerLifecycleBean implements LifecycleBean {
                 .addAccessAll(MqBrokerConfig.getAccessMap());
 
         brokerServerTcp = SocketD.createServer("sd:tcp")
-                .config(c -> c.port(Solon.cfg().serverPort() + 10000)
-                        .serialSend(true)
-                        .maxMemoryRatio(0.8F)
-                        .streamTimeout(MqBrokerConfig.streamTimeout)
-                        .ioThreads(MqBrokerConfig.ioThreads)
-                        .codecThreads(MqBrokerConfig.codecThreads)
-                        .exchangeThreads(MqBrokerConfig.exchangeThreads)
-                        .fragmentHandler(brokerFragmentHandler))
+                .config(c -> {
+                    c.port(Solon.cfg().serverPort() + 10000)
+                            .serialSend(true)
+                            .maxMemoryRatio(0.8F)
+                            .streamTimeout(MqBrokerConfig.streamTimeout)
+                            .readSemaphore(MqConstants.CLIENT_READ_SEMAPHORE_DEFAULT)
+                            .ioThreads(MqBrokerConfig.ioThreads)
+                            .codecThreads(MqBrokerConfig.codecThreads)
+                            .exchangeThreads(MqBrokerConfig.exchangeThreads)
+                            .fragmentHandler(brokerFragmentHandler);
+
+                    EventBus.publish(c);
+                })
                 .listen(brokerListener)
                 .start();
 
@@ -59,15 +63,20 @@ public class BrokerLifecycleBean implements LifecycleBean {
         if (Solon.cfg().getBool("folkmq.websocket", false)) {
             //添加 sd:ws 协议监听支持
             brokerServerWs = SocketD.createServer("sd:ws")
-                    .config(c -> c.port(Solon.cfg().serverPort() + 10001)
-                            .serialSend(true)
-                            .maxMemoryRatio(0.8F)
-                            .streamTimeout(MqBrokerConfig.streamTimeout)
-                            .ioThreads(MqBrokerConfig.ioThreads)
-                            .codecThreads(MqBrokerConfig.codecThreads)
-                            .exchangeThreads(MqBrokerConfig.exchangeThreads)
-                            .exchangeExecutor(brokerServerTcp.getConfig().getExchangeExecutor()) //复用通用执行器
-                            .fragmentHandler(brokerFragmentHandler))
+                    .config(c -> {
+                        c.port(Solon.cfg().serverPort() + 10001)
+                                .serialSend(true)
+                                .maxMemoryRatio(0.8F)
+                                .streamTimeout(MqBrokerConfig.streamTimeout)
+                                .readSemaphore(MqConstants.CLIENT_READ_SEMAPHORE_DEFAULT)
+                                .ioThreads(MqBrokerConfig.ioThreads)
+                                .codecThreads(MqBrokerConfig.codecThreads)
+                                .exchangeThreads(MqBrokerConfig.exchangeThreads)
+                                .exchangeExecutor(brokerServerTcp.getConfig().getExchangeExecutor()) //复用通用执行器
+                                .fragmentHandler(brokerFragmentHandler);
+
+                        EventBus.publish(c);
+                    })
                     .listen(brokerListener)
                     .start();
         }
@@ -95,6 +104,8 @@ public class BrokerLifecycleBean implements LifecycleBean {
             for (Session session : brokerListener.getSessionAll()) {
                 RunUtils.runAndTry(session::close);
             }
+
+            brokerListener.stop();
         }
 
         if (brokerServerTcp != null) {

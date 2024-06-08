@@ -34,7 +34,17 @@
                     <groupId>org.noear</groupId>
                     <artifactId>solon.sessionstate.local</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.noear</groupId>
+                    <artifactId>solon.boot.smarthttp</artifactId>
+                </exclusion>
             </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.noear</groupId>
+            <artifactId>solon.boot.jdkhttp</artifactId>
+            <version>${solon.version}</version>
         </dependency>
 
         <dependency>

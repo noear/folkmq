@@ -191,6 +191,9 @@ public class BrokerListenerFolkmq extends BrokerListener {
                     requester.sessionId(),
                     requester.remoteAddress().getAddress().getHostAddress());
 
+            //答复
+            requester.reply(message, new StringEntity("1"));
+
             //结束处理
             return;
         } else if (MqConstants.MQ_EVENT_REQUEST.equals(message.event())) {

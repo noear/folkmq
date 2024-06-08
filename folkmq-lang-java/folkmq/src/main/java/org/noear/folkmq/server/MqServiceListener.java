@@ -282,7 +282,7 @@ public class MqServiceListener extends MqServiceListenerBase implements MqServic
 
         if (brokerMode) {
             //申请加入
-            session.send(MqConstants.MQ_EVENT_JOIN, new StringEntity(""));
+            session.sendAndRequest(MqConstants.MQ_EVENT_JOIN, new StringEntity("").metaPut(EntityMetas.META_X_UNLIMITED, "1"), 30_000).await();
 
             log.info("Broker channel opened, sessionId={}", session.sessionId());
         } else {

@@ -1,7 +1,7 @@
 package org.noear.folkmq.server;
 
 import java.util.concurrent.DelayQueue;
-import java.util.concurrent.atomic.LongAdder;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * MqMessageHolder 数据队列
@@ -11,14 +11,14 @@ import java.util.concurrent.atomic.LongAdder;
  */
 public class MqMessageHolderQueue extends DelayQueue<MqMessageHolder> {
     //消息计数器
-    private final LongAdder[] _counters = new LongAdder[9];
+    private final AtomicLong[] _counters = new AtomicLong[9];
 
     public MqMessageHolderQueue() {
         super();
 
         //初始化计数器
         for (int i = 0; i < _counters.length; i++) {
-            _counters[i] = new LongAdder();
+            _counters[i] = new AtomicLong();
         }
     }
 
@@ -50,8 +50,8 @@ public class MqMessageHolderQueue extends DelayQueue<MqMessageHolder> {
     public void clear() {
         super.clear();
 
-        for (LongAdder l1 : _counters) {
-            l1.reset();
+        for (AtomicLong l1 : _counters) {
+            l1.set(0L);
         }
     }
 
@@ -62,9 +62,9 @@ public class MqMessageHolderQueue extends DelayQueue<MqMessageHolder> {
         int n = mh.getDistributeCount();
 
         if (n > 7) {
-            _counters[8].increment();
+            _counters[8].incrementAndGet();
         } else {
-            _counters[n].increment();
+            _counters[n].incrementAndGet();
         }
     }
 
@@ -75,9 +75,9 @@ public class MqMessageHolderQueue extends DelayQueue<MqMessageHolder> {
         int n = mh.getDistributeCount();
 
         if (n > 7) {
-            _counters[8].decrement();
+            _counters[8].decrementAndGet();
         } else {
-            _counters[n].decrement();
+            _counters[n].decrementAndGet();
         }
     }
 

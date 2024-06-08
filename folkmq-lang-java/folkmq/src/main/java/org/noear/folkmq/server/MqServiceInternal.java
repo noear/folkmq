@@ -17,6 +17,16 @@ import java.util.Set;
  */
 public interface MqServiceInternal {
     /**
+     * 获取发布 Qps
+     */
+    MqQps getQpsPublish();
+
+    /**
+     * 获取派发 Qps
+     */
+    MqQps getQpsDistribute();
+
+    /**
      * 获取所有会话
      */
     Collection<Session> getSessionAll();

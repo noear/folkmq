@@ -11,9 +11,11 @@ import org.noear.socketd.transport.core.Session;
 import org.noear.socketd.transport.core.entity.StringEntity;
 import org.noear.socketd.transport.core.listener.MessageHandler;
 import org.noear.socketd.utils.RunUtils;
+import org.noear.socketd.utils.RunnableEx;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ScheduledFuture;
 
 /**
  * 消息服务监听器
@@ -22,7 +24,20 @@ import java.util.*;
  * @since 1.0
  */
 public class MqServiceListener extends MqServiceListenerBase implements MqServiceInternal {
-    protected BrokerListener brokerListener = new BrokerListener();
+    protected final BrokerListener brokerListener = new BrokerListener();
+    protected final MqQps qpsPublish = new MqQps();
+    protected final MqQps qpsDistribute = new MqQps();
+    protected final ScheduledFuture<?> qpsScheduled;
+
+    @Override
+    public MqQps getQpsDistribute() {
+        return qpsDistribute;
+    }
+
+    @Override
+    public MqQps getQpsPublish() {
+        return qpsPublish;
+    }
 
     public MqServiceListener(boolean brokerMode) {
         //::初始化 Watcher 接口
@@ -32,6 +47,11 @@ public class MqServiceListener extends MqServiceListenerBase implements MqServic
 
         this.watcher = new MqWatcherDefault();
         this.watcher.init(this);
+
+        this.qpsScheduled = RunUtils.delayAndRepeat(()->{
+            qpsPublish.reset();
+            qpsDistribute.reset();
+        },5_000);
 
         //::初始化 BuilderListener(self) 的路由监听
         doOn(MqConstants.MQ_EVENT_SUBSCRIBE, (s, m) -> {
@@ -47,6 +67,8 @@ public class MqServiceListener extends MqServiceListenerBase implements MqServic
         });
 
         doOn(MqConstants.MQ_EVENT_PUBLISH, (s, m) -> {
+            qpsPublish.record();
+
             MqMetasResolver mr = MqUtils.getOf(m);
             //接收发布指令
             boolean isTrans = mr.isTransaction(m);
@@ -133,6 +155,8 @@ public class MqServiceListener extends MqServiceListenerBase implements MqServic
         });
 
         doOn(MqConstants.MQ_EVENT_REQUEST, (s, m) -> {
+            qpsPublish.record();
+
             String atName = m.atName();
 
             //单发模式（给同名的某个玩家，轮询负截均衡）
@@ -140,6 +164,7 @@ public class MqServiceListener extends MqServiceListenerBase implements MqServic
             if (responder != null && responder.isValid()) {
                 //转发消息
                 try {
+                    qpsDistribute.record();
                     brokerListener.forwardToSession(s, m, responder);
                 } catch (Throwable e) {
                     s.sendAlarm(m, "Server forward '@" + atName + "' error: " + e.getMessage());
@@ -198,13 +223,13 @@ public class MqServiceListener extends MqServiceListenerBase implements MqServic
     /**
      * 启动
      */
-    public void start(MqStarter starter) throws Exception {
+    public void start(RunnableEx<Exception> onStart) throws Exception {
         //观察者::服务启动之前
         watcher.onStartBefore();
 
         //启动
-        if (starter != null) {
-            starter.start();
+        if (onStart != null) {
+            onStart.run();
         }
         distributeThread.start();
 
@@ -235,6 +260,10 @@ public class MqServiceListener extends MqServiceListenerBase implements MqServic
         List<MqQueue> queueList = new ArrayList<>(queueMap.values());
         for (MqQueue queue : queueList) {
             queue.close();
+        }
+
+        if (qpsScheduled != null) {
+            qpsScheduled.cancel(true);
         }
 
         //标为已停止

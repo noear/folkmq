@@ -263,6 +263,7 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
         if (s1 != null) {
             try {
                 //开始请求确认
+                serviceListener.qpsDistribute.record();
                 s1.sendAndRequest(MqConstants.MQ_EVENT_REQUEST, messageHolder.getEntity(), MqNextTime.maxConsumeMillis()).thenReply(r -> {
                     //进入正常队列
                     int ack = Integer.parseInt(r.metaOrDefault(MqConstants.MQ_META_ACK, "0"));
@@ -409,6 +410,7 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
             //::Qos1
 
             //1.给会话发送消息 //如果有异步，上面会加入队列
+            serviceListener.qpsDistribute.record();
             s1.sendAndRequest(MqConstants.MQ_EVENT_DISTRIBUTE, messageHolder.getEntity(), MqNextTime.maxConsumeMillis()).thenReply(r -> {
                 int ack = Integer.parseInt(r.metaOrDefault(MqConstants.MQ_META_ACK, "0"));
                 acknowledgeDo(messageHolder, ack, true);
@@ -424,10 +426,12 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
             if (messageHolder.isBroadcast()) {
                 for (Session s0 : sessionAll()) {
                     if (SessionUtils.isActive(s0)) {
+                        serviceListener.qpsDistribute.record();
                         s0.send(MqConstants.MQ_EVENT_DISTRIBUTE, messageHolder.getEntity());
                     }
                 }
             } else {
+                serviceListener.qpsDistribute.record();
                 s1.send(MqConstants.MQ_EVENT_DISTRIBUTE, messageHolder.getEntity());
             }
 

@@ -22,6 +22,7 @@ import org.noear.solon.annotation.Component;
 import org.noear.solon.annotation.Inject;
 import org.noear.solon.core.AppContext;
 import org.noear.solon.core.bean.LifecycleBean;
+import org.noear.solon.core.event.EventBus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -93,13 +94,17 @@ public class FolkmqLifecycleBean implements LifecycleBean {
 
         //服务端（鉴权为可选。不添加则不鉴权）
         localServer = FolkMQ.createServer(schema)
-                .config(c -> c.serialSend(true)
-                        .maxMemoryRatio(0.8F)
-                        .streamTimeout(MqServerConfig.streamTimeout)
-                        //.readSemaphore(MqConstants.CLIENT_READ_SEMAPHORE_DEFAULT)
-                        .ioThreads(MqServerConfig.ioThreads)
-                        .codecThreads(MqServerConfig.codecThreads)
-                        .exchangeThreads(MqServerConfig.exchangeThreads))
+                .config(c -> {
+                    c.serialSend(true)
+                            .maxMemoryRatio(0.8F)
+                            .streamTimeout(MqServerConfig.streamTimeout)
+                            .readSemaphore(MqConstants.CLIENT_READ_SEMAPHORE_DEFAULT) //起到限流作用
+                            .ioThreads(MqServerConfig.ioThreads)
+                            .codecThreads(MqServerConfig.codecThreads)
+                            .exchangeThreads(MqServerConfig.exchangeThreads);
+
+                    EventBus.publish(c);
+                })
                 .addAccessAll(MqServerConfig.getAccessMap());
 
         if (saveEnable) {
@@ -194,14 +199,16 @@ public class FolkmqLifecycleBean implements LifecycleBean {
         }
 
         brokerSession = (ClusterClientSession) SocketD.createClusterClient(serverUrls)
-                .config(c ->
-                        c.metaPut(MqConstants.FOLKMQ_VERSION, FolkMQ.versionCodeAsString())
-                                .heartbeatInterval(6_000)
-                                .serialSend(true)
-                                .maxMemoryRatio(0.8F)
-                                .ioThreads(MqServerConfig.ioThreads)
-                                .codecThreads(MqServerConfig.codecThreads)
-                                .exchangeThreads(MqServerConfig.exchangeThreads))
+                .config(c -> {
+                    c.metaPut(MqConstants.FOLKMQ_VERSION, FolkMQ.versionCodeAsString())
+                            .heartbeatInterval(6_000)
+                            .serialSend(true)
+                            .maxMemoryRatio(0.8F)
+                            .ioThreads(MqServerConfig.ioThreads)
+                            .codecThreads(MqServerConfig.codecThreads)
+                            .exchangeThreads(MqServerConfig.exchangeThreads);
+                    EventBus.publish(c);
+                })
                 .listen(brokerServiceListener)
                 .open();
 

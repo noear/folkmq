@@ -35,6 +35,18 @@
             <groupId>org.noear</groupId>
             <artifactId>solon-api</artifactId>
             <version>${solon.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.noear</groupId>
+                    <artifactId>solon.boot.smarthttp</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.noear</groupId>
+            <artifactId>solon.boot.jdkhttp</artifactId>
+            <version>${solon.version}</version>
         </dependency>
 
         <dependency>

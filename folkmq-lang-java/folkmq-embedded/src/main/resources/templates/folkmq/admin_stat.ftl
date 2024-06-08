@@ -21,20 +21,21 @@
         <thead>
         <tr>
             <td width="200px" class="left">项目</td>
-            <td class="left">最新流量</td>
-            <td class="left">最大流量</td>
+            <td class="left" width="300px">当前流量（每秒）</td>
+            <td class="left" width="300px">最大流量（每秒）</td>
+            <td></td>
         </tr>
         </thead>
         <tbody id="tbody">
             <tr>
                 <td class="left">接收消息</td>
-                <td class="left">${qpsPublish.lastValue} / 秒</td>
-                <td class="left">${qpsPublish.maxValue} / 秒</td>
+                <td class="left">${qpsPublish.lastValue}</td>
+                <td class="left">${qpsPublish.maxValue}</td>
             </tr>
             <tr>
                 <td class="left">派发消息</td>
-                <td class="left">${qpsDistribute.lastValue} / 秒</td>
-                <td class="left">${qpsDistribute.maxValue} / 秒</td>
+                <td class="left">${qpsDistribute.lastValue}</td>
+                <td class="left">${qpsDistribute.maxValue}</td>
             </tr>
         </tbody>
     </table>

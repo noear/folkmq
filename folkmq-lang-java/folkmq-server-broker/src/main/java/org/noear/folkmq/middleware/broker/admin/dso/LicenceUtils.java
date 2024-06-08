@@ -2,7 +2,6 @@ package org.noear.folkmq.middleware.broker.admin.dso;
 
 import org.noear.folkmq.middleware.broker.common.ConfigNames;
 import org.noear.snack.core.utils.DateUtil;
-import org.noear.solon.Solon;
 import org.noear.solon.Utils;
 
 import java.time.LocalDate;
@@ -22,33 +21,33 @@ public class LicenceUtils {
 
     private static final String publicKey = "MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAI6+FX3DPmY0/dLXOOiVJwBhllQ6a34+8/WKS77L7BB9Ch3oyqXA41zqO3vQM2COIZDTxKSgPuRkOlFaKptoG0cCAwEAAQ==";
 
-    private LicenceDo licenceDo = new LicenceDo();
+    private LicenceDo licenceInfo = new LicenceDo();
 
     /**
      * 串号
      */
     public String getSn() {
-        return licenceDo.sn;
+        return licenceInfo.sn;
     }
 
     /**
      * 产品版本
      */
     public int getEdition() {
-        return licenceDo.edition;
+        return licenceInfo.edition;
     }
 
     /**
      * 产品版本名字
      */
     public String getEditionName() {
-        if (licenceDo.edition == 23) {
+        if (licenceInfo.edition == 23) {
             return "Enterprise Ultimate Edition";
-        } else if (licenceDo.edition == 22) {
+        } else if (licenceInfo.edition == 22) {
             return "Enterprise Premium Edition";
-        } else if (licenceDo.edition == 21) {
+        } else if (licenceInfo.edition == 21) {
             return "Enterprise Standard edition";
-        } else if (licenceDo.edition > 0) {
+        } else if (licenceInfo.edition > 0) {
             return "Unknown Edition";
         } else {
             return "Community Edition";
@@ -59,24 +58,24 @@ public class LicenceUtils {
      * 订阅者
      */
     public String getSubscribe() {
-        return licenceDo.subscribe;
+        return licenceInfo.subscribe;
     }
 
     /**
      * 订阅月数
      */
     public int getMonths() {
-        return licenceDo.months;
+        return licenceInfo.months;
     }
 
     /**
      * 订阅月数字符串模式
      */
     public String getMonthsStr() {
-        if (licenceDo.months >= 36) {
+        if (licenceInfo.months >= 36) {
             return "永久";
         } else {
-            return licenceDo.months + "个月";
+            return licenceInfo.months + "个月";
         }
     }
 
@@ -84,28 +83,28 @@ public class LicenceUtils {
      * 版本号
      */
     public String getVersion() {
-        return licenceDo.version;
+        return licenceInfo.version;
     }
 
     /**
      * 客户
      */
     public String getConsumer() {
-        return licenceDo.consumer;
+        return licenceInfo.consumer;
     }
 
     /**
      * 是否有效
      */
     public boolean isValid() {
-        return licenceDo.isValid;
+        return licenceInfo.isValid;
     }
 
     /**
      * 是否过期
      */
     public boolean isExpired() {
-        if (licenceDo.months >= 36) {
+        if (licenceInfo.months >= 36) {
             return false;
         }
 
@@ -115,9 +114,9 @@ public class LicenceUtils {
         }
 
         try {
-            LocalDate subscribeDate = DateUtil.parse(licenceDo.subscribe).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            LocalDate subscribeDate = DateUtil.parse(licenceInfo.subscribe).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
-            LocalDate tmp = subscribeDate.plusMonths(licenceDo.months);
+            LocalDate tmp = subscribeDate.plusMonths(licenceInfo.months);
             //当前时间大于授权时间
             return LocalDate.now().compareTo(tmp) > 0;
         } catch (Throwable e) {
@@ -129,7 +128,7 @@ public class LicenceUtils {
      * 描述
      */
     public String getDescription() {
-        return licenceDo.description;
+        return licenceInfo.description;
     }
 
 
@@ -168,6 +167,9 @@ public class LicenceUtils {
                 if (tmp.edition > 20 && tmp.edition < 30) {
                     //0 Community Edition, 21.Enterprise Standard edition, 22 Enterprise Premium Edition, 23 Enterprise Ultimate Edition
 
+                    licenceInfo = tmp;
+                    licenceInfo.isValid = true;
+
                     StringBuilder buf = new StringBuilder();
                     buf.append("Licence (for FolkMQ): ");
                     buf.append("SN=").append(getSn()).append(", ");
@@ -175,8 +177,7 @@ public class LicenceUtils {
                     buf.append("T=").append(getSubscribe()).append(", ");
                     buf.append("M=").append(getMonths());
 
-                    tmp.isValid = true;
-                    tmp.description = buf.toString();
+                    licenceInfo.description = buf.toString();
                 }
             }
 
@@ -185,10 +186,9 @@ public class LicenceUtils {
         }
 
         if (tmp.isValid) {
-            this.licenceDo = tmp;
             ConfigUtils.set(ConfigNames.folkmq_licence, licenceEncoded);
         } else {
-            tmp.description = "Licence (for FolkMQ): Unauthorized (with legal risks)";
+            licenceInfo.description = "Licence (for FolkMQ): Unauthorized (with legal risks)";
         }
 
         return tmp.isValid;

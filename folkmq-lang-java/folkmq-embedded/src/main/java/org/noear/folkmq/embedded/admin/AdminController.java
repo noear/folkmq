@@ -42,6 +42,16 @@ public class AdminController extends BaseController {
         return view("admin");
     }
 
+    @Mapping("/admin/stat")
+    public ModelAndView stat() {
+        ModelAndView mv = view("admin_stat");
+
+        mv.put("qpsPublish",serviceInternal.getQpsPublish());
+        mv.put("qpsDistribute",serviceInternal.getQpsDistribute());
+
+        return mv;
+    }
+
     @Mapping("/admin/topic")
     public ModelAndView topic() {
         Iterator<Map.Entry<String, Set<String>>> iterator = serviceInternal.getSubscribeMap().entrySet().iterator();

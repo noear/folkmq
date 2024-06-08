@@ -1,6 +1,8 @@
 package org.noear.folkmq.middleware.server;
 
+import org.noear.folkmq.common.MqConstants;
 import org.noear.folkmq.embedded.MqServerConfig;
+import org.noear.socketd.transport.client.ClientConfig;
 import org.noear.socketd.transport.server.ServerConfig;
 import org.noear.solon.Solon;
 import org.noear.solon.core.event.AppPluginLoadEndEvent;
@@ -18,6 +20,11 @@ public class App {
 
             app.onEvent(ServerConfig.class, c -> {
                 c.readSemaphore(0);
+            });
+
+            app.onEvent(ClientConfig.class, c -> {
+                c.readSemaphore(0);
+                c.writeSemaphore(MqConstants.CLIENT_WRITE_SEMAPHORE_DEFAULT);
             });
         });
     }

@@ -144,7 +144,6 @@ public class MqClientDefault implements MqClientInternal {
                             .serialSend(true)
                             .streamTimeout(MqConstants.CLIENT_STREAM_TIMEOUT_DEFAULT)
                             .writeSemaphore(MqConstants.CLIENT_WRITE_SEMAPHORE_DEFAULT)
-                            .readSemaphore(MqConstants.CLIENT_READ_SEMAPHORE_DEFAULT)
                             .ioThreads(1)
                             .codecThreads(1)
                             .exchangeThreads(1);

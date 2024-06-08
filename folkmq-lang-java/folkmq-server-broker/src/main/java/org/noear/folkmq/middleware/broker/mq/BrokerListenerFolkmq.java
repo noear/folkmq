@@ -127,18 +127,35 @@ public class BrokerListenerFolkmq extends BrokerListener {
         if (MqConstants.BROKER_AT_SERVER.equals(session.name()) == false) {
             //如果不是 server，直接添加为 player
             super.onOpen(session);
-        }
 
-        log.info("Player channel opened, sessionId={}, ip={}",
-                session.sessionId(),
-                session.remoteAddress().getAddress().getHostAddress());
+            log.info("Client channel opened, sessionId={}, ip={}",
+                    session.sessionId(),
+                    session.remoteAddress());
+        } else {
+            log.info("Server channel opened, sessionId={}, ip={}",
+                    session.sessionId(),
+                    session.remoteAddress());
+        }
     }
 
     @Override
     public void onClose(Session session) {
         super.onClose(session);
 
-        log.info("Player channel closed, sessionId={}", session.sessionId());
+        try {
+            if (MqConstants.BROKER_AT_SERVER.equals(session.name()) == false) {
+                log.info("Client channel closed, sessionId={}, ip={}",
+                        session.sessionId(),
+                        session.remoteAddress());
+            } else {
+                log.info("Server channel closed, sessionId={}, ip={}",
+                        session.sessionId(),
+                        session.remoteAddress());
+            }
+        } catch (Throwable e) {
+            //乎略
+        }
+
 
         Collection<String> atList = session.attrMap().keySet();
         if (atList.size() > 0) {
@@ -215,9 +232,9 @@ public class BrokerListenerFolkmq extends BrokerListener {
                 addPlayer(name, requester);
             }
 
-            log.info("Player channel joined, sessionId={}, ip={}",
+            log.info("Server channel joined, sessionId={}, ip={}",
                     requester.sessionId(),
-                    requester.remoteAddress().getAddress().getHostAddress());
+                    requester.remoteAddress());
 
             //答复
             requester.reply(message, new StringEntity("1"));
@@ -251,9 +268,9 @@ public class BrokerListenerFolkmq extends BrokerListener {
         }
 
         if (message.event().startsWith(MqConstants.ADMIN_PREFIX)) {
-            log.warn("Player channel admin events are not allowed, sessionId={}, ip={}",
+            log.warn("Client channel admin events are not allowed, sessionId={}, ip={}",
                     requester.sessionId(),
-                    requester.remoteAddress().getAddress().getHostAddress());
+                    requester.remoteAddress());
             return;
         }
 

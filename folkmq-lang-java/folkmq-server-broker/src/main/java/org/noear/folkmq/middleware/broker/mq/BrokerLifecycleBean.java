@@ -81,6 +81,10 @@ public class BrokerLifecycleBean implements LifecycleBean {
                     .start();
         }
 
+        //启动
+        brokerListener.start();
+
+        //注册
         appContext.wrapAndPut(BrokerListenerFolkmq.class, brokerListener);
 
         log.info("Server:main: folkmq-server-broker: Started (SOCKET.D/{}-{}, folkmq/{})",

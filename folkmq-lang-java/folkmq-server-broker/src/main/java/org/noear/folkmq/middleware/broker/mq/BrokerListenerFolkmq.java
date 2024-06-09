@@ -6,7 +6,7 @@ import org.noear.folkmq.common.MqUtils;
 import org.noear.folkmq.server.MqNextTime;
 import org.noear.folkmq.server.MqQps;
 import org.noear.snack.ONode;
-import org.noear.socketd.broker.BrokerListener;
+import org.noear.socketd.broker.BrokerListenerPlus;
 import org.noear.socketd.transport.core.Entity;
 import org.noear.socketd.transport.core.EntityMetas;
 import org.noear.socketd.transport.core.Message;
@@ -27,7 +27,7 @@ import java.util.concurrent.ScheduledFuture;
  * @author noear
  * @since 1.0
  */
-public class BrokerListenerFolkmq extends BrokerListener {
+public class BrokerListenerFolkmq extends BrokerListenerPlus {
     private final BrokerApiHandler apiHandler;
     private final MqQps qpsPublish = new MqQps();
     private final MqQps qpsDistribute = new MqQps();
@@ -124,15 +124,15 @@ public class BrokerListenerFolkmq extends BrokerListener {
             }
         }
 
-        if (MqConstants.BROKER_AT_SERVER.equals(session.name()) == false) {
+        if (MqConstants.BROKER_AT_SERVER.equals(session.name())) {
+            log.info("Server channel opened, sessionId={}, ip={}",
+                    session.sessionId(),
+                    session.remoteAddress());
+        } else {
             //如果不是 server，直接添加为 player
             super.onOpen(session);
 
             log.info("Client channel opened, sessionId={}, ip={}",
-                    session.sessionId(),
-                    session.remoteAddress());
-        } else {
-            log.info("Server channel opened, sessionId={}, ip={}",
                     session.sessionId(),
                     session.remoteAddress());
         }
@@ -142,18 +142,16 @@ public class BrokerListenerFolkmq extends BrokerListener {
     public void onClose(Session session) {
         super.onClose(session);
 
-        try {
-            if (MqConstants.BROKER_AT_SERVER.equals(session.name()) == false) {
-                log.info("Client channel closed, sessionId={}, ip={}",
-                        session.sessionId(),
-                        session.remoteAddress());
-            } else {
-                log.info("Server channel closed, sessionId={}, ip={}",
-                        session.sessionId(),
-                        session.remoteAddress());
-            }
-        } catch (Throwable e) {
-            //乎略
+
+        //不打印 ip，否则可能异常
+        if (MqConstants.BROKER_AT_SERVER.equals(session.name())) {
+            log.info("Server channel closed, sessionId={}, code={}",
+                    session.sessionId(),
+                    session.closeCode());
+        } else {
+            log.info("Client channel closed, sessionId={}, code={}",
+                    session.sessionId(),
+                    session.closeCode());
         }
 
 
@@ -167,7 +165,7 @@ public class BrokerListenerFolkmq extends BrokerListener {
     }
 
     @Override
-    public void onMessage(Session requester, Message message) throws IOException {
+    public void onMessageDo(Session requester, Message message) throws IOException {
         if (MqConstants.MQ_EVENT_SUBSCRIBE.equals(message.event())) {
             onSubscribe(requester, message);
         } else if (MqConstants.MQ_EVENT_UNSUBSCRIBE.equals(message.event())) {
@@ -193,7 +191,7 @@ public class BrokerListenerFolkmq extends BrokerListener {
                 for (Session s0 : getPlayerAll(atName)) {
                     if (SessionUtils.isActive(s0)) {
                         try {
-                            forwardToSession2(requester, message, s0, MqNextTime.maxConsumeMillis());
+                            forwardToSession(requester, message, s0, MqNextTime.maxConsumeMillis());
                         } catch (Throwable e) {
                             acknowledgeAsNo(requester, message);
                         }
@@ -205,7 +203,7 @@ public class BrokerListenerFolkmq extends BrokerListener {
                 if (SessionUtils.isActive(responder)) {
                     //转发消息
                     try {
-                        forwardToSession2(requester, message, responder, MqNextTime.maxConsumeMillis());
+                        forwardToSession(requester, message, responder, MqNextTime.maxConsumeMillis());
                     } catch (Throwable e) {
                         acknowledgeAsNo(requester, message);
                     }
@@ -252,7 +250,7 @@ public class BrokerListenerFolkmq extends BrokerListener {
             if (responder != null && responder.isValid()) {
                 //转发消息
                 try {
-                    forwardToSession2(requester, message, responder, MqNextTime.maxConsumeMillis());
+                    forwardToSession(requester, message, responder, MqNextTime.maxConsumeMillis());
                 } catch (Throwable e) {
                     requester.sendAlarm(message, "Broker forward '@" + atName + "' error: " + e.getMessage());
                 }
@@ -279,39 +277,7 @@ public class BrokerListenerFolkmq extends BrokerListener {
             qpsPublish.record();
         }
 
-        super.onMessage(requester, message);
-    }
-
-    private void forwardToSession2(Session requester, Message message, Session responder, long timeout) throws IOException {
-        if (message.isRequest()) {
-            responder.sendAndRequest(message.event(), message, timeout).thenReply(reply -> {
-                if (SessionUtils.isValid(requester)) {
-                    requester.reply(message, reply);
-                }
-            }).thenError(err -> {
-                //传递异常
-                if (SessionUtils.isValid(requester)) {
-                    RunUtils.runAndTry(() -> requester.sendAlarm(message, err.getMessage()));
-                }
-            });
-        } else if (message.isSubscribe()) {
-            responder.sendAndSubscribe(message.event(), message, timeout).thenReply(reply -> {
-                if (SessionUtils.isValid(requester)) {
-                    if (reply.isEnd()) {
-                        requester.replyEnd(message, reply);
-                    } else {
-                        requester.reply(message, reply);
-                    }
-                }
-            }).thenError(err -> {
-                //传递异常
-                if (SessionUtils.isValid(requester)) {
-                    RunUtils.runAndTry(() -> requester.sendAlarm(message, err.getMessage()));
-                }
-            });
-        } else {
-            responder.send(message.event(), message);
-        }
+        super.onMessageDo(requester, message);
     }
 
     private void onSubscribe(Session requester, Message message) {

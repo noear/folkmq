@@ -135,12 +135,16 @@ public class ViewQueueService implements LifecycleBean {
                         String json = r.dataAsString();
                         List<QueueVo> list = ONode.loadStr(json).toObjectList(QueueVo.class);
                         addQueueVo(list, queueVoMapTmp);
+                    }).thenError(err -> {
+                        log.debug(MqConstants.ADMIN_VIEW_QUEUE + " request failed", err);
                     });
 
                     session.sendAndRequest(MqConstants.ADMIN_VIEW_INSTANCE, reqEntity).thenReply(r -> {
                         String json = r.dataAsString();
                         ServerInfoVo infoVo = ONode.loadStr(json).toObject(ServerInfoVo.class);
                         session.attrPut("ServerInfoVo", infoVo);
+                    }).thenError(err -> {
+                        log.debug(MqConstants.ADMIN_VIEW_INSTANCE + " request failed", err);
                     });
                 } catch (Throwable e) {
                     log.warn("Cmd 'admin.view.queue' call error", e);

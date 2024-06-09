@@ -52,24 +52,18 @@ public class MqWatcherSnapshotPlus extends MqWatcherSnapshot {
     }
 
     public MqWatcherSnapshotPlus save900Condition(long save900Condition) {
-        if (save900Condition >= 1L) {
-            this.save900Condition = save900Condition;
-        }
+        this.save900Condition = save900Condition;
         return this;
     }
 
     public MqWatcherSnapshotPlus save300Condition(long save300Condition) {
-        if (save300Condition >= 1L) {
-            this.save300Condition = save300Condition;
-        }
+        this.save300Condition = save300Condition;
 
         return this;
     }
 
     public MqWatcherSnapshotPlus save100Condition(long save100Condition) {
-        if (save100Condition >= 1L) {
-            this.save100Condition = save100Condition;
-        }
+        this.save100Condition = save100Condition;
 
         return this;
     }
@@ -89,11 +83,13 @@ public class MqWatcherSnapshotPlus extends MqWatcherSnapshot {
     private void onSave900() {
         long count = save900Count.sumThenReset();
 
-        if (count >= save900Condition) {
-            onSave();
-        } else {
-            if (log.isDebugEnabled()) {
-                log.debug("No trigger save900 condition!");
+        if (save900Condition > 1L) {
+            if (count >= save900Condition) {
+                onSave();
+            } else {
+                if (log.isDebugEnabled()) {
+                    log.debug("No trigger save900 condition!");
+                }
             }
         }
     }
@@ -101,11 +97,13 @@ public class MqWatcherSnapshotPlus extends MqWatcherSnapshot {
     private void onSave300() {
         long count = save300Count.sumThenReset();
 
-        if (count >= save300Condition) {
-            onSave();
-        } else {
-            if (log.isDebugEnabled()) {
-                log.debug("No trigger save300 condition!");
+        if (save300Condition > 0) {
+            if (count >= save300Condition) {
+                onSave();
+            } else {
+                if (log.isDebugEnabled()) {
+                    log.debug("No trigger save300 condition!");
+                }
             }
         }
     }
@@ -113,11 +111,13 @@ public class MqWatcherSnapshotPlus extends MqWatcherSnapshot {
     private void onSave100() {
         long count = save100Count.sumThenReset();
 
-        if (count >= save100Condition) {
-            onSave();
-        } else {
-            if (log.isDebugEnabled()) {
-                log.debug("No trigger save100 condition!");
+        if (save100Condition > 0) {
+            if (count >= save100Condition) {
+                onSave();
+            } else {
+                if (log.isDebugEnabled()) {
+                    log.debug("No trigger save100 condition!");
+                }
             }
         }
     }

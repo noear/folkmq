@@ -83,8 +83,8 @@ public class AdminController extends BaseController {
     public ModelAndView stat() {
         ModelAndView mv = view("admin_stat");
 
-        mv.put("qpsPublish", brokerListener.getQpsPublish());
-        mv.put("qpsDistribute", brokerListener.getQpsDistribute());
+        mv.put("qpsInput", brokerListener.getQpsInput());
+        mv.put("qpsOutput", brokerListener.getQpsOutput());
 
         return mv;
     }

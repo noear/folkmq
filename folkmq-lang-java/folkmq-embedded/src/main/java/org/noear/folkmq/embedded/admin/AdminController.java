@@ -46,8 +46,8 @@ public class AdminController extends BaseController {
     public ModelAndView stat() {
         ModelAndView mv = view("admin_stat");
 
-        mv.put("qpsPublish",serviceInternal.getQpsPublish());
-        mv.put("qpsDistribute",serviceInternal.getQpsDistribute());
+        mv.put("qpsInput",serviceInternal.getQpsPublish());
+        mv.put("qpsOutput",serviceInternal.getQpsDistribute());
 
         return mv;
     }

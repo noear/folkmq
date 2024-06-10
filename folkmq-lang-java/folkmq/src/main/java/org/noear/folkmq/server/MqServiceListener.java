@@ -281,8 +281,8 @@ public class MqServiceListener extends MqServiceListenerBase implements MqServic
         session.handshake().outMeta(MqConstants.FOLKMQ_VERSION, FolkMQ.versionCodeAsString());
 
         if (brokerMode) {
-            //申请加入
-            session.sendAndRequest(MqConstants.MQ_EVENT_JOIN, new StringEntity("").metaPut(EntityMetas.META_X_UNLIMITED, "1"), 30_000).await();
+            //申请加入 //不要用 sendAndRequest
+            session.send(MqConstants.MQ_EVENT_JOIN, new StringEntity("").metaPut(EntityMetas.META_X_UNLIMITED, "1"));
 
             log.info("Broker channel opened, sessionId={}", session.sessionId());
         } else {

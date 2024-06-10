@@ -6,6 +6,8 @@ server.session:
 solon.app:
   group: folkmq
   name: folkmq-server
+
+solon:
   stop:
     delay: "4s"
 
@@ -19,7 +21,7 @@ folkmq.snapshot:
   enable: true
   save900: 1
   save300: 10
-  save100: 10000
+  save100: 0
 
 folkmq:
   path: "/folkmq"

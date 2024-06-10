@@ -11,6 +11,7 @@ import org.noear.socketd.transport.core.Entity;
 import org.noear.socketd.transport.core.EntityMetas;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
+import org.noear.socketd.transport.core.entity.PressureEntity;
 import org.noear.socketd.transport.core.entity.StringEntity;
 import org.noear.socketd.utils.RunUtils;
 import org.noear.socketd.utils.SessionUtils;
@@ -29,16 +30,16 @@ import java.util.concurrent.ScheduledFuture;
  */
 public class BrokerListenerFolkmq extends BrokerListenerPlus {
     private final BrokerApiHandler apiHandler;
-    private final MqQps qpsPublish = new MqQps();
-    private final MqQps qpsDistribute = new MqQps();
+    private final MqQps qpsInput = new MqQps();
+    private final MqQps qpsOutput = new MqQps();
     private final ScheduledFuture<?> qpsScheduled;
 
-    public MqQps getQpsDistribute() {
-        return qpsDistribute;
+    public MqQps getQpsInput() {
+        return qpsInput;
     }
 
-    public MqQps getQpsPublish() {
-        return qpsPublish;
+    public MqQps getQpsOutput() {
+        return qpsOutput;
     }
 
     //访问账号
@@ -57,12 +58,15 @@ public class BrokerListenerFolkmq extends BrokerListenerPlus {
         this.apiHandler = apiHandler;
 
         this.qpsScheduled = RunUtils.delayAndRepeat(()->{
-            qpsPublish.reset();
-            qpsDistribute.reset();
+            qpsInput.reset();
+            qpsOutput.reset();
         },5_000);
     }
 
+    @Override
     public void stop() {
+        super.stop();
+
         if (qpsScheduled != null) {
             qpsScheduled.cancel(true);
         }
@@ -164,6 +168,29 @@ public class BrokerListenerFolkmq extends BrokerListenerPlus {
         }
     }
 
+    private long maxPressure = 1200;
+    @Override
+    public void onMessage(Session requester, Message message) throws IOException {
+        if (brokerMessageCount.longValue() > maxPressure) {
+            if (MqConstants.BROKER_AT_SERVER.equals(requester.name()) == false) {
+                if (message.meta(EntityMetas.META_X_UNLIMITED) == null) {
+                    //如果压力过高
+                    requester.sendPressure(message, PressureEntity.getInstance());
+                    try {
+                        Thread.sleep(10);
+                    } catch (Throwable ex) {
+                        //乎略
+                    }
+                }
+            }
+        }
+
+        //记录流量
+        qpsInput.record();
+
+        super.onMessage(requester, message);
+    }
+
     @Override
     public void onMessageDo(Session requester, Message message) throws IOException {
         if (MqConstants.MQ_EVENT_SUBSCRIBE.equals(message.event())) {
@@ -176,9 +203,6 @@ public class BrokerListenerFolkmq extends BrokerListenerPlus {
 
             removePlayer(queueName, requester);
         } else if (MqConstants.MQ_EVENT_DISTRIBUTE.equals(message.event())) {
-            //记录流量
-            qpsDistribute.record();
-
             String atName = message.atName();
             boolean isBroadcast = MqUtils.getV2().isBroadcast(message.entity());
 
@@ -221,8 +245,13 @@ public class BrokerListenerFolkmq extends BrokerListenerPlus {
                 Entity entity = new StringEntity(json)
                         .metaPut(MqConstants.MQ_META_BATCH, "1")
                         .metaPut(EntityMetas.META_X_UNLIMITED, "1");
-                requester.sendAndRequest(MqConstants.MQ_EVENT_SUBSCRIBE, entity, 30_000).await();
+
+                //不用 sendAndRequest
+                requester.send(MqConstants.MQ_EVENT_SUBSCRIBE, entity);
             }
+
+            //标为不限制
+            requester.attrPut(EntityMetas.META_X_UNLIMITED, "1");
 
             //注册服务
             String name = requester.name();
@@ -235,14 +264,13 @@ public class BrokerListenerFolkmq extends BrokerListenerPlus {
                     requester.remoteAddress());
 
             //答复
-            requester.reply(message, new StringEntity("1"));
+            if(message.isRequest()) {
+                requester.reply(message, new StringEntity("1"));
+            }
 
             //结束处理
             return;
         } else if (MqConstants.MQ_EVENT_REQUEST.equals(message.event())) {
-            //记录流量
-            qpsPublish.record();
-
             String atName = message.atName();
 
             //单发模式（给同名的某个玩家，轮询负截均衡）
@@ -270,11 +298,6 @@ public class BrokerListenerFolkmq extends BrokerListenerPlus {
                     requester.sessionId(),
                     requester.remoteAddress());
             return;
-        }
-
-        if(MqConstants.MQ_EVENT_PUBLISH.equals(message.event())) {
-            //记录流量
-            qpsPublish.record();
         }
 
         super.onMessageDo(requester, message);
@@ -321,6 +344,8 @@ public class BrokerListenerFolkmq extends BrokerListenerPlus {
         Session responder = this.getPlayerAny(MqConstants.BROKER_AT_SERVER, null, null);
 
         if (responder != null) {
+            qpsOutput.record();
+
             if (qos > 0) {
                 responder.sendAndRequest(MqConstants.MQ_EVENT_PUBLISH, routingMessage).await();
             } else {
@@ -333,9 +358,16 @@ public class BrokerListenerFolkmq extends BrokerListenerPlus {
         }
     }
 
+    @Override
+    public void forwardToSession(Session requester, Message message, Session responder, long timeout) throws IOException {
+        qpsOutput.record();
+        super.forwardToSession(requester, message, responder, timeout);
+    }
+
     private void acknowledgeAsNo(Session requester, Message message) throws IOException {
         //如果没有会话，自动转为ACK失败
         if (message.isSubscribe() || message.isRequest()) {
+            qpsOutput.record();
             requester.replyEnd(message, new StringEntity("")
                     .metaPut(MqConstants.MQ_META_ACK, "0"));
         }

@@ -2,12 +2,14 @@ package org.noear.folkmq.middleware.broker.mq;
 
 import org.noear.folkmq.FolkMQ;
 import org.noear.folkmq.common.MqConstants;
+import org.noear.folkmq.common.MqMetasResolver;
 import org.noear.folkmq.common.MqUtils;
 import org.noear.folkmq.server.MqNextTime;
 import org.noear.folkmq.server.MqQps;
 import org.noear.snack.ONode;
 import org.noear.socketd.broker.BrokerListenerPlus;
 import org.noear.socketd.transport.core.*;
+import org.noear.socketd.transport.core.entity.EntityDefault;
 import org.noear.socketd.transport.core.entity.PressureEntity;
 import org.noear.socketd.transport.core.entity.StringEntity;
 import org.noear.socketd.utils.RunUtils;
@@ -54,10 +56,10 @@ public class BrokerListenerFolkmq extends BrokerListenerPlus {
     public BrokerListenerFolkmq(BrokerApiHandler apiHandler) {
         this.apiHandler = apiHandler;
 
-        this.qpsScheduled = RunUtils.delayAndRepeat(()->{
+        this.qpsScheduled = RunUtils.delayAndRepeat(() -> {
             qpsInput.reset();
             qpsOutput.reset();
-        },5_000);
+        }, 5_000);
     }
 
     @Override
@@ -166,6 +168,7 @@ public class BrokerListenerFolkmq extends BrokerListenerPlus {
     }
 
     private long maxPressure = 1200;
+
     @Override
     public void onMessage(Session requester, Message message) throws IOException {
         //记录流量
@@ -273,7 +276,7 @@ public class BrokerListenerFolkmq extends BrokerListenerPlus {
                     requester.remoteAddress());
 
             //答复
-            if(message.isRequest()) {
+            if (message.isRequest()) {
                 requester.reply(message, new StringEntity("1"));
             }
 
@@ -368,8 +371,18 @@ public class BrokerListenerFolkmq extends BrokerListenerPlus {
     private void acknowledgeAsNo(Session requester, Message message) throws IOException {
         //如果没有会话，自动转为ACK失败
         if (message.isSubscribe() || message.isRequest()) {
-            requester.replyEnd(message, new StringEntity("")
-                    .metaPut(MqConstants.MQ_META_ACK, "0"));
+            MqMetasResolver mr = MqUtils.getOf(message);
+            String key = mr.getKey(message);
+            String topic = mr.getTopic(message);
+            String consumerGroup = mr.getConsumerGroup(message);
+
+            EntityDefault entity = new EntityDefault();
+            entity.metaPut(MqConstants.MQ_META_TOPIC, topic);
+            entity.metaPut(MqConstants.MQ_META_CONSUMER_GROUP, consumerGroup);
+            entity.metaPut(MqConstants.MQ_META_KEY, key);
+            entity.metaPut(MqConstants.MQ_META_ACK, "0");
+
+            requester.replyEnd(message, entity);
         }
     }
 }

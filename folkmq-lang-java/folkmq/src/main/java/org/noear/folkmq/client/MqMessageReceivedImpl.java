@@ -7,6 +7,7 @@ import org.noear.folkmq.common.MqTopicHelper;
 import org.noear.socketd.transport.core.Entity;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
+import org.noear.socketd.transport.core.entity.EntityDefault;
 
 import java.io.IOException;
 import java.util.Date;
@@ -184,7 +185,12 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
 
     @Override
     public void acknowledge(boolean isOk) throws IOException {
-        clientInternal.reply(session, source, this, isOk, null);
+        EntityDefault entity = new EntityDefault();
+        entity.metaPut(MqConstants.MQ_META_TOPIC, topic);
+        entity.metaPut(MqConstants.MQ_META_CONSUMER_GROUP, consumerGroup);
+        entity.metaPut(MqConstants.MQ_META_KEY, key);
+
+        clientInternal.reply(session, source, this, isOk, entity);
     }
 
     @Override

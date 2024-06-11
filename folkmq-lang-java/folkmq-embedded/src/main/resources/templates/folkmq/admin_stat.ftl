@@ -28,12 +28,12 @@
         </thead>
         <tbody id="tbody">
             <tr>
-                <td class="left">接收消息</td>
+                <td class="left">接收用户消息</td>
                 <td class="left">${qpsInput.lastValue}</td>
                 <td class="left">${qpsInput.maxValue}</td>
             </tr>
             <tr>
-                <td class="left">派发消息</td>
+                <td class="left">派发用户消息</td>
                 <td class="left">${qpsOutput.lastValue}</td>
                 <td class="left">${qpsOutput.maxValue}</td>
             </tr>

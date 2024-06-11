@@ -7,10 +7,7 @@ import org.noear.folkmq.server.MqNextTime;
 import org.noear.folkmq.server.MqQps;
 import org.noear.snack.ONode;
 import org.noear.socketd.broker.BrokerListenerPlus;
-import org.noear.socketd.transport.core.Entity;
-import org.noear.socketd.transport.core.EntityMetas;
-import org.noear.socketd.transport.core.Message;
-import org.noear.socketd.transport.core.Session;
+import org.noear.socketd.transport.core.*;
 import org.noear.socketd.transport.core.entity.PressureEntity;
 import org.noear.socketd.transport.core.entity.StringEntity;
 import org.noear.socketd.utils.RunUtils;
@@ -171,7 +168,10 @@ public class BrokerListenerFolkmq extends BrokerListenerPlus {
     private long maxPressure = 1200;
     @Override
     public void onMessage(Session requester, Message message) throws IOException {
-        if (brokerMessageCount.longValue() > maxPressure) {
+        //记录流量
+        qpsInput.record();
+
+        if (brokerMessageCounter.longValue() > maxPressure) {
             if (MqConstants.BROKER_AT_SERVER.equals(requester.name()) == false) {
                 if (message.meta(EntityMetas.META_X_UNLIMITED) == null) {
                     //如果压力过高
@@ -185,10 +185,19 @@ public class BrokerListenerFolkmq extends BrokerListenerPlus {
             }
         }
 
+        super.onMessage(requester, message);
+    }
+
+    @Override
+    public void onReply(Session session, Reply reply) {
         //记录流量
         qpsInput.record();
+    }
 
-        super.onMessage(requester, message);
+    @Override
+    public void onSend(Session session, Message message) {
+        //记录输出
+        qpsOutput.record();
     }
 
     @Override
@@ -344,8 +353,6 @@ public class BrokerListenerFolkmq extends BrokerListenerPlus {
         Session responder = this.getPlayerAny(MqConstants.BROKER_AT_SERVER, null, null);
 
         if (responder != null) {
-            qpsOutput.record();
-
             if (qos > 0) {
                 responder.sendAndRequest(MqConstants.MQ_EVENT_PUBLISH, routingMessage).await();
             } else {
@@ -358,16 +365,9 @@ public class BrokerListenerFolkmq extends BrokerListenerPlus {
         }
     }
 
-    @Override
-    public void forwardToSession(Session requester, Message message, Session responder, long timeout) throws IOException {
-        qpsOutput.record();
-        super.forwardToSession(requester, message, responder, timeout);
-    }
-
     private void acknowledgeAsNo(Session requester, Message message) throws IOException {
         //如果没有会话，自动转为ACK失败
         if (message.isSubscribe() || message.isRequest()) {
-            qpsOutput.record();
             requester.replyEnd(message, new StringEntity("")
                     .metaPut(MqConstants.MQ_META_ACK, "0"));
         }

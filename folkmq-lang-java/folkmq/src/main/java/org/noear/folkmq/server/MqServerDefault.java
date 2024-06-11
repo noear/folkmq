@@ -101,8 +101,6 @@ public class MqServerDefault implements MqServer {
         server.config(c -> c.serialSend(true)
                 .maxMemoryRatio(0.8F)
                 .streamTimeout(MqConstants.SERVER_STREAM_TIMEOUT_DEFAULT)
-                .readRateLimit(10 * 1024 * 1024)
-                .writeRateLimit(10 * 1024 * 1024)
                 .ioThreads(1)
                 .codecThreads(1)
                 .exchangeThreads(1));

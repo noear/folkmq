@@ -13,12 +13,10 @@ import org.noear.socketd.exception.SocketDConnectionException;
 import org.noear.socketd.exception.SocketDException;
 import org.noear.socketd.transport.client.ClientConfigHandler;
 import org.noear.socketd.transport.client.ClientSession;
-import org.noear.socketd.transport.core.Entity;
-import org.noear.socketd.transport.core.EntityMetas;
-import org.noear.socketd.transport.core.Message;
-import org.noear.socketd.transport.core.Session;
+import org.noear.socketd.transport.core.*;
 import org.noear.socketd.transport.core.entity.EntityDefault;
 import org.noear.socketd.transport.core.entity.StringEntity;
+import org.noear.socketd.transport.core.impl.TrafficLimiterDefault;
 import org.noear.socketd.transport.stream.RequestStream;
 import org.noear.socketd.utils.StrUtils;
 import org.slf4j.Logger;
@@ -143,10 +141,7 @@ public class MqClientDefault implements MqClientInternal {
                             .maxMemoryRatio(0.8F)
                             .serialSend(true)
                             .streamTimeout(MqConstants.CLIENT_STREAM_TIMEOUT_DEFAULT)
-                            .writeSemaphore(MqConstants.CLIENT_WRITE_SEMAPHORE_DEFAULT)
-                            .readRateLimit(10 * 1024 * 1024)
-                            .writeRateLimit(2 * 1024 * 1024)
-                            .ioRatio(50)
+                            .trafficLimiter(new TrafficLimiterDefault(10_000))
                             .ioThreads(1)
                             .codecThreads(1)
                             .exchangeThreads(1);

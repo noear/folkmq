@@ -98,9 +98,6 @@ public class FolkmqLifecycleBean implements LifecycleBean {
                     c.serialSend(true)
                             .maxMemoryRatio(0.8F)
                             .streamTimeout(MqServerConfig.streamTimeout)
-                            .readSemaphore(MqConstants.CLIENT_READ_SEMAPHORE_DEFAULT) //起到限流作用
-                            .readRateLimit(10 * 1024 * 1024)
-                            .writeRateLimit(10 * 1024 * 1024)
                             .ioThreads(MqServerConfig.ioThreads)
                             .codecThreads(MqServerConfig.codecThreads)
                             .exchangeThreads(MqServerConfig.exchangeThreads);
@@ -206,8 +203,6 @@ public class FolkmqLifecycleBean implements LifecycleBean {
                             .heartbeatInterval(6_000)
                             .serialSend(true)
                             .maxMemoryRatio(0.8F)
-                            .readRateLimit(10 * 1024 * 1024)
-                            .writeRateLimit(10 * 1024 * 1024)
                             .ioThreads(MqServerConfig.ioThreads)
                             .codecThreads(MqServerConfig.codecThreads)
                             .exchangeThreads(MqServerConfig.exchangeThreads);

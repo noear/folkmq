@@ -19,13 +19,11 @@ public class App {
             });
 
             app.onEvent(ServerConfig.class, c -> {
-                c.readSemaphore(0);
-                c.writeSemaphore(0);
+
             });
 
             app.onEvent(ClientConfig.class, c -> {
-                c.readSemaphore(0);
-                c.writeSemaphore(0);
+
             });
         });
     }

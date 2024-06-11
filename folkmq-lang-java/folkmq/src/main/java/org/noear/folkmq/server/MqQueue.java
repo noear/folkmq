@@ -61,9 +61,14 @@ public interface MqQueue {
     void removeAt(String key);
 
     /**
-     * 确认消息
+     * 确认事务消息
      * */
     void affirmAt(String key, boolean isRollback);
+
+    /**
+     * 确认派发消息
+     * */
+    void acknowledgeAt(String key, int ack);
 
     /**
      * 派发消息

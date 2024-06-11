@@ -14,7 +14,7 @@ public class FolkMQ {
      * 获取版本代号（用于控制元信息版本）
      */
     public static int versionCode() {
-        return 2;
+        return 3;
     }
 
     /**

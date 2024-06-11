@@ -26,6 +26,13 @@ public class MqDraft {
     public final boolean transaction;
     public final String sequenceSharding;
 
+    /**
+     * 协议版本号
+     */
+    public int version() {
+        return mr.version();
+    }
+
     public MqDraft(MqMetasResolver mr, Message source) {
         this.mr = mr;
         this.source = source;

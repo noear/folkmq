@@ -444,6 +444,14 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
         }
     }
 
+    @Override
+    public void acknowledgeAt(String key, int ack) {
+        MqMessageHolder messageHolder = messageMap.get(key);
+        if (messageHolder != null) {
+            acknowledgeDo(messageHolder, ack, true);
+        }
+    }
+
     private void acknowledgeDo(MqMessageHolder messageHolder, int ack, boolean removeQueue) {
         try {
             if (messageMap.containsKey(messageHolder.getKey()) == false) {

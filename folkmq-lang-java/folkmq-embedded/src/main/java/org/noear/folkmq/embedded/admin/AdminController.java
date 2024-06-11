@@ -8,7 +8,6 @@ import org.noear.folkmq.server.watcher.MqWatcherSnapshotPlus;
 import org.noear.snack.core.utils.DateUtil;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.utils.RunUtils;
-import org.noear.solon.annotation.Controller;
 import org.noear.solon.annotation.Inject;
 import org.noear.solon.annotation.Mapping;
 import org.noear.solon.core.handle.ModelAndView;
@@ -98,10 +97,10 @@ public class AdminController extends BaseController {
             if (serviceInternal.hasSubscribe(topic)) {
                 Date scheduledDate = DateUtil.parse(scheduled);
                 MqMessage message = new MqMessage(content).qos(qos).scheduled(scheduledDate);
-                Message routingMessage = MqUtils.getV2().routingMessageBuild(topic, message);
+                Message routingMessage = MqUtils.getLast().routingMessageBuild(topic, message);
 
 
-                serviceInternal.routingDo(MqUtils.getV2(), routingMessage);
+                serviceInternal.routingDo(MqUtils.getLast(), routingMessage);
 
                 return Result.succeed();
             } else {

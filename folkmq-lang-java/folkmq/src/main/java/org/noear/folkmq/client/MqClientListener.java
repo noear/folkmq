@@ -47,7 +47,7 @@ public class MqClientListener extends EventListener {
                         }
                     }
                 } catch (Throwable e) {
-                    client.reply(s, m, message, false, new MqAlarm(e.getMessage()));
+                    client.reply(s, message, false, new MqAlarm(e.getMessage()));
                     log.warn("Client consume handle error, sid={}", m.sid(), e);
                 }
             } catch (Throwable e) {
@@ -66,7 +66,7 @@ public class MqClientListener extends EventListener {
                         client.consumeExecutor.submit(() -> onReceive(s, m, message, true));
                     }
                 }catch (Throwable e) {
-                    client.reply(s, m, message, false, new MqAlarm(e.getMessage()));
+                    client.reply(s, message, false, new MqAlarm(e.getMessage()));
                     log.warn("Client consume handle error, sid={}", m.sid(), e);
                 }
             } catch (Throwable e) {
@@ -114,22 +114,22 @@ public class MqClientListener extends EventListener {
 
                     //是否自动回执
                     if (subscription.isAutoAck()) {
-                        client.reply(s, m, message, true, null);
+                        client.reply(s, message, true, null);
                     }
                 } else {
                     //没有订阅
-                    client.reply(s, m, message, false, null);
+                    client.reply(s, message, false, null);
                 }
             } catch (Throwable e) {
                 try {
                     if (subscription != null) {
                         //有订阅
                         if (subscription.isAutoAck()) {
-                            client.reply(s, m, message, false, null);
+                            client.reply(s, message, false, null);
                         }
                     } else {
                         //没有订阅
-                        client.reply(s, m, message, false, null);
+                        client.reply(s, message, false, null);
                     }
 
                     log.warn("Client consume handle error, key={}", message.getKey(), e);

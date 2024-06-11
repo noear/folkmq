@@ -230,7 +230,7 @@ public class AdminController extends BaseController {
             if (brokerListener.hasSubscribe(topic)) {
                 Date scheduledDate = DateUtil.parse(scheduled);
                 MqMessage message = new MqMessage(content).qos(qos).scheduled(scheduledDate);
-                Message routingMessage = MqUtils.getV2().routingMessageBuild(topic, message);
+                Message routingMessage = MqUtils.getLast().routingMessageBuild(topic, message);
 
                 if (brokerListener.publishDo(routingMessage, qos)) {
                     return Result.succeed();

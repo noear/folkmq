@@ -5,9 +5,7 @@ import org.noear.folkmq.common.*;
 import org.noear.snack.ONode;
 import org.noear.socketd.broker.BrokerListener;
 import org.noear.socketd.exception.SocketDAlarmException;
-import org.noear.socketd.transport.core.EntityMetas;
-import org.noear.socketd.transport.core.Message;
-import org.noear.socketd.transport.core.Session;
+import org.noear.socketd.transport.core.*;
 import org.noear.socketd.transport.core.entity.StringEntity;
 import org.noear.socketd.transport.core.listener.MessageHandler;
 import org.noear.socketd.utils.RunUtils;
@@ -175,6 +173,34 @@ public class MqServiceListener extends MqServiceListenerBase implements MqServic
         });
     }
 
+    @Override
+    public void onSend(Session session, Message message) {
+        if (MqConstants.MQ_EVENT_DISTRIBUTE.equals(message.event())) {
+            MqMetasResolver mr = MqUtils.getOf(message);
+            if (mr.version() >= 3) {
+                session.config().getStreamManger().removeStream(message.sid());
+            }
+        }
+    }
+
+    @Override
+    public void onReply(Session session, Message message) {
+        if (MqConstants.MQ_EVENT_DISTRIBUTE.equals(message.event())) {
+            MqMetasResolver mr = MqUtils.getOf(message);
+            if (mr.version() >= 3) {
+                String key = mr.getKey(message);
+                String topic = mr.getTopic(message);
+                String consumerGroup = mr.getConsumerGroup(message);
+
+                String queueName = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP + consumerGroup;
+                MqQueue queue = getQueue(queueName);
+                if (queue != null) {
+                    int ack = Integer.parseInt(message.metaOrDefault(MqConstants.MQ_META_ACK, "0"));
+                    queue.acknowledgeAt(key, ack);
+                }
+            }
+        }
+    }
 
     /**
      * 配置监视器

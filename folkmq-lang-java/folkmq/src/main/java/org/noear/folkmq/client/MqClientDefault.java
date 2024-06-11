@@ -579,13 +579,12 @@ public class MqClientDefault implements MqClientInternal {
      * 消费答复
      *
      * @param session 会话
-     * @param from    来源消息
      * @param message 收到的消息
      * @param isOk    回执
      * @param entity  实体
      */
     @Override
-    public void reply(Session session, Message from, MqMessageReceivedImpl message, boolean isOk, Entity entity) throws IOException {
+    public void reply(Session session, MqMessageReceivedImpl message, boolean isOk, Entity entity) throws IOException {
         //发送“回执”，向服务端反馈消费情况
         if (message.getQos() > 0) {
             if (session.isValid()) {
@@ -593,11 +592,16 @@ public class MqClientDefault implements MqClientInternal {
                     entity = new EntityDefault();
                 }
 
+                entity.putMeta(MqMetasV2.MQ_META_VID, FolkMQ.versionCodeAsString());
+                entity.putMeta(MqMetasV2.MQ_META_TOPIC, message.getTopic());
+                entity.putMeta(MqMetasV2.MQ_META_CONSUMER_GROUP, message.getConsumerGroup());
+                entity.putMeta(MqMetasV2.MQ_META_KEY, message.getKey());
+
                 if (entity instanceof MqAlarm) {
-                    session.sendAlarm(from, entity.dataAsString());
+                    session.sendAlarm(message.getSource(), entity);
                 } else {
                     entity.putMeta(MqConstants.MQ_META_ACK, isOk ? "1" : "0");
-                    session.replyEnd(from, entity);
+                    session.replyEnd(message.getSource(), entity);
                 }
             }
         }

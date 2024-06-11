@@ -3,6 +3,7 @@ package org.noear.folkmq.middleware.broker.mq;
 import org.noear.folkmq.FolkMQ;
 import org.noear.folkmq.common.MqConstants;
 import org.noear.folkmq.common.MqMetasResolver;
+import org.noear.folkmq.common.MqMetasV2;
 import org.noear.folkmq.common.MqUtils;
 import org.noear.folkmq.server.MqNextTime;
 import org.noear.folkmq.server.MqQps;
@@ -192,7 +193,7 @@ public class BrokerListenerFolkmq extends BrokerListenerPlus {
     }
 
     @Override
-    public void onReply(Session session, Reply reply) {
+    public void onReply(Session session, Message message) {
         //记录流量
         qpsInput.record();
     }
@@ -216,7 +217,7 @@ public class BrokerListenerFolkmq extends BrokerListenerPlus {
             removePlayer(queueName, requester);
         } else if (MqConstants.MQ_EVENT_DISTRIBUTE.equals(message.event())) {
             String atName = message.atName();
-            boolean isBroadcast = MqUtils.getV2().isBroadcast(message.entity());
+            boolean isBroadcast = MqUtils.getLast().isBroadcast(message.entity());
 
             if (isBroadcast) {
                 //广播模式
@@ -377,9 +378,11 @@ public class BrokerListenerFolkmq extends BrokerListenerPlus {
             String consumerGroup = mr.getConsumerGroup(message);
 
             EntityDefault entity = new EntityDefault();
-            entity.metaPut(MqConstants.MQ_META_TOPIC, topic);
-            entity.metaPut(MqConstants.MQ_META_CONSUMER_GROUP, consumerGroup);
-            entity.metaPut(MqConstants.MQ_META_KEY, key);
+            entity.metaPut(MqMetasV2.MQ_META_VID, FolkMQ.versionCodeAsString());
+            entity.metaPut(MqMetasV2.MQ_META_TOPIC, topic);
+            entity.metaPut(MqMetasV2.MQ_META_CONSUMER_GROUP, consumerGroup);
+            entity.metaPut(MqMetasV2.MQ_META_KEY, key);
+
             entity.metaPut(MqConstants.MQ_META_ACK, "0");
 
             requester.replyEnd(message, entity);

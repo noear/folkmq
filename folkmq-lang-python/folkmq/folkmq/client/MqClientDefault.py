@@ -354,7 +354,7 @@ class MqClientDefault(MqClientInternal):
                 from folkmq.FolkMQ import FolkMQ
 
                 entity.put_meta(MqMetasV2.MQ_META_VID, FolkMQ.version_code_as_string())
-                entity.put_meta(MqMetasV2.MQ_META_TOPIC, message.get_topic())
+                entity.put_meta(MqMetasV2.MQ_META_TOPIC, message.get_full_topic())
                 entity.put_meta(MqMetasV2.MQ_META_CONSUMER_GROUP, message.get_consumer_group())
                 entity.put_meta(MqMetasV2.MQ_META_KEY, message.get_key())
 

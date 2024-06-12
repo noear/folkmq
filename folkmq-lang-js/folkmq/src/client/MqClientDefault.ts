@@ -10,7 +10,6 @@ import {MqMessage} from "./MqMessage";
 import {SocketDConnectionException, SocketDException} from "@noear/socket.d/exception/SocketDException";
 import {MqUtils} from "../common/MqUtils";
 import {Session} from "@noear/socket.d/transport/core/Session";
-import {Message} from "@noear/socket.d/transport/core/Message";
 import {MqClient, MqClientInternal} from "./MqClient";
 import {FolkMQ} from "../FolkMQ";
 import {FolkmqException} from "../exception/FolkmqException";
@@ -417,7 +416,7 @@ export class MqClientDefault implements MqClientInternal {
                 }
 
                 entity.putMeta(MqMetasV2.MQ_META_VID, FolkMQ.versionCodeAsString());
-                entity.putMeta(MqMetasV2.MQ_META_TOPIC, message.getTopic());
+                entity.putMeta(MqMetasV2.MQ_META_TOPIC, message.getFullTopic());
                 entity.putMeta(MqMetasV2.MQ_META_CONSUMER_GROUP, message.getConsumerGroup());
                 entity.putMeta(MqMetasV2.MQ_META_KEY, message.getKey());
 

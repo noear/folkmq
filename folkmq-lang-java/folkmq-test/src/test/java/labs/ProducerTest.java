@@ -17,8 +17,7 @@ public class ProducerTest {
 
         long i = 0;
         while (true) {
-            client.publishAsync("/jlwu/receive/gateway", new MqMessage(buf.toString() + i));
-            i++;
+            client.publishAsync("/jlwu/receive/gateway", new MqMessage(buf.toString() + i++));
         }
     }
 }

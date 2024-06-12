@@ -13,7 +13,7 @@ public class ConsumerTest {
 
         //订阅
         client.subscribe("/jlwu/receive/gateway",  message -> {
-            System.out.println("::" + message.getTopic() + " - " + message);
+            //System.out.println("::" + message.getTopic() + " - " + message);
         });
     }
 }

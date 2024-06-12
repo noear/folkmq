@@ -22,7 +22,7 @@
 
         <dependency>
             <groupId>org.noear</groupId>
-            <artifactId>folkmq-transport-smartsocket</artifactId>
+            <artifactId>folkmq-transport-netty</artifactId>
         </dependency>
 
         <dependency>

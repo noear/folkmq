@@ -6,7 +6,6 @@ from socketd.exception.SocketDExecption import SocketDConnectionException, Socke
 from socketd.transport.client.ClientConfig import ClientConfig
 from socketd.transport.core import Entity
 from socketd.transport.core.EntityMetas import EntityMetas
-from socketd.transport.core.Message import Message
 from socketd.transport.core.Session import Session
 from socketd.transport.core.Entity import Reply
 from socketd.transport.core.entity.EntityDefault import EntityDefault
@@ -345,18 +344,25 @@ class MqClientDefault(MqClientInternal):
             raise FolkmqException(messsage)
 
 
-    def reply(self, session: Session, f: Message, message: MqMessageReceivedImpl, isOk: bool, entity: Entity):
+    def reply(self, session: Session, message: MqMessageReceivedImpl, isOk: bool, entity: Entity):
         """发送“回执”，向服务端反馈消费情况"""
         if message.get_qos() > 0:
             if session.is_valid():
                 if entity is None:
                     entity = EntityDefault()
 
+                from folkmq.FolkMQ import FolkMQ
+
+                entity.put_meta(MqMetasV2.MQ_META_VID, FolkMQ.version_code_as_string())
+                entity.put_meta(MqMetasV2.MQ_META_TOPIC, message.get_topic())
+                entity.put_meta(MqMetasV2.MQ_META_CONSUMER_GROUP, message.get_consumer_group())
+                entity.put_meta(MqMetasV2.MQ_META_KEY, message.get_key())
+
                 if isinstance(entity, MqAlarm):
-                    RunUtils.taskTry(session.send_alarm(f, entity.data_as_string()))
+                    RunUtils.taskTry(session.send_alarm(message.get_source(), entity.data_as_string()))
                 else:
                     entity.put_meta(MqConstants.MQ_META_ACK, "1" if isOk else "0")
-                    RunUtils.taskTry(session.reply_end(f, entity))
+                    RunUtils.taskTry(session.reply_end(message.get_source(), entity))
 
     def _diversionOrNull(self, fullTopic: str, message: MqMessage) -> str | None:
         if message.is_transaction():

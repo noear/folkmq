@@ -67,7 +67,7 @@ class MqMessageReceivedImpl(MqMessageReceived):
         self.__expirationL = mr.get_expiration(source)
         self.__expiration = self.__expirationL
 
-    def getSource(self) -> Message:
+    def get_source(self) -> Message:
         return self.__source
 
     def get_sender(self) -> str | None:
@@ -116,10 +116,10 @@ class MqMessageReceivedImpl(MqMessageReceived):
         return self.__times
 
     def acknowledge(self, isOk: bool):
-        self.__clientInternal.reply(self.__session, self.__source, self, isOk, None)
+        self.__clientInternal.reply(self.__session, self, isOk, None)
 
     def response(self, entity:Entity):
-        self.__clientInternal.reply(self.__session, self.__source, self, True, entity)
+        self.__clientInternal.reply(self.__session, self, True, entity)
 
     def __str__(self) ->str:
         return "MqMessageReceived{" + \

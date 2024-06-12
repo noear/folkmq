@@ -68,19 +68,19 @@ class MqClientListener(EventListener):
                     # 有订阅
                     subscription.consume(message)
                     if subscription.is_auto_ack():
-                        self._client.reply(s, m, message, True, None)
+                        self._client.reply(s, message, True, None)
                 else:
                     # 没有订阅
-                    self._client.reply(s, m, message, False, None)
+                    self._client.reply(s, message, False, None)
             except Exception as e:
                 try:
                     if subscription is not None:
                         # 有订阅
                         if subscription.is_auto_ack():
-                            self._client.reply(s, m, message, False, None)
+                            self._client.reply(s, message, False, None)
                     else:
                         # 没有订阅
-                        self._client.reply(s, m, message, False, None)
+                        self._client.reply(s, message, False, None)
 
                     e_msg = traceback.format_exc()
                     log.warning(f"Client consume handle error, key={message.get_key()} \n{e_msg}")

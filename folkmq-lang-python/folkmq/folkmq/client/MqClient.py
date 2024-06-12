@@ -145,6 +145,6 @@ class MqClientInternal(MqClient):
         ...
 
     @abstractmethod
-    def reply(self, session: Session, f: Message, message: MqMessageReceivedImpl, isOk: bool, entity: Entity):
+    def reply(self, session: Session, message: MqMessageReceivedImpl, isOk: bool, entity: Entity):
         """消费答复"""
         ...

@@ -3,7 +3,7 @@ package org.noear.folkmq.middleware.broker.admin;
 import org.noear.folkmq.middleware.broker.admin.dso.QueueForceService;
 import org.noear.folkmq.middleware.broker.admin.dso.ViewQueueService;
 import org.noear.folkmq.middleware.broker.admin.model.QueueVo;
-import org.noear.folkmq.middleware.broker.mq.BrokerListenerFolkmq;
+import org.noear.folkmq.middleware.broker.mq.FolkmqBrokerListener;
 import org.noear.folkmq.common.MqConstants;
 import org.noear.solon.annotation.Controller;
 import org.noear.solon.annotation.Inject;
@@ -35,7 +35,7 @@ public class AdminQueueController extends BaseController {
     static final Logger log = LoggerFactory.getLogger(AdminQueueController.class);
 
     @Inject
-    BrokerListenerFolkmq brokerListener;
+    FolkmqBrokerListener brokerListener;
 
     @Inject
     ViewQueueService viewQueueService;

@@ -3,7 +3,7 @@ package org.noear.folkmq.middleware.broker.admin.dso;
 import org.noear.folkmq.middleware.broker.admin.model.QueueVo;
 import org.noear.folkmq.middleware.broker.admin.model.ServerInfoVo;
 import org.noear.folkmq.middleware.broker.common.ConfigNames;
-import org.noear.folkmq.middleware.broker.mq.BrokerListenerFolkmq;
+import org.noear.folkmq.middleware.broker.mq.FolkmqBrokerListener;
 import org.noear.folkmq.common.MqConstants;
 import org.noear.snack.ONode;
 import org.noear.socketd.transport.core.Entity;
@@ -33,7 +33,7 @@ public class ViewQueueService implements LifecycleBean {
     private static final Logger log = LoggerFactory.getLogger(ViewQueueService.class);
 
     @Inject
-    private BrokerListenerFolkmq brokerListener;
+    private FolkmqBrokerListener brokerListener;
 
     private Set<String> queueSet = Collections.newSetFromMap(new ConcurrentHashMap<>());
     private Map<String, QueueVo> queueVoMap = new ConcurrentHashMap<>();

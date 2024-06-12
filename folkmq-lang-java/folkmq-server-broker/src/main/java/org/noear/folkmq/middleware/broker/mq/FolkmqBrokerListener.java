@@ -8,14 +8,14 @@ import org.noear.folkmq.common.MqUtils;
 import org.noear.folkmq.server.MqNextTime;
 import org.noear.folkmq.server.MqQps;
 import org.noear.snack.ONode;
-import org.noear.socketd.broker.BrokerListenerPlus;
+import org.noear.socketd.broker.BrokerListener;
 import org.noear.socketd.transport.core.*;
 import org.noear.socketd.transport.core.entity.EntityDefault;
-import org.noear.socketd.transport.core.entity.PressureEntity;
 import org.noear.socketd.transport.core.entity.StringEntity;
 import org.noear.socketd.utils.RunUtils;
 import org.noear.socketd.utils.SessionUtils;
 import org.noear.socketd.utils.StrUtils;
+import org.noear.solon.core.Lifecycle;
 
 import java.io.IOException;
 import java.util.*;
@@ -28,7 +28,7 @@ import java.util.concurrent.ScheduledFuture;
  * @author noear
  * @since 1.0
  */
-public class BrokerListenerFolkmq extends BrokerListenerPlus {
+public class FolkmqBrokerListener extends BrokerListener implements Lifecycle {
     private final BrokerApiHandler apiHandler;
     private final MqQps qpsInput = new MqQps();
     private final MqQps qpsOutput = new MqQps();
@@ -54,7 +54,7 @@ public class BrokerListenerFolkmq extends BrokerListenerPlus {
     }
 
 
-    public BrokerListenerFolkmq(BrokerApiHandler apiHandler) {
+    public FolkmqBrokerListener(BrokerApiHandler apiHandler) {
         this.apiHandler = apiHandler;
 
         this.qpsScheduled = RunUtils.delayAndRepeat(() -> {
@@ -64,9 +64,11 @@ public class BrokerListenerFolkmq extends BrokerListenerPlus {
     }
 
     @Override
-    public void stop() {
-        super.stop();
+    public void start() {
+    }
 
+    @Override
+    public void stop() {
         if (qpsScheduled != null) {
             qpsScheduled.cancel(true);
         }
@@ -90,7 +92,7 @@ public class BrokerListenerFolkmq extends BrokerListenerPlus {
      * @param accessKey       访问者身份
      * @param accessSecretKey 访问者密钥
      */
-    public BrokerListenerFolkmq addAccess(String accessKey, String accessSecretKey) {
+    public FolkmqBrokerListener addAccess(String accessKey, String accessSecretKey) {
         accessMap.put(accessKey, accessSecretKey);
         return this;
     }
@@ -100,7 +102,7 @@ public class BrokerListenerFolkmq extends BrokerListenerPlus {
      *
      * @param accessMap 访问账号集合
      */
-    public BrokerListenerFolkmq addAccessAll(Map<String, String> accessMap) {
+    public FolkmqBrokerListener addAccessAll(Map<String, String> accessMap) {
         if (accessMap != null) {
             this.accessMap.putAll(accessMap);
         }
@@ -168,27 +170,10 @@ public class BrokerListenerFolkmq extends BrokerListenerPlus {
         }
     }
 
-    private long maxPressure = 1200;
-
     @Override
     public void onMessage(Session requester, Message message) throws IOException {
         //记录流量
         qpsInput.record();
-
-        if (brokerMessageCounter.longValue() > maxPressure) {
-            if (MqConstants.BROKER_AT_SERVER.equals(requester.name()) == false) {
-                if (message.meta(EntityMetas.META_X_UNLIMITED) == null) {
-                    //如果压力过高
-                    requester.sendPressure(message, PressureEntity.getInstance());
-                    try {
-                        Thread.sleep(10);
-                    } catch (Throwable ex) {
-                        //乎略
-                    }
-                }
-            }
-        }
-
         super.onMessage(requester, message);
     }
 

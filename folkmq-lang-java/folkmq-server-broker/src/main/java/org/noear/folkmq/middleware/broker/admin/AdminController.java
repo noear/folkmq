@@ -5,7 +5,7 @@ import org.noear.folkmq.middleware.broker.admin.dso.ViewQueueService;
 import org.noear.folkmq.middleware.broker.admin.model.ServerInfoVo;
 import org.noear.folkmq.middleware.broker.admin.model.ServerVo;
 import org.noear.folkmq.middleware.broker.admin.model.TopicVo;
-import org.noear.folkmq.middleware.broker.mq.BrokerListenerFolkmq;
+import org.noear.folkmq.middleware.broker.mq.FolkmqBrokerListener;
 import org.noear.folkmq.client.MqMessage;
 import org.noear.folkmq.common.MqConstants;
 import org.noear.folkmq.common.MqUtils;
@@ -44,7 +44,7 @@ public class AdminController extends BaseController {
     static final Logger log = LoggerFactory.getLogger(AdminController.class);
 
     @Inject
-    BrokerListenerFolkmq brokerListener;
+    FolkmqBrokerListener brokerListener;
 
     @Inject
     ViewQueueService viewQueueService;

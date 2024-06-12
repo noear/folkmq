@@ -16,7 +16,7 @@ import org.noear.socketd.transport.client.ClientSession;
 import org.noear.socketd.transport.core.*;
 import org.noear.socketd.transport.core.entity.EntityDefault;
 import org.noear.socketd.transport.core.entity.StringEntity;
-import org.noear.socketd.transport.core.impl.TrafficLimiterDefault;
+import org.noear.socketd.transport.core.traffic.TrafficLimiterDefault;
 import org.noear.socketd.transport.stream.RequestStream;
 import org.noear.socketd.utils.StrUtils;
 import org.slf4j.Logger;

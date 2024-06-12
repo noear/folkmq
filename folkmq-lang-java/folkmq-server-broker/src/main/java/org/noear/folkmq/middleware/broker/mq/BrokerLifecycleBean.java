@@ -1,7 +1,6 @@
 package org.noear.folkmq.middleware.broker.mq;
 
 import org.noear.folkmq.FolkMQ;
-import org.noear.folkmq.common.MqConstants;
 import org.noear.folkmq.middleware.broker.admin.dso.QueueForceService;
 import org.noear.folkmq.middleware.broker.common.MqBrokerConfig;
 import org.noear.socketd.SocketD;
@@ -34,12 +33,12 @@ public class BrokerLifecycleBean implements LifecycleBean {
 
     private Server brokerServerTcp;
     private Server brokerServerWs;
-    private BrokerListenerFolkmq brokerListener;
+    private FolkmqBrokerListener brokerListener;
 
     @Override
     public void start() throws Throwable {
         BrokerFragmentHandler brokerFragmentHandler = new BrokerFragmentHandler();
-        brokerListener = new BrokerListenerFolkmq(new BrokerApiHandler(queueForceService))
+        brokerListener = new FolkmqBrokerListener(new BrokerApiHandler(queueForceService))
                 .addAccessAll(MqBrokerConfig.getAccessMap());
 
         brokerServerTcp = SocketD.createServer("sd:tcp")
@@ -83,7 +82,7 @@ public class BrokerLifecycleBean implements LifecycleBean {
         brokerListener.start();
 
         //注册
-        appContext.wrapAndPut(BrokerListenerFolkmq.class, brokerListener);
+        appContext.wrapAndPut(FolkmqBrokerListener.class, brokerListener);
 
         log.info("Server:main: folkmq-server-broker: Started (SOCKET.D/{}-{}, folkmq/{})",
                 SocketD.protocolVersion(),

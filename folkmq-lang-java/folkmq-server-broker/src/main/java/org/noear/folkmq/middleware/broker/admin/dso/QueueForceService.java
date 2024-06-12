@@ -1,9 +1,8 @@
 package org.noear.folkmq.middleware.broker.admin.dso;
 
 import org.noear.folkmq.middleware.broker.admin.model.QueueVo;
-import org.noear.folkmq.middleware.broker.mq.BrokerListenerFolkmq;
+import org.noear.folkmq.middleware.broker.mq.FolkmqBrokerListener;
 import org.noear.folkmq.common.MqConstants;
-import org.noear.folkmq.common.MqMetasV1;
 import org.noear.socketd.transport.core.Entity;
 import org.noear.socketd.transport.core.Session;
 import org.noear.socketd.transport.core.entity.StringEntity;
@@ -28,7 +27,7 @@ public class QueueForceService {
     static AtomicBoolean force_lock = new AtomicBoolean(false);
 
     @Inject
-    BrokerListenerFolkmq brokerListener;
+    FolkmqBrokerListener brokerListener;
 
     @Inject
     ViewQueueService viewQueueService;

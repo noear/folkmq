@@ -136,10 +136,9 @@ export interface MqClientInternal extends MqClient {
      * 消费答复
      *
      * @param session 会话
-     * @param from    来源消息
      * @param message 收到的消息
      * @param isOk    回执
      * @param entity  实体
      */
-    reply(session: Session, from: Message, message: MqMessageReceivedImpl, isOk: boolean, entity: Entity | null);
+    reply(session: Session, message: MqMessageReceivedImpl, isOk: boolean, entity: Entity | null);
 }

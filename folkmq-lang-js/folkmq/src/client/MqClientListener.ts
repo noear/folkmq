@@ -76,22 +76,22 @@ export class MqClientListener extends EventListener {
 
                     //是否自动回执
                     if (subscription.isAutoAck()) {
-                        this._client.reply(s, m, message, true, null);
+                        this._client.reply(s, message, true, null);
                     }
                 } else {
                     //没有订阅
-                    this._client.reply(s, m, message, false, null);
+                    this._client.reply(s, message, false, null);
                 }
             } catch (e) {
                 try {
                     if (subscription != null) {
                         //有订阅
                         if (subscription.isAutoAck()) {
-                            this._client.reply(s, m, message, false, null);
+                            this._client.reply(s, message, false, null);
                         }
                     } else {
                         //没有订阅
-                        this._client.reply(s, m, message, false, null);
+                        this._client.reply(s, message, false, null);
                     }
 
                     console.warn("Client consume handle error, key=" + message.getKey(), e);

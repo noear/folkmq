@@ -204,11 +204,11 @@ export class MqMessageReceivedImpl implements MqMessageReceived {
      * 回执
      */
     acknowledge(isOk: boolean) {
-        this._clientInternal.reply(this._session, this._source, this, isOk, null);
+        this._clientInternal.reply(this._session, this, isOk, null);
     }
 
     response(entity: Entity | null) {
-        this._clientInternal.reply(this._session, this._source, this, true, entity);
+        this._clientInternal.reply(this._session, this, true, entity);
     }
 
     toString(): string {

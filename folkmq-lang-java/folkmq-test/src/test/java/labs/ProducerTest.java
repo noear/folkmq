@@ -10,9 +10,14 @@ public class ProducerTest {
         MqClient client = FolkMQ.createClient("folkmq://127.0.0.1:18602?ak=folkmq&sk=YapLHTx19RlsEE16")
                 .connect();
 
+        StringBuilder buf = new StringBuilder();
+        while (buf.length() < 1024) {
+            buf.append("0123456789abcdef;");
+        }
+
         long i = 0;
         while (true) {
-            client.publishAsync("/jlwu/receive/gateway", new MqMessage("hot-" + i));
+            client.publishAsync("/jlwu/receive/gateway", new MqMessage(buf.toString() + i));
             i++;
         }
     }

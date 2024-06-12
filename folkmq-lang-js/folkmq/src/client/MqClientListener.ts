@@ -1,4 +1,4 @@
-import {EventListener} from "@noear/socket.d/transport/core/Listener";
+import {EventListener} from "@noear/socket.d/transport/core/listener/EventListener";
 import {MqConstants} from "../common/MqConstants";
 import {Session} from "@noear/socket.d/transport/core/Session";
 import {SocketD} from "@noear/socket.d";

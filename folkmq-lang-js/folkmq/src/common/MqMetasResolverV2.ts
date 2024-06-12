@@ -1,4 +1,5 @@
-import {Entity, EntityDefault, StringEntity} from "@noear/socket.d/transport/core/Entity";
+import {Entity} from "@noear/socket.d/transport/core/Entity";
+import {EntityDefault} from "@noear/socket.d/transport/core/entity/EntityDefault";
 import {Message, MessageBuilder} from "@noear/socket.d/transport/core/Message";
 import { MqMessage } from "../client/MqMessage";
 import {MqMetasResolver} from "./MqMetasResolver";

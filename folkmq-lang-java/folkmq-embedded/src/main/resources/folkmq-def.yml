@@ -21,7 +21,7 @@ folkmq.snapshot:
   enable: true
   save900: 1
   save300: 10
-  save100: 0
+  save100: 10000
 
 folkmq:
   path: "/folkmq"

@@ -6,7 +6,7 @@ from folkmq.client.MqMessage import MqMessage
 class FolkMQ:
     @staticmethod
     def version_code()->int:
-        return 2
+        return 3
 
     @staticmethod
     def version_code_as_string()->str:

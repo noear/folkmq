@@ -345,7 +345,13 @@ class MqClientDefault(MqClientInternal):
 
 
     def reply(self, session: Session, message: MqMessageReceivedImpl, isOk: bool, entity: Entity):
-        """发送“回执”，向服务端反馈消费情况"""
+        # 确保只答复一次
+        if message.is_replied():
+            return #已答复
+        else:
+            message.set_replied(True) # 置为答复
+
+        # 发送“回执”，向服务端反馈消费情况
         if message.get_qos() > 0:
             if session.is_valid():
                 if entity is None:

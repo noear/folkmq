@@ -9,6 +9,7 @@ from socketd.transport.core.entity.StringEntity import StringEntity
 from socketd.transport.core.listener.EventListener import EventListener
 from socketd.utils.LogConfig import log
 
+from folkmq.client.MqAlarm import MqAlarm
 from folkmq.client.MqMessageReceived import MqMessageReceivedImpl
 from folkmq.common.MqConstants import MqConstants
 
@@ -22,20 +23,25 @@ class MqClientListener(EventListener):
         self.do_on(MqConstants.MQ_EVENT_REQUEST, self.doOn_request)
 
     def doOn_distribute(self, s:Session, m:Message):
+        message = MqMessageReceivedImpl(self._client, s, m)
+
         try:
-            message = MqMessageReceivedImpl(self._client, s, m)
             self.onReceive(s,m,message,False)
         except Exception as e:
             e_msg = traceback.format_exc()
             log.warning(f"Client consume handle error, sid={m.sid()} \n{e_msg}")
+            self._client.reply(s, message, False, MqAlarm(str(e)))
+
 
     def doOn_request(self, s:Session, m:Message):
+        message = MqMessageReceivedImpl(self._client, s, m)
+
         try:
-            message = MqMessageReceivedImpl(self._client, s, m)
             self.onReceive(s,m,message,True)
         except Exception as e:
             e_msg = traceback.format_exc()
             log.warning(f"Client consume handle error, sid={m.sid()} \n{e_msg}")
+            self._client.reply(s, message, False, MqAlarm(str(e)))
 
     def onReceive(self, s: Session, m: Message, message: MqMessageReceivedImpl, isRequest: bool):
         """接收时"""

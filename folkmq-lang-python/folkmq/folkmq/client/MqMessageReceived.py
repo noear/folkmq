@@ -67,6 +67,14 @@ class MqMessageReceivedImpl(MqMessageReceived):
         self.__expirationL = mr.get_expiration(source)
         self.__expiration = self.__expirationL
 
+        self.__replied = False
+
+    def is_replied(self) -> bool:
+        return self.__replied
+
+    def set_replied(self, replied: bool):
+        self.__replied = replied
+
     def get_source(self) -> Message:
         return self.__source
 

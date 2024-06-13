@@ -581,10 +581,10 @@ public class MqClientDefault implements MqClientInternal {
     @Override
     public void reply(Session session, MqMessageReceivedImpl message, boolean isOk, Entity entity) throws IOException {
         //确保只答复一次
-        if(message.isReplied()){
+        if (message.isReplied()) {
             //已答复
             return;
-        }else {
+        } else {
             //置为答复
             message.setReplied(true);
         }

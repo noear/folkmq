@@ -36,18 +36,18 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
     private final int times;
 
     //是否已答复（控制，只答复一次）
-    private boolean replied;
+    private boolean replied = false;
 
     /**
-     * 已答复
-     * */
+     * 是否已答复
+     */
     protected boolean isReplied() {
         return replied;
     }
 
     /**
      * 设置答复状态
-     * */
+     */
     protected void setReplied(boolean replied) {
         this.replied = replied;
     }
@@ -176,7 +176,7 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
 
     /**
      * 是否广播
-     * */
+     */
     @Override
     public boolean isBroadcast() {
         return broadcast;
@@ -200,12 +200,12 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
 
     @Override
     public void acknowledge(boolean isOk) throws IOException {
-        clientInternal.reply(session,this, isOk, null);
+        clientInternal.reply(session, this, isOk, null);
     }
 
     @Override
     public void response(Entity entity) throws IOException {
-        clientInternal.reply(session,this, true, entity);
+        clientInternal.reply(session, this, true, entity);
     }
 
     @Override

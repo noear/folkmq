@@ -47,8 +47,8 @@ public class MqClientListener extends EventListener {
                         }
                     }
                 } catch (Throwable e) {
-                    client.reply(s, message, false, new MqAlarm(e.getMessage()));
                     log.warn("Client consume handle error, sid={}", m.sid(), e);
+                    client.reply(s, message, false, new MqAlarm(e.getMessage()));
                 }
             } catch (Throwable e) {
                 log.warn("Client consume handle error, sid={}", m.sid(), e);
@@ -66,8 +66,8 @@ public class MqClientListener extends EventListener {
                         client.consumeExecutor.submit(() -> onReceive(s, m, message, true));
                     }
                 }catch (Throwable e) {
-                    client.reply(s, message, false, new MqAlarm(e.getMessage()));
                     log.warn("Client consume handle error, sid={}", m.sid(), e);
+                    client.reply(s, message, false, new MqAlarm(e.getMessage()));
                 }
             } catch (Throwable e) {
                 log.warn("Client consume handle error, sid={}", m.sid(), e);

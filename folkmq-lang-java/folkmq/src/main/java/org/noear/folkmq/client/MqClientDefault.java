@@ -580,6 +580,15 @@ public class MqClientDefault implements MqClientInternal {
      */
     @Override
     public void reply(Session session, MqMessageReceivedImpl message, boolean isOk, Entity entity) throws IOException {
+        //确保只答复一次
+        if(message.isReplied()){
+            //已答复
+            return;
+        }else {
+            //置为答复
+            message.setReplied(true);
+        }
+
         //发送“回执”，向服务端反馈消费情况
         if (message.getQos() > 0) {
             if (session.isValid()) {

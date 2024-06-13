@@ -31,11 +31,14 @@ public class TestCase27_sequence_err extends BaseTestCase {
         CountDownLatch countDownLatch = new CountDownLatch(count);
 
         client = FolkMQ.createClient("folkmq://127.0.0.1:" + getPort())
+                .autoAcknowledge(false)
                 .connect();
 
         List<Integer> msgList = new ArrayList<>();
         client.subscribe("demo", "a", ((message) -> {
             int id = Integer.parseInt(message.getBodyAsString());
+            System.out.println("------: " + id);
+
             if (message.getTimes() > 0 || id % 2 == 0) {
                 msgList.add(id);
                 countDownLatch.countDown();
@@ -46,7 +49,7 @@ public class TestCase27_sequence_err extends BaseTestCase {
         }));
 
         for (int i = 0; i < count; i++) {
-            client.publish("demo", new MqMessage(String.valueOf(i)).sequence(true));
+            client.publish("demo", new MqMessage(String.valueOf(i)).attr("id", String.valueOf(i)).sequence(true));
         }
 
         countDownLatch.await(52, TimeUnit.SECONDS);

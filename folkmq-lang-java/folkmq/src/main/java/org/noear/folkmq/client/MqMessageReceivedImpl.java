@@ -35,6 +35,23 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
     private final int qos;
     private final int times;
 
+    //是否已答复（控制，只答复一次）
+    private boolean replied;
+
+    /**
+     * 已答复
+     * */
+    protected boolean isReplied() {
+        return replied;
+    }
+
+    /**
+     * 设置答复状态
+     * */
+    protected void setReplied(boolean replied) {
+        this.replied = replied;
+    }
+
     public MqMessageReceivedImpl(MqClientInternal clientInternal, Session session, Message source) {
         this.clientInternal = clientInternal;
         this.session = session;

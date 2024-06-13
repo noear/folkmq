@@ -59,10 +59,27 @@ export class MqMessageReceivedImpl implements MqMessageReceived {
     private readonly _consumerGroup: string;
     private readonly _expiration: Date | null;
     private readonly _sequence: boolean;
-    private readonly _broadcast:boolean;
+    private readonly _broadcast: boolean;
     private readonly _transaction: boolean;
     private readonly _qos: number;
     private readonly _times: number;
+
+    //是否已答复（控制，只答复一次）
+    private _replied: boolean = false;
+
+    /**
+     * 是否已答复
+     * */
+    isReplied(): boolean {
+        return this._replied;
+    }
+
+    /**
+     * 设置答复状态
+     * */
+    setReplied(replied: boolean) {
+        this._replied = replied;
+    }
 
     constructor(clientInternal: MqClientInternal, session: Session, source: Message) {
         this._clientInternal = clientInternal;
@@ -161,7 +178,7 @@ export class MqMessageReceivedImpl implements MqMessageReceived {
         return this._qos;
     }
 
-    getAttr( name:string):string|null {
+    getAttr(name: string): string | null {
         return this._source.meta(MqConstants.MQ_ATTR_PREFIX + name);
     }
 

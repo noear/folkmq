@@ -7,6 +7,7 @@ import {MqClientDefault} from "./MqClientDefault";
 import {MqMessageReceivedImpl} from "./MqMessageReceived";
 import {Message} from "@noear/socket.d/transport/core/Message";
 import {EntityMetas} from "@noear/socket.d/transport/core/EntityMetas";
+import {MqAlarm} from "./MqAlarm";
 
 export class MqClientListener extends EventListener {
     private _client: MqClientDefault;
@@ -19,19 +20,23 @@ export class MqClientListener extends EventListener {
 
         //接收派发指令
         this.doOn(MqConstants.MQ_EVENT_DISTRIBUTE, (s, m) => {
+            let message = new MqMessageReceivedImpl(client, s, m);
+
             try {
-                let message = new MqMessageReceivedImpl(client, s, m);
                 this.onReceive(s, m, message, false);
             } catch (e) {
+                client.reply(s, message, false, new MqAlarm(String(e)));
                 console.warn("Client consume handle error, sid=" + m.sid(), e);
             }
         });
 
         this.doOn(MqConstants.MQ_EVENT_REQUEST, (s, m) => {
+            let message = new MqMessageReceivedImpl(client, s, m);
+
             try {
-                let message = new MqMessageReceivedImpl(client, s, m);
                 this.onReceive(s, m, message, true);
             } catch (e) {
+                client.reply(s, message, false, new MqAlarm(String(e)));
                 console.warn("Client consume handle error, sid=" + m.sid(), e);
             }
         });

@@ -53,7 +53,7 @@ export class MqClientDefault implements MqClientInternal {
     //自动回执
     private _autoAcknowledge: boolean = true;
 
-    constructor(urls: string[] | string, clientListener?:MqClientListener) {
+    constructor(urls: string[] | string, clientListener?: MqClientListener) {
         if (urls instanceof Array) {
             this._urls = urls;
         } else {
@@ -117,7 +117,7 @@ export class MqClientDefault implements MqClientInternal {
                     .codecThreads(1)
                     .exchangeThreads(1);
 
-                if(this._namespace){
+                if (this._namespace) {
                     c.metaPut(MqConstants.FOLKMQ_NAMESPACE, this._namespace)
                 }
 
@@ -344,7 +344,7 @@ export class MqClientDefault implements MqClientInternal {
         }
     }
 
-    transactionCheckback(transactionCheckback: IoConsumer<MqMessageReceived>) :MqClient {
+    transactionCheckback(transactionCheckback: IoConsumer<MqMessageReceived>): MqClient {
         if (transactionCheckback != null) {
             this._transactionCheckback = transactionCheckback;
         }
@@ -408,6 +408,15 @@ export class MqClientDefault implements MqClientInternal {
      * @param entity  实体
      */
     reply(session: Session, message: MqMessageReceivedImpl, isOk: boolean, entity: Entity | null) {
+        //确保只答复一次
+        if (message.isReplied()) {
+            //已答复
+            return;
+        } else {
+            //置为答复
+            message.setReplied(true);
+        }
+
         //发送“回执”，向服务端反馈消费情况
         if (message.getQos() > 0) {
             if (session.isValid()) {

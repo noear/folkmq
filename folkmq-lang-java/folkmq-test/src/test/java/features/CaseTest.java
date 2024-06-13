@@ -220,4 +220,11 @@ public class CaseTest {
         testCase.start();
         testCase.stop();
     }
+
+    @Test
+    public void TestCase35_batch_subscribe_namespace() throws Exception {
+        BaseTestCase testCase = new TestCase35_batch_subscribe_namespace(2035);
+        testCase.start();
+        testCase.stop();
+    }
 }

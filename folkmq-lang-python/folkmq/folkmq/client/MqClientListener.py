@@ -103,14 +103,14 @@ class MqClientListener(EventListener):
         if self._client.getSubscriptionSize() == 0:
             return
 
-        subscribeData:dict[str,str] = {}
+        subscribeData:dict[str,list] = {}
         for subscription in self._client.getSubscriptionAll():
-            queueNameSet = subscribeData.get(subscription.get_topic())
+            queueNameSet:list = subscribeData.get(subscription.get_topic())
             if queueNameSet is None:
-                queueNameSet = set()
+                queueNameSet = list()
                 subscribeData[subscription.get_topic()] = queueNameSet
 
-            queueNameSet.add(subscription.get_queue_name())
+            queueNameSet.append(subscription.get_queue_name())
 
         jsonStr = json.dumps(subscribeData)
         entity = (StringEntity(jsonStr)

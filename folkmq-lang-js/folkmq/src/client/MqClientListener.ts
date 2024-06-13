@@ -25,8 +25,8 @@ export class MqClientListener extends EventListener {
             try {
                 this.onReceive(s, m, message, false);
             } catch (e) {
-                client.reply(s, message, false, new MqAlarm(String(e)));
                 console.warn("Client consume handle error, sid=" + m.sid(), e);
+                client.reply(s, message, false, new MqAlarm(String(e)));
             }
         });
 
@@ -36,8 +36,8 @@ export class MqClientListener extends EventListener {
             try {
                 this.onReceive(s, m, message, true);
             } catch (e) {
-                client.reply(s, message, false, new MqAlarm(String(e)));
                 console.warn("Client consume handle error, sid=" + m.sid(), e);
+                client.reply(s, message, false, new MqAlarm(String(e)));
             }
         });
     }

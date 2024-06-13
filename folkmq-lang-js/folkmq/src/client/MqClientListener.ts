@@ -120,14 +120,14 @@ export class MqClientListener extends EventListener {
         }
 
         //用于重连时重新订阅
-        let subscribeData = new Map<String, Set<String>>;
+        let subscribeData = {};
         for (let subscription of this._client.getSubscriptionAll()) {
-            let queueNameSet = subscribeData.get(subscription.getTopic());
+            let queueNameSet:Array<string> = subscribeData[subscription.getTopic()];
             if (queueNameSet == null) {
-                queueNameSet = new Set<string>;
-                subscribeData.set(subscription.getTopic(), queueNameSet);
+                queueNameSet = [];
+                subscribeData[subscription.getTopic()] = queueNameSet;
             }
-            queueNameSet.add(subscription.getQueueName());
+            queueNameSet.push(subscription.getQueueName());
         }
 
         let json = JSON.stringify(subscribeData);
@@ -136,7 +136,7 @@ export class MqClientListener extends EventListener {
             .metaPut(EntityMetas.META_X_UNLIMITED, "1")
             .metaPut("@", MqConstants.BROKER_AT_SERVER);
 
-        session.sendAndRequest(MqConstants.MQ_EVENT_SUBSCRIBE, entity).await();
+        session.sendAndRequest(MqConstants.MQ_EVENT_SUBSCRIBE, entity, 30_000).await();
 
         console.info("Client onOpen batch subscribe successfully, sessionId=" + session.sessionId());
     }

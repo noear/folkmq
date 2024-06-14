@@ -9,6 +9,7 @@
 * 更名 folkmq-embedded 改为 folkmq-borker-embedded
 * 更名 folkmq-server-borker 改为 folkmq-proxy
 * 添加 folkmq-borker-embedded 传输接口配置支持
+* 优化 folkmq-proxy 队列看板数字获取方式
 * socket.d 升为 2.5.5
 
 ### 1.6.0

@@ -37,8 +37,6 @@ public class ViewQueueService implements LifecycleBean {
 
     private Set<String> queueSet = Collections.newSetFromMap(new ConcurrentHashMap<>());
     private Map<String, QueueVo> queueVoMap = new ConcurrentHashMap<>();
-    private Map<String, QueueVo> queueVoMapTmp = new ConcurrentHashMap<>();
-    private Object QUEUE_LOCK = new Object();
 
     private ScheduledFuture<?> scheduledFuture;
 
@@ -91,7 +89,6 @@ public class ViewQueueService implements LifecycleBean {
 
     public void removeQueueVo(String queueName) {
         queueVoMap.remove(queueName);
-        queueVoMapTmp.remove(queueName);
         queueSet.remove(queueName);
     }
 
@@ -109,32 +106,34 @@ public class ViewQueueService implements LifecycleBean {
                 MqConfigNames.folkmq_view_queue_syncInterval_def));
 
         if (sync_time_millis > 0) {
-            scheduledFuture = RunUtil.delay(this::delayDo, sync_time_millis);
+            scheduledFuture = RunUtil.delay(this::delayTask, sync_time_millis);
         }
     }
 
 
-    private void delayDo() {
+    private void delayTask() {
         try {
             Collection<Session> tmp = brokerListener.getPlayerAll(MqConstants.PROXY_AT_BROKER);
             if (tmp == null) {
                 return;
             }
 
-            //一种切换效果。把上次收集的效果切换给当前的。然后重新开始收集
+            //清理（下面重新合并）
             queueVoMap.clear();
-            queueVoMap.putAll(queueVoMapTmp);
-            queueVoMapTmp.clear();
 
             List<Session> sessions = new ArrayList<>(tmp);
             Entity reqEntity = new StringEntity("").metaPut(EntityMetas.META_X_UNLIMITED, "1");
 
             for (Session session : sessions) {
+                //合并集合
+                mergeQueueVo(session.attr("QueueVoList"), queueVoMap);
+
+                //重新获取
                 try {
                     session.sendAndRequest(MqConstants.ADMIN_VIEW_QUEUE, reqEntity).thenReply(r -> {
                         String json = r.dataAsString();
                         List<QueueVo> list = ONode.loadStr(json).toObjectList(QueueVo.class);
-                        addQueueVo(list, queueVoMapTmp);
+                        session.attrPut("QueueVoList", list);
                     }).thenError(err -> {
                         log.debug(MqConstants.ADMIN_VIEW_QUEUE + " request failed", err);
                     });
@@ -155,31 +154,34 @@ public class ViewQueueService implements LifecycleBean {
         }
     }
 
-    private void addQueueVo(List<QueueVo> list, Map<String, QueueVo> coll) {
-        synchronized (QUEUE_LOCK) {
-            for (QueueVo queueVo : list) {
-                if (Utils.isEmpty(queueVo.queue)) {
-                    continue;
-                }
+    private void mergeQueueVo(List<QueueVo> list, Map<String, QueueVo> coll) {
+        if (list == null) {
+            return;
+        }
 
-                queueSet.add(queueVo.queue);
 
-                QueueVo stat = coll.computeIfAbsent(queueVo.queue, n -> new QueueVo());
-
-                stat.queue = queueVo.queue;
-                stat.messageCount += queueVo.messageCount;
-                stat.messageDelayedCount1 += queueVo.messageDelayedCount1;
-                stat.messageDelayedCount2 += queueVo.messageDelayedCount2;
-                stat.messageDelayedCount3 += queueVo.messageDelayedCount3;
-                stat.messageDelayedCount4 += queueVo.messageDelayedCount4;
-                stat.messageDelayedCount5 += queueVo.messageDelayedCount5;
-                stat.messageDelayedCount6 += queueVo.messageDelayedCount6;
-                stat.messageDelayedCount7 += queueVo.messageDelayedCount7;
-                stat.messageDelayedCount8 += queueVo.messageDelayedCount8;
-
-                String topic = queueVo.queue.split(MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP)[0];
-                brokerListener.subscribeDo(null, topic, queueVo.queue);
+        for (QueueVo queueVo : list) {
+            if (Utils.isEmpty(queueVo.queue)) {
+                continue;
             }
+
+            queueSet.add(queueVo.queue);
+
+            QueueVo stat = coll.computeIfAbsent(queueVo.queue, n -> new QueueVo());
+
+            stat.queue = queueVo.queue;
+            stat.messageCount += queueVo.messageCount;
+            stat.messageDelayedCount1 += queueVo.messageDelayedCount1;
+            stat.messageDelayedCount2 += queueVo.messageDelayedCount2;
+            stat.messageDelayedCount3 += queueVo.messageDelayedCount3;
+            stat.messageDelayedCount4 += queueVo.messageDelayedCount4;
+            stat.messageDelayedCount5 += queueVo.messageDelayedCount5;
+            stat.messageDelayedCount6 += queueVo.messageDelayedCount6;
+            stat.messageDelayedCount7 += queueVo.messageDelayedCount7;
+            stat.messageDelayedCount8 += queueVo.messageDelayedCount8;
+
+            String topic = queueVo.queue.split(MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP)[0];
+            brokerListener.subscribeDo(null, topic, queueVo.queue);
         }
     }
 

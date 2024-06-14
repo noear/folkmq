@@ -13,5 +13,5 @@ services:
       - 8602:8602           #管理后台端口
       - 18602:18602         #消息服务端口
     volumes:
-      - ./logs/server:/logs
-      - ./data/server:/data
+      - ./logs/broker:/logs
+      - ./data/broker:/data

@@ -7,15 +7,15 @@ services:
     ports:
       - 8602:8602
       - 18602:18602 #mq: tcp 端口
-#      - 18603:18603 #mq: websocket 端口
+    #      - 18603:18603 #mq: websocket 端口
     volumes:
-      - ./data/broker:/data
-      - ./logs/broker:/logs
+      - ./data/proxy:/data
+      - ./logs/proxy:/logs
     environment:
       - folkmq.admin=admin  #管理后台密码（暂时没有管理后台）
-#      - folkmq.websocket=true #启用 websocket 端口
-#      - folkmq.access.ak=demo              #消息访问账号
-#      - folkmq.access.sk=YapLHTx19RlsEE16  #消息访问密钥
+      #      - folkmq.websocket=true #启用 websocket 端口
+      #      - folkmq.access.ak=demo              #消息访问账号
+      #      - folkmq.access.sk=YapLHTx19RlsEE16  #消息访问密钥
       - TZ=Asia/Shanghai
     networks:
       folkmq:
@@ -28,8 +28,8 @@ services:
       - 8611:8602
       - 18611:18602
     volumes:
-      - ./logs/server1:/logs
-      - ./data/server1:/data
+      - ./logs/broker1:/logs
+      - ./data/broker1:/data
     environment:
       - folkmq.proxy=folkmq://folkmq-proxy:18602
       - solon.start.ping=folkmq-proxy:8602
@@ -47,8 +47,8 @@ services:
       - 8612:8602
       - 18612:18602
     volumes:
-      - ./data/server2:/data
-      - ./logs/server2:/logs
+      - ./data/broker2:/data
+      - ./logs/broker2:/logs
     environment:
       - folkmq.proxy=folkmq://folkmq-proxy:18602
       - solon.start.ping=folkmq-proxy:8602

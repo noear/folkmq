@@ -120,12 +120,21 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
             return true;
         }
 
-//        if (sessionCount() == 0) {
-//            //如果没有会话，则不派发 //不能加，不然 ttl 消息就没有效果了
-//            return false;
-//        }
+        MqMessageHolder messageHolder;
 
-        MqMessageHolder messageHolder = messageQueue.poll();
+        if (sessionCount() == 0) {
+            //如果没有会话，则不派发 //不能加，不然 ttl 消息就没有效果了
+            messageHolder = messageQueue.peek();
+            if (messageHolder == null) {
+                return false;
+            }
+
+            if (messageHolder.getExpiration() == 0) {
+                return false;
+            }
+        }
+
+        messageHolder = messageQueue.poll();
 
         if (messageHolder != null) {
             if (messageHolder.isTransaction()) {

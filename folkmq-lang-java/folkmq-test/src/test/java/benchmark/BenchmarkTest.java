@@ -42,11 +42,7 @@ public class BenchmarkTest {
         //发布测试
         long start_time = System.currentTimeMillis();
         for (int i = 0; i < count; i++) {
-            client.publishAsync("test", new MqMessage("test-" + i)).whenComplete((r,e)->{
-                if(e!=null){
-                    e.printStackTrace();
-                }
-            });
+            client.publishAsync("test", new MqMessage("test-" + i));
         }
         long sendTime = System.currentTimeMillis() - start_time;
 

@@ -8,6 +8,7 @@
 * folkmq-server 更名为 folkmq-borker
 * folkmq-embedded 更名为 folkmq-borker-embedded
 * folkmq-server-borker 更名为 folkmq-proxy
+* socket.d 升为 2.5.5
 
 ### 1.6.0
 * 新增 控制台 “流量看板”

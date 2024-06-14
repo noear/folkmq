@@ -2,7 +2,7 @@ package features.cases;
 
 import org.noear.folkmq.FolkMQ;
 import org.noear.folkmq.client.MqMessage;
-import org.noear.folkmq.borker.MqQueue;
+import org.noear.folkmq.broker.MqQueue;
 
 import java.util.Date;
 

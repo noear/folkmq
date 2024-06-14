@@ -2,8 +2,8 @@ package org.noear.folkmq;
 
 import org.noear.folkmq.client.MqClient;
 import org.noear.folkmq.client.MqClientDefault;
-import org.noear.folkmq.borker.MqBorker;
-import org.noear.folkmq.borker.MqBorkerDefault;
+import org.noear.folkmq.broker.MqBorker;
+import org.noear.folkmq.broker.MqBorkerDefault;
 
 /**
  * @author noear
@@ -28,7 +28,7 @@ public class FolkMQ {
      * 获取版本名称
      */
     public static String versionName() {
-        return "1.6.0";
+        return "1.7.0";
     }
 
     /**

@@ -2,9 +2,9 @@ package features.cases;
 
 import org.noear.folkmq.FolkMQ;
 import org.noear.folkmq.client.MqMessage;
-import org.noear.folkmq.borker.MqBorker;
-import org.noear.folkmq.borker.MqBorkerInternal;
-import org.noear.folkmq.borker.MqQueue;
+import org.noear.folkmq.broker.MqBorker;
+import org.noear.folkmq.broker.MqBorkerInternal;
+import org.noear.folkmq.broker.MqQueue;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;

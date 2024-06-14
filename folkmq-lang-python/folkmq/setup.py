@@ -4,14 +4,14 @@ from setuptools import setup,find_packages
 
 setup(
     name='folkmq',
-    version='1.6.0',
+    version='1.7.0',
     description='@noear/folkmq python project',
     author='noear',
     url='https://folkmq.noear.org/',
     packages=find_packages(exclude=['*folkmq-test*']),   # 包内不需要引用的文件夹
     install_requires=[                          # 依赖包
-        'loguru>=0.7.2',
-        'websockets>=12.0',
+        'loguru==0.7.2',
+        'websockets==12.0',
         'socket.d>=2.5.5'
     ],
     classifiers=[

@@ -5,10 +5,10 @@
 * 添加 broker 配置可同步给 server 的能力
 
 ### 1.7.0
-* 更名 folkmq-server 改为 folkmq-borker
-* 更名 folkmq-embedded 改为 folkmq-borker-embedded
-* 更名 folkmq-server-borker 改为 folkmq-proxy
-* 添加 folkmq-borker-embedded 传输接口配置支持
+* 更名 folkmq-server 改为 folkmq-broker
+* 更名 folkmq-embedded 改为 folkmq-broker-embedded
+* 更名 folkmq-server-broker 改为 folkmq-proxy
+* 添加 folkmq-broker-embedded 传输接口配置支持
 * 优化 folkmq-proxy 队列看板数字获取方式
 * socket.d 升为 2.5.5
 

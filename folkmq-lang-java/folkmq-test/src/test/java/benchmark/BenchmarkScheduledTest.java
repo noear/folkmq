@@ -3,7 +3,7 @@ package benchmark;
 import org.noear.folkmq.FolkMQ;
 import org.noear.folkmq.client.MqClient;
 import org.noear.folkmq.client.MqMessage;
-import org.noear.folkmq.borker.MqBorker;
+import org.noear.folkmq.broker.MqBorker;
 
 import java.util.Date;
 import java.util.concurrent.CountDownLatch;

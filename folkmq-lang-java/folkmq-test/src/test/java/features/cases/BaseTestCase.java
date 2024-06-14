@@ -1,7 +1,7 @@
 package features.cases;
 
 import org.noear.folkmq.client.MqClient;
-import org.noear.folkmq.borker.MqBorker;
+import org.noear.folkmq.broker.MqBorker;
 
 /**
  * @author noear

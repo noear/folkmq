@@ -1,7 +1,7 @@
 package demo;
 
 import org.noear.folkmq.FolkMQ;
-import org.noear.folkmq.borker.MqBorker;
+import org.noear.folkmq.broker.MqBorker;
 
 /**
  * @author noear

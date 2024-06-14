@@ -123,7 +123,7 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
         MqMessageHolder messageHolder;
 
         if (sessionCount() == 0) {
-            //如果没有会话，则不派发 //不能加，不然 ttl 消息就没有效果了
+            //如果没有会话，则不派发（避免空转浪费）
             messageHolder = messageQueue.peek();
             if (messageHolder == null) {
                 return false;
@@ -268,7 +268,7 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
         Session s1 = null;
 
         //获取会话
-        if (serviceListener.clusterMode) {
+        if (serviceListener.proxyMode) {
             s1 = serviceListener.brokerListener.getSessionAny();
         } else {
             s1 = serviceListener.brokerListener.getPlayerAny(messageHolder.getSender());
@@ -319,7 +319,7 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
 
             //记日志
             if (log.isDebugEnabled()) {
-                if (serviceListener.clusterMode) {
+                if (serviceListener.proxyMode) {
                     log.debug("Queue: request: broker no sessions, times={}, key={}",
                             messageHolder.getDistributeCount(),
                             messageHolder.getKey());

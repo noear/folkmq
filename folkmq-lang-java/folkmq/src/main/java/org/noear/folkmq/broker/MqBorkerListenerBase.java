@@ -23,8 +23,8 @@ public abstract class MqBorkerListenerBase extends EventListener implements MqBo
 
     //观察者
     protected MqWatcher watcher;
-    //群集模式（有经理人的模式）
-    protected boolean clusterMode;
+    //代理模式（即连接代理的集群模式）
+    protected boolean proxyMode;
     //订阅锁
     protected final Object SUBSCRIBE_LOCK = new Object();
     //所有会话
@@ -48,7 +48,7 @@ public abstract class MqBorkerListenerBase extends EventListener implements MqBo
      * 通道类型
      * */
     public String chanelType() {
-        if (clusterMode) {
+        if (proxyMode) {
             return "proxy";
         } else {
             return "client";

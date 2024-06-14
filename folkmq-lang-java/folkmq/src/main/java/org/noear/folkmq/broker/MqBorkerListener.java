@@ -22,7 +22,7 @@ import java.util.concurrent.ScheduledFuture;
  * @since 1.0
  */
 public class MqBorkerListener extends MqBorkerListenerBase implements MqBorkerInternal {
-    protected final BrokerListener brokerListener = new BrokerListener();
+    protected final BrokerListener brokerListener = new BrokerListener(); //为 rpc 服务的
     protected final MqQps qpsPublish = new MqQps();
     protected final MqQps qpsDistribute = new MqQps();
     protected final ScheduledFuture<?> qpsScheduled;
@@ -37,9 +37,9 @@ public class MqBorkerListener extends MqBorkerListenerBase implements MqBorkerIn
         return qpsPublish;
     }
 
-    public MqBorkerListener(boolean clusterMode) {
+    public MqBorkerListener(boolean proxyMode) {
         //::初始化 Watcher 接口
-        this.clusterMode = clusterMode;
+        this.proxyMode = proxyMode;
 
         this.distributeThread = new Thread(this::distributeDo, "distributeThread");
 
@@ -71,8 +71,8 @@ public class MqBorkerListener extends MqBorkerListenerBase implements MqBorkerIn
             //接收发布指令
             boolean isTrans = mr.isTransaction(m);
 
-            if (clusterMode) {
-                //如果是经理模式，派发的消息不受内存限制
+            if (proxyMode) {
+                //如果是代理模式，派发的消息不受内存限制
                 m.putMeta(EntityMetas.META_X_UNLIMITED, "1");
             }
 
@@ -306,7 +306,7 @@ public class MqBorkerListener extends MqBorkerListenerBase implements MqBorkerIn
         //返馈版本号
         session.handshake().outMeta(MqConstants.FOLKMQ_VERSION, FolkMQ.versionCodeAsString());
 
-        if (clusterMode) {
+        if (proxyMode) {
             //申请加入 //不要用 sendAndRequest
             session.send(MqConstants.MQ_EVENT_JOIN, new StringEntity("").metaPut(EntityMetas.META_X_UNLIMITED, "1"));
 

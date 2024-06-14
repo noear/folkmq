@@ -74,13 +74,13 @@ class MqConstants:
     SEPARATOR_TOPIC_CONSUMER_GROUP = "#"
 
     #经理人服务
-    BROKER_AT_SERVER = "folkmq-server"
+    PROXY_AT_BROKER = "folkmq-server"
 
     #经理人服务
-    BROKER_AT_SERVER_HASH = "folkmq-server!"
+    PROXY_AT_BROKER_HASH = "folkmq-server!"
 
     #经理人所有服务
-    BROKER_AT_SERVER_ALL = "folkmq-server*"
+    PROXY_AT_BROKER_ALL = "folkmq-server*"
 
     #事件缓存队列消息费者
     MQ_TRAN_CONSUMER_GROUP = "!"

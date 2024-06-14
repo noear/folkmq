@@ -164,7 +164,7 @@ public class MqClientListener extends EventListener {
         Entity entity = new StringEntity(json)
                 .metaPut(MqConstants.MQ_META_BATCH, "1")
                 .metaPut(EntityMetas.META_X_UNLIMITED, "1")
-                .at(MqConstants.BROKER_AT_SERVER);
+                .at(MqConstants.PROXY_AT_BROKER);
 
         session.sendAndRequest(MqConstants.MQ_EVENT_SUBSCRIBE, entity, 30_000).await();
 

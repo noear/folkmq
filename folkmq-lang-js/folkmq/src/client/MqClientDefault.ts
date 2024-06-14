@@ -186,7 +186,7 @@ export class MqClientDefault implements MqClientInternal {
                     .metaPut(MqConstants.MQ_META_TOPIC, subscription.getTopic())
                     .metaPut(MqConstants.MQ_META_CONSUMER_GROUP, subscription.getConsumerGroup())
                     .metaPut(EntityMetas.META_X_UNLIMITED, "1")
-                    .at(MqConstants.BROKER_AT_SERVER_ALL);
+                    .at(MqConstants.PROXY_AT_BROKER_ALL);
 
                 //使用 Qos1
                 session.sendAndRequest(MqConstants.MQ_EVENT_SUBSCRIBE, entity, 30_000).await();
@@ -220,7 +220,7 @@ export class MqClientDefault implements MqClientInternal {
                 let entity = SocketD.newEntity("")
                     .metaPut(MqConstants.MQ_META_TOPIC, topic)
                     .metaPut(MqConstants.MQ_META_CONSUMER_GROUP, consumerGroup)
-                    .at(MqConstants.BROKER_AT_SERVER_ALL);
+                    .at(MqConstants.PROXY_AT_BROKER_ALL);
 
                 //使用 Qos1
                 session.sendAndRequest(MqConstants.MQ_EVENT_UNSUBSCRIBE, entity, 30_000).await();
@@ -287,7 +287,7 @@ export class MqClientDefault implements MqClientInternal {
         let entity = SocketD.newEntity("")
             .metaPut(MqConstants.MQ_META_TOPIC, topic)
             .metaPut(MqConstants.MQ_META_KEY, key)
-            .at(MqConstants.BROKER_AT_SERVER_ALL);
+            .at(MqConstants.PROXY_AT_BROKER_ALL);
 
         //::Qos1
         let resp = await session.sendAndRequest(MqConstants.MQ_EVENT_UNPUBLISH, entity).await();
@@ -386,7 +386,7 @@ export class MqClientDefault implements MqClientInternal {
 
         let entity = SocketD.newEntity(keyAry.join(","))
             .metaPut(MqConstants.MQ_META_ROLLBACK, (isRollback ? "1" : "0"))
-            .at(MqConstants.BROKER_AT_SERVER_HASH); //事务走哈希
+            .at(MqConstants.PROXY_AT_BROKER_HASH); //事务走哈希
 
         //::Qos1
         let resp = await session.sendAndRequest(MqConstants.MQ_EVENT_PUBLISH2, entity).await();

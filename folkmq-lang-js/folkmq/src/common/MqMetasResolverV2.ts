@@ -127,7 +127,7 @@ export class MqMetasResolverV2 implements MqMetasResolver {
 
         //是否有序
         if (message.isSequence() || message.isTransaction()) {
-            entity.at(MqConstants.BROKER_AT_SERVER_HASH);
+            entity.at(MqConstants.PROXY_AT_BROKER_HASH);
 
             if (message.isSequence()) {
                 entity.metaPut(MqMetasV2.MQ_META_SEQUENCE, "1");
@@ -138,7 +138,7 @@ export class MqMetasResolverV2 implements MqMetasResolver {
                 }
             }
         } else {
-            entity.at(MqConstants.BROKER_AT_SERVER);
+            entity.at(MqConstants.PROXY_AT_BROKER);
         }
 
         entity.metaPut(MqMetasV2.MQ_META_VID, FolkMQ.versionCode().toString());
@@ -153,7 +153,7 @@ export class MqMetasResolverV2 implements MqMetasResolver {
 
     routingMessageBuild(topic: string, message: MqMessage): Message {
         let entity = this.publishEntityBuild(topic, message)
-            .at(MqConstants.BROKER_AT_SERVER);
+            .at(MqConstants.PROXY_AT_BROKER);
 
         let messageDefault = new MessageBuilder()
             .flag(Flags.Message)

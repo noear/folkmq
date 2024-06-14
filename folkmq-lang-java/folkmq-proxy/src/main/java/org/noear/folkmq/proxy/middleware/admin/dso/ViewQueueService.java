@@ -116,7 +116,7 @@ public class ViewQueueService implements LifecycleBean {
 
     private void delayDo() {
         try {
-            Collection<Session> tmp = brokerListener.getPlayerAll(MqConstants.BROKER_AT_SERVER);
+            Collection<Session> tmp = brokerListener.getPlayerAll(MqConstants.PROXY_AT_BROKER);
             if (tmp == null) {
                 return;
             }

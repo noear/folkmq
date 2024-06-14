@@ -116,7 +116,7 @@ class MqClientListener(EventListener):
         entity = (StringEntity(jsonStr)
                   .meta_put(MqConstants.MQ_META_BATCH, "1")
                   .meta_put(EntityMetas.META_X_UNLIMITED, "1")
-                  .meta_put("@", MqConstants.BROKER_AT_SERVER))
+                  .meta_put("@", MqConstants.PROXY_AT_BROKER))
 
         await session.send_and_request(MqConstants.MQ_EVENT_SUBSCRIBE, entity).waiter()
 

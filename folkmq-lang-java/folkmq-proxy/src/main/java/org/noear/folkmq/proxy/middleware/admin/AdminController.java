@@ -167,7 +167,7 @@ public class AdminController extends BaseController {
     @Mapping("/admin/server")
     public ModelAndView server() throws IOException {
         List<ServerVo> list = new ArrayList<>();
-        Collection<Session> tmp = brokerListener.getPlayerAll(MqConstants.BROKER_AT_SERVER);
+        Collection<Session> tmp = brokerListener.getPlayerAll(MqConstants.PROXY_AT_BROKER);
 
         if (tmp != null) {
             List<Session> serverList = new ArrayList<>(tmp);
@@ -204,7 +204,7 @@ public class AdminController extends BaseController {
 
     @Mapping("/admin/server/ajax/save")
     public Result server_save(@NotEmpty String sid) throws IOException {
-        Collection<Session> tmp = brokerListener.getPlayerAll(MqConstants.BROKER_AT_SERVER);
+        Collection<Session> tmp = brokerListener.getPlayerAll(MqConstants.PROXY_AT_BROKER);
 
         if (tmp != null) {
             List<Session> serverList = new ArrayList<>(tmp);

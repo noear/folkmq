@@ -84,7 +84,7 @@ public class ProxyLifecycleBean implements LifecycleBean {
         //注册
         appContext.wrapAndPut(FolkmqProxyListener.class, brokerListener);
 
-        log.info("Server:main: folkmq-server-broker: Started (SOCKET.D/{}-{}, folkmq/{})",
+        log.info("Server:main: folkmq-proxy: Started (SOCKET.D/{}-{}, folkmq/{})",
                 SocketD.protocolVersion(),
                 SocketD.version(),
                 FolkMQ.versionName());

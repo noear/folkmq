@@ -53,7 +53,7 @@ public class QueueForceService {
 
             QueueVo queueVo = viewQueueService.getQueueVo(queueName);
             if (queueVo != null) {
-                Collection<Session> tmp = brokerListener.getPlayerAll(MqConstants.BROKER_AT_SERVER);
+                Collection<Session> tmp = brokerListener.getPlayerAll(MqConstants.PROXY_AT_BROKER);
 
                 if (tmp == null || tmp.size() == 0) {
                     return Result.failure("没有消费者连接，不能派发!");
@@ -105,7 +105,7 @@ public class QueueForceService {
                     return Result.failure("有消费者连接，不能清空!");
                 }
 
-                Collection<Session> tmp = brokerListener.getPlayerAll(MqConstants.BROKER_AT_SERVER);
+                Collection<Session> tmp = brokerListener.getPlayerAll(MqConstants.PROXY_AT_BROKER);
                 List<Session> serverList = new ArrayList<>(tmp);
                 Entity entity = new StringEntity("")
                         .metaPut(MqConstants.MQ_META_TOPIC, topic)
@@ -151,7 +151,7 @@ public class QueueForceService {
                 viewQueueService.removeQueueVo(queueName);
                 brokerListener.removeSubscribe(topic, queueName);
 
-                Collection<Session> tmp = brokerListener.getPlayerAll(MqConstants.BROKER_AT_SERVER);
+                Collection<Session> tmp = brokerListener.getPlayerAll(MqConstants.PROXY_AT_BROKER);
                 List<Session> serverList = new ArrayList<>(tmp);
                 Entity entity = new StringEntity("")
                         .metaPut(MqConstants.MQ_META_TOPIC, topic)

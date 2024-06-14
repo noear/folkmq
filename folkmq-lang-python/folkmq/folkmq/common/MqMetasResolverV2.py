@@ -105,7 +105,7 @@ class MqMetasResolverV2(MqMetasResolver):
 
         # 是否有序
         if message.is_sequence() or message.is_transaction():
-            entity.at(MqConstants.BROKER_AT_SERVER_HASH)
+            entity.at(MqConstants.PROXY_AT_BROKER_HASH)
             if message.is_sequence():
                 entity.meta_put(MqMetasV2.MQ_META_SEQUENCE, "1");
 
@@ -113,7 +113,7 @@ class MqMetasResolverV2(MqMetasResolver):
                     # 不是事务，并且有顺序分片
                     entity.meta_put(EntityMetas.META_X_HASH, message.getSequenceSharding())
         else:
-            entity.at(MqConstants.BROKER_AT_SERVER)
+            entity.at(MqConstants.PROXY_AT_BROKER)
 
         from folkmq.FolkMQ import FolkMQ
         entity.meta_put(MqMetasV2.MQ_META_VID, str(FolkMQ.version_code()))

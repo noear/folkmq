@@ -72,7 +72,7 @@ public class FolkmqLifecycleBean implements LifecycleBean {
             startBrokerSession(MqServerConfig.proxyServer, snapshotPlus);
         }
 
-        log.info("Server:main: folkmq-server: Started (SOCKET.D/{}-{}, folkmq/{})",
+        log.info("Server:main: folkmq-broker: Started (SOCKET.D/{}-{}, folkmq/{})",
                 SocketD.protocolVersion(),
                 SocketD.version(),
                 FolkMQ.versionName());
@@ -176,9 +176,9 @@ public class FolkmqLifecycleBean implements LifecycleBean {
             //确保有 @参数（外部可不加）
             if (url.contains("@=") == false) {
                 if (url.contains("?")) {
-                    url = url + "&@=" + MqConstants.BROKER_AT_SERVER;
+                    url = url + "&@=" + MqConstants.PROXY_AT_BROKER;
                 } else {
-                    url = url + "?@=" + MqConstants.BROKER_AT_SERVER;
+                    url = url + "?@=" + MqConstants.PROXY_AT_BROKER;
                 }
             }
 
@@ -229,7 +229,7 @@ public class FolkmqLifecycleBean implements LifecycleBean {
         }
 
 
-        log.info("Server:main: folkmq-server: Stop starting (SOCKET.D/{}-{}, folkmq/{})",
+        log.info("Server:main: folkmq-broker: Stop starting (SOCKET.D/{}-{}, folkmq/{})",
                 SocketD.protocolVersion(),
                 SocketD.version(),
                 FolkMQ.versionName());
@@ -248,7 +248,7 @@ public class FolkmqLifecycleBean implements LifecycleBean {
             brokerServiceListener.stop(null);
         }
 
-        log.info("Server:main: folkmq-server: Has Stopped (SOCKET.D/{}-{}, folkmq/{})",
+        log.info("Server:main: folkmq-broker: Has Stopped (SOCKET.D/{}-{}, folkmq/{})",
                 SocketD.protocolVersion(),
                 SocketD.version(),
                 FolkMQ.versionName());

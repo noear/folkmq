@@ -145,19 +145,19 @@ public interface MqConstants {
     String SEPARATOR_TOPIC_CONSUMER_GROUP = "#";
 
     /**
-     * 经理人服务
+     * 经理人服务（历史原因这个值不能改）
      */
-    String BROKER_AT_SERVER = "folkmq-server";
+    String PROXY_AT_BROKER = "folkmq-server";
 
     /**
      * 经理人服务
      */
-    String BROKER_AT_SERVER_HASH = "folkmq-server!";
+    String PROXY_AT_BROKER_HASH = "folkmq-server!";
 
     /**
      * 经理人所有服务
      */
-    String BROKER_AT_SERVER_ALL = "folkmq-server*";
+    String PROXY_AT_BROKER_ALL = "folkmq-server*";
 
     /**
      * 事件缓存队列消息费者

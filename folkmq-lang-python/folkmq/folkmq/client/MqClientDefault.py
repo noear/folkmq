@@ -142,7 +142,7 @@ class MqClientDefault(MqClientInternal):
                           .meta_put(MqConstants.MQ_META_TOPIC, subscription.get_topic())
                           .meta_put(MqConstants.MQ_META_CONSUMER_GROUP, subscription.get_consumer_group())
                           .meta_put(EntityMetas.META_X_UNLIMITED, "1")
-                          .at(MqConstants.BROKER_AT_SERVER_ALL))
+                          .at(MqConstants.PROXY_AT_BROKER_ALL))
                 #使用 Qos1
                 await session.send_and_request(MqConstants.MQ_EVENT_SUBSCRIBE, entity, 30_000).waiter()
                 log.info(f"Client subscribe successfully: {topic}#{consumerGroup}, sessionId={session.session_id()}")
@@ -169,7 +169,7 @@ class MqClientDefault(MqClientInternal):
                 entity = (StringEntity("")
                           .meta_put(MqConstants.MQ_META_TOPIC, topic)
                           .meta_put(MqConstants.MQ_META_CONSUMER_GROUP, consumerGroup)
-                          .at(MqConstants.BROKER_AT_SERVER_ALL))
+                          .at(MqConstants.PROXY_AT_BROKER_ALL))
                 #使用 Qos1
                 await session.send_and_request(MqConstants.MQ_EVENT_UNSUBSCRIBE, entity, 30_000).waiter()
                 log.info(f"Client unsubscribe successfully: {topic}#{consumerGroup}， sessionId={session.session_id()}")
@@ -263,7 +263,7 @@ class MqClientDefault(MqClientInternal):
         entity = (StringEntity("")
                   .meta_put(MqConstants.MQ_META_TOPIC, topic)
                   .meta_put(MqConstants.MQ_META_KEY, key)
-                  .at(MqConstants.BROKER_AT_SERVER_ALL))
+                  .at(MqConstants.PROXY_AT_BROKER_ALL))
 
         resp = await session.send_and_request(MqConstants.MQ_EVENT_UNPUBLISH, entity).waiter()
         confirm = int(resp.meta_or_default(MqConstants.MQ_META_CONFIRM, "0"))
@@ -334,7 +334,7 @@ class MqClientDefault(MqClientInternal):
 
         entity = (StringEntity(",".join(keyAry))
                   .meta_put(MqConstants.MQ_META_ROLLBACK, ( "1" if isRollback else "0"))
-                  .at(MqConstants.BROKER_AT_SERVER_HASH)) # 事务走哈希
+                  .at(MqConstants.PROXY_AT_BROKER_HASH)) # 事务走哈希
 
         resp = await session.send_and_request(MqConstants.MQ_EVENT_PUBLISH2, entity).waiter()
 

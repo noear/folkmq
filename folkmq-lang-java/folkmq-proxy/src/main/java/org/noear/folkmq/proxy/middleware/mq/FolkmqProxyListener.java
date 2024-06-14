@@ -130,7 +130,7 @@ public class FolkmqProxyListener extends BrokerListener implements Lifecycle {
             }
         }
 
-        if (MqConstants.BROKER_AT_SERVER.equals(session.name())) {
+        if (MqConstants.PROXY_AT_BROKER.equals(session.name())) {
             log.info("Server channel opened, sessionId={}, ip={}",
                     session.sessionId(),
                     session.remoteAddress());
@@ -150,7 +150,7 @@ public class FolkmqProxyListener extends BrokerListener implements Lifecycle {
 
 
         //不打印 ip，否则可能异常
-        if (MqConstants.BROKER_AT_SERVER.equals(session.name())) {
+        if (MqConstants.PROXY_AT_BROKER.equals(session.name())) {
             log.info("Server channel closed, sessionId={}, code={}",
                     session.sessionId(),
                     session.closeCode());
@@ -339,7 +339,7 @@ public class FolkmqProxyListener extends BrokerListener implements Lifecycle {
     }
 
     public boolean publishDo(Message routingMessage, int qos) throws IOException {
-        Session responder = this.getPlayerAny(MqConstants.BROKER_AT_SERVER, null, null);
+        Session responder = this.getPlayerAny(MqConstants.PROXY_AT_BROKER, null, null);
 
         if (responder != null) {
             if (qos > 0) {

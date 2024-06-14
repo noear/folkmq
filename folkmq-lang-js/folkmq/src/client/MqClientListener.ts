@@ -134,7 +134,7 @@ export class MqClientListener extends EventListener {
         let entity = SocketD.newEntity(json)
             .metaPut(MqConstants.MQ_META_BATCH, "1")
             .metaPut(EntityMetas.META_X_UNLIMITED, "1")
-            .metaPut("@", MqConstants.BROKER_AT_SERVER);
+            .metaPut("@", MqConstants.PROXY_AT_BROKER);
 
         session.sendAndRequest(MqConstants.MQ_EVENT_SUBSCRIBE, entity, 30_000).await();
 

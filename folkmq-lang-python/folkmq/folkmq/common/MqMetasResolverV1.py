@@ -108,12 +108,12 @@ class MqMetasResolverV1(MqMetasResolver):
 
         # 是否有序
         if  message.is_sequence() or message.is_transaction():
-            entity.at(MqConstants.BROKER_AT_SERVER_HASH)
+            entity.at(MqConstants.PROXY_AT_BROKER_HASH)
 
         if message.is_sequence():
             entity.meta_put(MqMetasV1.MQ_META_SEQUENCE, "1")
         else:
-            entity.at(MqConstants.BROKER_AT_SERVER)
+            entity.at(MqConstants.PROXY_AT_BROKER)
 
         # 用户属性
         #message.getAttrMap().forEach((value, key, map) = > {
@@ -123,7 +123,7 @@ class MqMetasResolverV1(MqMetasResolver):
         return entity
 
     def routing_message_build(self, topic: str, message: MqMessage) -> Message:
-        entity = self.publish_entity_build(topic, message).at(MqConstants.BROKER_AT_SERVER)
+        entity = self.publish_entity_build(topic, message).at(MqConstants.PROXY_AT_BROKER)
         messageDefault =  MessageBuilder().flag(Flags.Message) \
                                 .sid(StrUtils.guid()) \
                                 .event(MqConstants.MQ_EVENT_PUBLISH) \

@@ -135,17 +135,17 @@ export class MqConstants {
     /**
      * 经理人服务
      */
-    static readonly BROKER_AT_SERVER = "folkmq-server";
+    static readonly PROXY_AT_BROKER = "folkmq-server";
 
     /**
      * 经理人服务
      */
-    static readonly BROKER_AT_SERVER_HASH = "folkmq-server!";
+    static readonly PROXY_AT_BROKER_HASH = "folkmq-server!";
 
     /**
      * 经理人所有服务
      */
-    static readonly BROKER_AT_SERVER_ALL = "folkmq-server*";
+    static readonly PROXY_AT_BROKER_ALL = "folkmq-server*";
 
     /**
      * 事件缓存队列消息费者

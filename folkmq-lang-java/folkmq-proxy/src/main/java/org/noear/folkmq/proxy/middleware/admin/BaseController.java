@@ -19,8 +19,8 @@ public abstract class BaseController {
 
         viewModel.put("root", "");
 
-        viewModel.put("title", "FolkMQ-B");
-        viewModel.put("app", "FolkMQ-B");
+        viewModel.put("title", "FolkMQ-P");
+        viewModel.put("app", "FolkMQ Proxy");
         viewModel.put("version", FolkMQ.versionName());
 
         viewModel.put("static", "/");

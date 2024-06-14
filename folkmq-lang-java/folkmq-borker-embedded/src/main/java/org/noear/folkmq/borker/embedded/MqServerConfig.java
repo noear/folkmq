@@ -40,11 +40,13 @@ public class MqServerConfig {
 
         path = Solon.cfg().get(MqConfigNames.folkmq_path);
 
-        if (Solon.cfg().contains(MqConfigNames.folkmq_proxy)) {
-            proxyServer = Solon.cfg().get(MqConfigNames.folkmq_proxy);
-        } else {
+        String proxyServerTmp = Solon.cfg().get(MqConfigNames.folkmq_proxy);
+        if (StrUtils.isEmpty(proxyServerTmp)) {
             proxyServer = Solon.cfg().get("folkmq.broker");//向下兼容
+        } else {
+            proxyServer = proxyServerTmp;
         }
+
         saveEnable = Solon.cfg().getBool(MqConfigNames.folkmq_snapshot_enable, true);
         save900 = Solon.cfg().getLong(MqConfigNames.folkmq_snapshot_save900, 0);
         save300 = Solon.cfg().getLong(MqConfigNames.folkmq_snapshot_save300, 0);

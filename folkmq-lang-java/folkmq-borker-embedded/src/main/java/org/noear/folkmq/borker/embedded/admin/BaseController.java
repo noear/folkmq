@@ -19,8 +19,8 @@ public abstract class BaseController {
         ModelAndView viewModel = new ModelAndView("/folkmq/" + viewName + ".ftl");
 
 
-        viewModel.put("title", "FolkMQ-S");
-        viewModel.put("app", "FolkMQ-S");
+        viewModel.put("title", "FolkMQ");
+        viewModel.put("app", "FolkMQ");
         viewModel.put("version", FolkMQ.versionName());
         viewModel.put("root", MqServerConfig.path);
 

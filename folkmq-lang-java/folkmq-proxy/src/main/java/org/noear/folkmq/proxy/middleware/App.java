@@ -20,7 +20,7 @@ public class App {
     public static void main(String[] args) {
         Solon.start(App.class, args, app -> {
             //加载传传输插件
-            List<String> transportList = Solon.cfg().getList("folkmq.transport");
+            List<String> transportList = Solon.cfg().getList("folkmq.transport.providers");
             for (String s1 : transportList) {
                 Object p1 = ClassUtil.tryInstance(s1);
                 if (p1 instanceof ServerProvider) {

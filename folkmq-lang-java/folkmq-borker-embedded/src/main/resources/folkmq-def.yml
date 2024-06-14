@@ -11,7 +11,7 @@ solon:
   stop:
     delay: "4s"
 
-folkmq.transport:
+folkmq.transport.providers:
   - org.noear.socketd.transport.netty.tcp.TcpNioProvider
   - org.noear.socketd.transport.netty.udp.UdpNioProvider
   - org.noear.socketd.transport.java_websocket.WsNioProvider

@@ -30,7 +30,7 @@ public class FolkmqPlugin implements Plugin {
         Solon.cfg().loadAddIfAbsent(ResourceUtil.getResource("folkmq-def.yml"));
 
         //加载传传输插件
-        List<String> transportList = Solon.cfg().getList("folkmq.transport");
+        List<String> transportList = Solon.cfg().getList("folkmq.transport.providers");
         for (String s1 : transportList) {
             Object p1 = ClassUtil.tryInstance(s1);
             if (p1 instanceof ServerProvider) {

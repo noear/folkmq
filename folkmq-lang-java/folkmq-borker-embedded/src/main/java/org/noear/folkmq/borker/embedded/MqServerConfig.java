@@ -18,6 +18,7 @@ public class MqServerConfig {
     }
 
     public static final String path;
+    public static final String proxyServer;
 
     public static final String accessAk;
     public static final String accessSk;
@@ -29,7 +30,6 @@ public class MqServerConfig {
     public static final int exchangeThreads;
 
     public static final long streamTimeout;
-    public static final String proxyServer;
 
     public static final boolean saveEnable;
     public static final long save900;

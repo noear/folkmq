@@ -5,7 +5,7 @@ server.session:
 
 solon.app:
   group: folkmq
-  name: folkmq-server-broker
+  name: folkmq-proxy
 
 solon:
   stop:

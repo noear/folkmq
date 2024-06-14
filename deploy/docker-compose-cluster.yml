@@ -1,9 +1,9 @@
 version: '3.5'
 
 services:
-  folkmq-server-broker:
-    image: noearorg/folkmq-server-broker:1.6.0
-    container_name: folkmq-server-broker
+  folkmq-proxy:
+    image: noearorg/folkmq-proxy:1.6.0
+    container_name: folkmq-proxy
     ports:
       - 8602:8602
       - 18602:18602 #mq: tcp 端口
@@ -20,10 +20,10 @@ services:
     networks:
       folkmq:
         aliases:
-          - folkmq-server-broker
-  folkmq-server1:
-    image: noearorg/folkmq-server:1.6.0
-    container_name: folkmq-server1
+          - folkmq-proxy
+  folkmq-broker1:
+    image: noearorg/folkmq-broker:1.6.0
+    container_name: folkmq-broker1
     ports:
       - 8611:8602
       - 18611:18602
@@ -31,18 +31,18 @@ services:
       - ./logs/server1:/logs
       - ./data/server1:/data
     environment:
-      - folkmq.broker=folkmq://folkmq-server-broker:18602
-      - solon.start.ping=folkmq-server-broker:8602
+      - folkmq.proxy=folkmq://folkmq-proxy:18602
+      - solon.start.ping=folkmq-proxy:8602
       - TZ=Asia/Shanghai
     depends_on:
-      - folkmq-server-broker
+      - folkmq-proxy
     networks:
       folkmq:
         aliases:
-          - folkmq-server1
-  folkmq-server2:
-    image: noearorg/folkmq-server:1.6.0
-    container_name: folkmq-server2
+          - folkmq-broker1
+  folkmq-broker2:
+    image: noearorg/folkmq-broker:1.6.0
+    container_name: folkmq-broker2
     ports:
       - 8612:8602
       - 18612:18602
@@ -50,15 +50,15 @@ services:
       - ./data/server2:/data
       - ./logs/server2:/logs
     environment:
-      - folkmq.broker=folkmq://folkmq-server-broker:18602
-      - solon.start.ping=folkmq-server-broker:8602
+      - folkmq.proxy=folkmq://folkmq-proxy:18602
+      - solon.start.ping=folkmq-proxy:8602
       - TZ=Asia/Shanghai
     depends_on:
-      - folkmq-server-broker
+      - folkmq-proxy
     networks:
       folkmq:
         aliases:
-          - folkmq-server2
+          - folkmq-broker2
 networks:
   folkmq:
     name: folkmq

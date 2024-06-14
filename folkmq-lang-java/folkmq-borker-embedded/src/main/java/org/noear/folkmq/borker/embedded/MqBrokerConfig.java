@@ -12,13 +12,12 @@ import java.util.Map;
  * @author noear
  * @since 1.0
  */
-public class MqServerConfig {
+public class MqBrokerConfig {
     public static boolean isStandalone() {
         return FolkmqLifecycleBean.isStandalone();
     }
 
     public static final String path;
-    public static final String proxyServer;
 
     public static final String accessAk;
     public static final String accessSk;
@@ -36,6 +35,10 @@ public class MqServerConfig {
     public static final long save300;
     public static final long save100;
 
+
+    public static final String proxyServer;
+    public static final int folkmqTransportPort;
+
     static {
 
         path = Solon.cfg().get(MqConfigNames.folkmq_path);
@@ -46,6 +49,7 @@ public class MqServerConfig {
         } else {
             proxyServer = proxyServerTmp;
         }
+        folkmqTransportPort = Solon.cfg().getInt(MqConfigNames.folkmq_transport_port, 0);
 
         saveEnable = Solon.cfg().getBool(MqConfigNames.folkmq_snapshot_enable, true);
         save900 = Solon.cfg().getLong(MqConfigNames.folkmq_snapshot_save900, 0);

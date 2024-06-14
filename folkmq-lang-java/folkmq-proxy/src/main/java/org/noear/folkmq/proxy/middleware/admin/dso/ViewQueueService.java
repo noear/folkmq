@@ -2,7 +2,7 @@ package org.noear.folkmq.proxy.middleware.admin.dso;
 
 import org.noear.folkmq.proxy.middleware.admin.model.QueueVo;
 import org.noear.folkmq.proxy.middleware.admin.model.ServerInfoVo;
-import org.noear.folkmq.proxy.middleware.common.ConfigNames;
+import org.noear.folkmq.proxy.middleware.common.MqConfigNames;
 import org.noear.folkmq.proxy.middleware.mq.FolkmqProxyListener;
 import org.noear.folkmq.common.MqConstants;
 import org.noear.snack.ONode;
@@ -105,8 +105,8 @@ public class ViewQueueService implements LifecycleBean {
      */
     private void delay() {
         long sync_time_millis = Integer.parseInt(Solon.cfg().get(
-                ConfigNames.folkmq_view_queue_syncInterval,
-                ConfigNames.folkmq_view_queue_syncInterval_def));
+                MqConfigNames.folkmq_view_queue_syncInterval,
+                MqConfigNames.folkmq_view_queue_syncInterval_def));
 
         if (sync_time_millis > 0) {
             scheduledFuture = RunUtil.delay(this::delayDo, sync_time_millis);

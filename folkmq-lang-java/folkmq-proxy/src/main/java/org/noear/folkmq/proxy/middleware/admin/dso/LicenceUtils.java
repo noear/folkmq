@@ -1,6 +1,6 @@
 package org.noear.folkmq.proxy.middleware.admin.dso;
 
-import org.noear.folkmq.proxy.middleware.common.ConfigNames;
+import org.noear.folkmq.proxy.middleware.common.MqConfigNames;
 import org.noear.snack.core.utils.DateUtil;
 import org.noear.solon.Utils;
 
@@ -136,7 +136,7 @@ public class LicenceUtils {
      * 加载（解析）
      */
     public boolean load() {
-        String licenceEncoded = ConfigUtils.get(ConfigNames.folkmq_licence);
+        String licenceEncoded = ConfigUtils.get(MqConfigNames.folkmq_licence);
 
         return load(licenceEncoded);
     }
@@ -186,7 +186,7 @@ public class LicenceUtils {
         }
 
         if (tmp.isValid) {
-            ConfigUtils.set(ConfigNames.folkmq_licence, licenceEncoded);
+            ConfigUtils.set(MqConfigNames.folkmq_licence, licenceEncoded);
         } else {
             licenceInfo.description = "Licence (for FolkMQ): Unauthorized (with legal risks)";
         }

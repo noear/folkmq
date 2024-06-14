@@ -1,6 +1,6 @@
 package org.noear.folkmq.borker.middleware;
 
-import org.noear.folkmq.borker.embedded.MqServerConfig;
+import org.noear.folkmq.borker.embedded.MqBrokerConfig;
 import org.noear.socketd.transport.client.ClientConfig;
 import org.noear.socketd.transport.server.ServerConfig;
 import org.noear.solon.Solon;
@@ -14,7 +14,7 @@ public class App {
     public static void main(String[] args) {
         Solon.start(App.class, args, app -> {
             app.onEvent(AppPluginLoadEndEvent.class, e -> {
-                app.get("/", ctx -> ctx.redirect(MqServerConfig.path + "/login"));
+                app.get("/", ctx -> ctx.redirect(MqBrokerConfig.path + "/login"));
             });
 
             app.onEvent(ServerConfig.class, c -> {

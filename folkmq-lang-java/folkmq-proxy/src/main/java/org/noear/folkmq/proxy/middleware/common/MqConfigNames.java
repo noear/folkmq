@@ -4,7 +4,7 @@ package org.noear.folkmq.proxy.middleware.common;
  * @author noear
  * @since 1.0
  */
-public interface ConfigNames {
+public interface MqConfigNames {
     //管理密码
     String folkmq_admin = "folkmq.admin";
     //许可证
@@ -17,6 +17,9 @@ public interface ConfigNames {
     String folkmq_exchangeThreads = "folkmq.exchangeThreads";
     //流超时
     String folkmq_streamTimeout = "folkmq.streamTimeout";
+
+    //传输提供者
+    String folkmq_transport_providers = "folkmq.transport.providers";
 
     //视图队列同步间隔（ms）
     String folkmq_view_queue_syncInterval = "folkmq.view.queue.syncInterval";

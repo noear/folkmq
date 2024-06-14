@@ -1,6 +1,6 @@
 package org.noear.folkmq.proxy.middleware.admin;
 
-import org.noear.folkmq.proxy.middleware.common.ConfigNames;
+import org.noear.folkmq.proxy.middleware.common.MqConfigNames;
 import org.noear.folkmq.proxy.middleware.admin.utils.ImageUtils;
 import org.noear.folkmq.proxy.middleware.admin.utils.RandomUtils;
 import org.noear.solon.Solon;
@@ -34,7 +34,7 @@ public class LoginController extends BaseController {
     private final String adminUser = "admin";
 
     public LoginController(){
-        adminPassword = Solon.cfg().get(ConfigNames.folkmq_admin, "");
+        adminPassword = Solon.cfg().get(MqConfigNames.folkmq_admin, "");
     }
 
     @Mapping("/")

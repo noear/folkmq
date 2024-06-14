@@ -2,7 +2,7 @@ package org.noear.folkmq.proxy.middleware.mq;
 
 import org.noear.folkmq.FolkMQ;
 import org.noear.folkmq.proxy.middleware.admin.dso.QueueForceService;
-import org.noear.folkmq.proxy.middleware.common.MqBrokerConfig;
+import org.noear.folkmq.proxy.middleware.common.MqProxyConfig;
 import org.noear.socketd.SocketD;
 import org.noear.socketd.broker.BrokerFragmentHandler;
 import org.noear.socketd.transport.core.Session;
@@ -39,17 +39,17 @@ public class ProxyLifecycleBean implements LifecycleBean {
     public void start() throws Throwable {
         BrokerFragmentHandler brokerFragmentHandler = new BrokerFragmentHandler();
         brokerListener = new FolkmqProxyListener(new ProxyApiHandler(queueForceService))
-                .addAccessAll(MqBrokerConfig.getAccessMap());
+                .addAccessAll(MqProxyConfig.getAccessMap());
 
         brokerServerTcp = SocketD.createServer("sd:tcp")
                 .config(c -> {
                     c.port(Solon.cfg().serverPort() + 10000)
                             .serialSend(true)
                             .maxMemoryRatio(0.8F)
-                            .streamTimeout(MqBrokerConfig.streamTimeout)
-                            .ioThreads(MqBrokerConfig.ioThreads)
-                            .codecThreads(MqBrokerConfig.codecThreads)
-                            .exchangeThreads(MqBrokerConfig.exchangeThreads)
+                            .streamTimeout(MqProxyConfig.streamTimeout)
+                            .ioThreads(MqProxyConfig.ioThreads)
+                            .codecThreads(MqProxyConfig.codecThreads)
+                            .exchangeThreads(MqProxyConfig.exchangeThreads)
                             .fragmentHandler(brokerFragmentHandler);
 
                     EventBus.publish(c);
@@ -65,10 +65,10 @@ public class ProxyLifecycleBean implements LifecycleBean {
                         c.port(Solon.cfg().serverPort() + 10001)
                                 .serialSend(true)
                                 .maxMemoryRatio(0.8F)
-                                .streamTimeout(MqBrokerConfig.streamTimeout)
-                                .ioThreads(MqBrokerConfig.ioThreads)
-                                .codecThreads(MqBrokerConfig.codecThreads)
-                                .exchangeThreads(MqBrokerConfig.exchangeThreads)
+                                .streamTimeout(MqProxyConfig.streamTimeout)
+                                .ioThreads(MqProxyConfig.ioThreads)
+                                .codecThreads(MqProxyConfig.codecThreads)
+                                .exchangeThreads(MqProxyConfig.exchangeThreads)
                                 .exchangeExecutor(brokerServerTcp.getConfig().getExchangeExecutor()) //复用通用执行器
                                 .fragmentHandler(brokerFragmentHandler);
 

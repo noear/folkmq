@@ -6,7 +6,7 @@ import org.noear.folkmq.borker.embedded.admin.dso.ViewUtils;
 import org.noear.folkmq.borker.embedded.admin.model.ServerInfoVo;
 import org.noear.folkmq.common.MqConstants;
 import org.noear.folkmq.borker.embedded.MqConfigNames;
-import org.noear.folkmq.borker.embedded.MqServerConfig;
+import org.noear.folkmq.borker.embedded.MqBrokerConfig;
 import org.noear.folkmq.borker.MqBorker;
 import org.noear.folkmq.borker.MqBorkerInternal;
 import org.noear.folkmq.borker.MqBorkerListener;
@@ -58,18 +58,18 @@ public class FolkmqLifecycleBean implements LifecycleBean {
     public void start() throws Throwable {
         //初始化快照持久化
         snapshotPlus = new MqWatcherSnapshotPlus();
-        snapshotPlus.save900Condition(MqServerConfig.save900);
-        snapshotPlus.save300Condition(MqServerConfig.save300);
-        snapshotPlus.save100Condition(MqServerConfig.save100);
+        snapshotPlus.save900Condition(MqBrokerConfig.save900);
+        snapshotPlus.save300Condition(MqBrokerConfig.save300);
+        snapshotPlus.save100Condition(MqBrokerConfig.save100);
 
         appContext.wrapAndPut(MqWatcherSnapshotPlus.class, snapshotPlus);
 
-        if (Utils.isEmpty(MqServerConfig.proxyServer)) {
+        if (Utils.isEmpty(MqBrokerConfig.proxyServer)) {
             isStandalone = true;
             startLocalServerMode(snapshotPlus);
         } else {
             isStandalone = false;
-            startBrokerSession(MqServerConfig.proxyServer, snapshotPlus);
+            startBrokerSession(MqBrokerConfig.proxyServer, snapshotPlus);
         }
 
         log.info("Server:main: folkmq-broker: Started (SOCKET.D/{}-{}, folkmq/{})",
@@ -88,20 +88,27 @@ public class FolkmqLifecycleBean implements LifecycleBean {
                 .config(c -> {
                     c.serialSend(true)
                             .maxMemoryRatio(0.8F)
-                            .streamTimeout(MqServerConfig.streamTimeout)
-                            .ioThreads(MqServerConfig.ioThreads)
-                            .codecThreads(MqServerConfig.codecThreads)
-                            .exchangeThreads(MqServerConfig.exchangeThreads);
+                            .streamTimeout(MqBrokerConfig.streamTimeout)
+                            .ioThreads(MqBrokerConfig.ioThreads)
+                            .codecThreads(MqBrokerConfig.codecThreads)
+                            .exchangeThreads(MqBrokerConfig.exchangeThreads);
 
                     EventBus.publish(c);
                 })
-                .addAccessAll(MqServerConfig.getAccessMap());
+                .addAccessAll(MqBrokerConfig.getAccessMap());
 
-        if (MqServerConfig.saveEnable) {
+        if (MqBrokerConfig.saveEnable) {
             localServer.watcher(snapshotPlus);
         }
 
-        localServer.start(Solon.cfg().serverPort() + 10000);
+        if (MqBrokerConfig.folkmqTransportPort > 0) {
+            //如果有配置
+            localServer.start(MqBrokerConfig.folkmqTransportPort);
+        } else {
+            //如果没有
+            localServer.start(Solon.cfg().serverPort() + 10000);
+        }
+
 
         addApiEvent(localServer.getServerInternal());
 
@@ -159,7 +166,7 @@ public class FolkmqLifecycleBean implements LifecycleBean {
         addApiEvent(brokerServiceListener);
 
         //快照
-        if (MqServerConfig.saveEnable) {
+        if (MqBrokerConfig.saveEnable) {
             brokerServiceListener.watcher(snapshotPlus);
         }
 
@@ -194,9 +201,9 @@ public class FolkmqLifecycleBean implements LifecycleBean {
                             .heartbeatInterval(6_000)
                             .serialSend(true)
                             .maxMemoryRatio(0.8F)
-                            .ioThreads(MqServerConfig.ioThreads)
-                            .codecThreads(MqServerConfig.codecThreads)
-                            .exchangeThreads(MqServerConfig.exchangeThreads);
+                            .ioThreads(MqBrokerConfig.ioThreads)
+                            .codecThreads(MqBrokerConfig.codecThreads)
+                            .exchangeThreads(MqBrokerConfig.exchangeThreads);
                     EventBus.publish(c);
                 })
                 .listen(brokerServiceListener)

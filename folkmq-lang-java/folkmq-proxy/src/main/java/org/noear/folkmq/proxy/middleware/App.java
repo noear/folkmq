@@ -1,6 +1,7 @@
 package org.noear.folkmq.proxy.middleware;
 
 import org.noear.folkmq.proxy.middleware.admin.dso.LicenceUtils;
+import org.noear.folkmq.proxy.middleware.common.MqConfigNames;
 import org.noear.socketd.SocketD;
 import org.noear.socketd.transport.client.ClientProvider;
 import org.noear.socketd.transport.server.ServerProvider;
@@ -20,7 +21,7 @@ public class App {
     public static void main(String[] args) {
         Solon.start(App.class, args, app -> {
             //加载传传输插件
-            List<String> transportList = Solon.cfg().getList("folkmq.transport.providers");
+            List<String> transportList = Solon.cfg().getList(MqConfigNames.folkmq_transport_providers);
             for (String s1 : transportList) {
                 Object p1 = ClassUtil.tryInstance(s1);
                 if (p1 instanceof ServerProvider) {

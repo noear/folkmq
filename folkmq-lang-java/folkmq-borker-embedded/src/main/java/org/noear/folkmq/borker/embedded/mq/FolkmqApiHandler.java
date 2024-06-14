@@ -5,7 +5,7 @@ import org.noear.folkmq.common.MqApis;
 import org.noear.folkmq.common.MqConstants;
 import org.noear.folkmq.borker.embedded.admin.dso.QueueForceService;
 import org.noear.folkmq.borker.embedded.admin.dso.ViewUtils;
-import org.noear.folkmq.borker.embedded.MqServerConfig;
+import org.noear.folkmq.borker.embedded.MqBrokerConfig;
 import org.noear.folkmq.borker.MqBorkerListener;
 import org.noear.snack.ONode;
 import org.noear.socketd.transport.core.Message;
@@ -36,12 +36,12 @@ public class FolkmqApiHandler implements MessageHandler {
         String name = m.meta(MqConstants.API_NAME);
         String token = m.meta(MqConstants.API_TOKEN);
 
-        if (StrUtils.isEmpty(MqServerConfig.apiToken)) {
+        if (StrUtils.isEmpty(MqBrokerConfig.apiToken)) {
             s.sendAlarm(m, "Api calls are not supported");
             return;
         }
 
-        if (MqServerConfig.apiToken.equals(token) == false) {
+        if (MqBrokerConfig.apiToken.equals(token) == false) {
             s.sendAlarm(m, "Token is invalid");
             return;
         }
@@ -80,21 +80,21 @@ public class FolkmqApiHandler implements MessageHandler {
 
             if (MqApis.MQ_QUEUE_FORCE_CLEAR.equals(name)) {
                 //{code,data}
-                queueForceService.forceClear(serviceListener, topic, consumerGroup, MqServerConfig.isStandalone());
+                queueForceService.forceClear(serviceListener, topic, consumerGroup, MqBrokerConfig.isStandalone());
                 replyDo(s, m, Result.succeed());
                 return;
             }
 
             if (MqApis.MQ_QUEUE_FORCE_DELETE.equals(name)) {
                 //{code,data}
-                queueForceService.forceDelete(serviceListener, topic, consumerGroup, MqServerConfig.isStandalone());
+                queueForceService.forceDelete(serviceListener, topic, consumerGroup, MqBrokerConfig.isStandalone());
                 replyDo(s, m, Result.succeed());
                 return;
             }
 
             if (MqApis.MQ_QUEUE_FORCE_DISTRIBUTE.equals(name)) {
                 //{code,data}
-                queueForceService.forceDelete(serviceListener, topic, consumerGroup, MqServerConfig.isStandalone());
+                queueForceService.forceDelete(serviceListener, topic, consumerGroup, MqBrokerConfig.isStandalone());
                 replyDo(s, m, Result.succeed());
                 return;
             }

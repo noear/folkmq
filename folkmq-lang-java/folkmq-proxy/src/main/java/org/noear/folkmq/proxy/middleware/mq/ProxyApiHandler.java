@@ -3,7 +3,7 @@ package org.noear.folkmq.proxy.middleware.mq;
 import org.noear.folkmq.proxy.middleware.admin.dso.QueueForceService;
 import org.noear.folkmq.proxy.middleware.admin.dso.ViewQueueService;
 import org.noear.folkmq.proxy.middleware.admin.model.QueueVo;
-import org.noear.folkmq.proxy.middleware.common.MqBrokerConfig;
+import org.noear.folkmq.proxy.middleware.common.MqProxyConfig;
 import org.noear.folkmq.common.MqApis;
 import org.noear.folkmq.common.MqConstants;
 import org.noear.snack.ONode;
@@ -35,12 +35,12 @@ public class ProxyApiHandler implements MessageHandler {
         String name = m.meta(MqConstants.API_NAME);
         String token = m.meta(MqConstants.API_TOKEN);
 
-        if (StrUtils.isEmpty(MqBrokerConfig.apiToken)) {
+        if (StrUtils.isEmpty(MqProxyConfig.apiToken)) {
             s.sendAlarm(m, "Api calls are not supported");
             return;
         }
 
-        if (MqBrokerConfig.apiToken.equals(token) == false) {
+        if (MqProxyConfig.apiToken.equals(token) == false) {
             s.sendAlarm(m, "Token is invalid");
             return;
         }

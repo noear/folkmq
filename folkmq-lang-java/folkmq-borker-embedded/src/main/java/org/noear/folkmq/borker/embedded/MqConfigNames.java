@@ -23,6 +23,11 @@ public interface MqConfigNames {
     //流超时
     String folkmq_streamTimeout = "folkmq.streamTimeout";
 
+    //传输提供者
+    String folkmq_transport_providers = "folkmq.transport.providers";
+    //传输端口
+    String folkmq_transport_port = "folkmq.transport.port";
+
 
     //快照相关
     String folkmq_snapshot_enable = "folkmq.snapshot.enable";

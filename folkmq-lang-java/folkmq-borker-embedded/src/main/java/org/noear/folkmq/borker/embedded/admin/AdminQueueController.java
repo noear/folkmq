@@ -4,7 +4,7 @@ import org.noear.folkmq.borker.embedded.admin.dso.QueueForceService;
 import org.noear.folkmq.borker.embedded.admin.dso.ViewUtils;
 import org.noear.folkmq.borker.embedded.admin.model.QueueVo;
 import org.noear.folkmq.common.MqConstants;
-import org.noear.folkmq.borker.embedded.MqServerConfig;
+import org.noear.folkmq.borker.embedded.MqBrokerConfig;
 import org.noear.folkmq.borker.MqQueue;
 import org.noear.folkmq.borker.MqBorkerInternal;
 import org.noear.folkmq.borker.watcher.MqWatcherSnapshotPlus;
@@ -85,18 +85,18 @@ public class AdminQueueController extends BaseController {
     @Post
     @Mapping("/admin/queue_details/ajax/distribute")
     public Result queue_details_ajax_distribute(@NotEmpty String topic, @NotEmpty String consumerGroup) {
-        return queueForceService.forceDistribute(server, topic, consumerGroup, MqServerConfig.isStandalone());
+        return queueForceService.forceDistribute(server, topic, consumerGroup, MqBrokerConfig.isStandalone());
     }
 
     @Post
     @Mapping("/admin/queue_details/ajax/clear")
     public Result queue_details_ajax_clear(@NotEmpty String topic, @NotEmpty String consumerGroup) {
-        return queueForceService.forceClear(server, topic, consumerGroup, MqServerConfig.isStandalone());
+        return queueForceService.forceClear(server, topic, consumerGroup, MqBrokerConfig.isStandalone());
     }
 
     @Post
     @Mapping("/admin/queue_details/ajax/delete")
     public Result queue_details_ajax_delete(@NotEmpty String topic, @NotEmpty String consumerGroup) {
-        return queueForceService.forceDelete(server, topic, consumerGroup, MqServerConfig.isStandalone());
+        return queueForceService.forceDelete(server, topic, consumerGroup, MqBrokerConfig.isStandalone());
     }
 }

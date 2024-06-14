@@ -17,6 +17,8 @@ folkmq.transport.providers:
   - org.noear.socketd.transport.java_websocket.WsNioProvider
   - org.noear.socketd.transport.smartsocket.tcp.TcpAioProvider
 
+#folkmq.transport.port: 0
+
 folkmq.snapshot:
   enable: true
   save900: 1

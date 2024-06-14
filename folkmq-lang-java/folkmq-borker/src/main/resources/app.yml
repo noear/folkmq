@@ -39,6 +39,8 @@ folkmq.snapshot:
   save300: 10
   save100: 10000
 
+#folkmq.transport.port: 0
+
 #folkmq.api.token: "GhVPG@hjJMViC7xN"
 #folkmq.proxy: "folkmq://127.0.0.1:18602"
 

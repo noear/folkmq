@@ -2,7 +2,6 @@ package features.cases;
 
 import org.noear.folkmq.FolkMQ;
 import org.noear.folkmq.client.MqMessage;
-import org.noear.folkmq.borker.MqBorkerDefault;
 import org.noear.folkmq.borker.MqBorkerInternal;
 import org.noear.folkmq.borker.MqQueue;
 import org.noear.folkmq.borker.watcher.MqWatcherSnapshot;
@@ -24,7 +23,7 @@ public class TestCase09_persistent extends BaseTestCase {
         super.start();
 
         //服务端
-        server = new MqBorkerDefault()
+        server = FolkMQ.createBorker()
                 .watcher(new MqWatcherSnapshot())
                 .start(getPort());
 
@@ -45,7 +44,7 @@ public class TestCase09_persistent extends BaseTestCase {
         Thread.sleep(100);//确保断连
 
         server.stop();
-        server = new MqBorkerDefault() //相当于服务器重启了
+        server = FolkMQ.createBorker() //相当于服务器重启了
                 .watcher(new MqWatcherSnapshot())
                 .start(getPort());
 
@@ -59,7 +58,7 @@ public class TestCase09_persistent extends BaseTestCase {
         Thread.sleep(100);//确保断连
 
         server.stop();
-        server = new MqBorkerDefault() //相当于服务器重启了
+        server = FolkMQ.createBorker() //相当于服务器重启了
                 .watcher(new MqWatcherSnapshot())
                 .start(getPort());
 

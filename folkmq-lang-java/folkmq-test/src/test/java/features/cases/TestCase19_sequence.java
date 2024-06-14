@@ -2,7 +2,6 @@ package features.cases;
 
 import org.noear.folkmq.FolkMQ;
 import org.noear.folkmq.client.MqMessage;
-import org.noear.folkmq.borker.MqBorkerDefault;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +22,7 @@ public class TestCase19_sequence extends BaseTestCase {
         super.start();
 
         //服务端
-        server = new MqBorkerDefault()
+        server = FolkMQ.createBorker()
                 .start(getPort());
 
         //客户端

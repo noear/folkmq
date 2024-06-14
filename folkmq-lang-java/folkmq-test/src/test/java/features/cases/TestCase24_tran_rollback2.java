@@ -5,7 +5,6 @@ import org.noear.folkmq.client.MqMessage;
 import org.noear.folkmq.client.MqTransaction;
 import org.noear.folkmq.common.MqConstants;
 import org.noear.folkmq.borker.MqQueue;
-import org.noear.folkmq.borker.MqBorkerDefault;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -24,7 +23,7 @@ public class TestCase24_tran_rollback2 extends BaseTestCase {
         super.start();
 
         //服务端
-        server = new MqBorkerDefault()
+        server = FolkMQ.createBorker()
                 .start(getPort());
 
         //客户端

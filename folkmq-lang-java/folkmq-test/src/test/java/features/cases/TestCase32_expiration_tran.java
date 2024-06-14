@@ -4,7 +4,6 @@ import org.noear.folkmq.FolkMQ;
 import org.noear.folkmq.client.MqMessage;
 import org.noear.folkmq.client.MqTransaction;
 import org.noear.folkmq.borker.MqQueue;
-import org.noear.folkmq.borker.MqBorkerDefault;
 
 import java.util.Date;
 
@@ -22,7 +21,7 @@ public class TestCase32_expiration_tran extends BaseTestCase {
         super.start();
 
         //服务端
-        server = new MqBorkerDefault()
+        server = FolkMQ.createBorker()
                 .start(getPort());
 
         //客户端

@@ -37,9 +37,9 @@ public class MqBorkerListener extends MqBorkerListenerBase implements MqBorkerIn
         return qpsPublish;
     }
 
-    public MqBorkerListener(boolean brokerMode) {
+    public MqBorkerListener(boolean clusterMode) {
         //::初始化 Watcher 接口
-        this.clusterMode = brokerMode;
+        this.clusterMode = clusterMode;
 
         this.distributeThread = new Thread(this::distributeDo, "distributeThread");
 
@@ -71,7 +71,7 @@ public class MqBorkerListener extends MqBorkerListenerBase implements MqBorkerIn
             //接收发布指令
             boolean isTrans = mr.isTransaction(m);
 
-            if (brokerMode) {
+            if (clusterMode) {
                 //如果是经理模式，派发的消息不受内存限制
                 m.putMeta(EntityMetas.META_X_UNLIMITED, "1");
             }

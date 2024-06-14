@@ -5,7 +5,6 @@ import org.noear.folkmq.client.MqConsumeHandler;
 import org.noear.folkmq.client.MqMessage;
 import org.noear.folkmq.client.MqMessageReceived;
 import org.noear.folkmq.borker.MqQueue;
-import org.noear.folkmq.borker.MqBorkerDefault;
 import org.noear.folkmq.borker.MqBorkerInternal;
 import org.noear.folkmq.utils.PackagingLoop;
 import org.noear.folkmq.utils.PackagingLoopImpl;
@@ -32,7 +31,7 @@ public class TestCase28_packaging_loop extends BaseTestCase {
         super.start();
 
         //服务端
-        server = new MqBorkerDefault()
+        server = FolkMQ.createBorker()
                 .start(getPort());
 
         //客户端

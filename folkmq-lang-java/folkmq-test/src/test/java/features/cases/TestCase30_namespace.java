@@ -20,7 +20,7 @@ public class TestCase30_namespace extends BaseTestCase {
         super.start();
 
         //服务端
-        server = FolkMQ.createServer()
+        server = FolkMQ.createBorker()
                 .start(getPort());
 
         //客户端

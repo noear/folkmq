@@ -24,7 +24,7 @@ public class TestCase31_broadcast extends BaseTestCase {
         CountDownLatch countDownLatch = new CountDownLatch(2);
 
         //服务端
-        server = FolkMQ.createServer()
+        server = FolkMQ.createBorker()
                 .start(getPort());
 
         //客户端

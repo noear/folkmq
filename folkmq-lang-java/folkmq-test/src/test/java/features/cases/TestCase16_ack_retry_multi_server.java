@@ -3,7 +3,6 @@ package features.cases;
 import org.noear.folkmq.FolkMQ;
 import org.noear.folkmq.client.MqMessage;
 import org.noear.folkmq.borker.MqBorker;
-import org.noear.folkmq.borker.MqBorkerDefault;
 import org.noear.folkmq.borker.MqBorkerInternal;
 import org.noear.folkmq.borker.MqQueue;
 
@@ -23,10 +22,10 @@ public class TestCase16_ack_retry_multi_server extends BaseTestCase {
         super.start();
 
         //服务端
-        server = new MqBorkerDefault()
+        server = FolkMQ.createBorker()
                 .start(getPort());
 
-        MqBorker server2 = new MqBorkerDefault()
+        MqBorker server2 = FolkMQ.createBorker()
                 .start(getPort() + 10000);
 
         //客户端

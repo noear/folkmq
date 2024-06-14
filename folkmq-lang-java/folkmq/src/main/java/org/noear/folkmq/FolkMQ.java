@@ -34,7 +34,7 @@ public class FolkMQ {
     /**
      * 创建服务端
      */
-    public static MqBorker createServer() {
+    public static MqBorker createBorker() {
         return new MqBorkerDefault();
     }
 
@@ -43,7 +43,7 @@ public class FolkMQ {
      *
      * @param schema 指定架构
      */
-    public static MqBorker createServer(String schema) {
+    public static MqBorker createBorker(String schema) {
         return new MqBorkerDefault(schema);
     }
 

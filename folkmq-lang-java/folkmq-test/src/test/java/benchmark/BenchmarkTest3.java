@@ -4,7 +4,6 @@ import org.noear.folkmq.FolkMQ;
 import org.noear.folkmq.client.MqClient;
 import org.noear.folkmq.client.MqMessage;
 import org.noear.folkmq.borker.MqBorker;
-import org.noear.folkmq.borker.MqBorkerDefault;
 
 import java.util.concurrent.CountDownLatch;
 
@@ -12,7 +11,7 @@ import java.util.concurrent.CountDownLatch;
 public class BenchmarkTest3 {
     public static void main(String[] args) throws Exception {
         //服务端
-        MqBorker server = new MqBorkerDefault()
+        MqBorker server = FolkMQ.createBorker()
                 .addAccess("folkmq", "YapLHTx19RlsEE16")
                 .start(18602);
 

@@ -84,7 +84,7 @@ public class FolkmqLifecycleBean implements LifecycleBean {
         String schema = Solon.cfg().get(MqConfigNames.folkmq_schema);
 
         //服务端（鉴权为可选。不添加则不鉴权）
-        localServer = FolkMQ.createServer(schema)
+        localServer = FolkMQ.createBorker(schema)
                 .config(c -> {
                     c.serialSend(true)
                             .maxMemoryRatio(0.8F)

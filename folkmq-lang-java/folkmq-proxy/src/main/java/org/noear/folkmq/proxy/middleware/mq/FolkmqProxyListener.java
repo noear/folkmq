@@ -131,14 +131,14 @@ public class FolkmqProxyListener extends BrokerListener implements Lifecycle {
         }
 
         if (MqConstants.PROXY_AT_BROKER.equals(session.name())) {
-            log.info("Server channel opened, sessionId={}, ip={}",
+            log.info("Proxy: broker channel opened, sessionId={}, ip={}",
                     session.sessionId(),
                     session.remoteAddress());
         } else {
             //如果不是 server，直接添加为 player
             super.onOpen(session);
 
-            log.info("Client channel opened, sessionId={}, ip={}",
+            log.info("Proxy: client channel opened, sessionId={}, ip={}",
                     session.sessionId(),
                     session.remoteAddress());
         }
@@ -151,11 +151,11 @@ public class FolkmqProxyListener extends BrokerListener implements Lifecycle {
 
         //不打印 ip，否则可能异常
         if (MqConstants.PROXY_AT_BROKER.equals(session.name())) {
-            log.info("Server channel closed, sessionId={}, code={}",
+            log.info("Proxy: broker channel closed, sessionId={}, code={}",
                     session.sessionId(),
                     session.closeCode());
         } else {
-            log.info("Client channel closed, sessionId={}, code={}",
+            log.info("Proxy: client channel closed, sessionId={}, code={}",
                     session.sessionId(),
                     session.closeCode());
         }
@@ -257,7 +257,7 @@ public class FolkmqProxyListener extends BrokerListener implements Lifecycle {
                 addPlayer(name, requester);
             }
 
-            log.info("Server channel joined, sessionId={}, ip={}",
+            log.info("Proxy: broker channel joined, sessionId={}, ip={}",
                     requester.sessionId(),
                     requester.remoteAddress());
 

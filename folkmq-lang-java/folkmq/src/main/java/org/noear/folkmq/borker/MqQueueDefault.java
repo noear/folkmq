@@ -249,7 +249,7 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
             messageMap.remove(messageHolder.getKey());
 
             if (log.isWarnEnabled()) {
-                log.warn("MqMessage have expired, key={}", messageHolder.getKey());
+                log.warn("Queue: message have expired, key={}", messageHolder.getKey());
             }
             return true;
         }
@@ -259,7 +259,7 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
         Session s1 = null;
 
         //获取会话
-        if (serviceListener.brokerMode) {
+        if (serviceListener.clusterMode) {
             s1 = serviceListener.brokerListener.getSessionAny();
         } else {
             s1 = serviceListener.brokerListener.getPlayerAny(messageHolder.getSender());
@@ -284,7 +284,7 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
                     internalAdd(messageHolder.delayed());
 
                     if (log.isDebugEnabled()) {
-                        log.debug("MqQueue request then error, key={}",
+                        log.debug("Queue: request then error, key={}",
                                 messageHolder.getKey(), err);
                     }
                 });
@@ -300,7 +300,7 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
                 internalAdd(messageHolder.delayed());
 
                 if (log.isWarnEnabled()) {
-                    log.warn("MqQueue request error, key={}",
+                    log.warn("Queue: request error, key={}",
                             messageHolder.getKey(), e);
                 }
             }
@@ -310,12 +310,12 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
 
             //记日志
             if (log.isDebugEnabled()) {
-                if (serviceListener.brokerMode) {
-                    log.debug("MqQueue request: broker no sessions, times={}, key={}",
+                if (serviceListener.clusterMode) {
+                    log.debug("Queue: request: broker no sessions, times={}, key={}",
                             messageHolder.getDistributeCount(),
                             messageHolder.getKey());
                 } else {
-                    log.debug("MqQueue request: @{} no sessions, times={}, key={}",
+                    log.debug("Queue: request: @{} no sessions, times={}, key={}",
                             messageHolder.getSender(),
                             messageHolder.getDistributeCount(),
                             messageHolder.getKey());
@@ -341,7 +341,7 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
             messageMap.remove(messageHolder.getKey());
 
             if (log.isWarnEnabled()) {
-                log.warn("MqMessage have expired, key={}", messageHolder.getKey());
+                log.warn("Queue: message have expired, key={}", messageHolder.getKey());
             }
             return true;
         }
@@ -383,7 +383,7 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
 
                 //记日志
                 if (log.isWarnEnabled()) {
-                    log.warn("MqQueue distribute error, key={}",
+                    log.warn("Queue: distribute error, key={}",
                             messageHolder.getKey(), e);
                 }
             }
@@ -394,7 +394,7 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
 
             //记日志
             if (log.isDebugEnabled()) {
-                log.debug("MqQueue distribute: @{} no sessions, times={}, key={}",
+                log.debug("Queue: distribute: @{} no sessions, times={}, key={}",
                         consumerGroup,
                         messageHolder.getDistributeCount(),
                         messageHolder.getKey());

@@ -39,7 +39,7 @@ public class MqBorkerListener extends MqBorkerListenerBase implements MqBorkerIn
 
     public MqBorkerListener(boolean brokerMode) {
         //::初始化 Watcher 接口
-        this.brokerMode = brokerMode;
+        this.clusterMode = brokerMode;
 
         this.distributeThread = new Thread(this::distributeDo, "distributeThread");
 
@@ -165,10 +165,10 @@ public class MqBorkerListener extends MqBorkerListenerBase implements MqBorkerIn
                     qpsDistribute.record();
                     brokerListener.forwardToSession(s, m, responder);
                 } catch (Throwable e) {
-                    s.sendAlarm(m, "Server forward '@" + atName + "' error: " + e.getMessage());
+                    s.sendAlarm(m, "Broker: forward '@" + atName + "' error: " + e.getMessage());
                 }
             } else {
-                s.sendAlarm(m, "Server don't have '@" + atName + "' session");
+                s.sendAlarm(m, "Broker: don't have '@" + atName + "' session");
             }
         });
     }
@@ -306,11 +306,11 @@ public class MqBorkerListener extends MqBorkerListenerBase implements MqBorkerIn
         //返馈版本号
         session.handshake().outMeta(MqConstants.FOLKMQ_VERSION, FolkMQ.versionCodeAsString());
 
-        if (brokerMode) {
+        if (clusterMode) {
             //申请加入 //不要用 sendAndRequest
             session.send(MqConstants.MQ_EVENT_JOIN, new StringEntity("").metaPut(EntityMetas.META_X_UNLIMITED, "1"));
 
-            log.info("Broker channel opened, sessionId={}", session.sessionId());
+            log.info("Broker: {} channel opened, sessionId={}", chanelType(), session.sessionId());
         } else {
             //鉴权
             if (this.auth(session) == false) {
@@ -318,7 +318,7 @@ public class MqBorkerListener extends MqBorkerListenerBase implements MqBorkerIn
                 return;
             }
 
-            log.info("Client channel opened, sessionId={}", session.sessionId());
+            log.info("Broker: {} channel opened, sessionId={}", chanelType(), session.sessionId());
         }
 
         //添加会话，用于停止通知
@@ -359,7 +359,9 @@ public class MqBorkerListener extends MqBorkerListenerBase implements MqBorkerIn
     public void onClose(Session session) {
         super.onClose(session);
 
-        log.info("Server channel closed, sessionId={}", session.sessionId());
+
+        log.info("Broker: {} channel closed, sessionId={}", chanelType(), session.sessionId());
+
 
         //遍历会话绑定的队列 //线程安全处理
         List<String> queueNameList = new ArrayList<>(session.attrMap().keySet());
@@ -386,9 +388,10 @@ public class MqBorkerListener extends MqBorkerListenerBase implements MqBorkerIn
         if (log.isWarnEnabled()) {
             if (error instanceof SocketDAlarmException) {
                 SocketDAlarmException alarmException = (SocketDAlarmException) error;
-                log.warn("Server channel error, sessionId={}, from={}", session.sessionId(), alarmException.getAlarm(), error);
+
+                log.warn("Broker: {} channel error, sessionId={}, from={}", chanelType(), session.sessionId(), alarmException.getAlarm(), error);
             } else {
-                log.warn("Server channel error, sessionId={}", session.sessionId(), error);
+                log.warn("Broker: {} channel error, sessionId={}", chanelType(), session.sessionId(), error);
             }
         }
     }

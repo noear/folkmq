@@ -24,7 +24,7 @@ public abstract class MqBorkerListenerBase extends EventListener implements MqBo
     //观察者
     protected MqWatcher watcher;
     //群集模式（有经理人的模式）
-    protected boolean brokerMode;
+    protected boolean clusterMode;
     //订阅锁
     protected final Object SUBSCRIBE_LOCK = new Object();
     //所有会话
@@ -43,6 +43,17 @@ public abstract class MqBorkerListenerBase extends EventListener implements MqBo
     protected Thread distributeThread;
 
     protected final AtomicBoolean isStarted = new AtomicBoolean(false);
+
+    /**
+     * 通道类型
+     * */
+    public String chanelType() {
+        if (clusterMode) {
+            return "proxy";
+        } else {
+            return "client";
+        }
+    }
 
     /**
      * 获取所有会话
@@ -118,7 +129,7 @@ public abstract class MqBorkerListenerBase extends EventListener implements MqBo
             //::2.标识会话身份（从持久层恢复时，会话可能为 null）
 
             if (session != null) {
-                log.info("Server channel subscribe topic={}, consumerGroup={}, sessionId={}", topic, consumerGroup, session.sessionId());
+                log.info("Broker: {} channel subscribe topic={}, consumerGroup={}, sessionId={}", chanelType(), topic, consumerGroup, session.sessionId());
 
                 //会话绑定队列（可以绑定多个队列）
                 session.attrPut(queueName, "1");
@@ -153,7 +164,7 @@ public abstract class MqBorkerListenerBase extends EventListener implements MqBo
             return;
         }
 
-        log.info("Server channel unsubscribe topic={}, consumerGroup={}, sessionId={}", topic, consumerGroup, session.sessionId());
+        log.info("Broker: {} channel unsubscribe topic={}, consumerGroup={}, sessionId={}", chanelType(), topic, consumerGroup, session.sessionId());
 
         String queueName = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP + consumerGroup;
 
@@ -219,7 +230,7 @@ public abstract class MqBorkerListenerBase extends EventListener implements MqBo
         String key = message.meta(MqConstants.MQ_META_KEY);
         //可能是非法消息
         if (StrUtils.isEmpty(key)) {
-            log.warn("The key cannot be null, sid={}", message.sid());
+            log.warn("Broker: message key cannot be null, sid={}", message.sid());
             return;
         }
 
@@ -257,7 +268,7 @@ public abstract class MqBorkerListenerBase extends EventListener implements MqBo
                             }
                         } catch (Throwable e) {
                             if (log.isWarnEnabled()) {
-                                log.warn("MqQueue take error, queue={}", queue.getQueueName(), e);
+                                log.warn("Broker: queue take error, queue={}", queue.getQueueName(), e);
                             }
                         }
                     }
@@ -270,14 +281,14 @@ public abstract class MqBorkerListenerBase extends EventListener implements MqBo
             } catch (Throwable e) {
                 if (e instanceof InterruptedException == false) {
                     if (log.isWarnEnabled()) {
-                        log.warn("MqQueue distribute error", e);
+                        log.warn("Broker: queue distribute error", e);
                     }
                 }
             }
         }
 
         if (log.isWarnEnabled()) {
-            log.warn("MqQueue take stoped!");
+            log.warn("Broker: queue take stoped!");
         }
     }
 }

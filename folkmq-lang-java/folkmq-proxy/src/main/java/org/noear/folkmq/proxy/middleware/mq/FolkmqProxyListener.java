@@ -292,7 +292,7 @@ public class FolkmqProxyListener extends BrokerListener implements Lifecycle {
         }
 
         if (message.event().startsWith(MqConstants.ADMIN_PREFIX)) {
-            log.warn("Client channel admin events are not allowed, sessionId={}, ip={}",
+            log.warn("Proxy: client channel admin events are not allowed, sessionId={}, ip={}",
                     requester.sessionId(),
                     requester.remoteAddress());
             return;

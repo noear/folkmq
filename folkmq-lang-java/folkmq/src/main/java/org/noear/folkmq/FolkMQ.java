@@ -2,8 +2,8 @@ package org.noear.folkmq;
 
 import org.noear.folkmq.client.MqClient;
 import org.noear.folkmq.client.MqClientDefault;
-import org.noear.folkmq.server.MqServer;
-import org.noear.folkmq.server.MqServerDefault;
+import org.noear.folkmq.borker.MqBorker;
+import org.noear.folkmq.borker.MqBorkerDefault;
 
 /**
  * @author noear
@@ -34,8 +34,8 @@ public class FolkMQ {
     /**
      * 创建服务端
      */
-    public static MqServer createServer() {
-        return new MqServerDefault();
+    public static MqBorker createServer() {
+        return new MqBorkerDefault();
     }
 
     /**
@@ -43,8 +43,8 @@ public class FolkMQ {
      *
      * @param schema 指定架构
      */
-    public static MqServer createServer(String schema) {
-        return new MqServerDefault(schema);
+    public static MqBorker createServer(String schema) {
+        return new MqBorkerDefault(schema);
     }
 
     /**

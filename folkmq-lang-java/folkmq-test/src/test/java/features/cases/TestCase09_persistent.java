@@ -2,10 +2,10 @@ package features.cases;
 
 import org.noear.folkmq.FolkMQ;
 import org.noear.folkmq.client.MqMessage;
-import org.noear.folkmq.server.MqServerDefault;
-import org.noear.folkmq.server.MqServiceInternal;
-import org.noear.folkmq.server.MqQueue;
-import org.noear.folkmq.server.watcher.MqWatcherSnapshot;
+import org.noear.folkmq.borker.MqBorkerDefault;
+import org.noear.folkmq.borker.MqBorkerInternal;
+import org.noear.folkmq.borker.MqQueue;
+import org.noear.folkmq.borker.watcher.MqWatcherSnapshot;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -24,7 +24,7 @@ public class TestCase09_persistent extends BaseTestCase {
         super.start();
 
         //服务端
-        server = new MqServerDefault()
+        server = new MqBorkerDefault()
                 .watcher(new MqWatcherSnapshot())
                 .start(getPort());
 
@@ -45,7 +45,7 @@ public class TestCase09_persistent extends BaseTestCase {
         Thread.sleep(100);//确保断连
 
         server.stop();
-        server = new MqServerDefault() //相当于服务器重启了
+        server = new MqBorkerDefault() //相当于服务器重启了
                 .watcher(new MqWatcherSnapshot())
                 .start(getPort());
 
@@ -59,7 +59,7 @@ public class TestCase09_persistent extends BaseTestCase {
         Thread.sleep(100);//确保断连
 
         server.stop();
-        server = new MqServerDefault() //相当于服务器重启了
+        server = new MqBorkerDefault() //相当于服务器重启了
                 .watcher(new MqWatcherSnapshot())
                 .start(getPort());
 
@@ -86,7 +86,7 @@ public class TestCase09_persistent extends BaseTestCase {
         Thread.sleep(100);
 
         //检验服务端
-        MqServiceInternal serverInternal = server.getServerInternal();
+        MqBorkerInternal serverInternal = server.getServerInternal();
         System.out.println("server topicConsumerMap.size=" + serverInternal.getQueueMap().size());
         assert serverInternal.getQueueMap().size() == 1;
 

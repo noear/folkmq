@@ -4,9 +4,9 @@ import org.noear.folkmq.FolkMQ;
 import org.noear.folkmq.client.MqConsumeHandler;
 import org.noear.folkmq.client.MqMessage;
 import org.noear.folkmq.client.MqMessageReceived;
-import org.noear.folkmq.server.MqQueue;
-import org.noear.folkmq.server.MqServerDefault;
-import org.noear.folkmq.server.MqServiceInternal;
+import org.noear.folkmq.borker.MqQueue;
+import org.noear.folkmq.borker.MqBorkerDefault;
+import org.noear.folkmq.borker.MqBorkerInternal;
 import org.noear.folkmq.utils.PackagingLoop;
 import org.noear.folkmq.utils.PackagingLoopImpl;
 import org.noear.folkmq.utils.PackagingWorkHandler;
@@ -32,7 +32,7 @@ public class TestCase28_packaging_loop extends BaseTestCase {
         super.start();
 
         //服务端
-        server = new MqServerDefault()
+        server = new MqBorkerDefault()
                 .start(getPort());
 
         //客户端
@@ -57,7 +57,7 @@ public class TestCase28_packaging_loop extends BaseTestCase {
         Thread.sleep(100);
 
         //检验服务端
-        MqServiceInternal serverInternal = server.getServerInternal();
+        MqBorkerInternal serverInternal = server.getServerInternal();
         System.out.println("server topicConsumerMap.size=" + serverInternal.getQueueMap().size());
         assert serverInternal.getQueueMap().size() == 1;
 

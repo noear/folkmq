@@ -2,7 +2,7 @@ package features.cases;
 
 import org.noear.folkmq.FolkMQ;
 import org.noear.folkmq.client.*;
-import org.noear.folkmq.server.MqServerDefault;
+import org.noear.folkmq.borker.MqBorkerDefault;
 import org.noear.socketd.transport.core.Reply;
 import org.noear.socketd.transport.core.entity.StringEntity;
 
@@ -20,7 +20,7 @@ public class TestCase25_rpc extends BaseTestCase {
         super.start();
 
         //服务端
-        server = new MqServerDefault()
+        server = new MqBorkerDefault()
                 .start(getPort());
 
         //客户端

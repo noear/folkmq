@@ -1,12 +1,11 @@
 package features.cases;
 
 import org.noear.folkmq.FolkMQ;
-import org.noear.folkmq.client.MqClientDefault;
 import org.noear.folkmq.client.MqMessage;
-import org.noear.folkmq.server.MqServer;
-import org.noear.folkmq.server.MqServerDefault;
-import org.noear.folkmq.server.MqServiceInternal;
-import org.noear.folkmq.server.MqQueue;
+import org.noear.folkmq.borker.MqBorker;
+import org.noear.folkmq.borker.MqBorkerDefault;
+import org.noear.folkmq.borker.MqBorkerInternal;
+import org.noear.folkmq.borker.MqQueue;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -25,10 +24,10 @@ public class TestCase15_send_multi_server extends BaseTestCase {
         super.start();
 
         //服务端
-        server = new MqServerDefault()
+        server = new MqBorkerDefault()
                 .start(getPort());
 
-        MqServer server2 = new MqServerDefault()
+        MqBorker server2 = new MqBorkerDefault()
                 .start(getPort() + 10000);
 
         //客户端
@@ -55,7 +54,7 @@ public class TestCase15_send_multi_server extends BaseTestCase {
         Thread.sleep(100);
 
         //检验服务端
-        MqServiceInternal serverInternal = server.getServerInternal();
+        MqBorkerInternal serverInternal = server.getServerInternal();
         System.out.println("server topicConsumerMap.size=" + serverInternal.getQueueMap().size());
         assert serverInternal.getQueueMap().size() == 1;
 
@@ -67,7 +66,7 @@ public class TestCase15_send_multi_server extends BaseTestCase {
 
 
         //检验服务端
-        MqServiceInternal serverInternal2 = server2.getServerInternal();
+        MqBorkerInternal serverInternal2 = server2.getServerInternal();
         System.out.println("server topicConsumerMap.size=" + serverInternal2.getQueueMap().size());
         assert serverInternal2.getQueueMap().size() == 1;
 

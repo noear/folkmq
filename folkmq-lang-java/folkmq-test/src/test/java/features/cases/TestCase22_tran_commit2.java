@@ -4,8 +4,8 @@ import org.noear.folkmq.FolkMQ;
 import org.noear.folkmq.client.MqMessage;
 import org.noear.folkmq.client.MqTransaction;
 import org.noear.folkmq.common.MqConstants;
-import org.noear.folkmq.server.MqQueue;
-import org.noear.folkmq.server.MqServerDefault;
+import org.noear.folkmq.borker.MqQueue;
+import org.noear.folkmq.borker.MqBorkerDefault;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -24,7 +24,7 @@ public class TestCase22_tran_commit2 extends BaseTestCase {
         super.start();
 
         //服务端
-        server = new MqServerDefault()
+        server = new MqBorkerDefault()
                 .start(getPort());
 
         //客户端

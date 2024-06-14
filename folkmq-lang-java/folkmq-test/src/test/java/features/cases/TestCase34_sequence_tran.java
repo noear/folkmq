@@ -3,7 +3,7 @@ package features.cases;
 import org.noear.folkmq.FolkMQ;
 import org.noear.folkmq.client.MqMessage;
 import org.noear.folkmq.client.MqTransaction;
-import org.noear.folkmq.server.MqServerDefault;
+import org.noear.folkmq.borker.MqBorkerDefault;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +24,7 @@ public class TestCase34_sequence_tran extends BaseTestCase {
         super.start();
 
         //服务端
-        server = new MqServerDefault()
+        server = new MqBorkerDefault()
                 .start(getPort());
 
         //客户端

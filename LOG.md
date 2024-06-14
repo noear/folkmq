@@ -4,6 +4,11 @@
 * 添加 后台资源看板（显示内存），并添加手动 GC 操作?
 * 添加 broker 配置可同步给 server 的能力
 
+### 1.7.0
+* folkmq-server 更名为 folkmq-borker
+* folkmq-embedded 更名为 folkmq-borker-embedded
+* folkmq-server-borker 更名为 folkmq-proxy
+
 ### 1.6.0
 * 新增 控制台 “流量看板”
 * 新增 客户端流量控制支持（trafficLimiter），可控制客户端内存占用

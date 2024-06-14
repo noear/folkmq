@@ -1,7 +1,7 @@
 package features.cases;
 
 import org.noear.folkmq.client.MqClient;
-import org.noear.folkmq.server.MqServer;
+import org.noear.folkmq.borker.MqBorker;
 
 /**
  * @author noear
@@ -9,7 +9,7 @@ import org.noear.folkmq.server.MqServer;
  */
 public abstract class BaseTestCase {
     private final int port;
-    protected MqServer server;
+    protected MqBorker server;
     protected MqClient client;
 
     public int getPort() {

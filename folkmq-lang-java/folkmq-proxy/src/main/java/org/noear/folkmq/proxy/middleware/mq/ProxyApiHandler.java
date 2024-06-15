@@ -18,6 +18,8 @@ import java.io.IOException;
 import java.util.List;
 
 /**
+ * 代理接口处理
+ *
  * @author noear
  * @since 2.3
  */

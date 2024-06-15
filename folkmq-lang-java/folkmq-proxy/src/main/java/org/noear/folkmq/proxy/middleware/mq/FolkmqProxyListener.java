@@ -23,7 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 
 /**
- * FolkMq 经纪人监听
+ * FolkMq 代理监听
  *
  * @author noear
  * @since 1.0
@@ -201,88 +201,15 @@ public class FolkmqProxyListener extends BrokerListener implements Lifecycle {
 
             removePlayer(queueName, requester);
         } else if (MqConstants.MQ_EVENT_DISTRIBUTE.equals(message.event())) {
-            String atName = message.atName();
-            boolean isBroadcast = MqUtils.getLast().isBroadcast(message.entity());
-
-            if (isBroadcast) {
-                //广播模式
-                if (atName.endsWith("!")) {
-                    atName = atName.substring(0, atName.length() - 1);
-                }
-
-                for (Session s0 : getPlayerAll(atName)) {
-                    if (SessionUtils.isActive(s0)) {
-                        try {
-                            forwardToSession(requester, message, s0, MqNextTime.maxConsumeMillis());
-                        } catch (Throwable e) {
-                            acknowledgeAsNo(requester, message);
-                        }
-                    }
-                }
-            } else {
-                //单发模式（给同名的某个玩家，轮询负截均衡）
-                Session responder = getPlayerAny(atName, requester, message);
-                if (SessionUtils.isActive(responder)) {
-                    //转发消息
-                    try {
-                        forwardToSession(requester, message, responder, MqNextTime.maxConsumeMillis());
-                    } catch (Throwable e) {
-                        acknowledgeAsNo(requester, message);
-                    }
-                } else {
-                    acknowledgeAsNo(requester, message);
-                }
-            }
-
+            onDistribute(requester, message);
             //结束处理
             return;
         } else if (MqConstants.MQ_EVENT_JOIN.equals(message.event())) {
-            //同步订阅
-            if (subscribeMap.size() > 0) {
-                String json = ONode.stringify(subscribeMap);
-                Entity entity = new StringEntity(json)
-                        .metaPut(MqConstants.MQ_META_BATCH, "1")
-                        .metaPut(EntityMetas.META_X_UNLIMITED, "1");
-
-                //不用 sendAndRequest
-                requester.send(MqConstants.MQ_EVENT_SUBSCRIBE, entity);
-            }
-
-            //标为不限制
-            requester.attrPut(EntityMetas.META_X_UNLIMITED, "1");
-
-            //注册服务
-            String name = requester.name();
-            if (StrUtils.isNotEmpty(name)) {
-                addPlayer(name, requester);
-            }
-
-            log.info("Proxy: broker channel joined, sessionId={}, ip={}",
-                    requester.sessionId(),
-                    requester.remoteAddress());
-
-            //答复
-            if (message.isRequest()) {
-                requester.reply(message, new StringEntity("1"));
-            }
-
-            //结束处理
+            //经理加入时，同步订阅
+            onJoin(requester, message);
             return;
         } else if (MqConstants.MQ_EVENT_REQUEST.equals(message.event())) {
-            String atName = message.atName();
-
-            //单发模式（给同名的某个玩家，轮询负截均衡）
-            Session responder = getPlayerAny(atName, requester, message);
-            if (responder != null && responder.isValid()) {
-                //转发消息
-                try {
-                    forwardToSession(requester, message, responder, MqNextTime.maxConsumeMillis());
-                } catch (Throwable e) {
-                    requester.sendAlarm(message, "Broker forward '@" + atName + "' error: " + e.getMessage());
-                }
-            } else {
-                requester.sendAlarm(message, "Broker don't have '@" + atName + "' session");
-            }
+            onRequest(requester, message);
             return;
         }
 
@@ -301,6 +228,100 @@ public class FolkmqProxyListener extends BrokerListener implements Lifecycle {
         super.onMessageDo(requester, message);
     }
 
+    /**
+     * 收到经理连接时
+     */
+    private void onJoin(Session requester, Message message) throws IOException {
+        if (subscribeMap.size() > 0) {
+            String json = ONode.stringify(subscribeMap);
+            Entity entity = new StringEntity(json)
+                    .metaPut(MqConstants.MQ_META_BATCH, "1")
+                    .metaPut(EntityMetas.META_X_UNLIMITED, "1");
+
+            //不用 sendAndRequest
+            requester.send(MqConstants.MQ_EVENT_SUBSCRIBE, entity);
+        }
+
+        //标为不限制
+        requester.attrPut(EntityMetas.META_X_UNLIMITED, "1");
+
+        //注册服务
+        String name = requester.name();
+        if (StrUtils.isNotEmpty(name)) {
+            addPlayer(name, requester);
+        }
+
+        log.info("Proxy: broker channel joined, sessionId={}, ip={}",
+                requester.sessionId(),
+                requester.remoteAddress());
+
+        //答复
+        if (message.isRequest()) {
+            requester.reply(message, new StringEntity("1"));
+        }
+    }
+
+    /**
+     * 收到 Rpc 请求时（由 client 发起；也可能是 broker 发起的事务确认）
+     */
+    private void onRequest(Session requester, Message message) throws IOException {
+        String atName = message.atName();
+
+        //单发模式（给同名的某个玩家，轮询负截均衡）
+        Session responder = getPlayerAny(atName, requester, message);
+        if (responder != null && responder.isValid()) {
+            //转发消息
+            try {
+                forwardToSession(requester, message, responder, MqNextTime.maxConsumeMillis());
+            } catch (Throwable e) {
+                requester.sendAlarm(message, "Broker forward '@" + atName + "' error: " + e.getMessage());
+            }
+        } else {
+            requester.sendAlarm(message, "Broker don't have '@" + atName + "' session");
+        }
+    }
+
+    /**
+     * 收到派发指令时（由 broker 发起）
+     */
+    private void onDistribute(Session requester, Message message) throws IOException {
+        String atName = message.atName();
+        boolean isBroadcast = MqUtils.getLast().isBroadcast(message.entity());
+
+        if (isBroadcast) {
+            //广播模式
+            if (atName.endsWith("!")) {
+                atName = atName.substring(0, atName.length() - 1);
+            }
+
+            for (Session s0 : getPlayerAll(atName)) {
+                if (SessionUtils.isActive(s0)) {
+                    try {
+                        forwardToSession(requester, message, s0, MqNextTime.maxConsumeMillis());
+                    } catch (Throwable e) {
+                        acknowledgeAsNo(requester, message);
+                    }
+                }
+            }
+        } else {
+            //单发模式（给同名的某个玩家，轮询负截均衡）
+            Session responder = getPlayerAny(atName, requester, message);
+            if (SessionUtils.isActive(responder)) {
+                //转发消息
+                try {
+                    forwardToSession(requester, message, responder, MqNextTime.maxConsumeMillis());
+                } catch (Throwable e) {
+                    acknowledgeAsNo(requester, message);
+                }
+            } else {
+                acknowledgeAsNo(requester, message);
+            }
+        }
+    }
+
+    /**
+     * 收到订阅指令时（由 client 发起）
+     */
     private void onSubscribe(Session requester, Message message) {
         String is_batch = message.meta(MqConstants.MQ_META_BATCH);
         if ("1".equals(is_batch)) {
@@ -325,6 +346,9 @@ public class FolkmqProxyListener extends BrokerListener implements Lifecycle {
         }
     }
 
+    /**
+     * 订阅执行（实际会转发给 broker）
+     */
     public void subscribeDo(Session requester, String topic, String queueName) {
         if (requester != null) {
             requester.attrPut(queueName, "1");
@@ -338,6 +362,9 @@ public class FolkmqProxyListener extends BrokerListener implements Lifecycle {
         }
     }
 
+    /**
+     * 发布执行（实际会转发给 broker）
+     */
     public boolean publishDo(Message routingMessage, int qos) throws IOException {
         Session responder = this.getPlayerAny(MqConstants.PROXY_AT_BROKER, null, null);
 
@@ -354,6 +381,9 @@ public class FolkmqProxyListener extends BrokerListener implements Lifecycle {
         }
     }
 
+    /**
+     * 执行确认否（实际会转发给 broker）
+     */
     private void acknowledgeAsNo(Session requester, Message message) throws IOException {
         //如果没有会话，自动转为ACK失败
         if (message.isSubscribe() || message.isRequest()) {

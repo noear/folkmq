@@ -18,6 +18,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * 代理生命周期
+ *
  * @author noear
  * @since 1.0
  */
@@ -31,17 +33,17 @@ public class ProxyLifecycleBean implements LifecycleBean {
     @Inject
     private QueueForceService queueForceService;
 
-    private Server brokerServerTcp;
-    private Server brokerServerWs;
-    private FolkmqProxyListener brokerListener;
+    private Server proxyServerTcp;
+    private Server proxyServerWs;
+    private FolkmqProxyListener proxyListener;
 
     @Override
     public void start() throws Throwable {
         BrokerFragmentHandler brokerFragmentHandler = new BrokerFragmentHandler();
-        brokerListener = new FolkmqProxyListener(new ProxyApiHandler(queueForceService))
+        proxyListener = new FolkmqProxyListener(new ProxyApiHandler(queueForceService))
                 .addAccessAll(MqProxyConfig.getAccessMap());
 
-        brokerServerTcp = SocketD.createServer("sd:tcp")
+        proxyServerTcp = SocketD.createServer("sd:tcp")
                 .config(c -> {
                     c.port(Solon.cfg().serverPort() + 10000)
                             .serialSend(true)
@@ -54,13 +56,13 @@ public class ProxyLifecycleBean implements LifecycleBean {
 
                     EventBus.publish(c);
                 })
-                .listen(brokerListener)
+                .listen(proxyListener)
                 .start();
 
 
         if (Solon.cfg().getBool("folkmq.websocket", false)) {
             //添加 sd:ws 协议监听支持
-            brokerServerWs = SocketD.createServer("sd:ws")
+            proxyServerWs = SocketD.createServer("sd:ws")
                     .config(c -> {
                         c.port(Solon.cfg().serverPort() + 10001)
                                 .serialSend(true)
@@ -69,20 +71,20 @@ public class ProxyLifecycleBean implements LifecycleBean {
                                 .ioThreads(MqProxyConfig.ioThreads)
                                 .codecThreads(MqProxyConfig.codecThreads)
                                 .exchangeThreads(MqProxyConfig.exchangeThreads)
-                                .exchangeExecutor(brokerServerTcp.getConfig().getExchangeExecutor()) //复用通用执行器
+                                .exchangeExecutor(proxyServerTcp.getConfig().getExchangeExecutor()) //复用通用执行器
                                 .fragmentHandler(brokerFragmentHandler);
 
                         EventBus.publish(c);
                     })
-                    .listen(brokerListener)
+                    .listen(proxyListener)
                     .start();
         }
 
         //启动
-        brokerListener.start();
+        proxyListener.start();
 
         //注册
-        appContext.wrapAndPut(FolkmqProxyListener.class, brokerListener);
+        appContext.wrapAndPut(FolkmqProxyListener.class, proxyListener);
 
         log.info("Server:main: folkmq-proxy: Started (SOCKET.D/{}-{}, folkmq/{})",
                 SocketD.protocolVersion(),
@@ -92,8 +94,8 @@ public class ProxyLifecycleBean implements LifecycleBean {
 
     @Override
     public void prestop() throws Throwable {
-        if (brokerListener != null) {
-            for (Session session : brokerListener.getSessionAll()) {
+        if (proxyListener != null) {
+            for (Session session : proxyListener.getSessionAll()) {
                 RunUtils.runAndTry(session::closeStarting);
             }
         }
@@ -101,20 +103,20 @@ public class ProxyLifecycleBean implements LifecycleBean {
 
     @Override
     public void stop() throws Throwable {
-        if (brokerListener != null) {
-            for (Session session : brokerListener.getSessionAll()) {
+        if (proxyListener != null) {
+            for (Session session : proxyListener.getSessionAll()) {
                 RunUtils.runAndTry(session::close);
             }
 
-            brokerListener.stop();
+            proxyListener.stop();
         }
 
-        if (brokerServerTcp != null) {
-            brokerServerTcp.stop();
+        if (proxyServerTcp != null) {
+            proxyServerTcp.stop();
         }
 
-        if (brokerServerWs != null) {
-            brokerServerWs.stop();
+        if (proxyServerWs != null) {
+            proxyServerWs.stop();
         }
     }
 }

@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author noear
@@ -26,7 +27,7 @@ public abstract class MqBorkerListenerBase extends EventListener implements MqBo
     //代理模式（即连接代理的集群模式）
     protected boolean proxyMode;
     //订阅锁
-    protected final Object SUBSCRIBE_LOCK = new Object();
+    protected final ReentrantLock subscribeLock = new ReentrantLock(true);
     //所有会话
     protected final Map<String, Session> sessionAllMap = new ConcurrentHashMap<>();
     //服务端访问账号
@@ -121,7 +122,9 @@ public abstract class MqBorkerListenerBase extends EventListener implements MqBo
     public void subscribeDo(String topic, String consumerGroup, Session session) {
         String queueName = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP + consumerGroup;
 
-        synchronized (SUBSCRIBE_LOCK) {
+        subscribeLock.lock();
+
+        try {
             //::1.构建订阅关系，并获取队列
             MqQueue queue = queueGetOrInit(topic, consumerGroup, queueName);
 
@@ -137,6 +140,8 @@ public abstract class MqBorkerListenerBase extends EventListener implements MqBo
                 //加入队列会话
                 queue.sessionAdd(session);
             }
+        } finally {
+            subscribeLock.unlock();
         }
     }
 

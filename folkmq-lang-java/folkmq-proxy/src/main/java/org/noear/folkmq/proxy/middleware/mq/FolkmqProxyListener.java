@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * FolkMq 代理监听
@@ -43,11 +44,11 @@ public class FolkmqProxyListener extends BrokerListener implements Lifecycle {
     }
 
     //访问账号
-    private Map<String, String> accessMap = new HashMap<>();
+    private final Map<String, String> accessMap = new HashMap<>();
 
     //订阅关系表(topic=>topicConsumerGroup[])
-    private Map<String, Set<String>> subscribeMap = new ConcurrentHashMap<>();
-    private Object SUBSCRIBE_LOCK = new Object();
+    private final Map<String, Set<String>> subscribeMap = new ConcurrentHashMap<>();
+    private final ReentrantLock subscribeLock = new ReentrantLock(true);
 
     public Map<String, Set<String>> getSubscribeMap() {
         return subscribeMap;
@@ -355,10 +356,14 @@ public class FolkmqProxyListener extends BrokerListener implements Lifecycle {
             addPlayer(queueName, requester);
         }
 
-        synchronized (SUBSCRIBE_LOCK) {
+        subscribeLock.lock();
+
+        try {
             //以身份进行订阅(topic=>[topicConsumerGroup])
             Set<String> topicConsumerSet = subscribeMap.computeIfAbsent(topic, n -> Collections.newSetFromMap(new ConcurrentHashMap<>()));
             topicConsumerSet.add(queueName);
+        } finally {
+            subscribeLock.unlock();
         }
     }
 

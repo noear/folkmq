@@ -206,7 +206,7 @@ public class MqClientDefault implements MqClientInternal {
         //支持命名空间
         topic = MqTopicHelper.getFullTopic(namespace, topic);
 
-        if (clientSession != null) {
+        if (clientSession != null && clientSession.isValid()) {
             Entity entity = new StringEntity("")
                     .metaPut(MqConstants.API_NAME, apiName)
                     .metaPut(MqConstants.API_TOKEN, apiToken)
@@ -249,7 +249,7 @@ public class MqClientDefault implements MqClientInternal {
 
         subscriptionMap.put(subscription.getQueueName(), subscription);
 
-        if (clientSession != null) {
+        if (clientSession != null && clientSession.isValid()) {
             for (ClientSession session : clientSession.getSessionAll()) {
                 //如果有连接会话，则执行订阅
                 Entity entity = new StringEntity("")
@@ -280,7 +280,7 @@ public class MqClientDefault implements MqClientInternal {
         String queueName = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP + consumerGroup;
         subscriptionMap.remove(queueName);
 
-        if (clientSession != null) {
+        if (clientSession != null && clientSession.isValid()) {
             for (ClientSession session : clientSession.getSessionAll()) {
                 //如果有连接会话
                 Entity entity = new StringEntity("")

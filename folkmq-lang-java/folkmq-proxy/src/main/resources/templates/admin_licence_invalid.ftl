@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-    <title>${title!}</title>
+    <title>${app!}</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8 "/>
     <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico"/>
     <link rel="stylesheet" href="${css}/font-awesome-4.7.0/css/font-awesome.min.css" />
@@ -38,7 +38,7 @@
 </head>
 <body>
 <header>
-    <label>${app}</label>
+    <label>${title}</label>
     <nav>
     </nav>
     <aside>

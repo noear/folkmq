@@ -19,6 +19,8 @@ class MqAssert:
         MqAssert.assert_meta_symbols(str, paramName, '^', "^")
         MqAssert.assert_meta_symbols(str, paramName, '*', "*")
 
+        MqAssert.assert_meta_symbols(str, paramName, ':', ":")
+
     @staticmethod
     def assert_meta_symbols(str: str, paramName: str, c:str, cS:str):
         if str.find(c) >= 0:

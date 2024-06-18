@@ -176,7 +176,13 @@ public class MqBorkerListener extends MqBorkerListenerBase implements MqBorkerIn
     @Override
     public void onSend(Session session, Message message) {
         if (MqConstants.MQ_EVENT_DISTRIBUTE.equals(message.event())) {
-            MqMetasResolver mr = MqUtils.getOf(message);
+            MqMetasResolver mr = null;
+            if (proxyMode) {
+                mr = MqUtils.getOf(message); //集群
+            } else {
+                mr = MqUtils.getOf(session); //单机
+            }
+
             if (mr.version() >= 3) {
                 session.config().getStreamManger().removeStream(message.sid());
             }
@@ -186,7 +192,13 @@ public class MqBorkerListener extends MqBorkerListenerBase implements MqBorkerIn
     @Override
     public void onReply(Session session, Message message) {
         if (MqConstants.MQ_EVENT_DISTRIBUTE.equals(message.event())) {
-            MqMetasResolver mr = MqUtils.getOf(message);
+            MqMetasResolver mr = null;
+            if (proxyMode) {
+                mr = MqUtils.getOf(message); //集群
+            } else {
+                mr = MqUtils.getOf(session); //单机
+            }
+
             if (mr.version() >= 3) {
                 String key = mr.getKey(message);
                 String topic = mr.getTopic(message);

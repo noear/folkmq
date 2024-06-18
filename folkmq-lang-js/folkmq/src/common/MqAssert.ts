@@ -27,6 +27,7 @@ export class MqAssert {
         MqAssert.assertMetaSymbols(str, paramName, '%', "%");
         MqAssert.assertMetaSymbols(str, paramName, '^', "^");
         MqAssert.assertMetaSymbols(str, paramName, '*', "*");
+        MqAssert.assertMetaSymbols(str, paramName, ':', ":");
     }
 
     static assertMetaSymbols(str: string, paramName: string, c: string, cS: string) {

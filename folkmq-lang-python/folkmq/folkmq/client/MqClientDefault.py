@@ -135,7 +135,7 @@ class MqClientDefault(MqClientInternal):
         subscription = MqSubscription(topic, consumerGroup, autoAck, consumerHandler)
         self._subscriptionMap[subscription.get_queue_name()] = subscription
 
-        if self._clientSession is not None:
+        if self._clientSession is not None and self._clientSession.is_valid():
             for session in self._clientSession.get_session_all():
                 #如果有连接会话，则执行订阅
                 entity = (StringEntity("")
@@ -163,7 +163,7 @@ class MqClientDefault(MqClientInternal):
         queueName = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP + consumerGroup
         self._subscriptionMap.pop(queueName)
 
-        if self._clientSession is not None:
+        if self._clientSession is not None and self._clientSession.is_valid():
             for session in self._clientSession.get_session_all():
                 #如果有连接会话，则执行订阅
                 entity = (StringEntity("")

@@ -179,7 +179,7 @@ export class MqClientDefault implements MqClientInternal {
 
         this._subscriptionMap.set(subscription.getQueueName(), subscription);
 
-        if (this._clientSession != null) {
+        if (this._clientSession != null && this._clientSession.isValid()) {
             for (let session of this._clientSession.getSessionAll()) {
                 //如果有连接会话，则执行订阅
                 let entity = SocketD.newEntity("")
@@ -214,7 +214,7 @@ export class MqClientDefault implements MqClientInternal {
         let queueName = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP + consumerGroup;
         this._subscriptionMap.delete(queueName);
 
-        if (this._clientSession != null) {
+        if (this._clientSession != null && this._clientSession.isValid()) {
             for (let session of this._clientSession.getSessionAll()) {
                 //如果有连接会话
                 let entity = SocketD.newEntity("")

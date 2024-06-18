@@ -42,7 +42,7 @@ public class TestCase20_sequence_async extends BaseTestCase {
             client.publishAsync("demo", new MqMessage(String.valueOf(i)).sequence(true));
         }
 
-        countDownLatch.await(20, TimeUnit.SECONDS);
+        countDownLatch.await(4, TimeUnit.SECONDS);
 
         //检验客户端
         if(countDownLatch.getCount() > 0) {

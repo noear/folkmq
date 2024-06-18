@@ -21,6 +21,7 @@ import {Entity} from "@noear/socket.d/transport/core/Entity";
 import {MqAlarm} from "./MqAlarm";
 import {MqTopicHelper} from "../common/MqTopicHelper";
 import {EntityMetas} from "@noear/socket.d/transport/core/EntityMetas";
+import {SessionUtils} from "@noear/socket.d/utils/SessionUtils";
 
 /**
  * 消息客户端默认实现
@@ -179,7 +180,7 @@ export class MqClientDefault implements MqClientInternal {
 
         this._subscriptionMap.set(subscription.getQueueName(), subscription);
 
-        if (this._clientSession != null && this._clientSession.isValid()) {
+        if (SessionUtils.isValid(this._clientSession)) {
             for (let session of this._clientSession.getSessionAll()) {
                 //如果有连接会话，则执行订阅
                 let entity = SocketD.newEntity("")
@@ -214,7 +215,7 @@ export class MqClientDefault implements MqClientInternal {
         let queueName = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP + consumerGroup;
         this._subscriptionMap.delete(queueName);
 
-        if (this._clientSession != null && this._clientSession.isValid()) {
+        if (SessionUtils.isValid(this._clientSession)) {
             for (let session of this._clientSession.getSessionAll()) {
                 //如果有连接会话
                 let entity = SocketD.newEntity("")
@@ -430,7 +431,7 @@ export class MqClientDefault implements MqClientInternal {
                 entity.putMeta(MqMetasV2.MQ_META_KEY, message.getKey());
 
                 if (entity instanceof MqAlarm) {
-                    session.sendAlarm(message.getSource(), entity.dataAsString());
+                    session.sendAlarm(message.getSource(), entity);
                 } else {
                     entity.putMeta(MqConstants.MQ_META_ACK, isOk ? "1" : "0");
                     session.replyEnd(message.getSource(), entity);

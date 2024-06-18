@@ -18,6 +18,7 @@ import org.noear.socketd.transport.core.entity.EntityDefault;
 import org.noear.socketd.transport.core.entity.StringEntity;
 import org.noear.socketd.transport.core.traffic.TrafficLimiterDefault;
 import org.noear.socketd.transport.stream.RequestStream;
+import org.noear.socketd.utils.SessionUtils;
 import org.noear.socketd.utils.StrUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -206,7 +207,7 @@ public class MqClientDefault implements MqClientInternal {
         //支持命名空间
         topic = MqTopicHelper.getFullTopic(namespace, topic);
 
-        if (clientSession != null && clientSession.isValid()) {
+        if (SessionUtils.isValid(clientSession)) {
             Entity entity = new StringEntity("")
                     .metaPut(MqConstants.API_NAME, apiName)
                     .metaPut(MqConstants.API_TOKEN, apiToken)
@@ -249,7 +250,7 @@ public class MqClientDefault implements MqClientInternal {
 
         subscriptionMap.put(subscription.getQueueName(), subscription);
 
-        if (clientSession != null && clientSession.isValid()) {
+        if (SessionUtils.isValid(clientSession)) {
             for (ClientSession session : clientSession.getSessionAll()) {
                 //如果有连接会话，则执行订阅
                 Entity entity = new StringEntity("")
@@ -280,7 +281,7 @@ public class MqClientDefault implements MqClientInternal {
         String queueName = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP + consumerGroup;
         subscriptionMap.remove(queueName);
 
-        if (clientSession != null && clientSession.isValid()) {
+        if (SessionUtils.isValid(clientSession)) {
             for (ClientSession session : clientSession.getSessionAll()) {
                 //如果有连接会话
                 Entity entity = new StringEntity("")

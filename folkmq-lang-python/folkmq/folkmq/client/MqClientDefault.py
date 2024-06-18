@@ -14,6 +14,7 @@ from socketd.transport.stream.RequestStream import RequestStream
 from socketd.utils.CompletableFuture import CompletableFuture
 from socketd.utils.LogConfig import log
 from socketd.utils.RunUtils import RunUtils
+from socketd.utils.SessionUtils import SessionUtils
 
 from folkmq.client.MqAlarm import MqAlarm
 from folkmq.client.MqClient import MqClientInternal
@@ -135,7 +136,7 @@ class MqClientDefault(MqClientInternal):
         subscription = MqSubscription(topic, consumerGroup, autoAck, consumerHandler)
         self._subscriptionMap[subscription.get_queue_name()] = subscription
 
-        if self._clientSession is not None and self._clientSession.is_valid():
+        if SessionUtils.is_valid(self._clientSession):
             for session in self._clientSession.get_session_all():
                 #如果有连接会话，则执行订阅
                 entity = (StringEntity("")
@@ -163,7 +164,7 @@ class MqClientDefault(MqClientInternal):
         queueName = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP + consumerGroup
         self._subscriptionMap.pop(queueName)
 
-        if self._clientSession is not None and self._clientSession.is_valid():
+        if SessionUtils.is_valid(self._clientSession):
             for session in self._clientSession.get_session_all():
                 #如果有连接会话，则执行订阅
                 entity = (StringEntity("")

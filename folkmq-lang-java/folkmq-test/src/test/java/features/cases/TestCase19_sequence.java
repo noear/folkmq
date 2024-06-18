@@ -26,7 +26,7 @@ public class TestCase19_sequence extends BaseTestCase {
                 .start(getPort());
 
         //客户端
-        int count = 100000;
+        int count = 100_000;
         CountDownLatch countDownLatch = new CountDownLatch(count);
 
         client = FolkMQ.createClient("folkmq://127.0.0.1:" + getPort())

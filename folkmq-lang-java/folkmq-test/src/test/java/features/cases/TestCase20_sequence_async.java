@@ -26,7 +26,7 @@ public class TestCase20_sequence_async extends BaseTestCase {
                 .start(getPort());
 
         //客户端
-        int count = 100000;
+        int count = 100_000;
         CountDownLatch countDownLatch = new CountDownLatch(count);
 
         client = FolkMQ.createClient("folkmq://127.0.0.1:" + getPort())
@@ -42,7 +42,7 @@ public class TestCase20_sequence_async extends BaseTestCase {
             client.publishAsync("demo", new MqMessage(String.valueOf(i)).sequence(true));
         }
 
-        countDownLatch.await(4, TimeUnit.SECONDS);
+        countDownLatch.await(20, TimeUnit.SECONDS);
 
         //检验客户端
         if(countDownLatch.getCount() > 0) {

@@ -8,9 +8,9 @@ module.exports = {
     },
     output: {
         // 把所有依赖的模块合并输出到一个 bundle.js 文件
-        filename: 'folkmq.esm.js',
+        filename: 'folkmq.js',
         // 输出文件都放到 dist 目录下
         path: path.resolve(__dirname, './dist/release'),
-        libraryTarget: 'module'//'commonjs2' //module //window
+        libraryTarget: 'window'//'commonjs2' //module //window
     }
 }

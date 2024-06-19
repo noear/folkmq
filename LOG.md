@@ -4,6 +4,9 @@
 * 添加 后台资源看板（显示内存），并添加手动 GC 操作?
 * 添加 broker 配置可同步给 server 的能力
 
+### 1.7.2
+* socket.d 升为 2.5.7
+
 ### 1.7.1
 * 优化 MqBorkerListener “新确认模式”在单机下，多种客户端版本混用的兼容处理
 * 增加 MqClientDefault 订阅时的连接状态检测，如果未连接则转为 onOpen 处理

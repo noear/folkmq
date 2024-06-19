@@ -3,13 +3,9 @@ package org.noear.folkmq.broker.embedded;
 import org.noear.folkmq.broker.embedded.admin.AdminQueueController;
 import org.noear.folkmq.broker.embedded.admin.LoginController;
 import org.noear.folkmq.broker.embedded.admin.AdminController;
-import org.noear.socketd.SocketD;
-import org.noear.socketd.transport.client.ClientProvider;
-import org.noear.socketd.transport.server.ServerProvider;
 import org.noear.solon.Solon;
 import org.noear.solon.core.AppContext;
 import org.noear.solon.core.Plugin;
-import org.noear.solon.core.util.ClassUtil;
 import org.noear.solon.core.util.ResourceUtil;
 import org.noear.solon.validation.ValidatorException;
 
@@ -28,18 +24,6 @@ public class FolkmqPlugin implements Plugin {
 
         //加载默认配置文件
         Solon.cfg().loadAddIfAbsent(ResourceUtil.getResource("folkmq-def.yml"));
-
-        //加载传传输插件
-        List<String> transportList = Solon.cfg().getList(MqConfigNames.folkmq_transport_providers);
-        for (String s1 : transportList) {
-            Object p1 = ClassUtil.tryInstance(s1);
-            if (p1 instanceof ServerProvider) {
-                SocketD.registerServerProvider((ServerProvider) p1);
-            }
-            if (p1 instanceof ClientProvider) {
-                SocketD.registerClientProvider((ClientProvider) p1);
-            }
-        }
 
         //启用安全停止
         Solon.app().cfg().stopSafe(true);

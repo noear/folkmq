@@ -18,9 +18,6 @@ public interface MqConfigNames {
     //流超时
     String folkmq_streamTimeout = "folkmq.streamTimeout";
 
-    //传输提供者
-    String folkmq_transport_providers = "folkmq.transport.providers";
-
     //视图队列同步间隔（ms）
     String folkmq_view_queue_syncInterval = "folkmq.view.queue.syncInterval";
     String folkmq_view_queue_syncInterval_def = "5000";

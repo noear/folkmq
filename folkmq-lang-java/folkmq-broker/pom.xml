@@ -18,6 +18,17 @@
         <dependency>
             <groupId>org.noear</groupId>
             <artifactId>folkmq-broker-embedded</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.noear</groupId>
+                    <artifactId>folkmq-transport-smartsocket</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.noear</groupId>
+            <artifactId>folkmq-transport-netty</artifactId>
         </dependency>
 
         <dependency>

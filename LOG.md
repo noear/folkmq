@@ -5,6 +5,7 @@
 * 添加 broker 配置可同步给 server 的能力
 
 ### 1.7.2
+* 调整 broker-embedded 默认改为 smartsocket 适配
 * socket.d 升为 2.5.7
 
 ### 1.7.1

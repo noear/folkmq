@@ -122,15 +122,21 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
 
         MqMessageHolder messageHolder;
 
-        if (sessionCount() == 0) {
+        if (targetSessionCount() == 0) {
             //如果没有会话，则不派发（避免空转浪费）
             messageHolder = messageQueue.peek();
             if (messageHolder == null) {
                 return false;
             }
 
-            if (messageHolder.getExpiration() == 0) {
+            if (messageHolder.getExpiration() < 1L) {
+                //没有过期时间
                 return false;
+            } else {
+                if (messageHolder.getExpiration() > System.currentTimeMillis()) {
+                    //过期时间未到
+                    return false;
+                }
             }
         }
 
@@ -146,6 +152,17 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
             }
         } else {
             return false;
+        }
+    }
+
+    /**
+     * 目标会话数量
+     */
+    protected int targetSessionCount() {
+        if (isTransaction()) {
+            return serviceListener.brokerListener.getSessionCount();
+        } else {
+            return sessionCount();
         }
     }
 

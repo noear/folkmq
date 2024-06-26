@@ -28,7 +28,7 @@ public class FolkMQ {
      * 获取版本名称
      */
     public static String versionName() {
-        return "1.7.2";
+        return "1.7.3";
     }
 
     /**

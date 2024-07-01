@@ -43,7 +43,12 @@ public class MqBrokerConfig {
 
     static {
         path = Solon.cfg().get(MqConfigNames.folkmq_path);
-        displayPath = PathUtil.mergePath(Solon.cfg().serverContextPath(), path);
+        String displayPathStr = PathUtil.mergePath(Solon.cfg().serverContextPath(), path);
+        if (displayPathStr.endsWith("/")) {
+            displayPath = displayPathStr.substring(0, displayPathStr.length() - 1);
+        } else {
+            displayPath = displayPathStr;
+        }
 
         String proxyServerTmp = Solon.cfg().get(MqConfigNames.folkmq_proxy);
         if (StrUtils.isEmpty(proxyServerTmp)) {

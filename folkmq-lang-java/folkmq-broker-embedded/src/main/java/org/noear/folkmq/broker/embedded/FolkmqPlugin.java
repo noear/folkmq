@@ -9,8 +9,6 @@ import org.noear.solon.core.Plugin;
 import org.noear.solon.core.util.ResourceUtil;
 import org.noear.solon.validation.ValidatorException;
 
-import java.util.List;
-
 /**
  * @author noear
  * @since 1.5

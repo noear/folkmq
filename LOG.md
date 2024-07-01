@@ -4,6 +4,9 @@
 * 添加 后台资源看板（显示内存），并添加手动 GC 操作?
 * 添加 broker 配置可同步给 server 的能力
 
+### 1.7.4
+* 增加 broker-embedded 支持 context-path 
+
 ### 1.7.3
 * 修复 ttl消息，在没消费者时会自动延时的问题
 

@@ -22,12 +22,12 @@ public abstract class BaseController {
         viewModel.put("title", "FolkMQ");
         viewModel.put("app", "FolkMQ");
         viewModel.put("version", FolkMQ.versionName());
-        viewModel.put("root", MqBrokerConfig.path);
+        viewModel.put("root", MqBrokerConfig.displayPath);
 
-        viewModel.put("static", "/folkmq");
-        viewModel.put("css", "/folkmq/css");
-        viewModel.put("js", "/folkmq/js");
-        viewModel.put("img", "/folkmq/img");
+        viewModel.put("static", MqBrokerConfig.displayPath);
+        viewModel.put("css", MqBrokerConfig.displayPath + "/css");
+        viewModel.put("js", MqBrokerConfig.displayPath + "/js");
+        viewModel.put("img", MqBrokerConfig.displayPath + "/img");
 
         return viewModel;
     }

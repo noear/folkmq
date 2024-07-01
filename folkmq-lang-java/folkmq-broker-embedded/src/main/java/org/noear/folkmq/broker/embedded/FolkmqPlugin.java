@@ -8,6 +8,8 @@ import org.noear.solon.core.AppContext;
 import org.noear.solon.core.Plugin;
 import org.noear.solon.core.util.ResourceUtil;
 import org.noear.solon.validation.ValidatorException;
+import org.noear.solon.web.staticfiles.StaticMappings;
+import org.noear.solon.web.staticfiles.repository.ClassPathStaticRepository;
 
 /**
  * @author noear
@@ -40,8 +42,13 @@ public class FolkmqPlugin implements Plugin {
 
         //扫描
         context.beanScan(FolkmqPlugin.class);
+
+        //ctl
         Solon.app().add(MqBrokerConfig.path, AdminController.class);
         Solon.app().add(MqBrokerConfig.path, AdminQueueController.class);
         Solon.app().add(MqBrokerConfig.path, LoginController.class);
+
+        //static
+        StaticMappings.add(MqBrokerConfig.path + "/", new ClassPathStaticRepository("folkmq/static"));
     }
 }

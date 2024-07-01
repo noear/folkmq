@@ -4,7 +4,6 @@ import org.noear.folkmq.broker.embedded.mq.FolkmqLifecycleBean;
 import org.noear.folkmq.common.MqConstants;
 import org.noear.socketd.utils.StrUtils;
 import org.noear.solon.Solon;
-import org.noear.solon.Utils;
 import org.noear.solon.core.util.PathUtil;
 
 import java.util.Collections;
@@ -20,6 +19,7 @@ public class MqBrokerConfig {
     }
 
     public static final String path;
+    public static final String displayPath;
 
     public static final String accessAk;
     public static final String accessSk;
@@ -42,12 +42,8 @@ public class MqBrokerConfig {
     public static final int folkmqTransportPort;
 
     static {
-        String pathStr = Solon.cfg().get(MqConfigNames.folkmq_path);
-        if (Utils.isEmpty(Solon.cfg().serverContextPath())) {
-            path = pathStr;
-        } else {
-            path = PathUtil.mergePath(Solon.cfg().serverContextPath(), pathStr);
-        }
+        path = Solon.cfg().get(MqConfigNames.folkmq_path);
+        displayPath = PathUtil.mergePath(Solon.cfg().serverContextPath(), path);
 
         String proxyServerTmp = Solon.cfg().get(MqConfigNames.folkmq_proxy);
         if (StrUtils.isEmpty(proxyServerTmp)) {

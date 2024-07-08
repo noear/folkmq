@@ -4,6 +4,9 @@
 * 添加 后台资源看板（显示内存），并添加手动 GC 操作?
 * 添加 broker 配置可同步给 server 的能力
 
+### 1.7.5
+* socket.d 升为 2.5.9
+
 ### 1.7.4
 * 增加 broker-embedded 支持 context-path 
 

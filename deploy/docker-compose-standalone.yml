@@ -2,7 +2,7 @@ version: '3.5'
 
 services:
   folkmq-broker:
-    image: noearorg/folkmq-broker:1.7.4
+    image: noearorg/folkmq-broker:1.7.5
     container_name: folkmq-broker
     environment:
       - folkmq.admin=admin  #管理后台密码

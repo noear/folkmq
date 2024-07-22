@@ -3,6 +3,6 @@
   "description": "FolkMQ Node Test Project",
   "author": "noear",
   "dependencies": {
-    "@noear/folkmq": "1.7.4"
+    "@noear/folkmq": "1.7.5"
   }
 }

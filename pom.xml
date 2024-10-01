@@ -28,5 +28,6 @@
         <module>folkmq-lang-java/folkmq-proxy</module>
         <module>folkmq-lang-java/folkmq-test</module>
     </modules>
+
     
 </project>

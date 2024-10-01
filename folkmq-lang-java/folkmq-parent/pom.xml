@@ -6,7 +6,7 @@
 
     <groupId>org.noear</groupId>
     <artifactId>folkmq-parent</artifactId>
-    <version>1.7.6</version>
+    <version>1.7.8</version>
     <packaging>pom</packaging>
 
     <name>${project.artifactId}</name>
@@ -18,10 +18,10 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
 
-        <folkmq.version>1.7.6</folkmq.version>
-        <socketd.version>2.5.10</socketd.version>
-        <snack3.version>3.2.107</snack3.version>
-        <solon.version>2.8.6</solon.version>
+        <folkmq.version>1.7.8</folkmq.version>
+        <socketd.version>2.5.12</socketd.version>
+        <snack3.version>3.2.111</snack3.version>
+        <solon.version>3.0.0</solon.version>
 
         <micrometer.version>1.11.1</micrometer.version>
         <slf4j.version>2.0.12</slf4j.version>

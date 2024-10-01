@@ -93,7 +93,7 @@ public class ProxyLifecycleBean implements LifecycleBean {
     }
 
     @Override
-    public void prestop() throws Throwable {
+    public void preStop() throws Throwable {
         if (proxyListener != null) {
             for (Session session : proxyListener.getSessionAll()) {
                 RunUtils.runAndTry(session::closeStarting);

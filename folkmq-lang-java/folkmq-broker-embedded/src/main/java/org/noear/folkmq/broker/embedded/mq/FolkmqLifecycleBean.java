@@ -220,7 +220,7 @@ public class FolkmqLifecycleBean implements LifecycleBean {
     }
 
     @Override
-    public void prestop() throws Throwable {
+    public void preStop() throws Throwable {
         if (localServer != null) {
             localServer.prestop();
 //            for (Session s1 : localServer.getServerInternal().getSessionAll()) {

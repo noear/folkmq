@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.noear</groupId>
         <artifactId>folkmq-parent</artifactId>
-        <version>1.7.6</version>
+        <version>1.7.8</version>
         <relativePath>../folkmq-parent/pom.xml</relativePath>
     </parent>
 
@@ -33,31 +33,31 @@
 
         <dependency>
             <groupId>org.noear</groupId>
-            <artifactId>solon-api</artifactId>
+            <artifactId>solon-web</artifactId>
             <version>${solon.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.noear</groupId>
-                    <artifactId>solon.boot.smarthttp</artifactId>
+                    <artifactId>solon-boot-smarthttp</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
 
         <dependency>
             <groupId>org.noear</groupId>
-            <artifactId>solon.boot.jdkhttp</artifactId>
+            <artifactId>solon-boot-jdkhttp</artifactId>
             <version>${solon.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.noear</groupId>
-            <artifactId>solon.logging.logback</artifactId>
+            <artifactId>solon-logging-logback</artifactId>
             <version>${solon.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.noear</groupId>
-            <artifactId>solon.cloud.metrics</artifactId>
+            <artifactId>solon-cloud-metrics</artifactId>
             <version>${solon.version}</version>
         </dependency>
 

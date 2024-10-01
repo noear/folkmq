@@ -2,7 +2,7 @@ version: '3.5'
 
 services:
   folkmq-proxy:
-    image: noearorg/folkmq-proxy:1.7.7
+    image: noearorg/folkmq-proxy:1.7.8
     container_name: folkmq-proxy
     ports:
       - 8602:8602
@@ -22,7 +22,7 @@ services:
         aliases:
           - folkmq-proxy
   folkmq-broker1:
-    image: noearorg/folkmq-broker:1.7.7
+    image: noearorg/folkmq-broker:1.7.8
     container_name: folkmq-broker1
     ports:
       - 8611:8602
@@ -41,7 +41,7 @@ services:
         aliases:
           - folkmq-broker1
   folkmq-broker2:
-    image: noearorg/folkmq-broker:1.7.7
+    image: noearorg/folkmq-broker:1.7.8
     container_name: folkmq-broker2
     ports:
       - 8612:8602

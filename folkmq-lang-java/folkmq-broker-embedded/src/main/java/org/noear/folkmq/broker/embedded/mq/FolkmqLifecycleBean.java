@@ -20,6 +20,7 @@ import org.noear.solon.Solon;
 import org.noear.solon.Utils;
 import org.noear.solon.annotation.Component;
 import org.noear.solon.annotation.Inject;
+import org.noear.solon.boot.prop.impl.HttpServerProps;
 import org.noear.solon.core.AppContext;
 import org.noear.solon.core.bean.LifecycleBean;
 import org.noear.solon.core.event.EventBus;
@@ -189,16 +190,25 @@ public class FolkmqLifecycleBean implements LifecycleBean {
                 }
             }
 
-            //添加自己的主端口
-            url = url + "&port=" + Solon.cfg().serverPort();
-
             serverUrls.add(url);
         }
 
         brokerSession = (ClusterClientSession) SocketD.createClusterClient(serverUrls)
                 .config(c -> {
-                    c.metaPut(MqConstants.FOLKMQ_VERSION, FolkMQ.versionCodeAsString())
-                            .heartbeatInterval(6_000)
+                    HttpServerProps serverProps = HttpServerProps.getInstance();
+
+                    c.metaPut(MqConstants.FOLKMQ_VERSION, FolkMQ.versionCodeAsString());
+                    //添加主端口 - port
+                    c.metaPut("port", String.valueOf(serverProps.getPort()));
+                    //添加主端口 - wrapPort
+                    c.metaPut("wrapPort", String.valueOf(serverProps.getWrapPort()));
+
+                    //添加主机 - host
+                    c.metaPut("host", serverProps.getHost());
+                    //添加主机 - wrapHost
+                    c.metaPut("wrapHost", serverProps.getWrapHost());
+
+                    c.heartbeatInterval(6_000)
                             .serialSend(true)
                             .maxMemoryRatio(0.8F)
                             .ioThreads(MqBrokerConfig.ioThreads)

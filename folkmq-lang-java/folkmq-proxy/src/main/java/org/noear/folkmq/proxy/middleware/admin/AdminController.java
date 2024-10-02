@@ -175,13 +175,18 @@ public class AdminController extends BaseController {
             //用 list 转一下，免避线程安全
             for (Session session : serverList) {
                 InetSocketAddress socketAddress = session.remoteAddress();
-                String adminPort = session.param("port");
-                String adminAddr = socketAddress.getAddress().getHostAddress();
+
+                String adminPort = session.paramOrDefault("wrapPort", session.param("port"));
+                String adminHost = session.paramOrDefault("wrapHost", session.param("host"));;
+
+                if(adminHost == null) {
+                    adminHost = socketAddress.getAddress().getHostAddress();
+                }
 
                 ServerVo serverVo = new ServerVo();
                 serverVo.sid = session.sessionId();
-                serverVo.addree = adminAddr + ":" + socketAddress.getPort();
-                serverVo.adminUrl = "http://" + adminAddr + ":" + adminPort + "/admin";
+                serverVo.addree = adminHost + ":" + socketAddress.getPort();
+                serverVo.adminUrl = "http://" + adminHost + ":" + adminPort + "/admin";
 
                 ServerInfoVo infoVo = session.attr("ServerInfoVo");
                 if (infoVo != null) {

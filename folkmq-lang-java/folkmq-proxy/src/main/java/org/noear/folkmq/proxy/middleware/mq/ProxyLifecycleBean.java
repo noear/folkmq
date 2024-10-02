@@ -7,6 +7,7 @@ import org.noear.socketd.SocketD;
 import org.noear.socketd.broker.BrokerFragmentHandler;
 import org.noear.socketd.transport.core.Session;
 import org.noear.socketd.transport.server.Server;
+import org.noear.socketd.transport.server.ServerConfig;
 import org.noear.socketd.utils.RunUtils;
 import org.noear.solon.Solon;
 import org.noear.solon.annotation.Component;
@@ -46,15 +47,10 @@ public class ProxyLifecycleBean implements LifecycleBean {
         proxyServerTcp = SocketD.createServer("sd:tcp")
                 .config(c -> {
                     c.port(Solon.cfg().serverPort() + 10000)
-                            .serialSend(true)
-                            .maxMemoryRatio(0.8F)
-                            .streamTimeout(MqProxyConfig.streamTimeout)
-                            .ioThreads(MqProxyConfig.ioThreads)
-                            .codecThreads(MqProxyConfig.codecThreads)
                             .exchangeThreads(MqProxyConfig.exchangeThreads)
                             .fragmentHandler(brokerFragmentHandler);
 
-                    EventBus.publish(c);
+                    configureServer(c);
                 })
                 .listen(proxyListener)
                 .start();
@@ -65,16 +61,11 @@ public class ProxyLifecycleBean implements LifecycleBean {
             proxyServerWs = SocketD.createServer("sd:ws")
                     .config(c -> {
                         c.port(Solon.cfg().serverPort() + 10001)
-                                .serialSend(true)
-                                .maxMemoryRatio(0.8F)
-                                .streamTimeout(MqProxyConfig.streamTimeout)
-                                .ioThreads(MqProxyConfig.ioThreads)
-                                .codecThreads(MqProxyConfig.codecThreads)
                                 .exchangeThreads(MqProxyConfig.exchangeThreads)
                                 .exchangeExecutor(proxyServerTcp.getConfig().getExchangeExecutor()) //复用通用执行器
                                 .fragmentHandler(brokerFragmentHandler);
 
-                        EventBus.publish(c);
+                        configureServer(c);
                     })
                     .listen(proxyListener)
                     .start();
@@ -90,6 +81,23 @@ public class ProxyLifecycleBean implements LifecycleBean {
                 SocketD.protocolVersion(),
                 SocketD.version(),
                 FolkMQ.versionName());
+    }
+
+    /**
+     * 公共配置
+     * */
+    private void configureServer(ServerConfig serverConfig) {
+        serverConfig.serialSend(true)
+                .maxMemoryRatio(0.8F)
+                .streamTimeout(MqProxyConfig.streamTimeout);
+
+        serverConfig.ioThreads(MqProxyConfig.ioThreads)
+                .codecThreads(MqProxyConfig.codecThreads);
+
+        //serverConfig.trafficLimiter(new TrafficLimiterDefault(LicenceUtils.getGlobal().getTps()));
+
+
+        EventBus.publish(serverConfig);
     }
 
     @Override

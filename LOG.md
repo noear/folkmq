@@ -6,7 +6,7 @@
 
 ### 1.7.9
 
-* 添加 集群连接 port,wrapPort,host,wrapHost 配置支持
+* 添加 folkmq-borker wrapPort,wrapHost 配置支持（集群连接时，通过 port, host 元信息传递）
 
 ### 1.7.8
 * socket.d 升为 2.5.12

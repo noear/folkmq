@@ -54,6 +54,7 @@ public class LicenceUtils {
         }
     }
 
+
     /**
      * 订阅者
      */
@@ -94,6 +95,24 @@ public class LicenceUtils {
     }
 
     /**
+     * tps str
+     */
+    public String getTpsStr() {
+        return getTps() + " TPS";
+    }
+
+    /**
+     * tps
+     */
+    public int getTps() {
+        if (licenceInfo.tps > 0) {
+            return licenceInfo.tps;
+        } else {
+            return 1000;
+        }
+    }
+
+    /**
      * 是否有效
      */
     public boolean isValid() {
@@ -108,7 +127,7 @@ public class LicenceUtils {
             return false;
         }
 
-        if(isValid() == false){
+        if (isValid() == false) {
             //如果无效，则为过期
             return true;
         }
@@ -163,6 +182,10 @@ public class LicenceUtils {
                 tmp.subscribe = licence[3];
                 tmp.months = Integer.parseInt(licence[4]);
                 tmp.consumer = licence[5];
+
+                if (licence.length >= 7) {
+                    tmp.tps = Integer.parseInt(licence[6]);
+                }
 
                 if (tmp.edition > 20 && tmp.edition < 30) {
                     //0 Community Edition, 21.Enterprise Standard edition, 22 Enterprise Premium Edition, 23 Enterprise Ultimate Edition

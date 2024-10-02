@@ -43,6 +43,10 @@
                     <td>授予对象</td>
                     <td>${consumer!}</td>
                 </tr>
+                <tr>
+                    <td>授予流量</td>
+                    <td>${tps!}</td>
+                </tr>
 
                 </tbody>
             </table>

@@ -111,6 +111,7 @@ public class AdminController extends BaseController {
             vm.put("subscribeDate", LicenceUtils.getGlobal().getSubscribe());
             vm.put("subscribeMonths", LicenceUtils.getGlobal().getMonthsStr());
             vm.put("consumer", LicenceUtils.getGlobal().getConsumer());
+            vm.put("tps", LicenceUtils.getGlobal().getTpsStr());
         }
 
         return vm;

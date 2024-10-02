@@ -11,6 +11,7 @@ public class LicenceDo {
     public String subscribe;
     public int months;
     public String consumer;
+    public int tps;
 
     public boolean isValid = false;
     public String description = "Licence (for FolkMQ): Unauthorized (with legal risks)";

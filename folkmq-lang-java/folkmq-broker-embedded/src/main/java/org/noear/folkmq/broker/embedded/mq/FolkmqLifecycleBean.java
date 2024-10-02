@@ -199,14 +199,9 @@ public class FolkmqLifecycleBean implements LifecycleBean {
 
                     c.metaPut(MqConstants.FOLKMQ_VERSION, FolkMQ.versionCodeAsString());
                     //添加主端口 - port
-                    c.metaPut("port", String.valueOf(serverProps.getPort()));
-                    //添加主端口 - wrapPort
-                    c.metaPut("wrapPort", String.valueOf(serverProps.getWrapPort()));
-
+                    c.metaPut("port", String.valueOf(serverProps.getWrapPort()));
                     //添加主机 - host
-                    c.metaPut("host", serverProps.getHost());
-                    //添加主机 - wrapHost
-                    c.metaPut("wrapHost", serverProps.getWrapHost());
+                    c.metaPut("host", serverProps.getWrapHost());
 
                     c.heartbeatInterval(6_000)
                             .serialSend(true)

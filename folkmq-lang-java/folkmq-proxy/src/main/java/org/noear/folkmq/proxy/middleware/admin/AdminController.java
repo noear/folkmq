@@ -13,6 +13,7 @@ import org.noear.snack.core.utils.DateUtil;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
 import org.noear.socketd.transport.core.entity.StringEntity;
+import org.noear.solon.Utils;
 import org.noear.solon.annotation.Controller;
 import org.noear.solon.annotation.Inject;
 import org.noear.solon.annotation.Mapping;
@@ -176,10 +177,10 @@ public class AdminController extends BaseController {
             for (Session session : serverList) {
                 InetSocketAddress socketAddress = session.remoteAddress();
 
-                String adminPort = session.paramOrDefault("wrapPort", session.param("port"));
-                String adminHost = session.paramOrDefault("wrapHost", session.param("host"));;
+                String adminPort = session.param("port");
+                String adminHost = session.param("host");
 
-                if(adminHost == null) {
+                if(Utils.isEmpty(adminHost)) {
                     adminHost = socketAddress.getAddress().getHostAddress();
                 }
 

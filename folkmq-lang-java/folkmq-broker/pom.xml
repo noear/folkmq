@@ -55,6 +55,12 @@
             <groupId>org.noear</groupId>
             <artifactId>solon-boot-jdkhttp</artifactId>
             <version>${solon.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.junit.jupiter</groupId>
+                    <artifactId>junit-jupiter</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>

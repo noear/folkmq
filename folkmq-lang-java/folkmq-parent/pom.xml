@@ -20,8 +20,8 @@
 
         <folkmq.version>1.7.8</folkmq.version>
         <socketd.version>2.5.12</socketd.version>
-        <snack3.version>3.2.111</snack3.version>
-        <solon.version>3.0.0</solon.version>
+        <snack3.version>3.2.113</snack3.version>
+        <solon.version>3.0.1</solon.version>
 
         <micrometer.version>1.11.1</micrometer.version>
         <slf4j.version>2.0.12</slf4j.version>

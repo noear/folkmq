@@ -38,7 +38,15 @@
             <exclusions>
                 <exclusion>
                     <groupId>org.noear</groupId>
+                    <artifactId>solon-sessionstate-local</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.noear</groupId>
                     <artifactId>solon-boot-smarthttp</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.junit.jupiter</groupId>
+                    <artifactId>junit-jupiter</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

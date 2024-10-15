@@ -34,8 +34,11 @@
         <img src='https://gitee.com/noear/folkmq/badge/star.svg' alt='gitee star'/>
     </a>
     <a target="_blank" href='https://github.com/noear/folkmq/stargazers'>
-        <img src="https://img.shields.io/github/stars/noear/folkmq.svg?logo=github" alt="github star"/>
+        <img src="https://img.shields.io/github/stars/noear/folkmq.svg?style=flat&logo=github" alt="github star"/>
     </a>
+    <a target="_blank" href='https://gitcode.com/noear/folkmq/star'>
+		<img src='https://gitcode.com/noear/folkmq/star/badge.svg' alt='gitcode star'/>
+	</a>
 </p>
 
 <br/>

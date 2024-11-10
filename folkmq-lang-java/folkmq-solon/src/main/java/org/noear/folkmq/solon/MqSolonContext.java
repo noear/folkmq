@@ -223,9 +223,16 @@ public class MqSolonContext extends ContextEmpty {
         return true;
     }
 
-    @Override
-    public void asyncStart(long timeout, ContextAsyncListener listener, Runnable runnable) {
+    public void asyncListener(ContextAsyncListener listener) {
+        //向上兼容
+    }
+
+    public void asyncStart(long timeout, Runnable runnable) {
         //本身就是异步机制，不用启动
+    }
+
+    public void asyncStart(long timeout, ContextAsyncListener listener, Runnable runnable) {
+        //本身就是异步机制，不用启动 //向下兼容
     }
 
     @Override

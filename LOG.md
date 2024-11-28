@@ -5,7 +5,6 @@
 * 添加 broker 配置可同步给 server 的能力
 
 ### 1.7.9
-
 * socket.d 升为 2.5.13
 * solon 升为 3.0.3
 * snack3 升为 3.2.120

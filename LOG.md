@@ -4,6 +4,12 @@
 * 添加 后台资源看板（显示内存），并添加手动 GC 操作?
 * 添加 broker 配置可同步给 server 的能力
 
+### 1.7.9
+
+* socket.d 升为 2.5.13
+* solon 升为 3.0.3
+* snack3 升为 3.2.120
+
 ### 1.7.8
 * socket.d 升为 2.5.12
 * 添加 folkmq-borker wrapPort,wrapHost 配置支持（集群连接时，通过 port, host 元信息传递）

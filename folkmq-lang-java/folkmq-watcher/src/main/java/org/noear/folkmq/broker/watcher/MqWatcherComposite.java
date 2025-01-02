@@ -1,5 +1,6 @@
 package org.noear.folkmq.broker.watcher;
 
+import org.noear.folkmq.broker.MqDraft;
 import org.noear.folkmq.broker.MqMessageHolder;
 import org.noear.folkmq.broker.MqWatcher;
 import org.noear.folkmq.broker.MqBorkerInternal;
@@ -101,6 +102,13 @@ public class MqWatcherComposite implements MqWatcher {
     public void onUnPublish(Message message) {
         for (MqWatcher persistent : watcherList) {
             persistent.onUnPublish(message);
+        }
+    }
+
+    @Override
+    public void onRouting(MqDraft draft, String queueName) {
+        for (MqWatcher persistent : watcherList) {
+            persistent.onRouting(draft, queueName);
         }
     }
 

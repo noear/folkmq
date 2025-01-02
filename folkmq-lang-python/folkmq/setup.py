@@ -4,7 +4,7 @@ from setuptools import setup,find_packages
 
 setup(
     name='folkmq',
-    version='1.7.9',
+    version='1.8.0-M1',
     description='@noear/folkmq python project',
     author='noear',
     url='https://folkmq.noear.org/',

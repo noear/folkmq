@@ -63,6 +63,11 @@ public class MqWatcherDefault implements MqWatcher {
     }
 
     @Override
+    public void onRouting(MqDraft draft, String queueName) {
+
+    }
+
+    @Override
     public void onDistribute(String topic, String consumerGroup, MqMessageHolder messageHolder) {
 
     }

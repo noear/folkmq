@@ -73,6 +73,14 @@ public interface MqWatcher {
     void onUnPublish(Message message);
 
     /**
+     * 路由时
+     *
+     * @param draft     草案
+     * @param queueName 消息队列名
+     */
+    void onRouting(MqDraft draft, String queueName);
+
+    /**
      * 派发时
      *
      * @param topic         主题

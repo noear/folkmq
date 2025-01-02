@@ -4,7 +4,6 @@ import com.github.artbits.quickio.api.JDB;
 import com.github.artbits.quickio.core.Config;
 import com.github.artbits.quickio.core.QuickIO;
 import org.noear.folkmq.broker.*;
-import org.noear.folkmq.broker.watcher.MqWatcherSnapshot;
 import org.noear.folkmq.common.MqConstants;
 import org.noear.folkmq.common.MqMetasResolver;
 import org.noear.folkmq.common.MqUtils;
@@ -26,7 +25,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author noear 2025/1/2 created
  */
 public class MqWatcherQuickIo implements MqWatcher {
-    protected static final Logger log = LoggerFactory.getLogger(MqWatcherSnapshot.class);
+    protected static final Logger log = LoggerFactory.getLogger(MqWatcherQuickIo.class);
 
     //服务端引用
     private MqBorkerInternal serverRef;

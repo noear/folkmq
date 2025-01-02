@@ -10,7 +10,7 @@ import org.noear.folkmq.broker.embedded.MqBrokerConfig;
 import org.noear.folkmq.broker.MqBorker;
 import org.noear.folkmq.broker.MqBorkerInternal;
 import org.noear.folkmq.broker.MqBorkerListener;
-import org.noear.folkmq.broker.watcher.MqWatcherSnapshotPlus;
+import org.noear.folkmq.broker.watcher.fdb.MqWatcherSnapshotPlus;
 import org.noear.snack.ONode;
 import org.noear.socketd.SocketD;
 import org.noear.socketd.cluster.ClusterClientSession;

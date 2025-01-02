@@ -4,7 +4,7 @@ import org.noear.folkmq.FolkMQ;
 import org.noear.folkmq.client.MqMessage;
 import org.noear.folkmq.broker.MqBorkerInternal;
 import org.noear.folkmq.broker.MqQueue;
-import org.noear.folkmq.broker.watcher.MqWatcherSnapshot;
+import org.noear.folkmq.broker.watcher.fdb.MqWatcherSnapshot;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;

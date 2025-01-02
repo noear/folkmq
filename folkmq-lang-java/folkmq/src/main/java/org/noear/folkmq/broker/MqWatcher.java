@@ -75,10 +75,9 @@ public interface MqWatcher {
     /**
      * 路由时
      *
-     * @param draft     草案
-     * @param queueName 消息队列名
+     * @param messageHolder 消息持有人
      */
-    void onRouting(MqDraft draft, String queueName);
+    void onRouting(MqMessageHolder messageHolder);
 
     /**
      * 派发时

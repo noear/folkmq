@@ -106,9 +106,9 @@ public class MqWatcherComposite implements MqWatcher {
     }
 
     @Override
-    public void onRouting(MqDraft draft, String queueName) {
+    public void onRouting(MqMessageHolder messageHolder) {
         for (MqWatcher persistent : watcherList) {
-            persistent.onRouting(draft, queueName);
+            persistent.onRouting(messageHolder);
         }
     }
 

@@ -33,8 +33,12 @@ public class MqMessageHolder implements Delayed {
     private volatile int distributeCountPre;
     //派发顺序
     private volatile long distributeIdx;
+    //消息队列
+    private final String queueName;
     //是否完成
     private AtomicBoolean isDone;
+    //
+    private long id;
 
     public MqMessageHolder(MqDraft draft, String queueName, String consumerGroup) {
         this.draft = draft;
@@ -53,6 +57,8 @@ public class MqMessageHolder implements Delayed {
         this.distributeTimeRef = this.draft.scheduled;
         this.distributeTime = this.distributeTimeRef;
 
+        this.queueName = queueName;
+
         if (this.draft.sequence) {
             this.entity.at(queueName + "!");
         } else {
@@ -62,6 +68,14 @@ public class MqMessageHolder implements Delayed {
         if (transaction) {
             this.entity.at(this.draft.sender);
         }
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public long getId() {
+        return id;
     }
 
     /**
@@ -83,6 +97,13 @@ public class MqMessageHolder implements Delayed {
      */
     public String getKey() {
         return draft.key;
+    }
+
+    /**
+     * 获取消息队列名
+     */
+    public String getQueueName() {
+        return queueName;
     }
 
     /**

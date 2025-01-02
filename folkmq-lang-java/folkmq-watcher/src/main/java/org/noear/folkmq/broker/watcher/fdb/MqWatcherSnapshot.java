@@ -254,7 +254,7 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
                     MqDraft draft = new MqDraft(mr, message);
 
                     MqQueue queue = serverRef.getQueue(queueName);
-                    serverRef.routingToQueueDo(draft, queue);
+                    serverRef.routingToQueueDo(draft, queue, 0L);
                 }
             }
         }

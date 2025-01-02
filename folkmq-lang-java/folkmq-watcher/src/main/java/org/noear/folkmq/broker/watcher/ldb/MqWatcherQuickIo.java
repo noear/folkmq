@@ -49,10 +49,10 @@ public class MqWatcherQuickIo implements MqWatcher {
 
         String dataPath2 = dataPath;
 
-        this.db = QuickIO.db(Config.of(c->c.path(dataPath2).name("folkmq")));
+        this.db = QuickIO.db(Config.of(c -> c.path(dataPath2).name("folkmq")));
 
-        this.subscribeDocColl =  db.collection(SubscribeDoc.class);
-        this.messageDocColl =  db.collection(MessageDoc.class);
+        this.subscribeDocColl = db.collection(SubscribeDoc.class);
+        this.messageDocColl = db.collection(MessageDoc.class);
     }
 
     public boolean inSaveProcess() {
@@ -133,39 +133,39 @@ public class MqWatcherQuickIo implements MqWatcher {
     }
 
     private boolean loadQueue1(String queueName) throws IOException {
-       List<MessageDoc> msgList =  messageDocColl.find(m->m.queueName.equals(queueName));
-      for(MessageDoc msg: msgList) {
-          if(msg.data == null){
-              continue;
-          }
+        List<MessageDoc> msgList = messageDocColl.find(m -> m.queueName.equals(queueName));
+        for (MessageDoc msg : msgList) {
+            if (msg.data == null) {
+                continue;
+            }
 
-          EntityDefault entity = new EntityDefault();
-          if (msg.ver < 2) {
-              //旧版用 string
-              entity.dataSet(msg.data.getBytes(StandardCharsets.UTF_8));
-          } else {
-              //新版用 base64 支持二进制
-              entity.dataSet(Base64.getDecoder().decode(msg.data));
-          }
-          entity.metaStringSet(msg.metaString);
-          Message message = new MessageBuilder()
-                  .sid(StrUtils.guid())
-                  .flag(Flags.Message)
-                  .entity(entity)
-                  .build();
+            EntityDefault entity = new EntityDefault();
+            if (msg.ver < 2) {
+                //旧版用 string
+                entity.dataSet(msg.data.getBytes(StandardCharsets.UTF_8));
+            } else {
+                //新版用 base64 支持二进制
+                entity.dataSet(Base64.getDecoder().decode(msg.data));
+            }
+            entity.metaStringSet(msg.metaString);
+            Message message = new MessageBuilder()
+                    .sid(StrUtils.guid())
+                    .flag(Flags.Message)
+                    .entity(entity)
+                    .build();
 
-          MqMetasResolver mr = MqUtils.getOf(message);
-          MqDraft draft = new MqDraft(mr, message);
+            MqMetasResolver mr = MqUtils.getOf(message);
+            MqDraft draft = new MqDraft(mr, message);
 
-          MqQueue queue = serverRef.getQueue(queueName);
-          serverRef.routingToQueueDo(draft, queue);
-      }
+            MqQueue queue = serverRef.getQueue(queueName);
+            serverRef.routingToQueueDo(draft, queue, msg.objectId());
+        }
 
         return true;
     }
 
 
-    //////////////////////////////////////////
+    /// ///////////////////////////////////////
 
     @Override
     public void onStopAfter() {
@@ -202,15 +202,20 @@ public class MqWatcherQuickIo implements MqWatcher {
     }
 
     @Override
-    public void onRouting(MqDraft draft, String queueName) {
+    public void onRouting(MqMessageHolder messageHolder) {
+        if (messageHolder.getId() > 0L) {
+            return;
+        }
+
         MessageDoc doc = new MessageDoc();
         doc.ver = 2;
-        doc.key = draft.key;
-        doc.queueName = queueName;
-        doc.metaString = draft.source.metaString();
-        doc.data = draft.source.entity().dataAsString();
+        doc.queueName = messageHolder.getQueueName();
+        doc.metaString = messageHolder.getEntity().metaString();
+        doc.data = messageHolder.getEntity().dataAsString();
 
         messageDocColl.save(doc);
+
+        messageHolder.setId(doc.objectId());
     }
 
     @Override
@@ -220,6 +225,8 @@ public class MqWatcherQuickIo implements MqWatcher {
 
     @Override
     public void onAcknowledge(String topic, String consumerGroup, MqMessageHolder messageHolder, boolean isOk) {
-
+        if (isOk && messageHolder.getId() > 0L) {
+            messageDocColl.delete(messageHolder.getId());
+        }
     }
 }

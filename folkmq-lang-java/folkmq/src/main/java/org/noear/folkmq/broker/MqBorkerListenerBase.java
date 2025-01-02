@@ -206,8 +206,7 @@ public abstract class MqBorkerListenerBase extends EventListener implements MqBo
                     continue;
                 }
 
-                watcher.onRouting(draft, queue.getQueueName());
-                routingToQueueDo(draft, queue);
+                routingToQueueDo(draft, queue, 0L);
             }
         }
     }
@@ -215,21 +214,19 @@ public abstract class MqBorkerListenerBase extends EventListener implements MqBo
     protected void routingToQueueName(MqDraft draft, String queueName) {
         //取出所有订阅的主题消费者
         MqQueue queue = queueMap.get(queueName);
-
-        if (queue == null) {
-            return;
-        }
-
-        watcher.onRouting(draft, queue.getQueueName());
-        routingToQueueDo(draft, queue);
+        routingToQueueDo(draft, queue, 0L);
     }
 
     /**
      * 执行路由到队列
      */
-    public void routingToQueueDo(MqDraft draft, MqQueue queue) {
+    @Override
+    public void routingToQueueDo(MqDraft draft, MqQueue queue, long objId) {
         if (queue != null) {
             MqMessageHolder messageHolder = new MqMessageHolder(draft, queue.getQueueName(), queue.getConsumerGroup());
+            messageHolder.setId(objId);
+
+            watcher.onRouting(messageHolder);
             queue.add(messageHolder);
         }
     }

@@ -92,7 +92,7 @@ public interface MqBorkerInternal {
      * @param draft 消息草稿
      * @param queue 队列
      */
-    void routingToQueueDo(MqDraft draft, MqQueue queue);
+    void routingToQueueDo(MqDraft draft, MqQueue queue, long objId);
 
     /**
      * 添加事件扩展

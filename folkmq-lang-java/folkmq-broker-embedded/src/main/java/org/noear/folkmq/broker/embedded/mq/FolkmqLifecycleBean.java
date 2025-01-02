@@ -4,13 +4,13 @@ import org.noear.folkmq.FolkMQ;
 import org.noear.folkmq.broker.embedded.admin.dso.QueueForceService;
 import org.noear.folkmq.broker.embedded.admin.dso.ViewUtils;
 import org.noear.folkmq.broker.embedded.admin.model.ServerInfoVo;
+import org.noear.folkmq.broker.watcher.ldb.MqWatcherQuickIo;
 import org.noear.folkmq.common.MqConstants;
 import org.noear.folkmq.broker.embedded.MqConfigNames;
 import org.noear.folkmq.broker.embedded.MqBrokerConfig;
 import org.noear.folkmq.broker.MqBorker;
 import org.noear.folkmq.broker.MqBorkerInternal;
 import org.noear.folkmq.broker.MqBorkerListener;
-import org.noear.folkmq.broker.watcher.fdb.MqWatcherSnapshotPlus;
 import org.noear.snack.ONode;
 import org.noear.socketd.SocketD;
 import org.noear.socketd.cluster.ClusterClientSession;
@@ -53,17 +53,13 @@ public class FolkmqLifecycleBean implements LifecycleBean {
 
     private MqBorkerListener brokerServiceListener;
     private ClusterClientSession brokerSession;
-    private MqWatcherSnapshotPlus snapshotPlus;
 
     @Override
     public void start() throws Throwable {
         //初始化快照持久化
-        snapshotPlus = new MqWatcherSnapshotPlus();
-        snapshotPlus.save900Condition(MqBrokerConfig.save900);
-        snapshotPlus.save300Condition(MqBrokerConfig.save300);
-        snapshotPlus.save100Condition(MqBrokerConfig.save100);
+        MqWatcherQuickIo snapshotPlus = new MqWatcherQuickIo();
 
-        appContext.wrapAndPut(MqWatcherSnapshotPlus.class, snapshotPlus);
+        appContext.wrapAndPut(MqWatcherQuickIo.class, snapshotPlus);
 
         if (Utils.isEmpty(MqBrokerConfig.proxyServer)) {
             isStandalone = true;
@@ -80,7 +76,7 @@ public class FolkmqLifecycleBean implements LifecycleBean {
     }
 
 
-    private void startLocalServerMode(MqWatcherSnapshotPlus snapshotPlus) throws Exception {
+    private void startLocalServerMode(MqWatcherQuickIo snapshotPlus) throws Exception {
         //通讯架构
         String schema = Solon.cfg().get(MqConfigNames.folkmq_schema);
 
@@ -119,7 +115,7 @@ public class FolkmqLifecycleBean implements LifecycleBean {
         log.info("FlokMQ local server started!");
     }
 
-    private void startBrokerSession(String brokerServers, MqWatcherSnapshotPlus snapshotPlus) throws Exception {
+    private void startBrokerSession(String brokerServers, MqWatcherQuickIo snapshotPlus) throws Exception {
         brokerServiceListener = new MqBorkerListener(true);
 
         //允许控制台获取队列看板

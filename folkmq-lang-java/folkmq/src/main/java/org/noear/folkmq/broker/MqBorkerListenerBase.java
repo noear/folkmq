@@ -47,7 +47,7 @@ public abstract class MqBorkerListenerBase extends EventListener implements MqBo
 
     /**
      * 通道类型
-     * */
+     */
     public String chanelType() {
         if (proxyMode) {
             return "proxy";
@@ -206,6 +206,7 @@ public abstract class MqBorkerListenerBase extends EventListener implements MqBo
                     continue;
                 }
 
+                watcher.onRouting(draft, queue.getQueueName());
                 routingToQueueDo(draft, queue);
             }
         }
@@ -215,11 +216,16 @@ public abstract class MqBorkerListenerBase extends EventListener implements MqBo
         //取出所有订阅的主题消费者
         MqQueue queue = queueMap.get(queueName);
 
+        if (queue == null) {
+            return;
+        }
+
+        watcher.onRouting(draft, queue.getQueueName());
         routingToQueueDo(draft, queue);
     }
 
     /**
-     * 执行路由
+     * 执行路由到队列
      */
     public void routingToQueueDo(MqDraft draft, MqQueue queue) {
         if (queue != null) {

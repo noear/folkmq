@@ -47,10 +47,6 @@
                 <td class="left break">
                     <a href="${item.adminUrl}" target="_blank">${item.adminUrl}</a>
                 </td>
-
-                <td>
-                    <a href="#" onclick="saveDo('${item.sid}');return false;">更新快照</a>
-                </td>
             </tr>
         </#list>
         </tbody>

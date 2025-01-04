@@ -171,8 +171,9 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
      */
     @Override
     public void removeAt(String key) {
-        MqMessageHolder messageHolder = messageMap.remove(key);
+        MqMessageHolder messageHolder = messageMap.get(key);
         if (messageHolder != null) {
+            internalDelete(messageHolder);
             internalRemove(messageHolder);
         }
     }
@@ -194,7 +195,7 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
      * 事务确认处理
      */
     protected void affirmAtDo(MqMessageHolder messageHolder, boolean isRollback) {
-        messageMap.remove(messageHolder.getKey());
+        internalDelete(messageHolder);
 
         if (isRollback == false) {
             Message message = messageHolder.noTransaction();
@@ -266,13 +267,13 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
     protected boolean transpond0(MqMessageHolder messageHolder) {
         if (messageHolder.isDone()) {
             //已完成
-            messageMap.remove(messageHolder.getKey());
+            internalDelete(messageHolder);
             return true;
         }
 
         if (messageHolder.getExpiration() > 0 && messageHolder.getExpiration() < System.currentTimeMillis()) {
             //已过期
-            messageMap.remove(messageHolder.getKey());
+            internalDelete(messageHolder);
 
             if (log.isWarnEnabled()) {
                 log.warn("Queue: message have expired, key={}", messageHolder.getKey());
@@ -358,13 +359,13 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
     protected boolean distribute0(MqMessageHolder messageHolder) {
         if (messageHolder.isDone()) {
             //已完成
-            messageMap.remove(messageHolder.getKey());
+            internalDelete(messageHolder);
             return true;
         }
 
         if (messageHolder.getExpiration() > 0 && messageHolder.getExpiration() < System.currentTimeMillis()) {
             //已过期
-            messageMap.remove(messageHolder.getKey());
+            internalDelete(messageHolder);
 
             if (log.isWarnEnabled()) {
                 log.warn("Queue: message have expired, key={}", messageHolder.getKey());
@@ -485,12 +486,9 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
                 return;
             }
 
-            //观察者::回执时
-            watcher.onAcknowledge(topic, consumerGroup, messageHolder, ack > 0);
-
             if (ack > 0) {
                 //ok
-                messageMap.remove(messageHolder.getKey());
+                internalDelete(messageHolder);
                 if (removeQueue) {
                     internalRemove(messageHolder);
                 }
@@ -501,8 +499,16 @@ public class MqQueueDefault extends MqQueueBase implements MqQueue {
                 internalRemove(messageHolder);
                 internalAdd(messageHolder.delayed());
             }
+
+            //观察者::回执时
+            watcher.onAcknowledge(topic, consumerGroup, messageHolder, ack > 0);
         } finally {
             sequenceLock.set(false);
         }
+    }
+
+    protected void internalDelete(MqMessageHolder messageHolder) {
+        watcher.onRemove(topic, consumerGroup, messageHolder);
+        messageMap.remove(messageHolder.getKey());
     }
 }

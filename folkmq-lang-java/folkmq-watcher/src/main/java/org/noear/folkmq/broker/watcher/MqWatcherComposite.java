@@ -1,6 +1,5 @@
 package org.noear.folkmq.broker.watcher;
 
-import org.noear.folkmq.broker.MqDraft;
 import org.noear.folkmq.broker.MqMessageHolder;
 import org.noear.folkmq.broker.MqWatcher;
 import org.noear.folkmq.broker.MqBorkerInternal;
@@ -123,6 +122,13 @@ public class MqWatcherComposite implements MqWatcher {
     public void onAcknowledge(String topic, String consumerGroup, MqMessageHolder messageHolder, boolean isOk) {
         for (MqWatcher persistent : watcherList) {
             persistent.onAcknowledge(topic, consumerGroup, messageHolder, isOk);
+        }
+    }
+
+    @Override
+    public void onRemove(String topic, String consumerGroup, MqMessageHolder messageHolder) {
+        for (MqWatcher persistent : watcherList) {
+            persistent.onRemove(topic, consumerGroup, messageHolder);
         }
     }
 }

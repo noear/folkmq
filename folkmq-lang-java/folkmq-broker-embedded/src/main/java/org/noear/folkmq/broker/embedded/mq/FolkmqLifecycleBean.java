@@ -1,10 +1,12 @@
 package org.noear.folkmq.broker.embedded.mq;
 
 import org.noear.folkmq.FolkMQ;
+import org.noear.folkmq.broker.MqWatcher;
 import org.noear.folkmq.broker.embedded.admin.dso.QueueForceService;
 import org.noear.folkmq.broker.embedded.admin.dso.ViewUtils;
 import org.noear.folkmq.broker.embedded.admin.model.ServerInfoVo;
-import org.noear.folkmq.broker.watcher.ldb.MqWatcherQuickIo;
+import org.noear.folkmq.broker.watcher.fdb.MqWatcherSnapshotPlus;
+import org.noear.folkmq.broker.watcher.ldb.MqWatcherLevelDb;
 import org.noear.folkmq.common.MqConstants;
 import org.noear.folkmq.broker.embedded.MqConfigNames;
 import org.noear.folkmq.broker.embedded.MqBrokerConfig;
@@ -57,16 +59,16 @@ public class FolkmqLifecycleBean implements LifecycleBean {
     @Override
     public void start() throws Throwable {
         //初始化快照持久化
-        MqWatcherQuickIo snapshotPlus = new MqWatcherQuickIo();
+        MqWatcher watcher = new MqWatcherLevelDb();
 
-        appContext.wrapAndPut(MqWatcherQuickIo.class, snapshotPlus);
+        appContext.wrapAndPut(MqWatcher.class, watcher);
 
         if (Utils.isEmpty(MqBrokerConfig.proxyServer)) {
             isStandalone = true;
-            startLocalServerMode(snapshotPlus);
+            startLocalServerMode(watcher);
         } else {
             isStandalone = false;
-            startBrokerSession(MqBrokerConfig.proxyServer, snapshotPlus);
+            startBrokerSession(MqBrokerConfig.proxyServer, watcher);
         }
 
         log.info("Server:main: folkmq-broker: Started (SOCKET.D/{}-{}, folkmq/{})",
@@ -76,7 +78,7 @@ public class FolkmqLifecycleBean implements LifecycleBean {
     }
 
 
-    private void startLocalServerMode(MqWatcherQuickIo snapshotPlus) throws Exception {
+    private void startLocalServerMode(MqWatcher watcher) throws Exception {
         //通讯架构
         String schema = Solon.cfg().get(MqConfigNames.folkmq_schema);
 
@@ -95,7 +97,7 @@ public class FolkmqLifecycleBean implements LifecycleBean {
                 .addAccessAll(MqBrokerConfig.getAccessMap());
 
         if (MqBrokerConfig.saveEnable) {
-            localServer.watcher(snapshotPlus);
+            localServer.watcher(watcher);
         }
 
         if (MqBrokerConfig.folkmqTransportPort > 0) {
@@ -115,7 +117,7 @@ public class FolkmqLifecycleBean implements LifecycleBean {
         log.info("FlokMQ local server started!");
     }
 
-    private void startBrokerSession(String brokerServers, MqWatcherQuickIo snapshotPlus) throws Exception {
+    private void startBrokerSession(String brokerServers, MqWatcher watcher) throws Exception {
         brokerServiceListener = new MqBorkerListener(true);
 
         //允许控制台获取队列看板
@@ -164,7 +166,7 @@ public class FolkmqLifecycleBean implements LifecycleBean {
 
         //快照
         if (MqBrokerConfig.saveEnable) {
-            brokerServiceListener.watcher(snapshotPlus);
+            brokerServiceListener.watcher(watcher);
         }
 
         List<String> serverUrls = new ArrayList<>();

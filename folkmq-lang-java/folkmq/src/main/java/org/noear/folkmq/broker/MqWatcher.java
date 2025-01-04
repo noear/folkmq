@@ -97,4 +97,9 @@ public interface MqWatcher {
      * @param isOk          回执
      */
     void onAcknowledge(String topic, String consumerGroup, MqMessageHolder messageHolder, boolean isOk);
+
+    /**
+     * 移除时
+     */
+    void onRemove(String topic, String consumerGroup, MqMessageHolder messageHolder);
 }

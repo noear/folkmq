@@ -24,8 +24,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * @author noear 2025/1/2 created
  */
-public class MqWatcherQuickIo implements MqWatcher {
-    protected static final Logger log = LoggerFactory.getLogger(MqWatcherQuickIo.class);
+public class MqWatcherLevelDb implements MqWatcher {
+    protected static final Logger log = LoggerFactory.getLogger(MqWatcherLevelDb.class);
 
     //服务端引用
     private MqBorkerInternal serverRef;
@@ -38,18 +38,18 @@ public class MqWatcherQuickIo implements MqWatcher {
     //是否已启动
     private final AtomicBoolean isStarted = new AtomicBoolean(false);
 
-    public MqWatcherQuickIo() {
+    public MqWatcherLevelDb() {
         this(null);
     }
 
-    public MqWatcherQuickIo(String dataPath) {
+    public MqWatcherLevelDb(String dataPath) {
         if (StrUtils.isEmpty(dataPath)) {
             dataPath = "data/ldb/";
         }
 
         String dataPath2 = dataPath;
 
-        this.db = QuickIO.db(Config.of(c -> c.path(dataPath2).name("folkmq")));
+        this.db = QuickIO.db(Config.of(c -> c.path(dataPath2).name("folkmq").cache(100_1000_1000L)));
 
         this.subscribeDocColl = db.collection(SubscribeDoc.class);
         this.messageDocColl = db.collection(MessageDoc.class);
@@ -140,13 +140,8 @@ public class MqWatcherQuickIo implements MqWatcher {
             }
 
             EntityDefault entity = new EntityDefault();
-            if (msg.ver < 2) {
-                //旧版用 string
-                entity.dataSet(msg.data.getBytes(StandardCharsets.UTF_8));
-            } else {
-                //新版用 base64 支持二进制
-                entity.dataSet(Base64.getDecoder().decode(msg.data));
-            }
+            entity.dataSet(msg.data.getBytes(StandardCharsets.UTF_8));
+
             entity.metaStringSet(msg.metaString);
             Message message = new MessageBuilder()
                     .sid(StrUtils.guid())
@@ -225,7 +220,18 @@ public class MqWatcherQuickIo implements MqWatcher {
 
     @Override
     public void onAcknowledge(String topic, String consumerGroup, MqMessageHolder messageHolder, boolean isOk) {
-        if (isOk && messageHolder.getId() > 0L) {
+        if (isOk == false) {
+            MessageDoc msg = messageDocColl.findOne(messageHolder.getId());
+            if (msg != null) {
+                msg.metaString = messageHolder.getEntity().metaString();
+                messageDocColl.save(msg);
+            }
+        }
+    }
+
+    @Override
+    public void onRemove(String topic, String consumerGroup, MqMessageHolder messageHolder) {
+        if (messageHolder.getId() > 0L) {
             messageDocColl.delete(messageHolder.getId());
         }
     }

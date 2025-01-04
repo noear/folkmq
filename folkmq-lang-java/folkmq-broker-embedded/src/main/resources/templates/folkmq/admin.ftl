@@ -40,9 +40,6 @@
                 <a class='sel' href='${root}/admin/topic' target="dock">主题看板</a>
                 <a href='${root}/admin/queue' target="dock">队列看板</a>
                 <a href='${root}/admin/publish' target="dock">消息发布</a>
-                <br />
-                <br />
-                <a href='${root}/admin/save' target="dock">更新快照</a>
             </items>
         </menu>
     </left>

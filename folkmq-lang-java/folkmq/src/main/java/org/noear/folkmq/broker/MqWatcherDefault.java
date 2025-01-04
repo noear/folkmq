@@ -76,4 +76,9 @@ public class MqWatcherDefault implements MqWatcher {
     public void onAcknowledge(String topic, String consumerGroup, MqMessageHolder messageHolder, boolean isOk) {
 
     }
+
+    @Override
+    public void onRemove(String topic, String consumerGroup, MqMessageHolder messageHolder) {
+
+    }
 }

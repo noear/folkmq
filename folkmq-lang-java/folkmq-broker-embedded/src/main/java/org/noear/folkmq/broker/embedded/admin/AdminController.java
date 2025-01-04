@@ -4,10 +4,8 @@ import org.noear.folkmq.broker.embedded.admin.model.TopicVo;
 import org.noear.folkmq.client.MqMessage;
 import org.noear.folkmq.common.MqUtils;
 import org.noear.folkmq.broker.MqBorkerInternal;
-import org.noear.folkmq.broker.watcher.fdb.MqWatcherSnapshotPlus;
 import org.noear.snack.core.utils.DateUtil;
 import org.noear.socketd.transport.core.Message;
-import org.noear.socketd.utils.RunUtils;
 import org.noear.solon.annotation.Inject;
 import org.noear.solon.annotation.Mapping;
 import org.noear.solon.core.handle.ModelAndView;
@@ -32,9 +30,6 @@ public class AdminController extends BaseController {
 
     @Inject
     MqBorkerInternal serviceInternal;
-
-    @Inject
-    MqWatcherSnapshotPlus snapshotPlus;
 
     @Mapping("/admin")
     public ModelAndView admin() {
@@ -108,19 +103,6 @@ public class AdminController extends BaseController {
             }
         } catch (Exception e) {
             return Result.failure(e.getLocalizedMessage());
-        }
-    }
-
-    @Mapping("/admin/save")
-    public String save() {
-        if (snapshotPlus.inSaveProcess()) {
-            return "save in process";
-        } else {
-            RunUtils.asyncAndTry(() -> {
-                serviceInternal.save();
-            });
-
-            return "A new save processing task begins";
         }
     }
 }

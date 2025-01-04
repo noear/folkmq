@@ -7,7 +7,6 @@ import org.noear.folkmq.common.MqConstants;
 import org.noear.folkmq.broker.embedded.MqBrokerConfig;
 import org.noear.folkmq.broker.MqQueue;
 import org.noear.folkmq.broker.MqBorkerInternal;
-import org.noear.folkmq.broker.watcher.fdb.MqWatcherSnapshotPlus;
 import org.noear.socketd.transport.core.Session;
 import org.noear.solon.annotation.Inject;
 import org.noear.solon.annotation.Mapping;
@@ -37,9 +36,6 @@ public class AdminQueueController extends BaseController {
 
     @Inject
     private MqBorkerInternal server;
-
-    @Inject
-    private MqWatcherSnapshotPlus snapshotPlus;
 
     @Inject
     private QueueForceService queueForceService;

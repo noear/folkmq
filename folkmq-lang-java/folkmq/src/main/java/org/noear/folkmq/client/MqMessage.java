@@ -230,6 +230,7 @@ public class MqMessage implements MqMessageBase {
     /**
      * 获取属性字典
      */
+    @Override
     public Map<String, String> getAttrMap() {
         return Collections.unmodifiableMap(attrMap);
     }

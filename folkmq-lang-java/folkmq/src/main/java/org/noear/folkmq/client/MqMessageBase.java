@@ -1,6 +1,7 @@
 package org.noear.folkmq.client;
 
 import java.util.Date;
+import java.util.Map;
 
 /**
  * 消息接口
@@ -68,4 +69,9 @@ public interface MqMessageBase {
      * 获取属性
      */
     String getAttr(String name);
+
+    /**
+     * 获取属性集合
+     */
+    Map<String, String> getAttrMap();
 }

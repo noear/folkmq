@@ -8,7 +8,9 @@ import org.noear.socketd.transport.core.Session;
 import org.noear.socketd.transport.core.entity.EntityDefault;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -155,6 +157,21 @@ public class MqMessageReceivedImpl implements MqMessageReceived {
     @Override
     public String getAttr(String name) {
         return source.meta(MqConstants.MQ_ATTR_PREFIX + name);
+    }
+
+    private Map<String,String> attrMap;
+    @Override
+    public Map<String, String> getAttrMap() {
+        if (attrMap == null) {
+            attrMap = new HashMap<>();
+            for (Map.Entry<String, String> kv : source.metaMap().entrySet()) {
+                if (kv.getKey().startsWith(MqConstants.MQ_ATTR_PREFIX)) {
+                    attrMap.put(kv.getKey(), kv.getValue());
+                }
+            }
+        }
+
+        return Collections.unmodifiableMap(attrMap);
     }
 
 

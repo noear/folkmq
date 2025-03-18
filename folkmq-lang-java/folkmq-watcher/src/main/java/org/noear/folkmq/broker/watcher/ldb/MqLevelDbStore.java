@@ -60,6 +60,11 @@ public class MqLevelDbStore extends MqStoreBase {
     }
 
     @Override
+    public String getName() {
+        return "leveldb";
+    }
+
+    @Override
     public void init(MqBorkerInternal serverInternal) {
         this.serverRef = serverInternal;
     }

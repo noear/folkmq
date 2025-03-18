@@ -84,6 +84,11 @@ public class MqSnapshotStore extends MqStoreBase {
     }
 
     @Override
+    public String getName() {
+        return "fdb";
+    }
+
+    @Override
     public void init(MqBorkerInternal serverInternal) {
         this.serverRef = serverInternal;
     }

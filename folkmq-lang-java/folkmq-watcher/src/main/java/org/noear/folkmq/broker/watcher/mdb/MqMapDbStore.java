@@ -79,6 +79,11 @@ public class MqMapDbStore extends MqStoreBase {
     }
 
     @Override
+    public String getName() {
+        return "mapdb";
+    }
+
+    @Override
     public void init(MqBorkerInternal serverInternal) {
         this.serverRef = serverInternal;
     }

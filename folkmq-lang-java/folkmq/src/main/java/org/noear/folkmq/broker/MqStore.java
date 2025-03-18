@@ -5,4 +5,5 @@ package org.noear.folkmq.broker;
  * @since 1.8
  */
 public interface MqStore extends MqWatcher{
+    String getName();
 }

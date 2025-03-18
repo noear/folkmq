@@ -1,63 +1,50 @@
-package org.noear.folkmq.broker.store.leveldb;
+package org.noear.folkmq.broker.store.jdbc;
 
-import com.github.artbits.quickio.api.JDB;
-import com.github.artbits.quickio.core.Config;
-import com.github.artbits.quickio.core.QuickIO;
 import org.noear.folkmq.broker.*;
 import org.noear.folkmq.common.MqConstants;
 import org.noear.folkmq.common.MqMetasResolver;
 import org.noear.folkmq.common.MqUtils;
+import org.noear.folkmq.utils.SnowflakeId;
 import org.noear.socketd.transport.core.Flags;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
 import org.noear.socketd.transport.core.entity.EntityDefault;
 import org.noear.socketd.transport.core.entity.MessageBuilder;
 import org.noear.socketd.utils.StrUtils;
+import org.noear.wood.DbContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
+import javax.sql.DataSource;
+import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * @author noear 2025/1/2 created
+ * @author noear
+ * @since 1.8
  */
-public class MqLevelDbStore extends MqStoreBase {
-    protected static final Logger log = LoggerFactory.getLogger(MqLevelDbStore.class);
+public class MqJdbcStore extends MqStoreBase {
+    protected static final Logger log = LoggerFactory.getLogger(MqJdbcStore.class);
 
     //服务端引用
     private MqBorkerInternal serverRef;
-    private JDB db;
-    private com.github.artbits.quickio.api.Collection<SubscribeDoc> subscribeDocColl;
-    private com.github.artbits.quickio.api.Collection<MessageDoc> messageDocColl;
+    private DbContext db;
 
     //正在保持中
     private final AtomicBoolean inSaveProcess = new AtomicBoolean(false);
     //是否已启动
     private final AtomicBoolean isStarted = new AtomicBoolean(false);
 
-    public MqLevelDbStore() {
-        this(null);
-    }
+    public MqJdbcStore(DataSource dataSource) {
+       this.db = new DbContext(dataSource);
 
-    public MqLevelDbStore(String dataPath) {
-        if (StrUtils.isEmpty(dataPath)) {
-            dataPath = "data/ldb/";
-        }
-
-        String dataPath2 = dataPath;
-
-        this.db = QuickIO.db(Config.of(c -> c.path(dataPath2).name("folkmq").cache(100_1000_1000L)));
-
-        this.subscribeDocColl = db.collection(SubscribeDoc.class);
-        this.messageDocColl = db.collection(MessageDoc.class);
     }
 
     @Override
     public String getName() {
-        return "leveldb";
+        return "mapdb";
     }
 
     @Override
@@ -82,7 +69,9 @@ public class MqLevelDbStore extends MqStoreBase {
      */
     private void loadSubscribeMap() {
         try {
-            for (SubscribeDoc subs : subscribeDocColl.findAll()) {
+            List<SubscribeDoc> subscribeDocList = db.table("subscribe").selectList("*", SubscribeDoc.class);
+
+            for (SubscribeDoc subs : subscribeDocList) {
                 String consumerGroup = subs.queueName.split(MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP)[1];
                 serverRef.subscribeDo(subs.topic, consumerGroup, null);
             }
@@ -123,8 +112,11 @@ public class MqLevelDbStore extends MqStoreBase {
         }
     }
 
-    private boolean loadQueue1(String queueName) throws IOException {
-        List<MessageDoc> msgList = messageDocColl.find(m -> m.queueName.equals(queueName));
+    private boolean loadQueue1(String queueName) throws Exception {
+        List<MessageDoc> msgList = db.table("message")
+                .whereEq("queueName", queueName)
+                .selectList("*", MessageDoc.class);
+
         for (MessageDoc msg : msgList) {
             if (msg.data == null) {
                 continue;
@@ -144,7 +136,7 @@ public class MqLevelDbStore extends MqStoreBase {
             MqDraft draft = new MqDraft(mr, message);
 
             MqQueue queue = serverRef.getQueue(queueName);
-            serverRef.routingToQueueDo(draft, queue, msg.objectId());
+            serverRef.routingToQueueDo(draft, queue, msg.id);
         }
 
         return true;
@@ -164,7 +156,12 @@ public class MqLevelDbStore extends MqStoreBase {
         doc.topic = topic;
         doc.queueName = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP + consumerGroup;
 
-        subscribeDocColl.save(doc);
+        try {
+            db.table("subscribe").set("topic", doc.topic).set("queueName", doc.queueName)
+                    .insertBy("queueName");
+        } catch (Throwable ex) {
+            log.error("onSubscribe error", ex);
+        }
     }
 
     @Override
@@ -174,28 +171,37 @@ public class MqLevelDbStore extends MqStoreBase {
         }
 
         MessageDoc doc = new MessageDoc();
+        doc.id = SnowflakeId.DEFAULT.nextId();
         doc.ver = 2;
         doc.queueName = messageHolder.getQueueName();
         doc.metaString = messageHolder.getEntity().metaString();
         doc.data = messageHolder.getEntity().dataAsString();
 
-        messageDocColl.save(doc);
+        try {
+            db.table("message")
+                    .set("id", doc.id)
+                    .set("ver", doc.ver)
+                    .set("queueName", doc.queueName)
+                    .set("metaString", doc.metaString)
+                    .set("data", doc.data)
+                    .insertBy("id");
 
-        messageHolder.setId(doc.objectId());
-    }
-
-    @Override
-    public void onDistribute(String topic, String consumerGroup, MqMessageHolder messageHolder) {
-
+            messageHolder.setId(doc.id);
+        } catch (Throwable ex) {
+            log.error("onRouting error", ex);
+        }
     }
 
     @Override
     public void onAcknowledge(String topic, String consumerGroup, MqMessageHolder messageHolder, boolean isOk) {
         if (isOk == false) {
-            MessageDoc msg = messageDocColl.findOne(messageHolder.getId());
-            if (msg != null) {
-                msg.metaString = messageHolder.getEntity().metaString();
-                messageDocColl.save(msg);
+            try {
+                db.table("message")
+                        .set("metaString", messageHolder.getEntity().metaString())
+                        .whereEq("id", messageHolder.getId())
+                        .update();
+            } catch (Throwable ex) {
+                log.error("onAcknowledge error", ex);
             }
         }
     }
@@ -203,7 +209,13 @@ public class MqLevelDbStore extends MqStoreBase {
     @Override
     public void onRemove(String topic, String consumerGroup, MqMessageHolder messageHolder) {
         if (messageHolder.getId() > 0L) {
-            messageDocColl.delete(messageHolder.getId());
+            try {
+                db.table("message")
+                        .whereEq("id", messageHolder.getId())
+                        .delete();
+            } catch (Throwable ex) {
+                log.error("onRemove error", ex);
+            }
         }
     }
 }

@@ -74,10 +74,6 @@ public class MqMapDbStore extends MqStoreBase {
                 .createOrOpen();
     }
 
-    public boolean inSaveProcess() {
-        return inSaveProcess.get();
-    }
-
     @Override
     public String getName() {
         return "mapdb";

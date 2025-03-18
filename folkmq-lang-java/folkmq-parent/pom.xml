@@ -43,6 +43,7 @@
         <module>../folkmq-transport-netty</module>
         <module>../folkmq-transport-smartsocket</module>
         <module>../folkmq-store-fdb</module>
+        <module>../folkmq-store-jdbc</module>
         <module>../folkmq-store-leveldb</module>
         <module>../folkmq-store-mapdb</module>
     </modules>
@@ -100,6 +101,12 @@
             <dependency>
                 <groupId>org.noear</groupId>
                 <artifactId>folkmq-store-fdb</artifactId>
+                <version>${folkmq.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.noear</groupId>
+                <artifactId>folkmq-store-jdbc</artifactId>
                 <version>${folkmq.version}</version>
             </dependency>
 

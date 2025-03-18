@@ -79,10 +79,6 @@ public class MqSnapshotStore extends MqStoreBase {
         fileTmp.renameTo(file);
     }
 
-    public boolean inSaveProcess() {
-        return inSaveProcess.get();
-    }
-
     @Override
     public String getName() {
         return "fdb";

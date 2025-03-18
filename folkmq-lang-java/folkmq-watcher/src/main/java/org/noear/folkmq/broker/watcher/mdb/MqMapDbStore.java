@@ -21,8 +21,6 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
@@ -31,8 +29,8 @@ import java.util.stream.Collectors;
  * @author noear
  * @since 1.8
  */
-public class MqWatcherMapDb implements MqWatcher {
-    protected static final Logger log = LoggerFactory.getLogger(MqWatcherMapDb.class);
+public class MqMapDbStore extends MqStoreBase {
+    protected static final Logger log = LoggerFactory.getLogger(MqMapDbStore.class);
 
     //服务端引用
     private MqBorkerInternal serverRef;
@@ -45,11 +43,11 @@ public class MqWatcherMapDb implements MqWatcher {
     //是否已启动
     private final AtomicBoolean isStarted = new AtomicBoolean(false);
 
-    public MqWatcherMapDb() {
+    public MqMapDbStore() {
         this(null);
     }
 
-    public MqWatcherMapDb(String dataPath) {
+    public MqMapDbStore(String dataPath) {
         if (StrUtils.isEmpty(dataPath)) {
             dataPath = "data/mdb/";
         }
@@ -95,16 +93,6 @@ public class MqWatcherMapDb implements MqWatcher {
         } finally {
             isStarted.set(true);
         }
-    }
-
-    @Override
-    public void onStartAfter() {
-
-    }
-
-    @Override
-    public void onStopBefore() {
-
     }
 
     /**
@@ -191,32 +179,12 @@ public class MqWatcherMapDb implements MqWatcher {
     }
 
     @Override
-    public void onSave() {
-
-    }
-
-    @Override
     public void onSubscribe(String topic, String consumerGroup, Session session) {
         SubscribeDoc doc = new SubscribeDoc();
         doc.topic = topic;
         doc.queueName = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP + consumerGroup;
 
         subscribeDocColl.put(doc.queueName, doc);
-    }
-
-    @Override
-    public void onUnSubscribe(String topic, String consumerGroup, Session session) {
-
-    }
-
-    @Override
-    public void onPublish(Message message) {
-
-    }
-
-    @Override
-    public void onUnPublish(Message message) {
-
     }
 
     @Override
@@ -235,11 +203,6 @@ public class MqWatcherMapDb implements MqWatcher {
         messageDocColl.put(doc.id, doc);
 
         messageHolder.setId(doc.id);
-    }
-
-    @Override
-    public void onDistribute(String topic, String consumerGroup, MqMessageHolder messageHolder) {
-
     }
 
     @Override

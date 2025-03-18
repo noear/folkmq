@@ -5,8 +5,7 @@ import org.noear.folkmq.broker.MqWatcher;
 import org.noear.folkmq.broker.embedded.admin.dso.QueueForceService;
 import org.noear.folkmq.broker.embedded.admin.dso.ViewUtils;
 import org.noear.folkmq.broker.embedded.admin.model.ServerInfoVo;
-import org.noear.folkmq.broker.watcher.fdb.MqWatcherSnapshotPlus;
-import org.noear.folkmq.broker.watcher.ldb.MqWatcherLevelDb;
+import org.noear.folkmq.broker.watcher.ldb.MqLevelDbStore;
 import org.noear.folkmq.common.MqConstants;
 import org.noear.folkmq.broker.embedded.MqConfigNames;
 import org.noear.folkmq.broker.embedded.MqBrokerConfig;
@@ -59,7 +58,7 @@ public class FolkmqLifecycleBean implements LifecycleBean {
     @Override
     public void start() throws Throwable {
         //初始化快照持久化
-        MqWatcher watcher = new MqWatcherLevelDb();
+        MqWatcher watcher = new MqLevelDbStore();
 
         appContext.wrapAndPut(MqWatcher.class, watcher);
 

@@ -23,13 +23,13 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * 消息观察者 - 快照持久化（实现持久化）
+ * 消息快照持久化（实现持久化）
  *
  * @author noear
  * @since 1.0
  */
-public class MqWatcherSnapshot extends MqWatcherDefault {
-    protected static final Logger log = LoggerFactory.getLogger(MqWatcherSnapshot.class);
+public class MqSnapshotStore extends MqStoreBase {
+    protected static final Logger log = LoggerFactory.getLogger(MqSnapshotStore.class);
     private static final String file_suffix = ".fdb";
 
     //服务端引用
@@ -43,11 +43,11 @@ public class MqWatcherSnapshot extends MqWatcherDefault {
     //是否已启动
     private final AtomicBoolean isStarted = new AtomicBoolean(false);
 
-    public MqWatcherSnapshot() {
+    public MqSnapshotStore() {
         this(null);
     }
 
-    public MqWatcherSnapshot(String dataPath) {
+    public MqSnapshotStore(String dataPath) {
         if (StrUtils.isEmpty(dataPath)) {
             dataPath = "./data/fdb/";
         }

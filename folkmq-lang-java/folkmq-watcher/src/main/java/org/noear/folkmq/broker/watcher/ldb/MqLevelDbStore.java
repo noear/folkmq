@@ -24,8 +24,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * @author noear 2025/1/2 created
  */
-public class MqWatcherLevelDb implements MqWatcher {
-    protected static final Logger log = LoggerFactory.getLogger(MqWatcherLevelDb.class);
+public class MqLevelDbStore extends MqStoreBase {
+    protected static final Logger log = LoggerFactory.getLogger(MqLevelDbStore.class);
 
     //服务端引用
     private MqBorkerInternal serverRef;
@@ -38,11 +38,11 @@ public class MqWatcherLevelDb implements MqWatcher {
     //是否已启动
     private final AtomicBoolean isStarted = new AtomicBoolean(false);
 
-    public MqWatcherLevelDb() {
+    public MqLevelDbStore() {
         this(null);
     }
 
-    public MqWatcherLevelDb(String dataPath) {
+    public MqLevelDbStore(String dataPath) {
         if (StrUtils.isEmpty(dataPath)) {
             dataPath = "data/ldb/";
         }
@@ -74,16 +74,6 @@ public class MqWatcherLevelDb implements MqWatcher {
         } finally {
             isStarted.set(true);
         }
-    }
-
-    @Override
-    public void onStartAfter() {
-
-    }
-
-    @Override
-    public void onStopBefore() {
-
     }
 
     /**
@@ -168,32 +158,12 @@ public class MqWatcherLevelDb implements MqWatcher {
     }
 
     @Override
-    public void onSave() {
-
-    }
-
-    @Override
     public void onSubscribe(String topic, String consumerGroup, Session session) {
         SubscribeDoc doc = new SubscribeDoc();
         doc.topic = topic;
         doc.queueName = topic + MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP + consumerGroup;
 
         subscribeDocColl.save(doc);
-    }
-
-    @Override
-    public void onUnSubscribe(String topic, String consumerGroup, Session session) {
-
-    }
-
-    @Override
-    public void onPublish(Message message) {
-
-    }
-
-    @Override
-    public void onUnPublish(Message message) {
-
     }
 
     @Override

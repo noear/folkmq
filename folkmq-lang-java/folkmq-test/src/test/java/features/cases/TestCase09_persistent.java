@@ -4,7 +4,7 @@ import org.noear.folkmq.FolkMQ;
 import org.noear.folkmq.client.MqMessage;
 import org.noear.folkmq.broker.MqBorkerInternal;
 import org.noear.folkmq.broker.MqQueue;
-import org.noear.folkmq.broker.watcher.fdb.MqWatcherSnapshot;
+import org.noear.folkmq.broker.watcher.fdb.MqSnapshotStore;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -24,7 +24,7 @@ public class TestCase09_persistent extends BaseTestCase {
 
         //服务端
         server = FolkMQ.createBorker()
-                .watcher(new MqWatcherSnapshot())
+                .watcher(new MqSnapshotStore())
                 .start(getPort());
 
         //客户端
@@ -45,7 +45,7 @@ public class TestCase09_persistent extends BaseTestCase {
 
         server.stop();
         server = FolkMQ.createBorker() //相当于服务器重启了
-                .watcher(new MqWatcherSnapshot())
+                .watcher(new MqSnapshotStore())
                 .start(getPort());
 
         //上面已有有订阅记录了
@@ -59,7 +59,7 @@ public class TestCase09_persistent extends BaseTestCase {
 
         server.stop();
         server = FolkMQ.createBorker() //相当于服务器重启了
-                .watcher(new MqWatcherSnapshot())
+                .watcher(new MqSnapshotStore())
                 .start(getPort());
 
 

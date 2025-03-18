@@ -10,14 +10,14 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.atomic.LongAdder;
 
 /**
- * 消息观察者 - 快照持久化（增加实现策略）
+ * 消息快照持久化（增加实现策略）
  * <br/>
  * 持久化定位为副本，只要重启时能恢复订阅关系与消息即可
  *
  * @author noear
  * @since 1.0
  */
-public class MqWatcherSnapshotPlus extends MqWatcherSnapshot {
+public class MqSnapshotStorePlus extends MqSnapshotStore {
     private final LongAdder save900Count;
     private final LongAdder save300Count;
     private final LongAdder save100Count;
@@ -30,11 +30,11 @@ public class MqWatcherSnapshotPlus extends MqWatcherSnapshot {
     protected long save300Condition = 10L;
     protected long save100Condition = 10000L;
 
-    public MqWatcherSnapshotPlus() {
+    public MqSnapshotStorePlus() {
         this(null);
     }
 
-    public MqWatcherSnapshotPlus(String dataPath) {
+    public MqSnapshotStorePlus(String dataPath) {
         super(dataPath);
 
         this.save900Count = new LongAdder();
@@ -51,18 +51,18 @@ public class MqWatcherSnapshotPlus extends MqWatcherSnapshot {
         this.save100Future = RunUtils.scheduleWithFixedDelay(this::onSave100, fixedDelay100, fixedDelay100);
     }
 
-    public MqWatcherSnapshotPlus save900Condition(long save900Condition) {
+    public MqSnapshotStorePlus save900Condition(long save900Condition) {
         this.save900Condition = save900Condition;
         return this;
     }
 
-    public MqWatcherSnapshotPlus save300Condition(long save300Condition) {
+    public MqSnapshotStorePlus save300Condition(long save300Condition) {
         this.save300Condition = save300Condition;
 
         return this;
     }
 
-    public MqWatcherSnapshotPlus save100Condition(long save100Condition) {
+    public MqSnapshotStorePlus save100Condition(long save100Condition) {
         this.save100Condition = save100Condition;
 
         return this;

@@ -46,6 +46,7 @@
         <module>../folkmq-store-jdbc</module>
         <module>../folkmq-store-leveldb</module>
         <module>../folkmq-store-mapdb</module>
+        <module>../folkmq-store-mongodb</module>
     </modules>
 
     <dependencyManagement>
@@ -119,6 +120,12 @@
             <dependency>
                 <groupId>org.noear</groupId>
                 <artifactId>folkmq-store-mapdb</artifactId>
+                <version>${folkmq.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.noear</groupId>
+                <artifactId>folkmq-store-mongodb</artifactId>
                 <version>${folkmq.version}</version>
             </dependency>
 

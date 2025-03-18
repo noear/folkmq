@@ -22,6 +22,7 @@ public class BenchmarkTest {
         CountDownLatch countDownLatch = new CountDownLatch(count);
 
         MqClient client = FolkMQ.createClient("folkmq://127.0.0.1:18602?ak=folkmq&sk=YapLHTx19RlsEE16")
+                .config(c->c.trafficLimiter(null))
                 .connect();
 
         //订阅

@@ -42,6 +42,9 @@
         <module>../folkmq-transport-java-websocket</module>
         <module>../folkmq-transport-netty</module>
         <module>../folkmq-transport-smartsocket</module>
+        <module>../folkmq-store-fdb</module>
+        <module>../folkmq-store-leveldb</module>
+        <module>../folkmq-store-mapdb</module>
     </modules>
 
     <dependencyManagement>
@@ -91,6 +94,24 @@
             <dependency>
                 <groupId>org.noear</groupId>
                 <artifactId>folkmq-transport-smartsocket</artifactId>
+                <version>${folkmq.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.noear</groupId>
+                <artifactId>folkmq-store-fdb</artifactId>
+                <version>${folkmq.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.noear</groupId>
+                <artifactId>folkmq-store-leveldb</artifactId>
+                <version>${folkmq.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.noear</groupId>
+                <artifactId>folkmq-store-mapdb</artifactId>
                 <version>${folkmq.version}</version>
             </dependency>
 

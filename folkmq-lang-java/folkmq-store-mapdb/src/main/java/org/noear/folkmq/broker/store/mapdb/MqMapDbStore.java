@@ -1,14 +1,14 @@
-package org.noear.folkmq.broker.watcher.mdb;
+package org.noear.folkmq.broker.store.mapdb;
 
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import org.mapdb.HTreeMap;
 import org.mapdb.Serializer;
 import org.noear.folkmq.broker.*;
-import org.noear.folkmq.broker.watcher.utils.SnowflakeId;
 import org.noear.folkmq.common.MqConstants;
 import org.noear.folkmq.common.MqMetasResolver;
 import org.noear.folkmq.common.MqUtils;
+import org.noear.folkmq.utils.SnowflakeId;
 import org.noear.socketd.transport.core.Flags;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;

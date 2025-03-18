@@ -17,7 +17,27 @@
     <dependencies>
         <dependency>
             <groupId>org.noear</groupId>
+            <artifactId>folkmq</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.noear</groupId>
             <artifactId>folkmq-watcher</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.noear</groupId>
+            <artifactId>folkmq-store-fdb</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.noear</groupId>
+            <artifactId>folkmq-store-leveldb</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.noear</groupId>
+            <artifactId>folkmq-store-mapdb</artifactId>
         </dependency>
 
         <dependency>

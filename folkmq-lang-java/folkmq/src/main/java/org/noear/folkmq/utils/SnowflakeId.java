@@ -1,4 +1,4 @@
-package org.noear.folkmq.broker.watcher.utils;
+package org.noear.folkmq.utils;
 
 import java.util.concurrent.locks.ReentrantLock;
 

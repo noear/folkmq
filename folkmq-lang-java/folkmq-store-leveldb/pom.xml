@@ -11,19 +11,20 @@
         <relativePath>../folkmq-parent/pom.xml</relativePath>
     </parent>
 
-    <artifactId>folkmq-watcher</artifactId>
+    <artifactId>folkmq-store-leveldb</artifactId>
     <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
             <groupId>org.noear</groupId>
             <artifactId>folkmq</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
-            <groupId>io.micrometer</groupId>
-            <artifactId>micrometer-core</artifactId>
-            <version>${micrometer.version}</version>
+            <groupId>com.github.artbits</groupId>
+            <artifactId>quickio</artifactId>
+            <version>1.4.1</version>
         </dependency>
     </dependencies>
 

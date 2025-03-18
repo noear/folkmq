@@ -1,4 +1,4 @@
-package org.noear.folkmq.broker.watcher.mdb;
+package org.noear.folkmq.broker.store.mapdb;
 
 import java.io.Serializable;
 

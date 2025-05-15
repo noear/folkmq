@@ -94,6 +94,11 @@ public class MqSolonContext extends ContextEmpty {
     }
 
     @Override
+    public String path() {
+        return uri().getPath();
+    }
+
+    @Override
     public long contentLength() {
         return _request.getSource().dataSize();
     }

@@ -11,6 +11,7 @@ import org.noear.socketd.SocketD;
 import org.noear.socketd.cluster.ClusterClientSession;
 import org.noear.socketd.exception.SocketDConnectionException;
 import org.noear.socketd.exception.SocketDException;
+import org.noear.socketd.transport.client.Client;
 import org.noear.socketd.transport.client.ClientConfigHandler;
 import org.noear.socketd.transport.client.ClientSession;
 import org.noear.socketd.transport.core.*;
@@ -113,6 +114,17 @@ public class MqClientDefault implements MqClientInternal {
 
     @Override
     public MqClient connect() throws IOException {
+        clientSession = (ClusterClientSession) doConnect().open();
+        return this;
+    }
+
+    @Override
+    public MqClient connectOrThow() throws IOException {
+        clientSession = (ClusterClientSession) doConnect().openOrThow();
+        return this;
+    }
+
+    protected Client doConnect() throws IOException {
         List<String> serverUrls = new ArrayList<>();
 
         for (String url : urls) {
@@ -135,7 +147,7 @@ public class MqClientDefault implements MqClientInternal {
 
 
         //默认不缩小分片，方便无锁发送
-        clientSession = (ClusterClientSession) SocketD.createClusterClient(serverUrls)
+        return SocketD.createClusterClient(serverUrls)
                 .config(c -> {
                     c.metaPut(MqConstants.FOLKMQ_VERSION, FolkMQ.versionCodeAsString())
                             .heartbeatInterval(6_000)
@@ -155,10 +167,7 @@ public class MqClientDefault implements MqClientInternal {
                         clientConfigHandler.clientConfig(c);
                     }
                 })
-                .listen(clientListener)
-                .open();
-
-        return this;
+                .listen(clientListener);
     }
 
     @Override

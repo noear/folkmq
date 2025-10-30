@@ -37,9 +37,14 @@ public interface MqClient {
     MqClient namespaceAs(String namespace);
 
     /**
-     * 连接
+     * 连接（如果失败则打印，保持心跳重试）
      */
     MqClient connect() throws IOException;
+
+    /**
+     * 连接（如果失败则异常）
+     */
+    MqClient connectOrThow() throws IOException;
 
     /**
      * 断开连接

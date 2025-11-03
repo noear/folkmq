@@ -5,9 +5,7 @@ import org.noear.folkmq.common.MqConstants;
 import org.noear.folkmq.common.MqMetasResolver;
 import org.noear.folkmq.common.MqUtils;
 import org.noear.folkmq.utils.IoUtils;
-import org.noear.snack.ONode;
-import org.noear.snack.core.Feature;
-import org.noear.snack.core.Options;
+import org.noear.snack4.ONode;
 import org.noear.socketd.transport.core.Entity;
 import org.noear.socketd.transport.core.Flags;
 import org.noear.socketd.transport.core.Message;
@@ -132,10 +130,10 @@ public class MqSnapshotStore extends MqStoreBase {
     private void loadSubscribeMapOldDo(File subscribeMapFile) throws Exception {
         String subscribeMapJsonStr = readSnapshotFile(subscribeMapFile);
 
-        ONode subscribeMapJson = ONode.loadStr(subscribeMapJsonStr, Feature.DisThreadLocal);
-        for (String topic : subscribeMapJson.obj().keySet()) {
+        ONode subscribeMapJson = ONode.ofJson(subscribeMapJsonStr);
+        for (String topic : subscribeMapJson.getObject().keySet()) {
             ONode oQueueNameList = subscribeMapJson.get(topic);
-            for (ONode oQueueName : oQueueNameList.ary()) {
+            for (ONode oQueueName : oQueueNameList.getArray()) {
                 String consumerGroup = oQueueName.getString().split(MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP)[1];
                 serverRef.subscribeDo(topic, consumerGroup, null);
             }
@@ -163,12 +161,12 @@ public class MqSnapshotStore extends MqStoreBase {
                 }
 
                 if (topicJsonStr.endsWith("}")) {
-                    ONode oNode = ONode.loadStr(topicJsonStr, Feature.DisThreadLocal);
+                    ONode oNode = ONode.ofJson(topicJsonStr);
 
                     String topic = oNode.get("topic").getString();
                     ONode oQueueNameList = oNode.get("queues");
 
-                    for (ONode oQueueName : oQueueNameList.ary()) {
+                    for (ONode oQueueName : oQueueNameList.getArray()) {
                         String consumerGroup = oQueueName.getString().split(MqConstants.SEPARATOR_TOPIC_CONSUMER_GROUP)[1];
                         serverRef.subscribeDo(topic, consumerGroup, null);
                     }
@@ -225,7 +223,7 @@ public class MqSnapshotStore extends MqStoreBase {
                 }
 
                 if (messageJsonStr.endsWith("}")) {
-                    ONode messageJson = ONode.loadStr(messageJsonStr, Feature.DisThreadLocal);
+                    ONode messageJson = ONode.ofJson(messageJsonStr);
 
                     int ver = messageJson.get("v").getInt();
                     String metaString = messageJson.get("meta").getString();
@@ -333,7 +331,7 @@ public class MqSnapshotStore extends MqStoreBase {
                 String topic = kv.getKey();
                 Set<String> topicConsumerList = kv.getValue();
 
-                ONode topicJson = new ONode(Options.def().add(Feature.DisThreadLocal));
+                ONode topicJson = new ONode();
                 topicJson.set("topic", topic);
                 topicJson.getOrNew("queues").addAll(topicConsumerList);
 
@@ -414,7 +412,7 @@ public class MqSnapshotStore extends MqStoreBase {
 
                     try {
                         Entity entity = messageHolder.getEntity();
-                        ONode entityJson = new ONode(Options.def().add(Feature.DisThreadLocal));
+                        ONode entityJson = new ONode();
                         entityJson.set("v", 2); //ver
                         entityJson.set("meta", entity.metaString());
                         entityJson.set("data", Base64.getEncoder().encodeToString(entity.dataAsBytes()));

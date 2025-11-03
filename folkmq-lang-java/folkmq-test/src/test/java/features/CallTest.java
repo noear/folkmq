@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.noear.folkmq.FolkMQ;
 import org.noear.folkmq.client.MqClient;
 import org.noear.folkmq.common.MqApis;
-import org.noear.snack.ONode;
+import org.noear.snack4.ONode;
 
 import java.io.IOException;
 
@@ -28,7 +28,7 @@ public class CallTest {
     public void MQ_QUEUE_LIST() throws Exception {
         String json = client.call(MqApis.MQ_QUEUE_LIST, apiToken, "test", "a").get();
         System.out.println(json);
-        ONode oNode = ONode.loadStr(json);
+        ONode oNode = ONode.ofJson(json);
         assert oNode.get("code").getInt() == 200;
         assert oNode.get("data").isArray();
     }
@@ -37,7 +37,7 @@ public class CallTest {
     public void MQ_QUEUE_VIEW_MESSAGE() throws Exception {
         String json = client.call(MqApis.MQ_QUEUE_VIEW_MESSAGE, apiToken, "test", "a").get();
         System.out.println(json);
-        ONode oNode = ONode.loadStr(json);
+        ONode oNode = ONode.ofJson(json);
 
         if (oNode.get("code").getInt() == 200) {
             assert oNode.get("data").isObject();
@@ -50,7 +50,7 @@ public class CallTest {
     public void MQ_QUEUE_VIEW_SESSION() throws Exception {
         String json = client.call(MqApis.MQ_QUEUE_VIEW_SESSION, apiToken, "test", "a").get();
         System.out.println(json);
-        ONode oNode = ONode.loadStr(json);
+        ONode oNode = ONode.ofJson(json);
         assert oNode.get("code").getInt() == 200;
         assert oNode.get("data").isArray();
     }
@@ -59,7 +59,7 @@ public class CallTest {
     public void MQ_QUEUE_FORCE_CLEAR() throws Exception {
         String json = client.call(MqApis.MQ_QUEUE_FORCE_CLEAR, apiToken, "test", "a").get();
         System.out.println(json);
-        ONode oNode = ONode.loadStr(json);
+        ONode oNode = ONode.ofJson(json);
         assert oNode.get("code").getInt() == 200;
     }
 
@@ -67,7 +67,7 @@ public class CallTest {
     public void MQ_QUEUE_FORCE_DELETE() throws Exception {
         String json = client.call(MqApis.MQ_QUEUE_FORCE_DELETE, apiToken, "test", "a").get();
         System.out.println(json);
-        ONode oNode = ONode.loadStr(json);
+        ONode oNode = ONode.ofJson(json);
         assert oNode.get("code").getInt() == 200;
     }
 
@@ -75,7 +75,7 @@ public class CallTest {
     public void MQ_QUEUE_FORCE_DISTRIBUTE() throws Exception {
         String json = client.call(MqApis.MQ_QUEUE_FORCE_DISTRIBUTE, apiToken, "test", "a").get();
         System.out.println(json);
-        ONode oNode = ONode.loadStr(json);
+        ONode oNode = ONode.ofJson(json);
         assert oNode.get("code").getInt() == 200;
     }
 }

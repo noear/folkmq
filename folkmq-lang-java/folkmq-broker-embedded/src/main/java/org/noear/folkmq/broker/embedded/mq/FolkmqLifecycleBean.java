@@ -12,7 +12,7 @@ import org.noear.folkmq.broker.embedded.MqBrokerConfig;
 import org.noear.folkmq.broker.MqBorker;
 import org.noear.folkmq.broker.MqBorkerInternal;
 import org.noear.folkmq.broker.MqBorkerListener;
-import org.noear.snack.ONode;
+import org.noear.snack4.ONode;
 import org.noear.socketd.SocketD;
 import org.noear.socketd.cluster.ClusterClientSession;
 import org.noear.socketd.transport.core.entity.StringEntity;
@@ -122,7 +122,7 @@ public class FolkmqLifecycleBean implements LifecycleBean {
         //允许控制台获取队列看板
         brokerServiceListener.doOn(MqConstants.ADMIN_VIEW_QUEUE, (s, m) -> {
             if (m.isRequest() || m.isSubscribe()) {
-                String json = ONode.stringify(ViewUtils.queueView(brokerServiceListener));
+                String json = ONode.serialize(ViewUtils.queueView(brokerServiceListener));
                 s.replyEnd(m, new StringEntity(json));
             }
         });
@@ -132,7 +132,7 @@ public class FolkmqLifecycleBean implements LifecycleBean {
             if (m.isRequest() || m.isSubscribe()) {
                 ServerInfoVo infoVo = new ServerInfoVo();
                 infoVo.memoryRatio = MemoryUtils.getUseMemoryRatio();
-                String json = ONode.stringify(infoVo);
+                String json = ONode.serialize(infoVo);
                 s.replyEnd(m, new StringEntity(json));
             }
         });

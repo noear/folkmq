@@ -5,7 +5,8 @@ import org.noear.folkmq.proxy.middleware.admin.model.ServerInfoVo;
 import org.noear.folkmq.proxy.middleware.common.MqConfigNames;
 import org.noear.folkmq.proxy.middleware.mq.FolkmqProxyListener;
 import org.noear.folkmq.common.MqConstants;
-import org.noear.snack.ONode;
+import org.noear.snack4.ONode;
+import org.noear.snack4.codec.TypeRef;
 import org.noear.socketd.transport.core.Entity;
 import org.noear.socketd.transport.core.EntityMetas;
 import org.noear.socketd.transport.core.Session;
@@ -132,7 +133,7 @@ public class ViewQueueService implements LifecycleBean {
                 try {
                     session.sendAndRequest(MqConstants.ADMIN_VIEW_QUEUE, reqEntity).thenReply(r -> {
                         String json = r.dataAsString();
-                        List<QueueVo> list = ONode.loadStr(json).toObjectList(QueueVo.class);
+                        List<QueueVo> list = ONode.ofJson(json).toBean(TypeRef.listOf(QueueVo.class));
                         session.attrPut("QueueVoList", list);
                     }).thenError(err -> {
                         log.debug(MqConstants.ADMIN_VIEW_QUEUE + " request failed", err);
@@ -140,7 +141,7 @@ public class ViewQueueService implements LifecycleBean {
 
                     session.sendAndRequest(MqConstants.ADMIN_VIEW_INSTANCE, reqEntity).thenReply(r -> {
                         String json = r.dataAsString();
-                        ServerInfoVo infoVo = ONode.loadStr(json).toObject(ServerInfoVo.class);
+                        ServerInfoVo infoVo = ONode.ofJson(json).toBean(ServerInfoVo.class);
                         session.attrPut("ServerInfoVo", infoVo);
                     }).thenError(err -> {
                         log.debug(MqConstants.ADMIN_VIEW_INSTANCE + " request failed", err);

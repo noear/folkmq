@@ -7,7 +7,7 @@ import org.noear.folkmq.broker.embedded.admin.dso.QueueForceService;
 import org.noear.folkmq.broker.embedded.admin.dso.ViewUtils;
 import org.noear.folkmq.broker.embedded.MqBrokerConfig;
 import org.noear.folkmq.broker.MqBorkerListener;
-import org.noear.snack.ONode;
+import org.noear.snack4.ONode;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
 import org.noear.socketd.transport.core.entity.StringEntity;
@@ -104,6 +104,6 @@ public class FolkmqApiHandler implements MessageHandler {
     }
 
     private void replyDo(Session s, Message m, Result rst) throws IOException {
-        s.replyEnd(m, new StringEntity(ONode.stringify(rst)));
+        s.replyEnd(m, new StringEntity(ONode.serialize(rst)));
     }
 }

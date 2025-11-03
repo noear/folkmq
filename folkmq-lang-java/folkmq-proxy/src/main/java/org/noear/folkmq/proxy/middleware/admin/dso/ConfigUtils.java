@@ -1,8 +1,9 @@
 package org.noear.folkmq.proxy.middleware.admin.dso;
 
 import org.noear.folkmq.utils.IoUtils;
-import org.noear.snack.ONode;
-import org.noear.snack.core.Feature;
+import org.noear.snack4.ONode;
+import org.noear.snack4.Feature;
+import org.noear.snack4.Options;
 import org.noear.solon.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,17 +29,15 @@ public class ConfigUtils {
                     if (file.exists()) {
                         try {
                             String json = IoUtils.readFile(file);
-                            _dom = ONode.loadStr(json);
+                            _dom = ONode.ofJson(json, Feature.Write_PrettyFormat);
                         } catch (Exception ex) {
                             log.warn(ex.getMessage(), ex);
                         }
                     }
 
                     if(_dom == null) {
-                        _dom = new ONode();
+                        _dom = new ONode(Options.of(Feature.Write_PrettyFormat));
                     }
-
-                    _dom.options().add(Feature.PrettyFormat);
                 }
             } finally {
                 Utils.locker().unlock();

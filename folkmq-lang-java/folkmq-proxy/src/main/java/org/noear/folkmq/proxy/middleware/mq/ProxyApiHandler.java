@@ -6,7 +6,7 @@ import org.noear.folkmq.proxy.middleware.admin.model.QueueVo;
 import org.noear.folkmq.proxy.middleware.common.MqProxyConfig;
 import org.noear.folkmq.common.MqApis;
 import org.noear.folkmq.common.MqConstants;
-import org.noear.snack.ONode;
+import org.noear.snack4.ONode;
 import org.noear.socketd.transport.core.Message;
 import org.noear.socketd.transport.core.Session;
 import org.noear.socketd.transport.core.entity.StringEntity;
@@ -105,6 +105,6 @@ public class ProxyApiHandler implements MessageHandler {
     }
 
     private void replyDo(Session s, Message m, Result rst) throws IOException {
-        s.replyEnd(m, new StringEntity(ONode.stringify(rst)));
+        s.replyEnd(m, new StringEntity(ONode.serialize(rst)));
     }
 }

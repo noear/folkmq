@@ -2,7 +2,7 @@ package org.noear.folkmq.broker;
 
 import org.noear.folkmq.FolkMQ;
 import org.noear.folkmq.common.*;
-import org.noear.snack.ONode;
+import org.noear.snack4.ONode;
 import org.noear.socketd.broker.BrokerListener;
 import org.noear.socketd.exception.SocketDAlarmException;
 import org.noear.socketd.transport.core.*;
@@ -417,8 +417,8 @@ public class MqBorkerListener extends MqBorkerListenerBase implements MqBorkerIn
         String is_batch = m.meta(MqConstants.MQ_META_BATCH);
 
         if ("1".equals(is_batch)) {
-            ONode oNode = ONode.loadStr(m.dataAsString());
-            Map<String, Collection<String>> subscribeData = oNode.toObject();
+            ONode oNode = ONode.ofJson(m.dataAsString());
+            Map<String, Collection<String>> subscribeData = oNode.toBean();
             if (subscribeData != null) {
                 for (Map.Entry<String, Collection<String>> kv : subscribeData.entrySet()) {
                     for (String queueName : kv.getValue()) {

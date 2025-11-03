@@ -7,7 +7,7 @@ import org.noear.folkmq.common.MqMetasV2;
 import org.noear.folkmq.common.MqUtils;
 import org.noear.folkmq.broker.MqNextTime;
 import org.noear.folkmq.broker.MqQps;
-import org.noear.snack.ONode;
+import org.noear.snack4.ONode;
 import org.noear.socketd.broker.BrokerListener;
 import org.noear.socketd.transport.core.*;
 import org.noear.socketd.transport.core.entity.EntityDefault;
@@ -234,7 +234,7 @@ public class FolkmqProxyListener extends BrokerListener implements Lifecycle {
      */
     private void onJoin(Session requester, Message message) throws IOException {
         if (subscribeMap.size() > 0) {
-            String json = ONode.stringify(subscribeMap);
+            String json = ONode.serialize(subscribeMap);
             Entity entity = new StringEntity(json)
                     .metaPut(MqConstants.MQ_META_BATCH, "1")
                     .metaPut(EntityMetas.META_X_UNLIMITED, "1");
@@ -326,8 +326,8 @@ public class FolkmqProxyListener extends BrokerListener implements Lifecycle {
     private void onSubscribe(Session requester, Message message) {
         String is_batch = message.meta(MqConstants.MQ_META_BATCH);
         if ("1".equals(is_batch)) {
-            ONode oNode = ONode.loadStr(message.dataAsString());
-            Map<String, Collection<String>> subscribeData = oNode.toObject();
+            ONode oNode = ONode.ofJson(message.dataAsString());
+            Map<String, Collection<String>> subscribeData = oNode.toBean();
             if (subscribeData != null) {
                 for (Map.Entry<String, Collection<String>> kv : subscribeData.entrySet()) {
                     for (String queueName : kv.getValue()) {

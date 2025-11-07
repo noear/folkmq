@@ -7,6 +7,7 @@
 sudo pip install -r reqeusts.txt
 
 sudo pip install -r reqeusts.txt -i https://pypi.tuna.tsinghua.edu.cn/simple/
+sudo pip install -r requests.txt -i https://pypi.org/simple
 
 pip3 install setuptools -i https://pypi.tuna.tsinghua.edu.cn/simple/
 ```

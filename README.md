@@ -18,7 +18,7 @@
 		<img src="https://img.shields.io/:license-AGPL3.0-blue.svg" alt="AGPL3.0" />
 	</a>
     <a>
-		<img src="https://img.shields.io/badge/Java-8~22-green.svg" alt="Java-8~22" />
+		<img src="https://img.shields.io/badge/Java-8~25-green.svg" alt="Java-8~25" />
 	</a>
     <a>
 		<img src="https://img.shields.io/badge/Kotlin-8+-green.svg" alt="Kotlin-8+" />

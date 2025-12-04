@@ -4,6 +4,13 @@
 * 添加 后台资源看板（显示内存），并添加手动 GC 操作?
 * 添加 broker 配置可同步给 server 的能力
 
+
+### 1.7.13
+
+* snack4 升为 4.0.17
+* solon 升为 3.7.3
+
+
 ### 1.7.12
 
 * 添加 MqClient:connectOrThow 方法
